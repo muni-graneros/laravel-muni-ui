@@ -160,3 +160,53 @@
 .fi-main-ctn a > .fi-icon, .fi-main-ctn label > svg {
     width:1.15rem !important; height:1.15rem !important; flex:none;
 }
+
+/* ══ v7: riqueza visual — tarjetas, cabeceras, profundidad institucional ════ */
+
+/* Cabecera de página: título grande + regla de franja debajo */
+.fi-main > .fi-header, .fi-page > .fi-header { position:relative; padding-bottom:1rem; margin-bottom:.5rem; }
+.fi-main > .fi-header::after, .fi-page > .fi-header::after {
+    content:""; position:absolute; left:0; bottom:0; width:64px; height:3px; border-radius:2px;
+    background:linear-gradient(90deg,var(--mg-petroleo),var(--mg-lima));
+}
+.fi-header-heading { font-size:1.85rem !important; }
+
+/* Tarjetas de estadística: lavado de color superior + acento vivo */
+.fi-wi-stats-overview-stat {
+    position:relative; overflow:hidden;
+    background:linear-gradient(180deg, color-mix(in srgb,var(--mg-petroleo) 4%, #fff), #fff) !important;
+}
+.fi-wi-stats-overview-stat::after {
+    content:""; position:absolute; top:0; right:0; width:120px; height:120px; pointer-events:none;
+    background:radial-gradient(circle at 100% 0, color-mix(in srgb,var(--mg-petroleo) 10%,transparent), transparent 70%);
+}
+.fi-wi-stats-overview-stat-value { font-size:2.3rem !important; }
+.fi-wi-stats-overview-stat-description { font-weight:600; }
+
+/* Secciones: encabezado con tick de acento */
+.fi-section-header { position:relative; }
+.fi-section-header-heading { padding-inline-start:.85rem; position:relative; }
+.fi-section-header-heading::before {
+    content:""; position:absolute; inset-inline-start:0; top:50%; transform:translateY(-50%);
+    width:4px; height:1.05em; border-radius:2px; background:linear-gradient(180deg,var(--mg-petroleo),var(--mg-lima));
+}
+
+/* Barra superior: título del panel con más presencia */
+.fi-topbar { backdrop-filter:saturate(1.1); }
+
+/* Footer institucional de la barra lateral (inyectado por render hook) */
+.mg-sidebar-foot {
+    margin-top:auto; padding:.9rem 1rem; border-top:1px solid var(--mg-borde);
+    display:flex; align-items:center; gap:.6rem; font-family:inherit;
+}
+.mg-sidebar-foot img { width:26px; height:26px; object-fit:contain; }
+.mg-sidebar-foot b { font-size:.72rem; font-weight:800; color:var(--mg-petroleo); line-height:1.1; display:block; }
+.mg-sidebar-foot span { font-size:.66rem; color:var(--mg-tinta); opacity:.7; }
+.fi-sidebar-nav { display:flex; flex-direction:column; }
+.fi-sidebar-nav-groups { flex:1; }
+
+/* Botón "Nuevo/Crear" y acciones primarias: gradiente institucional sutil */
+.fi-btn.fi-color-primary { background-image:linear-gradient(180deg, color-mix(in srgb,#fff 8%, transparent), transparent); }
+
+/* Enlaces de acción en tablas (Editar/Borrar): peso */
+.fi-ta-actions .fi-link { font-weight:600; }

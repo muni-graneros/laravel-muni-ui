@@ -2,276 +2,270 @@
 <style>
     *{box-sizing:border-box;margin:0;padding:0}
     :root{
-        --crema:#faf6ef; --crema2:#f3ede1; --crema3:#fffdf9; --teal:#0f5c54; --teal-d:#0a423c; --teal-l:#e4f1ee;
-        --terra:#d0693f; --terra-l:#fae9e0; --salvia:#7a9b6e; --salvia-l:#eaf1e6; --oro:#e0a53f;
-        --tinta:#2a2420; --gris:#6b6259; --gris-l:#9a9086;
-        --fs:1; --ls:0;
+        --papel:#f2ece0; --papel2:#e9e1d1; --sup:#fbf7ef; --tinta:#1b1712; --tinta2:#4a4238; --gris:#6f6656;
+        --terra:#bd5230; --terra-d:#9c3f22; --bosque:#274a39; --bosque-l:#dce8e0; --mostaza:#c98a2b;
+        --fs:1; --ls:0; --lh:1.62;
+        --disp:'Helvetica Neue',Arial,system-ui,sans-serif;
         --serif:'Iowan Old Style','Palatino Linotype',Georgia,serif;
-        --body:system-ui,-apple-system,'Segoe UI',sans-serif;
+        --mono:ui-monospace,'SF Mono','Roboto Mono',monospace;
     }
     html{scroll-behavior:smooth}
-    body{background:var(--crema);color:var(--tinta);font-family:var(--body);line-height:1.65;font-size:calc(17px*var(--fs));letter-spacing:calc(var(--ls)*1px);-webkit-font-smoothing:antialiased;transition:background .3s,color .3s;overflow-x:hidden}
+    body{background:var(--papel);color:var(--tinta);font-family:var(--serif);font-size:calc(18px*var(--fs));line-height:var(--lh);letter-spacing:calc(var(--ls)*1px);-webkit-font-smoothing:antialiased;overflow-x:hidden;transition:background .3s,color .3s}
     @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-    body.hc{--crema:#fff;--crema2:#fff;--crema3:#fff;--tinta:#000;--gris:#141414;--gris-l:#333;--teal:#00352f;--teal-l:#d6ece8;--terra:#8f2f00;--teal-d:#001f1b}
-    body.hc .card,body.hc .step,body.hc .cred,body.hc .qbtn{border-width:2.5px!important}
-    a{color:var(--teal);text-underline-offset:3px;font-weight:600}
-    .wrap{max-width:1120px;margin:0 auto;padding:0 26px}
-    .serif{font-family:var(--serif)}
+    /* modo oscuro cálido (no el típico azul) */
+    body.dark{--papel:#161310;--papel2:#1e1a15;--sup:#211c16;--tinta:#f0e9dc;--tinta2:#c3b9a8;--gris:#8f8674;--terra:#e07a52;--terra-d:#c25e38;--bosque:#6fae8c;--bosque-l:#1c2e25;--mostaza:#e0a94a}
+    body.hc{--papel:#fff;--papel2:#fff;--sup:#fff;--tinta:#000;--tinta2:#161616;--gris:#2a2a2a;--terra:#a03000;--terra-d:#7a2400;--bosque:#0d3a26;--bosque-l:#d4e8dc}
+    body.hc .rule,body.hc .cell,body.hc .num-line{border-color:#000!important}
+    a{color:var(--terra);text-underline-offset:3px;font-weight:600}
+    .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,44px)}
+    .disp{font-family:var(--disp);font-weight:800;letter-spacing:-.03em;line-height:.92}
+    .mono{font-family:var(--mono)}
+    .upper{text-transform:uppercase;letter-spacing:.14em}
 
-    /* ORGANIC blobs de fondo */
-    .decor{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-    .decor b{position:absolute;border-radius:50%;filter:blur(60px);opacity:.14}
-    .d1{width:420px;height:420px;background:var(--salvia);top:-100px;right:-60px;animation:sway 20s ease-in-out infinite}
-    .d2{width:340px;height:340px;background:var(--terra);bottom:8%;left:-80px;animation:sway 26s ease-in-out infinite reverse}
-    @keyframes sway{50%{transform:translate(30px,40px) scale(1.08)}}
+    /* patrón braille de fondo */
+    .braille-bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.4;
+        background-image:radial-gradient(var(--tinta) 1.3px,transparent 1.4px);background-size:26px 30px;
+        -webkit-mask-image:radial-gradient(ellipse 90% 60% at 80% 0,#000,transparent 75%);mask-image:radial-gradient(ellipse 90% 60% at 80% 0,#000,transparent 75%)}
+    body.hc .braille-bg{display:none}
 
-    /* A11Y BAR — practica lo que predica */
-    .a11y{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:9px;padding:11px 26px;background:var(--teal);color:#fff;flex-wrap:wrap;font-size:calc(13.5px*var(--fs))}
-    .a11y b{font-weight:800;display:flex;align-items:center;gap:8px}
+    /* barra accesibilidad */
+    .a11y{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:10px;padding:10px clamp(20px,4vw,44px);background:var(--tinta);color:var(--papel);flex-wrap:wrap;font-family:var(--disp);font-weight:600;font-size:calc(13px*var(--fs))}
+    .a11y .lab{display:flex;align-items:center;gap:8px;font-weight:800}
     .a11y .sp{flex:1}
-    .a11y__grp{display:inline-flex;gap:5px;align-items:center}
-    .qbtn{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:inherit;font-weight:700;padding:6px 13px;border-radius:999px;border:1.5px solid #ffffff55;background:#ffffff1a;color:#fff;cursor:pointer;transition:.15s;min-height:38px}
-    .qbtn:hover{background:#ffffff33}
-    .qbtn:focus-visible{outline:3px solid #ffe08a;outline-offset:2px}
-    .qbtn[aria-pressed="true"]{background:#fff;color:var(--teal)}
+    .a11y__g{display:inline-flex;gap:4px}
+    .qbtn{font-family:var(--disp);font-size:inherit;font-weight:700;padding:6px 13px;border:1.5px solid currentColor;background:transparent;color:var(--papel);cursor:pointer;transition:.15s;min-height:38px;border-radius:2px}
+    .qbtn:hover{background:var(--papel);color:var(--tinta)}
+    .qbtn:focus-visible{outline:3px solid var(--mostaza);outline-offset:2px}
+    .qbtn[aria-pressed="true"]{background:var(--terra);border-color:var(--terra);color:#fff}
 
-    /* NAV */
-    nav{position:relative;z-index:2;display:flex;align-items:center;gap:16px;padding:22px 26px;max-width:1120px;margin:0 auto}
-    .brand{display:flex;align-items:center;gap:13px;font-weight:800;font-size:calc(18px*var(--fs))}
-    .bmark{width:46px;height:46px;border-radius:15px;background:var(--teal);color:#fff;display:grid;place-items:center;font-size:23px;box-shadow:0 10px 24px -10px var(--teal)}
-    .brand small{display:block;font-size:calc(11px*var(--fs));color:var(--gris);letter-spacing:.05em;text-transform:uppercase;font-weight:600}
+    /* nav */
+    nav{position:relative;z-index:2;display:flex;align-items:center;gap:16px;padding:26px 0}
+    .brand{display:flex;align-items:center;gap:13px;font-family:var(--disp);font-weight:800;font-size:calc(19px*var(--fs))}
+    .bmark{display:grid;grid-template-columns:repeat(2,7px);grid-template-rows:repeat(3,7px);gap:3px;padding:8px;background:var(--terra);border-radius:6px}
+    .bmark i{width:7px;height:7px;border-radius:50%;background:#fff;opacity:.28}
+    .bmark i.on{opacity:1}
     nav .sp{flex:1}
-    .btn{display:inline-flex;align-items:center;gap:9px;font-weight:700;font-size:calc(16px*var(--fs));padding:13px 24px;border-radius:14px;cursor:pointer;border:2px solid transparent;transition:.15s;min-height:50px}
-    .btn:focus-visible{outline:3px solid var(--terra);outline-offset:3px}
-    .btn-p{background:var(--teal);color:#fff}.btn-p:hover{background:var(--teal-d);transform:translateY(-1px)}
-    .btn-o{background:var(--crema3);color:var(--teal);border-color:var(--teal)}.btn-o:hover{background:var(--teal-l)}
-    .btn-t{background:var(--terra);color:#fff}.btn-t:hover{filter:brightness(.94)}
+    .btn{display:inline-flex;align-items:center;gap:9px;font-family:var(--disp);font-weight:700;font-size:calc(15px*var(--fs));padding:12px 22px;cursor:pointer;border:2px solid transparent;transition:.15s;min-height:48px;border-radius:3px}
+    .btn:focus-visible{outline:3px solid var(--mostaza);outline-offset:3px}
+    .btn-p{background:var(--terra);color:#fff}.btn-p:hover{background:var(--terra-d);transform:translateY(-1px)}
+    .btn-o{background:transparent;color:var(--tinta);border-color:var(--tinta)}.btn-o:hover{background:var(--tinta);color:var(--papel)}
+    .btn-b{background:var(--bosque);color:#fff}.btn-b:hover{filter:brightness(1.08)}
 
-    /* HERO */
-    .hero{position:relative;z-index:1;padding:56px 0 30px}
-    .hero__grid{display:grid;grid-template-columns:1fr;gap:50px;align-items:center}
-    @media(min-width:900px){.hero__grid{grid-template-columns:1.08fr .92fr}}
-    .eyebrow{display:inline-flex;align-items:center;gap:9px;font-weight:800;color:var(--teal);background:var(--teal-l);padding:9px 17px;border-radius:999px;font-size:calc(13.5px*var(--fs))}
-    h1{font-family:var(--serif);font-weight:700;font-size:calc(54px*var(--fs));line-height:1.04;letter-spacing:-.015em;margin:22px 0 0;text-wrap:balance}
-    h1 em{font-style:italic;color:var(--teal)}
-    .lede{margin-top:22px;font-size:calc(20px*var(--fs));color:var(--gris);max-width:36ch}
-    .hero__cta{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap}
-    .hero__trust{display:flex;align-items:center;gap:12px;margin-top:28px;font-size:calc(14px*var(--fs));color:var(--gris)}
-    .faces{display:flex}.faces span{width:34px;height:34px;border-radius:50%;border:2px solid var(--crema);display:grid;place-items:center;font-size:16px;margin-left:-8px}
-    .faces span:nth-child(1){background:var(--terra-l)}.faces span:nth-child(2){background:var(--teal-l)}.faces span:nth-child(3){background:var(--salvia-l)}.faces span:nth-child(4){background:var(--crema2)}
+    /* HERO editorial asimétrico */
+    .hero{position:relative;z-index:1;padding:30px 0 60px}
+    .hero__kick{font-family:var(--mono);font-size:calc(13px*var(--fs));color:var(--terra);letter-spacing:.06em;margin-bottom:24px;display:flex;align-items:center;gap:12px}
+    .hero__kick::before{content:"";width:44px;height:2px;background:var(--terra)}
+    .hero h1{font-family:var(--disp);font-weight:800;font-size:clamp(58px,15vw,180px);letter-spacing:-.045em;line-height:.86;margin:0}
+    .hero h1 .ln2{color:var(--terra);display:block}
+    .hero h1 .ln3{-webkit-text-stroke:2px var(--tinta);color:transparent;display:block}
+    body.hc .hero h1 .ln3{-webkit-text-stroke-color:#000}
+    .braille-word{display:flex;gap:10px;margin:26px 0 0;flex-wrap:wrap}
+    .cell{display:grid;grid-template-columns:repeat(2,11px);grid-template-rows:repeat(3,11px);gap:5px}
+    .cell i{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--gris);opacity:.5}
+    .cell i.on{background:var(--tinta);border-color:var(--tinta);opacity:1}
+    .hero__grid{display:grid;grid-template-columns:1fr;gap:40px;margin-top:20px}
+    @media(min-width:900px){.hero__grid{grid-template-columns:1.4fr .6fr;align-items:end}}
+    .hero__lede{font-size:calc(21px*var(--fs));color:var(--tinta2);max-width:40ch}
+    .hero__cta{display:flex;gap:14px;margin-top:26px;flex-wrap:wrap}
+    .hero__side{border-left:3px solid var(--terra);padding-left:22px}
+    .hero__side .big{font-family:var(--disp);font-weight:800;font-size:calc(58px*var(--fs));line-height:1;color:var(--bosque)}
+    .hero__side p{font-size:calc(15px*var(--fs));color:var(--gris);margin-top:8px}
 
-    /* HUMAN illustration card */
-    .human{position:relative;aspect-ratio:.94;max-width:420px;margin:0 auto}
-    .human svg{position:absolute;inset:0;width:100%;height:100%}
-    .human__card{position:absolute;left:8%;right:8%;top:50%;transform:translateY(-50%);background:var(--crema3);border:1px solid #00000010;border-radius:26px;padding:28px;box-shadow:0 40px 90px -40px #0f5c5466;text-align:center}
-    .human__ring{width:88px;height:88px;border-radius:50%;margin:0 auto 16px;background:linear-gradient(135deg,var(--teal-l),var(--salvia-l));color:var(--teal);display:grid;place-items:center;font-size:42px}
-    .human__card h3{font-family:var(--serif);font-size:calc(24px*var(--fs))}
-    .human__card p{color:var(--gris);font-size:calc(15px*var(--fs));margin-top:4px}
-    .human__badge{display:inline-flex;align-items:center;gap:8px;margin-top:16px;background:var(--teal);color:#fff;font-weight:700;padding:9px 17px;border-radius:999px;font-size:calc(13.5px*var(--fs))}
-    .human__float{position:absolute;background:var(--crema3);border:1px solid #00000010;border-radius:16px;padding:12px 16px;box-shadow:0 20px 40px -20px #0006;font-weight:700;font-size:calc(13px*var(--fs));display:flex;align-items:center;gap:9px;animation:sway 8s ease-in-out infinite}
-    .hf1{top:4%;left:-4%;color:var(--terra)}.hf2{bottom:8%;right:-2%;color:var(--salvia);animation-delay:1.5s}
+    /* STATEMENT gigante */
+    .statement{position:relative;z-index:1;padding:80px 0;border-top:3px solid var(--tinta);margin-top:40px}
+    .statement p{font-family:var(--disp);font-weight:800;font-size:clamp(30px,5.5vw,66px);letter-spacing:-.03em;line-height:1.02;max-width:20ch}
+    .statement p em{font-style:normal;color:var(--terra)}
+    .statement .foot{font-family:var(--serif);font-size:calc(18px*var(--fs));color:var(--tinta2);margin-top:24px;max-width:52ch}
 
-    /* PROCESO — cómo te acompañamos */
-    .proc{position:relative;z-index:1;padding:80px 0}
-    .center{text-align:center}
-    .sec-eb{display:inline-block;font-weight:800;color:var(--terra);letter-spacing:.04em;font-size:calc(14px*var(--fs));margin-bottom:12px}
-    .sec-h{font-family:var(--serif);font-size:calc(40px*var(--fs));letter-spacing:-.01em;line-height:1.1;text-wrap:balance}
-    .sec-sub{color:var(--gris);max-width:52ch;margin:14px auto 0;font-size:calc(18px*var(--fs))}
-    .steps{display:grid;grid-template-columns:1fr;gap:20px;margin-top:52px;counter-reset:s}
-    @media(min-width:760px){.steps{grid-template-columns:repeat(3,1fr)}}
-    .step{position:relative;background:var(--crema3);border:1.5px solid #00000010;border-radius:22px;padding:30px 26px}
-    .step::before{counter-increment:s;content:counter(s);position:absolute;top:-18px;left:26px;width:44px;height:44px;border-radius:13px;background:var(--teal);color:#fff;display:grid;place-items:center;font-family:var(--serif);font-size:calc(20px*var(--fs));font-weight:700;box-shadow:0 10px 24px -10px var(--teal)}
-    .step h3{font-family:var(--serif);font-size:calc(22px*var(--fs));margin-top:14px}
-    .step p{color:var(--gris);margin-top:8px;font-size:calc(15.5px*var(--fs))}
-    .step .t{margin-top:14px;font-weight:700;color:var(--teal);font-size:calc(13.5px*var(--fs))}
+    /* PROCESO editorial — números gigantes, no cards */
+    .proc{position:relative;z-index:1;padding:70px 0}
+    .sec-tag{font-family:var(--mono);font-size:calc(13px*var(--fs));color:var(--terra);letter-spacing:.06em;margin-bottom:40px;display:flex;align-items:center;gap:12px}
+    .sec-tag::before{content:"";width:44px;height:2px;background:var(--terra)}
+    .pline{display:grid;grid-template-columns:auto 1fr;gap:clamp(20px,4vw,54px);align-items:baseline;padding:34px 0;border-top:1px solid var(--tinta)}
+    .pline:last-child{border-bottom:1px solid var(--tinta)}
+    .pline__n{font-family:var(--disp);font-weight:800;font-size:clamp(52px,9vw,110px);line-height:.8;color:var(--terra);letter-spacing:-.04em}
+    .pline__b h3{font-family:var(--disp);font-weight:800;font-size:calc(26px*var(--fs));letter-spacing:-.01em}
+    .pline__b p{color:var(--tinta2);margin-top:8px;max-width:56ch;font-size:calc(17px*var(--fs))}
+    .pline__b .tag{display:inline-flex;align-items:center;gap:8px;margin-top:12px;font-family:var(--mono);font-size:calc(13px*var(--fs));color:var(--bosque);font-weight:600}
 
-    /* SERVICIOS */
-    .serv{position:relative;z-index:1;padding:30px 0 80px}
-    .cards{display:grid;grid-template-columns:1fr;gap:20px;margin-top:48px}
-    @media(min-width:720px){.cards{grid-template-columns:repeat(3,1fr)}}
-    .card{background:var(--crema3);border:1.5px solid #00000010;border-radius:22px;padding:30px;transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden}
-    .card:hover{transform:translateY(-4px);box-shadow:0 30px 60px -30px #0f5c5540}
-    .card__ic{width:60px;height:60px;border-radius:18px;display:grid;place-items:center;font-size:30px;margin-bottom:18px}
-    .card.c1 .card__ic{background:var(--teal-l);color:var(--teal)}.card.c2 .card__ic{background:var(--terra-l);color:var(--terra)}.card.c3 .card__ic{background:var(--salvia-l);color:var(--salvia)}
-    .card h3{font-family:var(--serif);font-size:calc(24px*var(--fs))}
-    .card p{color:var(--gris);margin-top:9px;font-size:calc(16px*var(--fs))}
-    .card ul{list-style:none;margin-top:16px;display:flex;flex-direction:column;gap:8px}
-    .card li{display:flex;align-items:flex-start;gap:9px;font-size:calc(14.5px*var(--fs));color:var(--tinta)}
-    .card li::before{content:"✓";color:var(--teal);font-weight:800;flex-shrink:0}
+    /* CREDENCIAL — editorial split */
+    .cred-sec{position:relative;z-index:1;padding:80px 0;background:var(--papel2);border-top:3px solid var(--tinta);border-bottom:3px solid var(--tinta);margin:40px 0}
+    .cred-grid{display:grid;grid-template-columns:1fr;gap:48px;align-items:center}
+    @media(min-width:880px){.cred-grid{grid-template-columns:1fr 1fr}}
+    .cred-h{font-family:var(--disp);font-weight:800;font-size:clamp(34px,5vw,60px);letter-spacing:-.03em;line-height:.95}
+    .cred-h em{font-style:normal;color:var(--terra)}
+    .cred-p{font-size:calc(18px*var(--fs));color:var(--tinta2);margin-top:20px;max-width:42ch}
+    .clist{list-style:none;margin:24px 0 0;display:flex;flex-direction:column;gap:14px}
+    .clist li{display:flex;align-items:flex-start;gap:13px;font-size:calc(16px*var(--fs))}
+    .clist .bdot{flex-shrink:0;margin-top:4px;display:grid;grid-template-columns:repeat(2,6px);grid-template-rows:repeat(3,6px);gap:3px}
+    .clist .bdot i{width:6px;height:6px;border-radius:50%;background:var(--terra)}
+    .clist .bdot i.off{background:var(--gris);opacity:.35}
+    .cred{background:var(--tinta);color:var(--papel);border-radius:6px;padding:30px;max-width:440px;box-shadow:14px 14px 0 var(--terra);position:relative}
+    body.hc .cred{box-shadow:14px 14px 0 var(--terra),0 0 0 2px #000}
+    .cred__top{display:flex;justify-content:space-between;align-items:flex-start}
+    .cred__top .l{font-family:var(--mono);font-size:calc(11px*var(--fs));letter-spacing:.04em;opacity:.75;max-width:22ch}
+    .cred__seal{display:grid;grid-template-columns:repeat(2,8px);grid-template-rows:repeat(3,8px);gap:4px}
+    .cred__seal i{width:8px;height:8px;border-radius:50%;background:var(--papel);opacity:.3}.cred__seal i.on{opacity:1;background:var(--terra)}
+    .cred__body{display:flex;gap:16px;align-items:center;margin-top:30px}
+    .cred__photo{width:74px;height:74px;border-radius:8px;background:#ffffff1a;display:grid;place-items:center;font-size:36px;flex-shrink:0}
+    .cred__name{font-family:var(--disp);font-weight:800;font-size:calc(23px*var(--fs))}
+    .cred__meta{font-family:var(--mono);font-size:calc(12px*var(--fs));opacity:.8;margin-top:4px}
+    .cred__foot{display:flex;justify-content:space-between;align-items:center;margin-top:26px;font-family:var(--mono);font-size:calc(12px*var(--fs))}
+    .cred__vig{background:var(--bosque);color:#fff;padding:6px 12px;border-radius:3px;font-weight:700}
 
-    /* CREDENCIAL DIGITAL */
-    .cred-sec{position:relative;z-index:1;padding:80px 0;display:grid;grid-template-columns:1fr;gap:48px;align-items:center}
-    @media(min-width:880px){.cred-sec{grid-template-columns:.9fr 1.1fr}}
-    .cred{background:linear-gradient(135deg,var(--teal),var(--teal-d));color:#fff;border-radius:24px;padding:30px;max-width:440px;box-shadow:0 40px 90px -40px var(--teal-d);position:relative;overflow:hidden}
-    .cred::after{content:"";position:absolute;right:-40px;top:-40px;width:180px;height:180px;border-radius:50%;background:#ffffff14}
-    .cred__top{display:flex;justify-content:space-between;align-items:center;position:relative}
-    .cred__top .l{font-weight:800;letter-spacing:.06em;font-size:calc(12px*var(--fs));opacity:.9}
-    .cred__logo{width:40px;height:40px;border-radius:11px;background:#ffffff26;display:grid;place-items:center;font-size:20px}
-    .cred__body{display:flex;gap:16px;align-items:center;margin-top:26px;position:relative}
-    .cred__photo{width:78px;height:78px;border-radius:16px;background:#ffffff22;display:grid;place-items:center;font-size:38px;flex-shrink:0}
-    .cred__name{font-family:var(--serif);font-size:calc(23px*var(--fs));font-weight:700}
-    .cred__meta{opacity:.9;font-size:calc(13.5px*var(--fs));margin-top:3px}
-    .cred__foot{display:flex;justify-content:space-between;margin-top:24px;font-family:ui-monospace,monospace;font-size:calc(12px*var(--fs));opacity:.85;position:relative}
-    .cred__valid{display:inline-flex;align-items:center;gap:7px;background:#ffffff26;padding:6px 12px;border-radius:999px;font-weight:700}
+    /* HISTORIA editorial */
+    .story{position:relative;z-index:1;padding:70px 0}
+    .story blockquote{font-family:var(--disp);font-weight:800;font-size:clamp(26px,4.6vw,52px);letter-spacing:-.02em;line-height:1.08;max-width:22ch}
+    .story blockquote span{color:var(--terra)}
+    .story__who{display:flex;align-items:center;gap:14px;margin-top:30px}
+    .story__av{width:52px;height:52px;border-radius:50%;background:var(--terra);color:#fff;display:grid;place-items:center;font-size:24px}
+    .story__who b{font-family:var(--disp);font-weight:800;display:block;font-size:calc(16px*var(--fs))}
+    .story__who span{color:var(--gris);font-size:calc(14px*var(--fs))}
 
-    /* HISTORIA / testimonio */
-    .story{position:relative;z-index:1;padding:20px 0 80px}
-    .story__card{background:var(--crema3);border:1.5px solid #00000010;border-radius:26px;padding:clamp(30px,5vw,56px);text-align:center;position:relative}
-    .story__q{font-family:var(--serif);font-size:calc(30px*var(--fs));line-height:1.35;max-width:26ch;margin:0 auto;letter-spacing:-.01em}
-    .story__q::before{content:"“";color:var(--terra);font-size:1.4em;line-height:0;vertical-align:-.2em}
-    .story__who{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:28px}
-    .story__av{width:48px;height:48px;border-radius:50%;background:var(--terra-l);color:var(--terra);display:grid;place-items:center;font-size:22px}
-    .story__who b{display:block;font-size:calc(15px*var(--fs))}.story__who span{color:var(--gris);font-size:calc(13.5px*var(--fs))}
+    /* IMPACTO números gigantes en línea */
+    .impact{position:relative;z-index:1;padding:60px 0;border-top:3px solid var(--tinta)}
+    .igrid{display:grid;grid-template-columns:1fr 1fr;gap:40px 30px}
+    @media(min-width:820px){.igrid{grid-template-columns:repeat(4,1fr)}}
+    .icell .n{font-family:var(--disp);font-weight:800;font-size:clamp(46px,7vw,84px);letter-spacing:-.04em;line-height:.85;color:var(--terra)}
+    .icell .l{font-family:var(--serif);color:var(--tinta2);margin-top:12px;font-size:calc(15px*var(--fs))}
+    .icell:nth-child(2) .n{color:var(--bosque)}.icell:nth-child(4) .n{color:var(--bosque)}
 
-    /* IMPACTO números */
-    .impact{position:relative;z-index:1;display:grid;grid-template-columns:1fr;gap:1px;background:#00000012;border:1px solid #00000012;border-radius:22px;overflow:hidden;margin:0 0 70px}
-    @media(min-width:640px){.impact{grid-template-columns:repeat(4,1fr)}}
-    .icell{background:var(--crema3);padding:32px 22px;text-align:center}
-    .icell .n{font-family:var(--serif);font-size:calc(40px*var(--fs));font-weight:700;color:var(--teal);line-height:1}
-    .icell .l{color:var(--gris);font-size:calc(14px*var(--fs));margin-top:8px}
-
-    /* CTA final */
-    .cta-final{position:relative;z-index:1;margin:0 auto 70px;background:linear-gradient(135deg,var(--teal),var(--teal-d));color:#fff;border-radius:32px;padding:clamp(44px,6vw,72px) 40px;text-align:center;overflow:hidden}
-    .cta-final::before{content:"";position:absolute;left:-60px;bottom:-60px;width:260px;height:260px;border-radius:50%;background:#ffffff10}
-    .cta-final h2{font-family:var(--serif);font-size:calc(44px*var(--fs));letter-spacing:-.01em;position:relative}
-    .cta-final p{margin:16px auto 0;max-width:46ch;font-size:calc(19px*var(--fs));opacity:.94;position:relative}
-    .cta-final .btn-w{background:#fff;color:var(--teal);margin-top:32px;position:relative}
-    .cta-final .btn-w:hover{background:var(--crema)}
-    footer{position:relative;z-index:1;border-top:1.5px solid #00000018;padding:30px 26px;color:var(--gris);font-size:calc(14px*var(--fs));text-align:center;line-height:1.7}
+    /* CTA */
+    .cta{position:relative;z-index:1;margin:70px 0;background:var(--terra);color:#fff;border-radius:8px;padding:clamp(44px,6vw,80px) clamp(30px,5vw,60px);overflow:hidden}
+    .cta__braille{position:absolute;right:-20px;top:-20px;opacity:.16;display:grid;grid-template-columns:repeat(6,18px);grid-template-rows:repeat(9,18px);gap:8px}
+    .cta__braille i{width:18px;height:18px;border-radius:50%;background:#fff}
+    .cta h2{font-family:var(--disp);font-weight:800;font-size:clamp(34px,5vw,64px);letter-spacing:-.03em;line-height:.95;position:relative}
+    .cta p{font-size:calc(19px*var(--fs));margin:18px 0 0;max-width:44ch;opacity:.95;position:relative}
+    .cta .btn-w{background:#fff;color:var(--terra);margin-top:30px;position:relative}
+    .cta .btn-w:hover{background:var(--tinta);color:#fff}
+    footer{position:relative;z-index:1;border-top:3px solid var(--tinta);padding:30px 0;color:var(--gris);font-family:var(--mono);font-size:calc(13px*var(--fs));display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
 </style>
 
 <body>
-<div class="decor"><b class="d1"></b><b class="d2"></b></div>
+<div class="braille-bg"></div>
 
 <div class="a11y" role="region" aria-label="Herramientas de accesibilidad">
-    <b>◐ Accesibilidad</b>
-    <span class="a11y__grp" role="group" aria-label="Tamaño de texto">
+    <span class="lab">⠁ ACCESIBILIDAD</span>
+    <span class="a11y__g" role="group" aria-label="Tamaño de texto">
         <button class="qbtn" onclick="setFs(-1)" aria-label="Reducir texto">A−</button>
         <button class="qbtn" onclick="setFs(0)" aria-label="Texto normal">A</button>
         <button class="qbtn" onclick="setFs(1)" aria-label="Aumentar texto">A+</button>
     </span>
-    <button class="qbtn" id="hcBtn" aria-pressed="false" onclick="toggleHc()">◑ Alto contraste</button>
-    <button class="qbtn" id="lsBtn" aria-pressed="false" onclick="toggleLs()">↔ Más espaciado</button>
+    <button class="qbtn" id="hcBtn" aria-pressed="false" onclick="toggleHc()">CONTRASTE</button>
+    <button class="qbtn" id="lsBtn" aria-pressed="false" onclick="toggleLs()">ESPACIADO</button>
+    <button class="qbtn" id="dkBtn" aria-pressed="false" onclick="toggleDk()">OSCURO</button>
     <span class="sp"></span>
-    <span style="opacity:.9">Ajusta la página a ti — de verdad funciona.</span>
+    <span style="opacity:.85;font-weight:600">Ajusta esta página a ti — funciona de verdad.</span>
 </div>
 
-<nav>
-    <div class="brand"><div class="bmark">♿</div><div>Oficina de Inclusión<small>SIREDIC · Graneros</small></div></div>
-    <div class="sp"></div>
-    <a class="btn btn-o">Ingresar</a>
-    <a class="btn btn-p">Registrarme</a>
-</nav>
+<div class="wrap">
+    <nav>
+        <div class="brand"><div class="bmark"><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i></div>Inclusión Graneros</div>
+        <div class="sp"></div>
+        <a class="btn btn-o">Ingresar</a>
+        <a class="btn btn-p">Registrarme</a>
+    </nav>
 
-<header class="hero wrap">
-    <div class="hero__grid">
-        <div>
-            <span class="eyebrow">✦ Sistema de Registro de Discapacidad</span>
-            <h1>Cada persona,<br><em>reconocida</em><br>como es.</h1>
-            <p class="lede">Registro, credenciales y atención para personas con discapacidad — con trato digno, tiempos cortos y tus datos siempre protegidos.</p>
-            <div class="hero__cta">
-                <a class="btn btn-p">Iniciar mi registro →</a>
-                <a class="btn btn-t">Pedir una atención</a>
+    <header class="hero">
+        <div class="hero__kick">SIREDIC · Sistema municipal de discapacidad</div>
+        <h1>No es una<br><span class="ln2">rampa</span><span class="ln3">al final.</span></h1>
+        <div class="braille-word" id="brailleWord" aria-hidden="true"></div>
+        <div class="hero__grid">
+            <div>
+                <p class="hero__lede">La accesibilidad no se agrega después. Es la puerta por la que se entra. Registro, credenciales y atención para personas con discapacidad — con trato digno desde el primer clic.</p>
+                <div class="hero__cta">
+                    <a class="btn btn-p">Iniciar mi registro →</a>
+                    <a class="btn btn-b">Pedir una atención</a>
+                </div>
             </div>
-            <div class="hero__trust">
-                <div class="faces"><span>☺</span><span>☻</span><span>♥</span><span>+</span></div>
-                <span>Más de <b>300 vecinos</b> ya registrados en Graneros.</span>
-            </div>
-        </div>
-        <div class="human">
-            <svg viewBox="0 0 400 400" aria-hidden="true">
-                <path fill="var(--salvia)" opacity=".18" d="M320 120c40 60 30 150-30 200s-170 60-230-10S30 130 100 80s180-20 220 40Z"/>
-                <path fill="var(--terra)" opacity=".14" d="M300 260c30 40-10 100-70 110s-120-20-130-80 40-90 100-90 70 20 100 60Z"/>
-            </svg>
-            <div class="human__float hf1">✎ Registro en 4 min</div>
-            <div class="human__float hf2">♡ Atención confirmada</div>
-            <div class="human__card">
-                <div class="human__ring">☺</div>
-                <h3>María Espinoza</h3>
-                <p>Registrada · Credencial vigente</p>
-                <span class="human__badge">✓ Todo en orden</span>
+            <div class="hero__side">
+                <div class="big" id="heroCount">300+</div>
+                <p>vecinos de Graneros ya reconocidos en el registro municipal.</p>
             </div>
         </div>
-    </div>
-</header>
+    </header>
+</div>
+
+<section class="statement wrap">
+    <p>Un municipio se mide por cómo trata a <em>quien más lo necesita.</em></p>
+    <p class="foot">Por eso construimos cada pantalla pensando primero en quien más barreras encuentra. Si funciona para todas las personas, funciona.</p>
+</section>
 
 <section class="proc wrap">
-    <div class="center">
-        <span class="sec-eb">CÓMO TE ACOMPAÑAMOS</span>
-        <h2 class="sec-h">Tres pasos, sin que te agotes</h2>
-        <p class="sec-sub">Pensado para que sea claro, corto y humano. Nadie debería cansarse haciendo un trámite.</p>
-    </div>
-    <div class="steps">
-        <div class="step"><h3>Te registras</h3><p>Completa tus datos en minutos. Autocompletamos lo que el municipio ya sabe de ti, para que no repitas nada.</p><div class="t">▸ En línea o presencial</div></div>
-        <div class="step"><h3>Te evaluamos</h3><p>Un profesional revisa tu solicitud con calma y te acompaña en cada requisito, sin apuros ni ventanillas.</p><div class="t">▸ Con cita, sin espera</div></div>
-        <div class="step"><h3>Te acreditamos</h3><p>Recibes tu credencial y quedas en el registro. Te avisamos antes de que venza, sin que estés pendiente.</p><div class="t">▸ Credencial SENADIS</div></div>
-    </div>
+    <div class="sec-tag">CÓMO TE ACOMPAÑAMOS</div>
+    <div class="pline"><div class="pline__n">01</div><div class="pline__b"><h3>Te registras</h3><p>Completa tus datos en minutos. Autocompletamos lo que el municipio ya sabe de ti, para que no repitas nada. En línea o presencial, como prefieras.</p><span class="tag">⠿ 4 minutos en promedio</span></div></div>
+    <div class="pline"><div class="pline__n">02</div><div class="pline__b"><h3>Te evaluamos</h3><p>Un profesional revisa tu solicitud con calma y te acompaña en cada requisito. Con cita, sin apuros, sin salas de espera eternas.</p><span class="tag">⠿ Un profesional dedicado</span></div></div>
+    <div class="pline"><div class="pline__n">03</div><div class="pline__b"><h3>Te acreditamos</h3><p>Recibes tu credencial SENADIS y quedas en el registro. Te avisamos antes de que venza, sin que tengas que estar pendiente.</p><span class="tag">⠿ Credencial verificable</span></div></div>
 </section>
 
-<section class="serv wrap">
-    <div class="center">
-        <span class="sec-eb">NUESTROS SERVICIOS</span>
-        <h2 class="sec-h">Todo en un lugar amable</h2>
-    </div>
-    <div class="cards">
-        <div class="card c1"><div class="card__ic">✎</div><h3>Registro</h3><p>Tu inscripción en el sistema municipal de discapacidad.</p>
-            <ul><li>Autocompletado desde el registro civil</li><li>Guardas y sigues después</li><li>Datos cifrados en reposo</li></ul></div>
-        <div class="card c2"><div class="card__ic">◈</div><h3>Credencial SENADIS</h3><p>Solicita, renueva y descarga tu credencial.</p>
-            <ul><li>Aviso antes del vencimiento</li><li>Descarga en PDF al instante</li><li>Verificable por QR</li></ul></div>
-        <div class="card c3"><div class="card__ic">♡</div><h3>Atención</h3><p>Agenda con la oficina cuando te acomode.</p>
-            <ul><li>Un profesional dedicado</li><li>Recordatorio 24 h antes</li><li>Sin salas de espera</li></ul></div>
-    </div>
-</section>
-
-<section class="cred-sec wrap">
-    <div>
-        <span class="sec-eb">TU CREDENCIAL</span>
-        <h2 class="sec-h" style="font-size:calc(36px*var(--fs))">Una acreditación<br>que abre puertas</h2>
-        <p style="margin-top:18px;color:var(--gris);font-size:calc(17px*var(--fs));max-width:42ch">Beneficios en transporte, salud y trámites. Emitida por el municipio y reconocida por SENADIS, con verificación digital y tus datos protegidos bajo la Ley 21.719.</p>
-        <a class="btn btn-p" style="margin-top:26px">Solicitar mi credencial →</a>
-    </div>
-    <div style="display:grid;place-items:center">
-        <div class="cred">
-            <div class="cred__top"><span class="l">CREDENCIAL DE DISCAPACIDAD · SENADIS</span><span class="cred__logo">♿</span></div>
-            <div class="cred__body">
-                <div class="cred__photo">☺</div>
-                <div><div class="cred__name">María J. Espinoza</div><div class="cred__meta">RUN 15.987.654-3 · Graneros</div></div>
+<section class="cred-sec">
+    <div class="wrap cred-grid">
+        <div>
+            <div class="sec-tag">TU CREDENCIAL</div>
+            <h2 class="cred-h">Una acreditación que <em>abre puertas.</em></h2>
+            <p class="cred-p">Beneficios en transporte, salud y trámites. Emitida por el municipio, reconocida por SENADIS, verificable con un código.</p>
+            <ul class="clist">
+                <li><span class="bdot"><i></i><i class="off"></i><i></i><i></i><i class="off"></i><i></i></span>Aviso automático antes del vencimiento</li>
+                <li><span class="bdot"><i></i><i></i><i class="off"></i><i></i><i class="off"></i><i></i></span>Descarga en PDF al instante, con QR</li>
+                <li><span class="bdot"><i></i><i class="off"></i><i></i><i class="off"></i><i></i><i></i></span>Tus datos protegidos bajo la Ley 21.719</li>
+            </ul>
+        </div>
+        <div style="display:grid;place-items:center">
+            <div class="cred">
+                <div class="cred__top"><span class="l">CREDENCIAL DE DISCAPACIDAD · SENADIS · MUNICIPALIDAD DE GRANEROS</span><span class="cred__seal"><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i></span></div>
+                <div class="cred__body"><div class="cred__photo">☺</div><div><div class="cred__name">María J. Espinoza</div><div class="cred__meta">RUN 15.987.654-3 · Graneros</div></div></div>
+                <div class="cred__foot"><span class="cred__vig">✓ VIGENTE 2029</span><span>N.º 2026-0883</span></div>
             </div>
-            <div class="cred__foot"><span class="cred__valid">✓ Vigente hasta 2029</span><span>N.º 2026-0883</span></div>
         </div>
     </div>
 </section>
 
 <section class="story wrap">
-    <div class="story__card">
-        <p class="story__q serif">Hice todo el trámite desde el celular de mi hija. No tuve que ir a ninguna oficina y me llamaron por mi nombre. Se siente distinto cuando te tratan bien.”</p>
-        <div class="story__who"><div class="story__av">☻</div><div><b>Rosa Fuentes</b><span>Vecina de Graneros · registrada en 2026</span></div></div>
+    <blockquote>“Hice todo desde el celular de mi hija. No fui a ninguna oficina y me llamaron <span>por mi nombre.</span>”</blockquote>
+    <div class="story__who"><div class="story__av">☻</div><div><b>Rosa Fuentes</b><span>Vecina de Graneros · registrada en 2026</span></div></div>
+</section>
+
+<section class="impact wrap">
+    <div class="igrid">
+        <div class="icell"><div class="n" data-c="300" data-suf="+">0</div><div class="l">vecinos reconocidos en el registro</div></div>
+        <div class="icell"><div class="n" data-c="4" data-suf=" min">0</div><div class="l">promedio para completar el registro</div></div>
+        <div class="icell"><div class="n" data-c="0">0</div><div class="l">filas presenciales necesarias</div></div>
+        <div class="icell"><div class="n" data-c="100" data-suf="%">0</div><div class="l">de los datos dentro del municipio</div></div>
     </div>
 </section>
 
 <section class="wrap">
-    <div class="impact">
-        <div class="icell"><div class="n">300+</div><div class="l">vecinos registrados</div></div>
-        <div class="icell"><div class="n">4 min</div><div class="l">promedio de registro</div></div>
-        <div class="icell"><div class="n">0</div><div class="l">filas presenciales</div></div>
-        <div class="icell"><div class="n">100%</div><div class="l">datos dentro del municipio</div></div>
-    </div>
-</section>
-
-<section class="wrap">
-    <div class="cta-final">
-        <h2>Da el primer paso hoy</h2>
+    <div class="cta">
+        <div class="cta__braille" aria-hidden="true" id="ctaBraille"></div>
+        <h2>Da el primer paso hoy.</h2>
         <p>El registro es gratuito y más simple de lo que crees. Estamos de tu lado en cada trámite, de principio a fin.</p>
         <a class="btn btn-w">Registrarme ahora →</a>
     </div>
 </section>
 
-<footer>© 2026 Municipalidad de Graneros · Oficina de Inclusión y Discapacidad<br>Datos protegidos bajo la Ley 21.719 · Esta página cumple pautas de accesibilidad WCAG</footer>
+<footer class="wrap"><span>© 2026 MUNICIPALIDAD DE GRANEROS · OFICINA DE INCLUSIÓN</span><span>WCAG 2.1 AA · LEY 21.719</span></footer>
 
 <script>
-    let fs=1, ls=0;
-    const apply=()=>{ const r=document.documentElement.style; r.setProperty('--fs',fs); r.setProperty('--ls',ls); };
-    function setFs(d){ fs = d===0 ? 1 : Math.min(1.5, Math.max(0.9, +(fs+d*0.12).toFixed(2))); apply(); }
-    function toggleHc(){ const b=document.body.classList.toggle('hc'); document.getElementById('hcBtn').setAttribute('aria-pressed',b); }
-    function toggleLs(){ ls = ls?0:0.5; apply(); document.getElementById('lsBtn').setAttribute('aria-pressed', ls>0); }
+    // Braille: mapa de puntos activos por letra (posiciones 1-6). 1 4 / 2 5 / 3 6
+    const B={a:[1],b:[1,2],c:[1,4],d:[1,4,5],e:[1,5],f:[1,2,4],g:[1,2,4,5],h:[1,2,5],i:[2,4],j:[2,4,5],k:[1,3],l:[1,2,3],m:[1,3,4],n:[1,3,4,5],o:[1,3,5],p:[1,2,3,4],q:[1,2,3,4,5],r:[1,2,3,5],s:[2,3,4],t:[2,3,4,5],u:[1,3,6],v:[1,2,3,6],w:[2,4,5,6],x:[1,3,4,6],y:[1,3,4,5,6],z:[1,3,5,6],'ó':[2,4,6],' ':[]};
+    // La grilla CSS es row-major (2 columnas), así que el orden de puntos es [1,4,2,5,3,6].
+    function renderWord(el,word){el.innerHTML='';[...word.toLowerCase()].forEach(ch=>{
+        const on=B[ch]||[];const c=document.createElement('div');c.className='cell';
+        [1,4,2,5,3,6].forEach(d=>{const i=document.createElement('i');if(on.includes(d))i.className='on';c.appendChild(i);});
+        el.appendChild(c);});}
+    renderWord(document.getElementById('brailleWord'),'digna');
+    // cta braille decorativo aleatorio
+    const cta=document.getElementById('ctaBraille');for(let i=0;i<54;i++){const d=document.createElement('i');if(Math.random()>.45)d.style.opacity=Math.random()>.5?'1':'.4';else d.style.opacity='0';cta.appendChild(d);}
+
+    // accesibilidad
+    let fs=1,ls=0;const apply=()=>{const r=document.documentElement.style;r.setProperty('--fs',fs);r.setProperty('--ls',ls);};
+    function setFs(d){fs=d===0?1:Math.min(1.5,Math.max(.9,+(fs+d*.12).toFixed(2)));apply();}
+    function toggleHc(){const b=document.body.classList.toggle('hc');document.getElementById('hcBtn').setAttribute('aria-pressed',b);}
+    function toggleLs(){ls=ls?0:.6;apply();document.getElementById('lsBtn').setAttribute('aria-pressed',ls>0);}
+    function toggleDk(){const b=document.body.classList.toggle('dark');document.getElementById('dkBtn').setAttribute('aria-pressed',b);}
+
+    // count-up al entrar en vista
+    function up(el){const t=+el.dataset.c,suf=el.dataset.suf||'',dur=1100,t0=performance.now();const step=x=>{const p=Math.min((x-t0)/dur,1),e=1-Math.pow(1-p,3);el.textContent=Math.round(t*e).toLocaleString('es-CL')+suf;if(p<1)requestAnimationFrame(step);};requestAnimationFrame(step);}
+    const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){up(x.target);io.unobserve(x.target);}}),{threshold:.6});
+    document.querySelectorAll('.icell .n').forEach(el=>io.observe(el));
 </script>

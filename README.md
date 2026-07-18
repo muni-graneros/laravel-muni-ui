@@ -89,11 +89,21 @@ php artisan vendor:publish --tag=muni-ui-css   # → resources/css/vendor/muni-u
 |-----------|-------------------|
 | `<x-muni::app-shell>` | `theme` (light/dark), `system`, `subtitle`, `status`, `title`, `maxWidth` |
 | `<x-muni::topbar>` | `system`, `subtitle`, `status` (online/degraded/offline), `logo` (slot) |
+| `<x-muni::page-header>` | `title`, `subtitle`, `eyebrow`; slot `actions` |
+| `<x-muni::stat>` | `value`, `label`, `tone`, `delta`, `deltaDir` (up/down), `spark` (array→sparkline), `hint` |
 | `<x-muni::kpi>` | `value`, `label`, `tone` (neutral/ok/warn/danger/info), `hint` |
 | `<x-muni::badge>` | `tone`, `dot` |
-| `<x-muni::data-table>` | `columns` (array), `empty`; el slot son los `<tr data-muni-row>` |
+| `<x-muni::alert>` | `tone` (ok/warn/danger/info), `title`, `icon` (slot HTML) |
+| `<x-muni::card>` | `title`, `subtitle`, `flush`; slot `actions` |
+| `<x-muni::button>` | `variant` (primary/ghost/subtle/danger), `size` (sm/md/lg), `href`, `icon`, `type` |
+| `<x-muni::segmented>` | `name`, `options` (array), `value` — radios reales sin JS; o slot |
 | `<x-muni::filter-bar>` | `action`, `method`; slots `submitLabel`, `actions` |
 | `<x-muni::field>` | `label`; el control (input/select) va en el slot |
+| `<x-muni::data-table>` | `columns` (array), `empty`; el slot son los `<tr data-muni-row>` |
+| `<x-muni::pagination>` | `current`, `total`, `url` (closure fn(\$p)), `info` |
+
+Todos respetan `prefers-reduced-motion`, tienen estados `:focus-visible` con anillo de foco
+accesible (`--muni-ring`), y micro-interacciones de hover/active con transiciones tokenizadas.
 
 **Firma del sistema:** la morosidad no es un badge redondo suelto — una fila
 `<tr data-muni-row class="muni-row--danger">` pinta una franja de estado en el borde

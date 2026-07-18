@@ -69,6 +69,39 @@
     .tcell .n{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--teal);font-variant-numeric:tabular-nums}
     .tcell .l{font-size:12.5px;color:var(--muted);margin-top:5px}
 
+    /* SPLIT — acceso único */
+    .split-sec{position:relative;z-index:1;padding:80px 0;border-top:1px solid var(--line)}
+    .split{display:grid;grid-template-columns:1fr;gap:48px;align-items:center}
+    @media(min-width:880px){.split{grid-template-columns:1.05fr .95fr}}
+    .split-h{font-family:var(--serif);font-size:clamp(32px,5vw,52px);line-height:1.05;letter-spacing:-.02em}
+    .split-p{color:var(--muted);font-size:17px;line-height:1.65;margin-top:18px;max-width:46ch}
+    .split-list{list-style:none;margin:22px 0 0;display:flex;flex-direction:column;gap:11px}
+    .split-list li{display:flex;align-items:flex-start;gap:10px;font-size:15px}
+    .split-list li::before{content:"✓";color:var(--teal);font-weight:800;flex-shrink:0}
+    .access-viz{position:relative;aspect-ratio:1;max-width:340px;margin:0 auto;display:grid;place-items:center}
+    .av-lines{position:absolute;inset:0;width:100%;height:100%}
+    .av-center{position:relative;z-index:2;width:110px;height:110px;border-radius:50%;background:var(--surface);border:2px solid var(--teal);display:grid;place-items:center;text-align:center;font-size:11px;color:var(--muted);box-shadow:0 0 40px -10px var(--teal)}
+    .av-center b{font-family:var(--mono);font-size:13px;color:var(--tinta)}
+    .av-node{position:absolute;z-index:2;width:56px;height:56px;border-radius:16px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;font-size:26px;box-shadow:0 12px 30px -14px #0007;animation:bob 5s ease-in-out infinite}
+    .av-node.n1{top:6%;left:6%}.av-node.n2{top:6%;right:6%;animation-delay:.6s}.av-node.n3{bottom:6%;left:6%;animation-delay:1.2s}.av-node.n4{bottom:6%;right:6%;animation-delay:1.8s}
+    @keyframes bob{50%{transform:translateY(-8px)}}
+
+    /* DS section */
+    .ds-sec{position:relative;z-index:1;padding:80px 0;border-top:1px solid var(--line)}
+    .center-h{text-align:center;max-width:640px;margin:0 auto}
+    .ds-grid{display:grid;grid-template-columns:1fr;gap:18px;margin-top:48px}
+    @media(min-width:640px){.ds-grid{grid-template-columns:1fr 1fr}}
+    @media(min-width:940px){.ds-grid{grid-template-columns:repeat(4,1fr)}}
+    .dsc{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:26px 22px}
+    .dsc__ic{width:48px;height:48px;border-radius:13px;background:var(--soft);color:var(--teal);display:grid;place-items:center;font-size:24px;margin-bottom:14px}
+    .dsc h3{font-size:16px;letter-spacing:-.01em}
+    .dsc p{color:var(--muted);font-size:13.5px;margin-top:7px;line-height:1.55}
+
+    /* HUB CTA */
+    .hub-cta{position:relative;z-index:1;text-align:center;margin:70px 0;padding:clamp(46px,6vw,76px) 40px;border-radius:32px;background:linear-gradient(135deg,var(--teal),var(--teal-d));color:#fff;overflow:hidden}
+    .hub-cta h2{font-family:var(--serif);font-size:clamp(32px,5vw,52px);letter-spacing:-.02em}
+    .hub-cta p{margin:14px auto 0;max-width:44ch;font-size:18px;opacity:.94}
+
     footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:30px 0;color:var(--hint);font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
 </style>
 
@@ -128,6 +161,46 @@
         <div class="tcell"><div class="n">100%</div><div class="l">datos dentro del municipio</div></div>
         <div class="tcell"><div class="n">21.719</div><div class="l">Ley de protección cumplida</div></div>
     </div>
+
+    <section class="split-sec">
+        <div class="split">
+            <div>
+                <div class="pill" style="margin-bottom:18px"><span class="d"></span>Un solo acceso</div>
+                <h2 class="split-h">Una cuenta.<br>Toda la ciudad.</h2>
+                <p class="split-p">Inicia sesión una vez con ClaveÚnica o tu correo municipal y muévete entre patentes, licencias e inclusión sin volver a autenticarte. El maestro de personas reconoce tu RUT en todos los sistemas.</p>
+                <ul class="split-list">
+                    <li>Autenticación única (SSO) con Keycloak</li>
+                    <li>Tus datos se autocompletan en cada trámite</li>
+                    <li>Cierras sesión una vez, en todos lados</li>
+                </ul>
+            </div>
+            <div class="access-viz">
+                <div class="av-center">RUT<br><b>12.345.678-5</b></div>
+                <div class="av-node n1">📜</div><div class="av-node n2">🚦</div><div class="av-node n3">♿</div><div class="av-node n4">🎛️</div>
+                <svg class="av-lines" viewBox="0 0 300 300"><g stroke="var(--teal)" stroke-width="1.5" opacity=".3" fill="none"><line x1="150" y1="150" x2="60" y2="60"/><line x1="150" y1="150" x2="240" y2="60"/><line x1="150" y1="150" x2="60" y2="240"/><line x1="150" y1="150" x2="240" y2="240"/></g></svg>
+            </div>
+        </div>
+    </section>
+
+    <section class="ds-sec">
+        <div class="center-h">
+            <div class="pill" style="margin-bottom:16px"><span class="d"></span>Construido a conciencia</div>
+            <h2 class="split-h" style="text-align:center;margin:0 auto">Un sistema de diseño,<br>no cuatro sitios sueltos.</h2>
+            <p class="split-p" style="text-align:center;margin:14px auto 0">Los cuatro servicios comparten <b>41 componentes</b>, un contrato de tokens y un dark mode que respeta a Filament, al sistema operativo y a cada persona. Coherencia real, no coincidencia.</p>
+        </div>
+        <div class="ds-grid">
+            <div class="dsc"><div class="dsc__ic">◧</div><h3>Tokens compartidos</h3><p>Un cambio de color se propaga a los cuatro sistemas al instante.</p></div>
+            <div class="dsc"><div class="dsc__ic">◐</div><h3>Dark mode universal</h3><p>Se adapta a Filament, al OS y al toggle — sin duplicar código.</p></div>
+            <div class="dsc"><div class="dsc__ic">♿</div><h3>Accesible por defecto</h3><p>Foco visible, contraste, movimiento reducido y teclado en cada pieza.</p></div>
+            <div class="dsc"><div class="dsc__ic">⛓</div><h3>Datos protegidos</h3><p>Todo dentro del municipio. Ley 21.719 cumplida por diseño, no por parche.</p></div>
+        </div>
+    </section>
+
+    <section class="hub-cta">
+        <h2>Tu próximo trámite empieza aquí.</h2>
+        <p>Elige un servicio y comienza. Sin filas, sin papeleo, sin salir de casa.</p>
+        <a class="btn btn-p" style="background:#fff;color:var(--teal);margin-top:28px;font-size:15px;padding:14px 28px">Comenzar ahora →</a>
+    </section>
 
     <footer><span>© 2026 Municipalidad de Graneros · Ecosistema Digital</span><span class="mono">graneros.cl · construido con laravel-muni-ui</span></footer>
 </section>

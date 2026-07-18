@@ -64,6 +64,36 @@
     .stamp{display:inline-block;transform:rotate(-7deg);border:3px solid var(--sello);color:var(--sello);border-radius:8px;padding:12px 26px;font-family:var(--sans);font-weight:800;font-size:20px;letter-spacing:.04em;text-transform:uppercase;opacity:.85;margin-bottom:26px;box-shadow:inset 0 0 0 1px #7a2b2433}
     .stamp-sec h2{font-size:clamp(30px,5vw,52px);letter-spacing:-.02em}
     .stamp-sec p{font-family:var(--sans);color:var(--tinta2);max-width:44ch;margin:14px auto 0;font-size:17px;line-height:1.6}
+    /* HOW */
+    .how{padding:80px 0;border-top:1.5px solid #00000018}
+    .how-grid{display:grid;grid-template-columns:1fr;gap:22px;margin-top:44px}
+    @media(min-width:720px){.how-grid{grid-template-columns:repeat(3,1fr)}}
+    .how-step{position:relative;padding:28px 26px;background:var(--papel3);border:1px solid #00000012;border-radius:8px}
+    .how-num{position:absolute;top:-16px;left:24px;width:44px;height:44px;background:var(--sello);color:var(--papel3);display:grid;place-items:center;border-radius:6px;font-size:22px;font-weight:700}
+    .how-step h3{font-size:22px;margin-top:14px}
+    .how-step p{font-family:var(--sans);color:var(--tinta2);margin-top:8px;font-size:15px;line-height:1.55}
+
+    /* RUBROS */
+    .rubros{padding:80px 0;background:var(--papel2);border-top:1.5px solid #00000018;border-bottom:1.5px solid #00000018}
+    .rub-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:40px}
+    @media(min-width:720px){.rub-grid{grid-template-columns:repeat(5,1fr)}}
+    .rub{background:var(--papel3);border:1px solid #00000012;border-radius:8px;padding:24px 18px;text-align:center;transition:transform .2s}
+    .rub:hover{transform:translateY(-4px)}
+    .rub__ic{display:block;font-size:26px;color:var(--sello);margin-bottom:10px}
+    .rub b{font-size:15px;font-family:var(--sans)}
+    .rub__n{display:block;font-size:26px;font-weight:700;color:var(--tinta);margin-top:8px}
+
+    /* PLAZOS */
+    .plazos{padding:80px 0}
+    .plazos__box{display:grid;grid-template-columns:1fr;gap:36px;align-items:center;background:var(--papel3);border:1px solid #00000012;border-radius:12px;padding:clamp(30px,5vw,52px)}
+    @media(min-width:820px){.plazos__box{grid-template-columns:1.2fr .8fr}}
+    .cuotas{display:flex;flex-direction:column;gap:14px}
+    .cuota{display:flex;align-items:center;gap:14px;background:var(--papel);border:1px solid #00000012;border-radius:8px;padding:18px 22px}
+    .cuota .mono{font-size:12px;color:var(--gris)}
+    .cuota b{font-size:20px;flex:1}
+    .cuota__tag{font-family:var(--sans);font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px}
+    .cuota__tag.ok{background:#3c5a3e18;color:var(--verde)}.cuota__tag.wa{background:#b0842818;color:var(--oro)}
+
     footer{border-top:1.5px solid #00000018;padding:28px 0;color:var(--gris);font-family:var(--sans);font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
 </style>
 
@@ -110,6 +140,44 @@
     <h2>Regulariza en tres clics.</h2>
     <p>Consulta tu patente por RUT o razón social, revisa tu estado y descarga el comprobante. Sin filas, sin trámites de ventanilla.</p>
     <a class="btn btn-s" style="margin-top:28px;font-size:15px;padding:14px 26px">Consultar y pagar →</a>
+</section>
+
+<section class="how wrap">
+    <div class="folio">Procedimiento</div>
+    <h2 class="ledger__h">Consultar toma menos que firmar un cheque.</h2>
+    <div class="how-grid">
+        <div class="how-step"><span class="how-num serif">I</span><h3>Busca</h3><p>Ingresa tu RUT o razón social. El registro te encuentra al instante, con tu estado y monto.</p></div>
+        <div class="how-step"><span class="how-num serif">II</span><h3>Revisa</h3><p>Ve si estás al día o con recargo, el capital declarado y el detalle de tu patente vigente.</p></div>
+        <div class="how-step"><span class="how-num serif">III</span><h3>Regulariza</h3><p>Paga en línea y descarga tu comprobante timbrado. Queda registrado en el libro al momento.</p></div>
+    </div>
+</section>
+
+<section class="rubros">
+    <div class="wrap">
+        <div class="folio">El registro por rubros</div>
+        <h2 class="ledger__h">Cada giro, su renglón.</h2>
+        <div class="rub-grid">
+            <div class="rub"><span class="rub__ic">◈</span><b>Comercial</b><span class="rub__n mono">642</span></div>
+            <div class="rub"><span class="rub__ic">⚙</span><b>Industrial</b><span class="rub__n mono">148</span></div>
+            <div class="rub"><span class="rub__ic">✚</span><b>Alimentos</b><span class="rub__n mono">211</span></div>
+            <div class="rub"><span class="rub__ic">◷</span><b>Servicios</b><span class="rub__n mono">198</span></div>
+            <div class="rub"><span class="rub__ic">✿</span><b>Agrícola</b><span class="rub__n mono">85</span></div>
+        </div>
+    </div>
+</section>
+
+<section class="plazos wrap">
+    <div class="plazos__box">
+        <div>
+            <div class="folio" style="margin-bottom:12px">Calendario</div>
+            <h2 class="ledger__h" style="font-size:clamp(24px,4vw,38px)">El plazo importa.<br>Te lo recordamos.</h2>
+            <p style="font-family:var(--sans);color:var(--tinta2);margin-top:16px;max-width:44ch;font-size:16px">Las patentes se pagan en cuotas semestrales. Antes de cada vencimiento te avisamos por correo y por el portal — nada de recargos por olvido.</p>
+        </div>
+        <div class="cuotas">
+            <div class="cuota"><span class="mono">1.ª cuota</span><b>Enero</b><span class="cuota__tag ok">Vigente</span></div>
+            <div class="cuota"><span class="mono">2.ª cuota</span><b>Julio</b><span class="cuota__tag wa">Próxima</span></div>
+        </div>
+    </div>
 </section>
 
 <footer class="wrap"><span>© 2026 Municipalidad de Graneros · Dirección de Administración y Finanzas</span><span class="mono">patentes.graneros.cl</span></footer>

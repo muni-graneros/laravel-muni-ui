@@ -79,6 +79,31 @@
     .tcell h3{font-family:var(--sans);font-size:16px;font-weight:700}
     .tcell p{font-family:var(--sans);font-size:13.5px;color:#93a3b5;margin-top:7px;line-height:1.55}
 
+    /* DEPLOY */
+    .deploy{padding:80px 0;border-top:1px solid var(--line)}
+    .dep-grid{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:36px}
+    .dep{display:flex;align-items:center;gap:20px;padding:22px 24px;background:var(--panel)}
+    .dep__n{font-size:16px;color:var(--fos);font-weight:700;flex-shrink:0}
+    .dep h3{font-family:var(--sans);font-size:16px;font-weight:700}
+    .dep p{font-size:13.5px;color:#93a3b5;margin-top:4px;max-width:60ch}
+    .dep__st{margin-left:auto;display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--gris);white-space:nowrap}
+    .dep__st .dot{width:7px;height:7px;border-radius:50%;box-shadow:0 0 8px currentColor}
+    .dep__st .ok{background:var(--fos);color:var(--fos)}.dep__st .wa{background:var(--ambar);color:var(--ambar)}
+
+    /* FLOW */
+    .flow-sec{padding:80px 0;border-top:1px solid var(--line)}
+    .flow{display:flex;align-items:stretch;gap:14px;margin-top:40px;flex-wrap:wrap}
+    .fstep{flex:1;min-width:200px;background:var(--panel);border:1px solid var(--line2);border-radius:14px;padding:26px 22px}
+    .fstep__ic{width:46px;height:46px;border-radius:12px;background:#31e6a814;color:var(--fos);display:grid;place-items:center;font-size:22px;margin-bottom:14px}
+    .fstep h4{font-family:var(--sans);font-size:16px;font-weight:700}
+    .fstep p{font-size:13.5px;color:#93a3b5;margin-top:7px;line-height:1.55}
+    .farrow{display:grid;place-items:center;color:var(--fos);font-size:24px;font-weight:700}
+    @media(max-width:640px){.farrow{display:none}}
+
+    /* CA CTA */
+    .ca-cta{padding:40px 0 70px}
+    .ca-cta__box{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;background:linear-gradient(120deg,var(--panel),#0c1a16);border:1px solid var(--line2);border-radius:18px;padding:40px}
+
     footer{border-top:1px solid var(--line);padding:26px 0;color:var(--gris);font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
 </style>
 
@@ -123,6 +148,38 @@
             <div class="tcell"><div class="ic">◈</div><h3>Rostro + tarjeta</h3><p>Doble factor físico en cada puerta. Detección facial local (OpenCV) sin enviar imágenes fuera del municipio.</p></div>
             <div class="tcell"><div class="ic">⛓</div><h3>Hash encadenado</h3><p>Cada acceso queda unido por hash al anterior. Alterar un registro rompe la cadena — auditoría a prueba de manipulación.</p></div>
             <div class="tcell"><div class="ic">⚡</div><h3>Puente en vivo</h3><p>Los equipos Dahua reportan por un bridge propio. El backend valida, decide y transmite el evento en menos de 300 ms.</p></div>
+        </div>
+    </section>
+
+    <section class="deploy wrap">
+        <div class="kick">Despliegue</div>
+        <h2 class="tech__h">Un puesto de control en cada puerta</h2>
+        <div class="dep-grid">
+            <div class="dep"><div class="dep__n mono">01</div><div><h3>Edificio consistorial</h3><p class="sans">Acceso de funcionarios por rostro. Registro de jornada automático, sin tarjetas que se pierden.</p></div><span class="dep__st"><span class="dot ok"></span>Activo</span></div>
+            <div class="dep"><div class="dep__n mono">02</div><div><h3>Bodega municipal</h3><p class="sans">Doble factor rostro + tarjeta para zonas restringidas. Alertas si entra quien no debe.</p></div><span class="dep__st"><span class="dot ok"></span>Activo</span></div>
+            <div class="dep"><div class="dep__n mono">03</div><div><h3>Recinto de máquinas</h3><p class="sans">Solo personal autorizado. Cada apertura queda en la cadena de auditoría con hora exacta.</p></div><span class="dep__st"><span class="dot wa"></span>Mantención</span></div>
+        </div>
+    </section>
+
+    <section class="flow-sec wrap">
+        <div class="kick">Anatomía de un acceso</div>
+        <h2 class="tech__h">De la cámara a la puerta, en 3 latidos</h2>
+        <div class="flow">
+            <div class="fstep"><div class="fstep__ic">◉</div><h4>Captura</h4><p class="sans">La cámara Dahua detecta un rostro y lo envía al bridge local. La imagen nunca sale del municipio.</p></div>
+            <div class="farrow">→</div>
+            <div class="fstep"><div class="fstep__ic">◎</div><h4>Decisión</h4><p class="sans">El backend valida identidad y permisos. Concede, deniega o marca para revisión en &lt;300 ms.</p></div>
+            <div class="farrow">→</div>
+            <div class="fstep"><div class="fstep__ic">⛓</div><h4>Registro</h4><p class="sans">El evento se encadena por hash al anterior y aparece en la consola en vivo. Inalterable.</p></div>
+        </div>
+    </section>
+
+    <section class="ca-cta wrap">
+        <div class="ca-cta__box">
+            <div>
+                <h2 class="tech__h" style="font-size:clamp(26px,4vw,40px)">¿Listo para ver quién entra?</h2>
+                <p class="sans" style="color:#9fb0c2;margin-top:12px;max-width:44ch;font-size:15px">Instala el bridge, conecta tus equipos y ten la consola de accesos en vivo desde el primer día.</p>
+            </div>
+            <a class="btn btn-p" style="font-size:15px;padding:14px 26px">Solicitar demo →</a>
         </div>
     </section>
 

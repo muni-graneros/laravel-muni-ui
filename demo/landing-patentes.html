@@ -1,0 +1,124 @@
+<title>Patentes Comerciales — Municipalidad de Graneros</title>
+<style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+        --papel:#efe9dc; --papel2:#e6dfcf; --papel3:#f6f1e6; --tinta:#211d16; --tinta2:#4a4136;
+        --sello:#7a2b24; --sello2:#9c3a30; --oro:#b08428; --verde:#3c5a3e; --gris:#8a8172;
+        --serif:'Iowan Old Style',Georgia,'Palatino Linotype',serif;
+        --sans:system-ui,-apple-system,'Segoe UI',sans-serif;
+        --mono:ui-monospace,'SF Mono',monospace;
+    }
+    body{background:var(--papel);color:var(--tinta);font-family:var(--serif);-webkit-font-smoothing:antialiased;
+        background-image:radial-gradient(circle at 20% 10%,#0000000a,transparent 40%),radial-gradient(circle at 80% 90%,#0000000a,transparent 40%)}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+    a{color:var(--sello);text-decoration:none}
+    .sans{font-family:var(--sans)}.mono{font-family:var(--mono)}
+    .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+    .tnum{font-variant-numeric:tabular-nums;font-family:var(--mono)}
+
+    nav{display:flex;align-items:center;gap:16px;padding:22px 28px;max-width:1080px;margin:0 auto;border-bottom:1.5px solid #00000018}
+    .brand{display:flex;align-items:center;gap:12px}
+    .seal-sm{width:40px;height:40px;border-radius:50%;border:2px solid var(--sello);color:var(--sello);display:grid;place-items:center;font-weight:800;font-size:15px;font-family:var(--sans)}
+    .brand b{font-size:17px;letter-spacing:-.01em}
+    .brand small{display:block;font-family:var(--sans);font-size:11px;color:var(--gris);letter-spacing:.06em;text-transform:uppercase}
+    nav .sp{flex:1}
+    .btn{font-family:var(--sans);font-weight:700;font-size:13.5px;padding:11px 20px;border-radius:3px;cursor:pointer;border:1.5px solid transparent;transition:.15s}
+    .btn-s{background:var(--sello);color:var(--papel3)}.btn-s:hover{background:var(--sello2)}
+    .btn-o{background:transparent;color:var(--tinta);border-color:#00000030}.btn-o:hover{border-color:var(--sello);color:var(--sello)}
+
+    /* HERO — asimétrico, el sello como firma */
+    .hero{display:grid;grid-template-columns:1fr;gap:50px;padding:70px 0 40px;align-items:center}
+    @media(min-width:900px){.hero{grid-template-columns:1.25fr .75fr}}
+    .folio{font-family:var(--mono);font-size:12px;letter-spacing:.12em;color:var(--gris);text-transform:uppercase;margin-bottom:20px}
+    .folio::before{content:"§ "}
+    h1{font-size:clamp(44px,8vw,92px);line-height:.98;letter-spacing:-.025em;font-weight:400}
+    h1 em{font-style:italic;color:var(--sello)}
+    .rule{width:64px;height:3px;background:var(--oro);margin:26px 0}
+    .lede{font-family:var(--sans);font-size:17px;line-height:1.65;color:var(--tinta2);max-width:46ch}
+    .hero__cta{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap}
+    /* SELLO grande giratorio sutil */
+    .seal-wrap{display:grid;place-items:center}
+    .seal{width:230px;height:230px;border-radius:50%;position:relative;display:grid;place-items:center;
+        border:3px double var(--sello);color:var(--sello);background:radial-gradient(circle,var(--papel3),var(--papel2));box-shadow:0 20px 50px -24px #7a2b2455,inset 0 0 30px #7a2b2412}
+    .seal__ring{position:absolute;inset:14px;border-radius:50%;border:1px solid #7a2b2455}
+    .seal__txt{position:absolute;inset:0;animation:spin 40s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .seal__center{text-align:center}
+    .seal__center .n{font-family:var(--mono);font-size:40px;font-weight:700}
+    .seal__center .l{font-family:var(--sans);font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+
+    /* LIBRO DE CIFRAS — no columnas densas, sino grandes cifras que respiran */
+    .ledger{padding:70px 0;border-top:1.5px solid #00000018}
+    .ledger__h{font-size:clamp(28px,4.5vw,46px);letter-spacing:-.02em;max-width:16ch}
+    .rows{margin-top:44px;display:flex;flex-direction:column;gap:0}
+    .lrow{display:grid;grid-template-columns:auto 1fr auto;gap:22px;align-items:baseline;padding:22px 0;border-bottom:1px solid #00000015}
+    .lrow:hover{background:#00000006}
+    .lrow__k{font-family:var(--mono);font-size:12px;color:var(--gris)}
+    .lrow__label{font-size:22px}
+    .lrow__label small{display:block;font-family:var(--sans);font-size:13px;color:var(--gris);margin-top:2px}
+    .lrow__val{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:34px;font-weight:700;text-align:right}
+    .lrow__val.mor{color:var(--sello)}.lrow__val.ok{color:var(--verde)}
+
+    /* CTA con estampa */
+    .stamp-sec{padding:80px 0;text-align:center;position:relative}
+    .stamp{display:inline-block;transform:rotate(-7deg);border:3px solid var(--sello);color:var(--sello);border-radius:8px;padding:12px 26px;font-family:var(--sans);font-weight:800;font-size:20px;letter-spacing:.04em;text-transform:uppercase;opacity:.85;margin-bottom:26px;box-shadow:inset 0 0 0 1px #7a2b2433}
+    .stamp-sec h2{font-size:clamp(30px,5vw,52px);letter-spacing:-.02em}
+    .stamp-sec p{font-family:var(--sans);color:var(--tinta2);max-width:44ch;margin:14px auto 0;font-size:17px;line-height:1.6}
+    footer{border-top:1.5px solid #00000018;padding:28px 0;color:var(--gris);font-family:var(--sans);font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+</style>
+
+<body>
+<nav>
+    <div class="brand"><div class="seal-sm">R</div><div><b>Rentas Municipales</b><small>Patentes comerciales · Graneros</small></div></div>
+    <div class="sp"></div>
+    <a class="btn btn-o">Consultar patente</a>
+    <a class="btn btn-s">Ingresar</a>
+</nav>
+
+<header class="hero wrap">
+    <div>
+        <div class="folio">Libro de Rentas · Folio 2026</div>
+        <h1>La contabilidad<br>de una <em>ciudad</em>.</h1>
+        <div class="rule"></div>
+        <p class="lede">Cada patente comercial de Graneros, en un registro vivo. Consulta, paga y regulariza en línea; el municipio ve la morosidad al instante y actúa sin papeleo.</p>
+        <div class="hero__cta"><a class="btn btn-s">Consultar mi patente →</a><a class="btn btn-o">Ver el registro público</a></div>
+    </div>
+    <div class="seal-wrap">
+        <div class="seal">
+            <div class="seal__ring"></div>
+            <svg class="seal__txt" viewBox="0 0 230 230" width="230" height="230">
+                <defs><path id="cir" d="M115,115 m-92,0 a92,92 0 1,1 184,0 a92,92 0 1,1 -184,0"/></defs>
+                <text font-family="system-ui" font-size="12" letter-spacing="3" fill="#7a2b24"><textPath href="#cir" startOffset="0">· MUNICIPALIDAD DE GRANEROS · DIRECCIÓN DE RENTAS · REGISTRO OFICIAL </textPath></text>
+            </svg>
+            <div class="seal__center"><div class="n" id="total">0</div><div class="l">patentes vigentes</div></div>
+        </div>
+    </div>
+</header>
+
+<section class="ledger wrap">
+    <h2 class="ledger__h">El estado de las cuentas, hoy.</h2>
+    <div class="rows">
+        <div class="lrow"><span class="lrow__k">01</span><span class="lrow__label">En el registro<small>Total de patentes activas</small></span><span class="lrow__val tnum" data-c="1284">0</span></div>
+        <div class="lrow"><span class="lrow__k">02</span><span class="lrow__label">Al día<small>Sin deuda al 31 de diciembre</small></span><span class="lrow__val ok tnum" data-c="1067">0</span></div>
+        <div class="lrow"><span class="lrow__k">03</span><span class="lrow__label">Morosas<small>Con recargo pendiente de cobro</small></span><span class="lrow__val mor tnum" data-c="217">0</span></div>
+        <div class="lrow"><span class="lrow__k">04</span><span class="lrow__label">Capital declarado<small>Millones de pesos en giro</small></span><span class="lrow__val tnum" data-c="214" data-suf=" M">0</span></div>
+    </div>
+</section>
+
+<section class="stamp-sec wrap">
+    <div class="stamp">Al día ✓</div>
+    <h2>Regulariza en tres clics.</h2>
+    <p>Consulta tu patente por RUT o razón social, revisa tu estado y descarga el comprobante. Sin filas, sin trámites de ventanilla.</p>
+    <a class="btn btn-s" style="margin-top:28px;font-size:15px;padding:14px 26px">Consultar y pagar →</a>
+</section>
+
+<footer class="wrap"><span>© 2026 Municipalidad de Graneros · Dirección de Administración y Finanzas</span><span class="mono">patentes.graneros.cl</span></footer>
+
+<script>
+    function up(el){ const target=+el.dataset.c, suf=el.dataset.suf||'', dur=1200, t0=performance.now();
+        const step=t=>{ const p=Math.min((t-t0)/dur,1), e=1-Math.pow(1-p,3); el.textContent=Math.round(target*e).toLocaleString('es-CL')+suf; if(p<1)requestAnimationFrame(step); };
+        requestAnimationFrame(step); }
+    const tot=document.getElementById('total'); tot.dataset.c='1284'; up(tot);
+    const io=new IntersectionObserver((es)=>es.forEach(x=>{ if(x.isIntersecting){ up(x.target); io.unobserve(x.target); }}),{threshold:.6});
+    document.querySelectorAll('.lrow__val').forEach(el=>io.observe(el));
+</script>

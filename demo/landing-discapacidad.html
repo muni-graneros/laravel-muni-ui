@@ -1,0 +1,277 @@
+<title>Oficina de Inclusión — Municipalidad de Graneros</title>
+<style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+        --crema:#faf6ef; --crema2:#f3ede1; --crema3:#fffdf9; --teal:#0f5c54; --teal-d:#0a423c; --teal-l:#e4f1ee;
+        --terra:#d0693f; --terra-l:#fae9e0; --salvia:#7a9b6e; --salvia-l:#eaf1e6; --oro:#e0a53f;
+        --tinta:#2a2420; --gris:#6b6259; --gris-l:#9a9086;
+        --fs:1; --ls:0;
+        --serif:'Iowan Old Style','Palatino Linotype',Georgia,serif;
+        --body:system-ui,-apple-system,'Segoe UI',sans-serif;
+    }
+    html{scroll-behavior:smooth}
+    body{background:var(--crema);color:var(--tinta);font-family:var(--body);line-height:1.65;font-size:calc(17px*var(--fs));letter-spacing:calc(var(--ls)*1px);-webkit-font-smoothing:antialiased;transition:background .3s,color .3s;overflow-x:hidden}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+    body.hc{--crema:#fff;--crema2:#fff;--crema3:#fff;--tinta:#000;--gris:#141414;--gris-l:#333;--teal:#00352f;--teal-l:#d6ece8;--terra:#8f2f00;--teal-d:#001f1b}
+    body.hc .card,body.hc .step,body.hc .cred,body.hc .qbtn{border-width:2.5px!important}
+    a{color:var(--teal);text-underline-offset:3px;font-weight:600}
+    .wrap{max-width:1120px;margin:0 auto;padding:0 26px}
+    .serif{font-family:var(--serif)}
+
+    /* ORGANIC blobs de fondo */
+    .decor{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+    .decor b{position:absolute;border-radius:50%;filter:blur(60px);opacity:.14}
+    .d1{width:420px;height:420px;background:var(--salvia);top:-100px;right:-60px;animation:sway 20s ease-in-out infinite}
+    .d2{width:340px;height:340px;background:var(--terra);bottom:8%;left:-80px;animation:sway 26s ease-in-out infinite reverse}
+    @keyframes sway{50%{transform:translate(30px,40px) scale(1.08)}}
+
+    /* A11Y BAR — practica lo que predica */
+    .a11y{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:9px;padding:11px 26px;background:var(--teal);color:#fff;flex-wrap:wrap;font-size:calc(13.5px*var(--fs))}
+    .a11y b{font-weight:800;display:flex;align-items:center;gap:8px}
+    .a11y .sp{flex:1}
+    .a11y__grp{display:inline-flex;gap:5px;align-items:center}
+    .qbtn{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:inherit;font-weight:700;padding:6px 13px;border-radius:999px;border:1.5px solid #ffffff55;background:#ffffff1a;color:#fff;cursor:pointer;transition:.15s;min-height:38px}
+    .qbtn:hover{background:#ffffff33}
+    .qbtn:focus-visible{outline:3px solid #ffe08a;outline-offset:2px}
+    .qbtn[aria-pressed="true"]{background:#fff;color:var(--teal)}
+
+    /* NAV */
+    nav{position:relative;z-index:2;display:flex;align-items:center;gap:16px;padding:22px 26px;max-width:1120px;margin:0 auto}
+    .brand{display:flex;align-items:center;gap:13px;font-weight:800;font-size:calc(18px*var(--fs))}
+    .bmark{width:46px;height:46px;border-radius:15px;background:var(--teal);color:#fff;display:grid;place-items:center;font-size:23px;box-shadow:0 10px 24px -10px var(--teal)}
+    .brand small{display:block;font-size:calc(11px*var(--fs));color:var(--gris);letter-spacing:.05em;text-transform:uppercase;font-weight:600}
+    nav .sp{flex:1}
+    .btn{display:inline-flex;align-items:center;gap:9px;font-weight:700;font-size:calc(16px*var(--fs));padding:13px 24px;border-radius:14px;cursor:pointer;border:2px solid transparent;transition:.15s;min-height:50px}
+    .btn:focus-visible{outline:3px solid var(--terra);outline-offset:3px}
+    .btn-p{background:var(--teal);color:#fff}.btn-p:hover{background:var(--teal-d);transform:translateY(-1px)}
+    .btn-o{background:var(--crema3);color:var(--teal);border-color:var(--teal)}.btn-o:hover{background:var(--teal-l)}
+    .btn-t{background:var(--terra);color:#fff}.btn-t:hover{filter:brightness(.94)}
+
+    /* HERO */
+    .hero{position:relative;z-index:1;padding:56px 0 30px}
+    .hero__grid{display:grid;grid-template-columns:1fr;gap:50px;align-items:center}
+    @media(min-width:900px){.hero__grid{grid-template-columns:1.08fr .92fr}}
+    .eyebrow{display:inline-flex;align-items:center;gap:9px;font-weight:800;color:var(--teal);background:var(--teal-l);padding:9px 17px;border-radius:999px;font-size:calc(13.5px*var(--fs))}
+    h1{font-family:var(--serif);font-weight:700;font-size:calc(54px*var(--fs));line-height:1.04;letter-spacing:-.015em;margin:22px 0 0;text-wrap:balance}
+    h1 em{font-style:italic;color:var(--teal)}
+    .lede{margin-top:22px;font-size:calc(20px*var(--fs));color:var(--gris);max-width:36ch}
+    .hero__cta{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap}
+    .hero__trust{display:flex;align-items:center;gap:12px;margin-top:28px;font-size:calc(14px*var(--fs));color:var(--gris)}
+    .faces{display:flex}.faces span{width:34px;height:34px;border-radius:50%;border:2px solid var(--crema);display:grid;place-items:center;font-size:16px;margin-left:-8px}
+    .faces span:nth-child(1){background:var(--terra-l)}.faces span:nth-child(2){background:var(--teal-l)}.faces span:nth-child(3){background:var(--salvia-l)}.faces span:nth-child(4){background:var(--crema2)}
+
+    /* HUMAN illustration card */
+    .human{position:relative;aspect-ratio:.94;max-width:420px;margin:0 auto}
+    .human svg{position:absolute;inset:0;width:100%;height:100%}
+    .human__card{position:absolute;left:8%;right:8%;top:50%;transform:translateY(-50%);background:var(--crema3);border:1px solid #00000010;border-radius:26px;padding:28px;box-shadow:0 40px 90px -40px #0f5c5466;text-align:center}
+    .human__ring{width:88px;height:88px;border-radius:50%;margin:0 auto 16px;background:linear-gradient(135deg,var(--teal-l),var(--salvia-l));color:var(--teal);display:grid;place-items:center;font-size:42px}
+    .human__card h3{font-family:var(--serif);font-size:calc(24px*var(--fs))}
+    .human__card p{color:var(--gris);font-size:calc(15px*var(--fs));margin-top:4px}
+    .human__badge{display:inline-flex;align-items:center;gap:8px;margin-top:16px;background:var(--teal);color:#fff;font-weight:700;padding:9px 17px;border-radius:999px;font-size:calc(13.5px*var(--fs))}
+    .human__float{position:absolute;background:var(--crema3);border:1px solid #00000010;border-radius:16px;padding:12px 16px;box-shadow:0 20px 40px -20px #0006;font-weight:700;font-size:calc(13px*var(--fs));display:flex;align-items:center;gap:9px;animation:sway 8s ease-in-out infinite}
+    .hf1{top:4%;left:-4%;color:var(--terra)}.hf2{bottom:8%;right:-2%;color:var(--salvia);animation-delay:1.5s}
+
+    /* PROCESO — cómo te acompañamos */
+    .proc{position:relative;z-index:1;padding:80px 0}
+    .center{text-align:center}
+    .sec-eb{display:inline-block;font-weight:800;color:var(--terra);letter-spacing:.04em;font-size:calc(14px*var(--fs));margin-bottom:12px}
+    .sec-h{font-family:var(--serif);font-size:calc(40px*var(--fs));letter-spacing:-.01em;line-height:1.1;text-wrap:balance}
+    .sec-sub{color:var(--gris);max-width:52ch;margin:14px auto 0;font-size:calc(18px*var(--fs))}
+    .steps{display:grid;grid-template-columns:1fr;gap:20px;margin-top:52px;counter-reset:s}
+    @media(min-width:760px){.steps{grid-template-columns:repeat(3,1fr)}}
+    .step{position:relative;background:var(--crema3);border:1.5px solid #00000010;border-radius:22px;padding:30px 26px}
+    .step::before{counter-increment:s;content:counter(s);position:absolute;top:-18px;left:26px;width:44px;height:44px;border-radius:13px;background:var(--teal);color:#fff;display:grid;place-items:center;font-family:var(--serif);font-size:calc(20px*var(--fs));font-weight:700;box-shadow:0 10px 24px -10px var(--teal)}
+    .step h3{font-family:var(--serif);font-size:calc(22px*var(--fs));margin-top:14px}
+    .step p{color:var(--gris);margin-top:8px;font-size:calc(15.5px*var(--fs))}
+    .step .t{margin-top:14px;font-weight:700;color:var(--teal);font-size:calc(13.5px*var(--fs))}
+
+    /* SERVICIOS */
+    .serv{position:relative;z-index:1;padding:30px 0 80px}
+    .cards{display:grid;grid-template-columns:1fr;gap:20px;margin-top:48px}
+    @media(min-width:720px){.cards{grid-template-columns:repeat(3,1fr)}}
+    .card{background:var(--crema3);border:1.5px solid #00000010;border-radius:22px;padding:30px;transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden}
+    .card:hover{transform:translateY(-4px);box-shadow:0 30px 60px -30px #0f5c5540}
+    .card__ic{width:60px;height:60px;border-radius:18px;display:grid;place-items:center;font-size:30px;margin-bottom:18px}
+    .card.c1 .card__ic{background:var(--teal-l);color:var(--teal)}.card.c2 .card__ic{background:var(--terra-l);color:var(--terra)}.card.c3 .card__ic{background:var(--salvia-l);color:var(--salvia)}
+    .card h3{font-family:var(--serif);font-size:calc(24px*var(--fs))}
+    .card p{color:var(--gris);margin-top:9px;font-size:calc(16px*var(--fs))}
+    .card ul{list-style:none;margin-top:16px;display:flex;flex-direction:column;gap:8px}
+    .card li{display:flex;align-items:flex-start;gap:9px;font-size:calc(14.5px*var(--fs));color:var(--tinta)}
+    .card li::before{content:"✓";color:var(--teal);font-weight:800;flex-shrink:0}
+
+    /* CREDENCIAL DIGITAL */
+    .cred-sec{position:relative;z-index:1;padding:80px 0;display:grid;grid-template-columns:1fr;gap:48px;align-items:center}
+    @media(min-width:880px){.cred-sec{grid-template-columns:.9fr 1.1fr}}
+    .cred{background:linear-gradient(135deg,var(--teal),var(--teal-d));color:#fff;border-radius:24px;padding:30px;max-width:440px;box-shadow:0 40px 90px -40px var(--teal-d);position:relative;overflow:hidden}
+    .cred::after{content:"";position:absolute;right:-40px;top:-40px;width:180px;height:180px;border-radius:50%;background:#ffffff14}
+    .cred__top{display:flex;justify-content:space-between;align-items:center;position:relative}
+    .cred__top .l{font-weight:800;letter-spacing:.06em;font-size:calc(12px*var(--fs));opacity:.9}
+    .cred__logo{width:40px;height:40px;border-radius:11px;background:#ffffff26;display:grid;place-items:center;font-size:20px}
+    .cred__body{display:flex;gap:16px;align-items:center;margin-top:26px;position:relative}
+    .cred__photo{width:78px;height:78px;border-radius:16px;background:#ffffff22;display:grid;place-items:center;font-size:38px;flex-shrink:0}
+    .cred__name{font-family:var(--serif);font-size:calc(23px*var(--fs));font-weight:700}
+    .cred__meta{opacity:.9;font-size:calc(13.5px*var(--fs));margin-top:3px}
+    .cred__foot{display:flex;justify-content:space-between;margin-top:24px;font-family:ui-monospace,monospace;font-size:calc(12px*var(--fs));opacity:.85;position:relative}
+    .cred__valid{display:inline-flex;align-items:center;gap:7px;background:#ffffff26;padding:6px 12px;border-radius:999px;font-weight:700}
+
+    /* HISTORIA / testimonio */
+    .story{position:relative;z-index:1;padding:20px 0 80px}
+    .story__card{background:var(--crema3);border:1.5px solid #00000010;border-radius:26px;padding:clamp(30px,5vw,56px);text-align:center;position:relative}
+    .story__q{font-family:var(--serif);font-size:calc(30px*var(--fs));line-height:1.35;max-width:26ch;margin:0 auto;letter-spacing:-.01em}
+    .story__q::before{content:"“";color:var(--terra);font-size:1.4em;line-height:0;vertical-align:-.2em}
+    .story__who{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:28px}
+    .story__av{width:48px;height:48px;border-radius:50%;background:var(--terra-l);color:var(--terra);display:grid;place-items:center;font-size:22px}
+    .story__who b{display:block;font-size:calc(15px*var(--fs))}.story__who span{color:var(--gris);font-size:calc(13.5px*var(--fs))}
+
+    /* IMPACTO números */
+    .impact{position:relative;z-index:1;display:grid;grid-template-columns:1fr;gap:1px;background:#00000012;border:1px solid #00000012;border-radius:22px;overflow:hidden;margin:0 0 70px}
+    @media(min-width:640px){.impact{grid-template-columns:repeat(4,1fr)}}
+    .icell{background:var(--crema3);padding:32px 22px;text-align:center}
+    .icell .n{font-family:var(--serif);font-size:calc(40px*var(--fs));font-weight:700;color:var(--teal);line-height:1}
+    .icell .l{color:var(--gris);font-size:calc(14px*var(--fs));margin-top:8px}
+
+    /* CTA final */
+    .cta-final{position:relative;z-index:1;margin:0 auto 70px;background:linear-gradient(135deg,var(--teal),var(--teal-d));color:#fff;border-radius:32px;padding:clamp(44px,6vw,72px) 40px;text-align:center;overflow:hidden}
+    .cta-final::before{content:"";position:absolute;left:-60px;bottom:-60px;width:260px;height:260px;border-radius:50%;background:#ffffff10}
+    .cta-final h2{font-family:var(--serif);font-size:calc(44px*var(--fs));letter-spacing:-.01em;position:relative}
+    .cta-final p{margin:16px auto 0;max-width:46ch;font-size:calc(19px*var(--fs));opacity:.94;position:relative}
+    .cta-final .btn-w{background:#fff;color:var(--teal);margin-top:32px;position:relative}
+    .cta-final .btn-w:hover{background:var(--crema)}
+    footer{position:relative;z-index:1;border-top:1.5px solid #00000018;padding:30px 26px;color:var(--gris);font-size:calc(14px*var(--fs));text-align:center;line-height:1.7}
+</style>
+
+<body>
+<div class="decor"><b class="d1"></b><b class="d2"></b></div>
+
+<div class="a11y" role="region" aria-label="Herramientas de accesibilidad">
+    <b>◐ Accesibilidad</b>
+    <span class="a11y__grp" role="group" aria-label="Tamaño de texto">
+        <button class="qbtn" onclick="setFs(-1)" aria-label="Reducir texto">A−</button>
+        <button class="qbtn" onclick="setFs(0)" aria-label="Texto normal">A</button>
+        <button class="qbtn" onclick="setFs(1)" aria-label="Aumentar texto">A+</button>
+    </span>
+    <button class="qbtn" id="hcBtn" aria-pressed="false" onclick="toggleHc()">◑ Alto contraste</button>
+    <button class="qbtn" id="lsBtn" aria-pressed="false" onclick="toggleLs()">↔ Más espaciado</button>
+    <span class="sp"></span>
+    <span style="opacity:.9">Ajusta la página a ti — de verdad funciona.</span>
+</div>
+
+<nav>
+    <div class="brand"><div class="bmark">♿</div><div>Oficina de Inclusión<small>SIREDIC · Graneros</small></div></div>
+    <div class="sp"></div>
+    <a class="btn btn-o">Ingresar</a>
+    <a class="btn btn-p">Registrarme</a>
+</nav>
+
+<header class="hero wrap">
+    <div class="hero__grid">
+        <div>
+            <span class="eyebrow">✦ Sistema de Registro de Discapacidad</span>
+            <h1>Cada persona,<br><em>reconocida</em><br>como es.</h1>
+            <p class="lede">Registro, credenciales y atención para personas con discapacidad — con trato digno, tiempos cortos y tus datos siempre protegidos.</p>
+            <div class="hero__cta">
+                <a class="btn btn-p">Iniciar mi registro →</a>
+                <a class="btn btn-t">Pedir una atención</a>
+            </div>
+            <div class="hero__trust">
+                <div class="faces"><span>☺</span><span>☻</span><span>♥</span><span>+</span></div>
+                <span>Más de <b>300 vecinos</b> ya registrados en Graneros.</span>
+            </div>
+        </div>
+        <div class="human">
+            <svg viewBox="0 0 400 400" aria-hidden="true">
+                <path fill="var(--salvia)" opacity=".18" d="M320 120c40 60 30 150-30 200s-170 60-230-10S30 130 100 80s180-20 220 40Z"/>
+                <path fill="var(--terra)" opacity=".14" d="M300 260c30 40-10 100-70 110s-120-20-130-80 40-90 100-90 70 20 100 60Z"/>
+            </svg>
+            <div class="human__float hf1">✎ Registro en 4 min</div>
+            <div class="human__float hf2">♡ Atención confirmada</div>
+            <div class="human__card">
+                <div class="human__ring">☺</div>
+                <h3>María Espinoza</h3>
+                <p>Registrada · Credencial vigente</p>
+                <span class="human__badge">✓ Todo en orden</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<section class="proc wrap">
+    <div class="center">
+        <span class="sec-eb">CÓMO TE ACOMPAÑAMOS</span>
+        <h2 class="sec-h">Tres pasos, sin que te agotes</h2>
+        <p class="sec-sub">Pensado para que sea claro, corto y humano. Nadie debería cansarse haciendo un trámite.</p>
+    </div>
+    <div class="steps">
+        <div class="step"><h3>Te registras</h3><p>Completa tus datos en minutos. Autocompletamos lo que el municipio ya sabe de ti, para que no repitas nada.</p><div class="t">▸ En línea o presencial</div></div>
+        <div class="step"><h3>Te evaluamos</h3><p>Un profesional revisa tu solicitud con calma y te acompaña en cada requisito, sin apuros ni ventanillas.</p><div class="t">▸ Con cita, sin espera</div></div>
+        <div class="step"><h3>Te acreditamos</h3><p>Recibes tu credencial y quedas en el registro. Te avisamos antes de que venza, sin que estés pendiente.</p><div class="t">▸ Credencial SENADIS</div></div>
+    </div>
+</section>
+
+<section class="serv wrap">
+    <div class="center">
+        <span class="sec-eb">NUESTROS SERVICIOS</span>
+        <h2 class="sec-h">Todo en un lugar amable</h2>
+    </div>
+    <div class="cards">
+        <div class="card c1"><div class="card__ic">✎</div><h3>Registro</h3><p>Tu inscripción en el sistema municipal de discapacidad.</p>
+            <ul><li>Autocompletado desde el registro civil</li><li>Guardas y sigues después</li><li>Datos cifrados en reposo</li></ul></div>
+        <div class="card c2"><div class="card__ic">◈</div><h3>Credencial SENADIS</h3><p>Solicita, renueva y descarga tu credencial.</p>
+            <ul><li>Aviso antes del vencimiento</li><li>Descarga en PDF al instante</li><li>Verificable por QR</li></ul></div>
+        <div class="card c3"><div class="card__ic">♡</div><h3>Atención</h3><p>Agenda con la oficina cuando te acomode.</p>
+            <ul><li>Un profesional dedicado</li><li>Recordatorio 24 h antes</li><li>Sin salas de espera</li></ul></div>
+    </div>
+</section>
+
+<section class="cred-sec wrap">
+    <div>
+        <span class="sec-eb">TU CREDENCIAL</span>
+        <h2 class="sec-h" style="font-size:calc(36px*var(--fs))">Una acreditación<br>que abre puertas</h2>
+        <p style="margin-top:18px;color:var(--gris);font-size:calc(17px*var(--fs));max-width:42ch">Beneficios en transporte, salud y trámites. Emitida por el municipio y reconocida por SENADIS, con verificación digital y tus datos protegidos bajo la Ley 21.719.</p>
+        <a class="btn btn-p" style="margin-top:26px">Solicitar mi credencial →</a>
+    </div>
+    <div style="display:grid;place-items:center">
+        <div class="cred">
+            <div class="cred__top"><span class="l">CREDENCIAL DE DISCAPACIDAD · SENADIS</span><span class="cred__logo">♿</span></div>
+            <div class="cred__body">
+                <div class="cred__photo">☺</div>
+                <div><div class="cred__name">María J. Espinoza</div><div class="cred__meta">RUN 15.987.654-3 · Graneros</div></div>
+            </div>
+            <div class="cred__foot"><span class="cred__valid">✓ Vigente hasta 2029</span><span>N.º 2026-0883</span></div>
+        </div>
+    </div>
+</section>
+
+<section class="story wrap">
+    <div class="story__card">
+        <p class="story__q serif">Hice todo el trámite desde el celular de mi hija. No tuve que ir a ninguna oficina y me llamaron por mi nombre. Se siente distinto cuando te tratan bien.”</p>
+        <div class="story__who"><div class="story__av">☻</div><div><b>Rosa Fuentes</b><span>Vecina de Graneros · registrada en 2026</span></div></div>
+    </div>
+</section>
+
+<section class="wrap">
+    <div class="impact">
+        <div class="icell"><div class="n">300+</div><div class="l">vecinos registrados</div></div>
+        <div class="icell"><div class="n">4 min</div><div class="l">promedio de registro</div></div>
+        <div class="icell"><div class="n">0</div><div class="l">filas presenciales</div></div>
+        <div class="icell"><div class="n">100%</div><div class="l">datos dentro del municipio</div></div>
+    </div>
+</section>
+
+<section class="wrap">
+    <div class="cta-final">
+        <h2>Da el primer paso hoy</h2>
+        <p>El registro es gratuito y más simple de lo que crees. Estamos de tu lado en cada trámite, de principio a fin.</p>
+        <a class="btn btn-w">Registrarme ahora →</a>
+    </div>
+</section>
+
+<footer>© 2026 Municipalidad de Graneros · Oficina de Inclusión y Discapacidad<br>Datos protegidos bajo la Ley 21.719 · Esta página cumple pautas de accesibilidad WCAG</footer>
+
+<script>
+    let fs=1, ls=0;
+    const apply=()=>{ const r=document.documentElement.style; r.setProperty('--fs',fs); r.setProperty('--ls',ls); };
+    function setFs(d){ fs = d===0 ? 1 : Math.min(1.5, Math.max(0.9, +(fs+d*0.12).toFixed(2))); apply(); }
+    function toggleHc(){ const b=document.body.classList.toggle('hc'); document.getElementById('hcBtn').setAttribute('aria-pressed',b); }
+    function toggleLs(){ ls = ls?0:0.5; apply(); document.getElementById('lsBtn').setAttribute('aria-pressed', ls>0); }
+</script>

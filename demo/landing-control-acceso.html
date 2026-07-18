@@ -1,0 +1,153 @@
+<title>Control de Acceso — Municipalidad de Graneros</title>
+<style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+        --bg:#06080b; --bg2:#0b0f14; --panel:#0e141b; --line:#17212c; --line2:#22303e;
+        --fos:#31e6a8; --cian:#38bdf8; --ambar:#fbbf24; --rojo:#f4506a; --tinta:#d6e2ee; --gris:#5f7288;
+        --mono:ui-monospace,'SF Mono','JetBrains Mono','Roboto Mono',monospace;
+        --sans:system-ui,-apple-system,'Segoe UI',sans-serif;
+    }
+    body{background:var(--bg);color:var(--tinta);font-family:var(--mono);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+    a{color:inherit;text-decoration:none}
+    .sans{font-family:var(--sans)}
+    .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+    /* grid + scanline ambiente */
+    .amb{position:fixed;inset:0;z-index:0;pointer-events:none}
+    .amb__grid{position:absolute;inset:0;background-image:linear-gradient(#31e6a808 1px,transparent 1px),linear-gradient(90deg,#31e6a808 1px,transparent 1px);background-size:40px 40px;mask-image:radial-gradient(ellipse 90% 70% at 50% 0,#000 40%,transparent)}
+    .amb__scan{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#31e6a855,transparent);animation:scan 6s linear infinite}
+    @keyframes scan{0%{top:-2%}100%{top:102%}}
+
+    .shell{position:relative;z-index:1}
+    /* topbar tipo consola */
+    .bar{display:flex;align-items:center;gap:14px;padding:14px 24px;border-bottom:1px solid var(--line);background:#070a0e}
+    .bmark{width:34px;height:34px;border-radius:7px;background:var(--fos);color:#04140d;display:grid;place-items:center;font-weight:800;font-size:16px;box-shadow:0 0 18px #31e6a855}
+    .bar b{font-size:14px;letter-spacing:.02em}
+    .bar .sp{flex:1}
+    .chip{display:inline-flex;align-items:center;gap:7px;font-size:11px;padding:5px 11px;border:1px solid var(--line2);border-radius:6px;color:var(--gris)}
+    .chip .d{width:6px;height:6px;border-radius:50%;background:var(--fos);box-shadow:0 0 8px var(--fos);animation:pulse 1.8s infinite}
+    @keyframes pulse{50%{opacity:.3}}
+    .btn{font-family:var(--mono);font-size:13px;font-weight:600;padding:9px 16px;border-radius:7px;cursor:pointer;border:1px solid transparent;transition:.15s}
+    .btn-p{background:var(--fos);color:#04140d}.btn-p:hover{box-shadow:0 0 20px #31e6a855}
+    .btn-o{background:transparent;color:var(--tinta);border-color:var(--line2)}.btn-o:hover{border-color:var(--fos)}
+
+    /* HERO layout: texto + consola en vivo */
+    .hero{display:grid;grid-template-columns:1fr;gap:40px;padding:64px 0 40px;align-items:center}
+    @media(min-width:940px){.hero{grid-template-columns:1.05fr .95fr}}
+    .kick{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--fos);margin-bottom:20px}
+    .kick::before{content:"▸ "}
+    h1{font-family:var(--sans);font-weight:800;font-size:clamp(38px,7vw,72px);line-height:1;letter-spacing:-.03em}
+    h1 .g{background:linear-gradient(120deg,var(--fos),var(--cian));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .lede{font-family:var(--sans);margin-top:22px;font-size:17px;line-height:1.6;color:#9fb0c2;max-width:48ch}
+    .cta{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}
+    .metrics{display:flex;gap:28px;margin-top:44px;flex-wrap:wrap}
+    .metrics .n{font-size:26px;font-weight:700;color:var(--fos)}
+    .metrics .l{font-size:11px;color:var(--gris);margin-top:2px}
+
+    /* consola: escáner + feed en vivo */
+    .console{background:var(--panel);border:1px solid var(--line2);border-radius:14px;overflow:hidden;box-shadow:0 40px 80px -30px #000}
+    .console__bar{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--line);background:#080c11;font-size:11px;color:var(--gris)}
+    .tl{display:flex;gap:5px}.tl i{width:9px;height:9px;border-radius:50%;background:var(--line2)}
+    .scan-face{position:relative;height:158px;display:grid;place-items:center;border-bottom:1px solid var(--line);overflow:hidden;background:radial-gradient(circle at 50% 40%,#0f1a22,#080c11)}
+    .face{width:96px;height:96px;border-radius:14px;border:1px solid var(--line2);position:relative;display:grid;place-items:center;color:var(--gris);font-size:46px}
+    .face::before,.face::after{content:"";position:absolute;width:18px;height:18px;border:2px solid var(--fos)}
+    .face::before{top:-1px;left:-1px;border-right:none;border-bottom:none}
+    .face::after{bottom:-1px;right:-1px;border-left:none;border-top:none}
+    .scan-line{position:absolute;left:calc(50% - 60px);width:120px;height:2px;background:linear-gradient(90deg,transparent,var(--fos),transparent);box-shadow:0 0 12px var(--fos);animation:facescan 2.4s ease-in-out infinite}
+    @keyframes facescan{0%,100%{top:38px}50%{top:120px}}
+    .scan-tag{position:absolute;bottom:12px;left:14px;font-size:11px;color:var(--fos)}
+    .feed{padding:8px;max-height:230px;overflow:hidden}
+    .ev{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:8px;font-size:12px;animation:evin .4s var(--sans)}
+    @keyframes evin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+    .ev+.ev{border-top:1px solid var(--line)}
+    .ev .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;box-shadow:0 0 8px currentColor}
+    .ev .who{flex:1;color:var(--tinta)}
+    .ev .t{color:var(--gris);font-size:11px}
+    .ev.ok .dot{background:var(--fos);color:var(--fos)} .ev.ok .tag{color:var(--fos)}
+    .ev.deny .dot{background:var(--rojo);color:var(--rojo)} .ev.deny .tag{color:var(--rojo)}
+    .ev.warn .dot{background:var(--ambar);color:var(--ambar)} .ev.warn .tag{color:var(--ambar)}
+    .ev .tag{font-size:11px;font-weight:600}
+
+    /* FEATURES fila técnica */
+    .tech{padding:80px 0;border-top:1px solid var(--line)}
+    .tech__h{font-family:var(--sans);font-weight:800;font-size:clamp(26px,4vw,42px);letter-spacing:-.02em}
+    .tgrid{display:grid;grid-template-columns:1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:36px}
+    @media(min-width:760px){.tgrid{grid-template-columns:repeat(3,1fr)}}
+    .tcell{background:var(--panel);padding:26px 22px}
+    .tcell .ic{color:var(--fos);font-size:22px;margin-bottom:12px}
+    .tcell h3{font-family:var(--sans);font-size:16px;font-weight:700}
+    .tcell p{font-family:var(--sans);font-size:13.5px;color:#93a3b5;margin-top:7px;line-height:1.55}
+
+    footer{border-top:1px solid var(--line);padding:26px 0;color:var(--gris);font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+</style>
+
+<body>
+<div class="amb"><div class="amb__grid"></div><div class="amb__scan"></div></div>
+<div class="shell">
+    <div class="bar">
+        <div class="bmark">◉</div><b>CONTROL DE ACCESO</b><span style="color:var(--gris);font-size:12px">// graneros.sec</span>
+        <span class="sp"></span>
+        <span class="chip"><span class="d"></span>3 dispositivos en línea</span>
+        <a class="btn btn-o">Documentación</a>
+        <a class="btn btn-p">Abrir consola</a>
+    </div>
+
+    <div class="wrap hero">
+        <div>
+            <div class="kick">Vigilancia biométrica · tiempo real</div>
+            <h1>Quién entra,<br><span class="g">al instante</span>.</h1>
+            <p class="lede">Reconocimiento facial y tarjeta en los accesos municipales. Cada evento, registrado con hash inmutable y visible en la consola en el momento en que ocurre.</p>
+            <div class="cta"><a class="btn btn-p">Ver la consola en vivo →</a><a class="btn btn-o">Cómo funciona</a></div>
+            <div class="metrics">
+                <div><div class="n" id="m1">0</div><div class="l">eventos hoy</div></div>
+                <div><div class="n">&lt;300ms</div><div class="l">latencia de decisión</div></div>
+                <div><div class="n">100%</div><div class="l">eventos con hash</div></div>
+            </div>
+        </div>
+
+        <div class="console">
+            <div class="console__bar"><div class="tl"><i></i><i></i><i></i></div><span>consola / acceso-principal</span><span class="sp" style="flex:1"></span><span style="color:var(--fos)">● REC</span></div>
+            <div class="scan-face">
+                <div class="face">☻<div class="scan-line"></div></div>
+                <div class="scan-tag" id="scanTag">▸ escaneando rostro…</div>
+            </div>
+            <div class="feed" id="feed"></div>
+        </div>
+    </div>
+
+    <section class="tech wrap">
+        <div class="kick">Arquitectura</div>
+        <h2 class="tech__h">Diseñado para no fallar en silencio</h2>
+        <div class="tgrid">
+            <div class="tcell"><div class="ic">◈</div><h3>Rostro + tarjeta</h3><p>Doble factor físico en cada puerta. Detección facial local (OpenCV) sin enviar imágenes fuera del municipio.</p></div>
+            <div class="tcell"><div class="ic">⛓</div><h3>Hash encadenado</h3><p>Cada acceso queda unido por hash al anterior. Alterar un registro rompe la cadena — auditoría a prueba de manipulación.</p></div>
+            <div class="tcell"><div class="ic">⚡</div><h3>Puente en vivo</h3><p>Los equipos Dahua reportan por un bridge propio. El backend valida, decide y transmite el evento en menos de 300 ms.</p></div>
+        </div>
+    </section>
+
+    <footer class="wrap"><span>© 2026 Municipalidad de Graneros · Seguridad y Control</span><span>acceso.graneros.cl · Ley 21.719</span></footer>
+</div>
+
+<script>
+    const names = ['J. Soto · #A-102','M. Espinoza · #A-088','P. Gutiérrez · TARJETA','Visitante · sin registro','R. Díaz · #A-205','C. Morales · #A-041','Desconocido · rostro','A. Reyes · #A-160'];
+    const kinds = [['ok','ACCESO','Concedido'],['ok','ACCESO','Concedido'],['ok','ACCESO','Concedido'],['deny','DENEGADO','Rechazado'],['warn','REVISAR','Sin credencial'],['ok','ACCESO','Concedido']];
+    let count = 1247; const m1=document.getElementById('m1'); const feed=document.getElementById('feed'); const scanTag=document.getElementById('scanTag');
+    // count-up inicial
+    let shown=0; const ci=setInterval(()=>{ shown=Math.min(count, shown+37); m1.textContent=shown.toLocaleString('es-CL'); if(shown>=count) clearInterval(ci); },28);
+    function now(){ return new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+    function tick(){
+        const k = kinds[Math.floor(Math.random()*kinds.length)];
+        const who = names[Math.floor(Math.random()*names.length)];
+        const el = document.createElement('div');
+        el.className = 'ev '+k[0];
+        el.innerHTML = `<span class="dot"></span><span class="who">${who}</span><span class="tag ${k[0]}">${k[2]}</span><span class="t">${now()}</span>`;
+        feed.prepend(el);
+        while(feed.children.length>6) feed.removeChild(feed.lastChild);
+        count++; m1.textContent = count.toLocaleString('es-CL');
+        scanTag.textContent = k[0]==='ok' ? '✓ identidad verificada' : (k[0]==='deny' ? '✕ acceso denegado' : '⚠ requiere revisión');
+        scanTag.style.color = k[0]==='ok' ? 'var(--fos)' : (k[0]==='deny' ? 'var(--rojo)' : 'var(--ambar)');
+    }
+    for(let i=0;i<4;i++) setTimeout(tick, i*300);
+    setInterval(tick, 2600);
+</script>

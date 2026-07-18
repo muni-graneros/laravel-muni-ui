@@ -1,0 +1,151 @@
+/* ============================================================================
+   laravel-muni-ui — Sistema de diseño del ecosistema municipal de Graneros
+   ----------------------------------------------------------------------------
+   Contrato de tokens `--muni-*` con dos presets seleccionables por
+   `data-muni-theme` en <html>:
+     - "light"  → linaje `.om` (discapacidad): institucional sereno, teal.
+     - "dark"   → linaje `.fc` (feria): terminal de datos, alto contraste.
+   Los valores son VERBATIM de los CSS de producción (feria.css / discapacidad.css)
+   para que un sistema del ecosistema pueda migrar sin cambiar su identidad.
+
+   Uso en la app (Tailwind v4):
+     @import "tailwindcss";
+     @import "../../vendor/muni-graneros/laravel-muni-ui/resources/css/muni-ui.css";
+     @source "../../vendor/muni-graneros/laravel-muni-ui/resources/views/**/*.blade.php";
+   ============================================================================ */
+
+/* El tema oscuro se activa por atributo, no por prefers-color-scheme: cada sistema
+   fija su tema explícitamente (los paneles del ecosistema no son auto-dark). */
+@custom-variant dark (&:where([data-muni-theme=dark], [data-muni-theme=dark] *));
+
+/* ── Preset LIGHT (por defecto) — linaje `.om` (discapacidad) ───────────────── */
+:root,
+[data-muni-theme="light"] {
+    /* Superficies */
+    --muni-bg: #f5f6f8;
+    --muni-surface: #ffffff;
+    --muni-surface-2: #f5f6f8;
+    --muni-surface-3: #eceef2;
+    --muni-panel: #ffffff;
+
+    /* Texto y bordes */
+    --muni-text: #1a1d24;
+    --muni-muted: #5a6070;
+    --muni-hint: #6b7280;
+    --muni-border: #e0e3ea;
+    --muni-border-2: #c8ccd6;
+
+    /* Acento institucional (teal Graneros) */
+    --muni-accent: #0f766e;
+    --muni-accent-strong: #115e59;
+    --muni-accent-soft: #f0fdfa;
+    --muni-on-accent: #ffffff;
+
+    /* Estados semánticos: tripletes fg / bg / border */
+    --muni-ok-fg: #0f7a5a;
+    --muni-ok-bg: #e2f5ee;
+    --muni-ok-border: #0f7a5a;
+
+    --muni-warn-fg: #c47a10;
+    --muni-warn-bg: #fef3dc;
+    --muni-warn-border: #c47a10;
+
+    --muni-danger-fg: #b03030;
+    --muni-danger-bg: #fdeaea;
+    --muni-danger-border: #b03030;
+
+    --muni-info-fg: #1f5fb0;
+    --muni-info-bg: #e6effb;
+    --muni-info-border: #1f5fb0;
+
+    /* Forma y elevación */
+    --muni-radius: 10px;
+    --muni-radius-lg: 14px;
+    --muni-radius-sm: 7px;
+    --muni-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+    --muni-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.10);
+
+    /* Tipografía */
+    --muni-font-sans: 'DM Sans', system-ui, sans-serif;
+    --muni-font-mono: 'DM Mono', ui-monospace, monospace;
+
+    /* Cromo estructural */
+    --muni-topbar-h: 56px;
+    --muni-glow: none;
+}
+
+/* ── Preset DARK — linaje `.fc` (feria): terminal de datos ──────────────────── */
+[data-muni-theme="dark"] {
+    --muni-bg: #0b0f14;
+    --muni-surface: #111620;
+    --muni-surface-2: #181e2a;
+    --muni-surface-3: #1c2333;
+    --muni-panel: #1c2333;
+
+    --muni-text: #e2e8f4;
+    --muni-muted: #7a8ba8;
+    --muni-hint: #4a5a74;
+    --muni-border: #2a3347;
+    --muni-border-2: #3a4560;
+
+    --muni-accent: #f59e0b;
+    --muni-accent-strong: #d97706;
+    --muni-accent-soft: #2d1d00;
+    --muni-on-accent: #0b0f14;
+
+    --muni-ok-fg: #22c55e;
+    --muni-ok-bg: #0d2d1a;
+    --muni-ok-border: #166534;
+
+    --muni-warn-fg: #f59e0b;
+    --muni-warn-bg: #2d1d00;
+    --muni-warn-border: #92400e;
+
+    --muni-danger-fg: #ef4444;
+    --muni-danger-bg: #2d0d0d;
+    --muni-danger-border: #991b1b;
+
+    --muni-info-fg: #3b82f6;
+    --muni-info-bg: #0d1a2d;
+    --muni-info-border: #1e3a5f;
+
+    --muni-radius: 8px;
+    --muni-radius-lg: 12px;
+    --muni-radius-sm: 6px;
+    --muni-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    --muni-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+
+    --muni-font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+    --muni-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+    --muni-topbar-h: 52px;
+    /* Firma del tema oscuro: los dots de estado tienen resplandor (glow terminal). */
+    --muni-glow: 0 0 6px currentColor;
+}
+
+/* ── Puente a utilidades Tailwind (opcional) ────────────────────────────────
+   Expone los tokens como colores de Tailwind (`bg-muni-surface`, `text-muni-muted`…)
+   para quien prefiera utilidades a `var()`. `inline` re-lee la variable en runtime,
+   así el cambio de `data-muni-theme` re-tiñe sin recompilar. */
+@theme inline {
+    --color-muni-bg: var(--muni-bg);
+    --color-muni-surface: var(--muni-surface);
+    --color-muni-surface-2: var(--muni-surface-2);
+    --color-muni-surface-3: var(--muni-surface-3);
+    --color-muni-panel: var(--muni-panel);
+    --color-muni-text: var(--muni-text);
+    --color-muni-muted: var(--muni-muted);
+    --color-muni-hint: var(--muni-hint);
+    --color-muni-border: var(--muni-border);
+    --color-muni-accent: var(--muni-accent);
+    --color-muni-ok: var(--muni-ok-fg);
+    --color-muni-warn: var(--muni-warn-fg);
+    --color-muni-danger: var(--muni-danger-fg);
+    --color-muni-info: var(--muni-info-fg);
+
+    --font-muni-sans: var(--muni-font-sans);
+    --font-muni-mono: var(--muni-font-mono);
+
+    --radius-muni: var(--muni-radius);
+    --radius-muni-lg: var(--muni-radius-lg);
+}

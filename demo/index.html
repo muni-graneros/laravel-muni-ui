@@ -1,0 +1,161 @@
+<title>laravel-muni-ui · Sistema de diseño municipal</title>
+<style>
+    /* ─── Tokens del paquete (inline para la demo; en producción vienen de muni-ui.css) ─── */
+    [data-muni-theme="light"] {
+        --muni-bg:#f5f6f8; --muni-surface:#fff; --muni-surface-2:#f5f6f8; --muni-surface-3:#eceef2;
+        --muni-text:#1a1d24; --muni-muted:#5a6070; --muni-hint:#6b7280; --muni-border:#e0e3ea;
+        --muni-accent:#0f766e; --muni-on-accent:#fff;
+        --muni-ok-fg:#0f7a5a; --muni-ok-bg:#e2f5ee; --muni-ok-border:#0f7a5a;
+        --muni-warn-fg:#c47a10; --muni-warn-bg:#fef3dc; --muni-warn-border:#c47a10;
+        --muni-danger-fg:#b03030; --muni-danger-bg:#fdeaea; --muni-danger-border:#b03030;
+        --muni-info-fg:#1f5fb0; --muni-info-bg:#e6effb;
+        --muni-radius:10px; --muni-radius-sm:7px; --muni-shadow:0 2px 8px rgba(0,0,0,.07);
+        --muni-font-sans:'DM Sans',system-ui,sans-serif; --muni-font-mono:'DM Mono',ui-monospace,monospace;
+        --muni-topbar-h:56px; --muni-glow:none;
+    }
+    [data-muni-theme="dark"] {
+        --muni-bg:#0b0f14; --muni-surface:#111620; --muni-surface-2:#181e2a; --muni-surface-3:#1c2333;
+        --muni-text:#e2e8f4; --muni-muted:#7a8ba8; --muni-hint:#4a5a74; --muni-border:#2a3347;
+        --muni-accent:#f59e0b; --muni-on-accent:#0b0f14;
+        --muni-ok-fg:#22c55e; --muni-ok-bg:#0d2d1a; --muni-ok-border:#166534;
+        --muni-warn-fg:#f59e0b; --muni-warn-bg:#2d1d00; --muni-warn-border:#92400e;
+        --muni-danger-fg:#ef4444; --muni-danger-bg:#2d0d0d; --muni-danger-border:#991b1b;
+        --muni-info-fg:#3b82f6; --muni-info-bg:#0d1a2d;
+        --muni-radius:8px; --muni-radius-sm:6px; --muni-shadow:0 2px 8px rgba(0,0,0,.35);
+        --muni-font-sans:'IBM Plex Sans',system-ui,sans-serif; --muni-font-mono:'IBM Plex Mono',ui-monospace,monospace;
+        --muni-topbar-h:52px; --muni-glow:0 0 6px currentColor;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin:0; background:#0a0a0c; font-family:system-ui,sans-serif; color:#c9cdd6; }
+    .page-head { max-width:1200px; margin:0 auto; padding:40px 24px 8px; }
+    .page-head h1 { margin:0; font-family:ui-monospace,monospace; font-size:22px; font-weight:700; letter-spacing:-.02em; color:#f2f4f8; }
+    .page-head p { margin:6px 0 0; font-size:13.5px; color:#8a8f9c; max-width:60ch; line-height:1.5; }
+    .panels { display:grid; grid-template-columns:1fr 1fr; gap:20px; max-width:1400px; margin:0 auto; padding:24px; }
+    @media (max-width:960px){ .panels { grid-template-columns:1fr; } }
+
+    /* Cada panel se aísla en su tema */
+    .theme-panel { border-radius:14px; overflow:hidden; border:1px solid #23262e; background:var(--muni-bg); color:var(--muni-text); font-family:var(--muni-font-sans); }
+    .theme-tag { font-family:ui-monospace,monospace; font-size:11px; padding:6px 12px; background:#16181d; color:#8a8f9c; border-bottom:1px solid #23262e; letter-spacing:.03em; }
+
+    /* ── topbar ── */
+    .m-topbar { position:sticky; top:0; height:var(--muni-topbar-h); display:flex; align-items:center; gap:12px; padding:0 16px; background:var(--muni-surface); border-bottom:1px solid var(--muni-border); }
+    .m-logo { height:38px; display:flex; align-items:center; padding:4px 10px; background:#fff; border-radius:var(--muni-radius-sm); }
+    .m-logo span { font-family:var(--muni-font-mono); font-weight:700; font-size:13px; color:#0b0f14; letter-spacing:-.02em; }
+    .m-titles { display:flex; flex-direction:column; line-height:1.2; }
+    .m-titles .name { font-size:13px; font-weight:700; color:var(--muni-text); }
+    .m-titles .sub { font-size:11px; color:var(--muni-muted); }
+    .m-spacer { flex:1; }
+
+    /* ── badge ── */
+    .m-badge { display:inline-flex; align-items:center; gap:6px; padding:3px 9px; font-family:var(--muni-font-mono); font-size:11px; font-weight:600; line-height:1; letter-spacing:.02em; border-radius:999px; }
+    .m-badge .dot { width:6px; height:6px; border-radius:50%; background:currentColor; box-shadow:var(--muni-glow); }
+    .m-badge.ok { color:var(--muni-ok-fg); background:var(--muni-ok-bg); border:1px solid var(--muni-ok-border); }
+    .m-badge.warn { color:var(--muni-warn-fg); background:var(--muni-warn-bg); border:1px solid var(--muni-warn-border); }
+    .m-badge.danger { color:var(--muni-danger-fg); background:var(--muni-danger-bg); border:1px solid var(--muni-danger-border); }
+
+    .m-body { padding:20px 16px 28px; }
+
+    /* ── kpi row ── */
+    .m-kpis { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+    .m-kpi { position:relative; padding:16px 18px 16px 20px; background:var(--muni-surface); border:1px solid var(--muni-border); border-radius:var(--muni-radius); box-shadow:var(--muni-shadow); min-width:140px; flex:1; }
+    .m-kpi .rail { position:absolute; left:0; top:10px; bottom:10px; width:3px; border-radius:0 2px 2px 0; }
+    .m-kpi .n { font-family:var(--muni-font-mono); font-variant-numeric:tabular-nums; font-size:28px; font-weight:700; line-height:1.05; }
+    .m-kpi .l { margin-top:4px; font-size:11px; font-weight:600; color:var(--muni-muted); text-transform:uppercase; letter-spacing:.04em; }
+
+    /* ── filter bar ── */
+    .m-filters { display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end; padding:14px 16px; margin-bottom:16px; background:var(--muni-surface-2); border:1px solid var(--muni-border); border-radius:var(--muni-radius); }
+    .m-field { display:flex; flex-direction:column; gap:4px; }
+    .m-field span { font-size:11px; font-weight:600; color:var(--muni-muted); text-transform:uppercase; letter-spacing:.03em; }
+    .m-field input, .m-field select { padding:8px 10px; font-family:var(--muni-font-sans); font-size:13px; background:var(--muni-surface); color:var(--muni-text); border:1px solid var(--muni-border); border-radius:var(--muni-radius-sm); min-width:150px; }
+    .m-apply { margin-left:auto; font-size:13px; font-weight:600; padding:9px 18px; border:none; border-radius:var(--muni-radius-sm); background:var(--muni-accent); color:var(--muni-on-accent); cursor:pointer; }
+
+    /* ── data table ── */
+    .m-table-wrap { overflow-x:auto; border:1px solid var(--muni-border); border-radius:var(--muni-radius); background:var(--muni-surface); }
+    table { width:100%; border-collapse:collapse; font-size:12.5px; }
+    th { text-align:left; white-space:nowrap; padding:9px 12px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--muni-muted); background:var(--muni-surface-2); border-bottom:1px solid var(--muni-border); }
+    td { padding:8px 12px; border-bottom:1px solid var(--muni-border); white-space:nowrap; color:var(--muni-text); }
+    tbody tr:hover { background:var(--muni-surface-2); }
+    tr.danger td:first-child { box-shadow:inset 3px 0 0 var(--muni-danger-fg); color:var(--muni-danger-fg); font-weight:600; }
+    .num { font-family:var(--muni-font-mono); font-variant-numeric:tabular-nums; }
+</style>
+
+<div class="page-head">
+    <h1>laravel-muni-ui</h1>
+    <p>Sistema de diseño del ecosistema municipal de Graneros. Un solo contrato de tokens,
+       dos identidades seleccionables por <code>data-muni-theme</code>: claro institucional
+       (linaje discapacidad) y oscuro terminal de datos (linaje feria). Mismo componente,
+       misma estructura — abajo, un panel de patentes comerciales renderizado en ambos temas.</p>
+</div>
+
+<div class="panels">
+    <!-- ══════════ LIGHT ══════════ -->
+    <div class="theme-panel" data-muni-theme="light">
+        <div class="theme-tag">data-muni-theme="light" · DM Sans / DM Mono · teal institucional</div>
+        <div class="m-topbar">
+            <div class="m-logo"><span>GRA</span></div>
+            <div class="m-titles"><span class="name">Patentes Comerciales</span><span class="sub">Municipalidad de Graneros</span></div>
+            <div class="m-spacer"></div>
+            <span class="m-badge ok"><span class="dot"></span>En línea</span>
+        </div>
+        <div class="m-body">
+            <div class="m-kpis">
+                <div class="m-kpi"><span class="rail" style="background:var(--muni-text)"></span><div class="n">1.284</div><div class="l">Resultado del filtro</div></div>
+                <div class="m-kpi"><span class="rail" style="background:var(--muni-danger-fg)"></span><div class="n" style="color:var(--muni-danger-fg)">217</div><div class="l">Morosas</div></div>
+                <div class="m-kpi"><span class="rail" style="background:var(--muni-ok-fg)"></span><div class="n" style="color:var(--muni-ok-fg)">1.067</div><div class="l">Al día</div></div>
+            </div>
+            <div class="m-filters">
+                <label class="m-field"><span>Buscar</span><input value="INDURA" placeholder="RUT o razón social"></label>
+                <label class="m-field"><span>Morosidad</span><select><option>Todas</option><option>Solo morosas</option></select></label>
+                <button class="m-apply">Aplicar</button>
+            </div>
+            <div class="m-table-wrap">
+                <table>
+                    <thead><tr><th>Razón social</th><th>RUT</th><th>Tipo</th><th class="num">Capital</th><th>Estado</th></tr></thead>
+                    <tbody>
+                        <tr><td>Comercial Andes Ltda.</td><td class="num">76.150.343-2</td><td>Comercial</td><td class="num">$ 12.400.000</td><td><span class="m-badge ok"><span class="dot"></span>Al día</span></td></tr>
+                        <tr class="danger"><td>Ferretería El Roble</td><td class="num">78.221.905-K</td><td>Industrial</td><td class="num">$ 8.900.000</td><td><span class="m-badge danger"><span class="dot"></span>Morosa</span></td></tr>
+                        <tr><td>Panadería Santa Rosa</td><td class="num">77.043.112-6</td><td>Alimentos</td><td class="num">$ 3.150.000</td><td><span class="m-badge ok"><span class="dot"></span>Al día</span></td></tr>
+                        <tr class="danger"><td>Transportes Maule SpA</td><td class="num">76.998.201-4</td><td>Servicios</td><td class="num">$ 21.700.000</td><td><span class="m-badge danger"><span class="dot"></span>Morosa</span></td></tr>
+                        <tr><td>Óptica Visión Clara</td><td class="num">77.512.660-1</td><td>Comercial</td><td class="num">$ 5.600.000</td><td><span class="m-badge warn"><span class="dot"></span>Por vencer</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════ DARK ══════════ -->
+    <div class="theme-panel" data-muni-theme="dark">
+        <div class="theme-tag">data-muni-theme="dark" · IBM Plex Sans / Mono · ámbar sobre tinta</div>
+        <div class="m-topbar">
+            <div class="m-logo"><span>GRA</span></div>
+            <div class="m-titles"><span class="name">Patentes Comerciales</span><span class="sub">Municipalidad de Graneros</span></div>
+            <div class="m-spacer"></div>
+            <span class="m-badge ok"><span class="dot"></span>En línea</span>
+        </div>
+        <div class="m-body">
+            <div class="m-kpis">
+                <div class="m-kpi"><span class="rail" style="background:var(--muni-text)"></span><div class="n">1.284</div><div class="l">Resultado del filtro</div></div>
+                <div class="m-kpi"><span class="rail" style="background:var(--muni-danger-fg)"></span><div class="n" style="color:var(--muni-danger-fg)">217</div><div class="l">Morosas</div></div>
+                <div class="m-kpi"><span class="rail" style="background:var(--muni-ok-fg)"></span><div class="n" style="color:var(--muni-ok-fg)">1.067</div><div class="l">Al día</div></div>
+            </div>
+            <div class="m-filters">
+                <label class="m-field"><span>Buscar</span><input value="INDURA" placeholder="RUT o razón social"></label>
+                <label class="m-field"><span>Morosidad</span><select><option>Todas</option><option>Solo morosas</option></select></label>
+                <button class="m-apply">Aplicar</button>
+            </div>
+            <div class="m-table-wrap">
+                <table>
+                    <thead><tr><th>Razón social</th><th>RUT</th><th>Tipo</th><th class="num">Capital</th><th>Estado</th></tr></thead>
+                    <tbody>
+                        <tr><td>Comercial Andes Ltda.</td><td class="num">76.150.343-2</td><td>Comercial</td><td class="num">$ 12.400.000</td><td><span class="m-badge ok"><span class="dot"></span>Al día</span></td></tr>
+                        <tr class="danger"><td>Ferretería El Roble</td><td class="num">78.221.905-K</td><td>Industrial</td><td class="num">$ 8.900.000</td><td><span class="m-badge danger"><span class="dot"></span>Morosa</span></td></tr>
+                        <tr><td>Panadería Santa Rosa</td><td class="num">77.043.112-6</td><td>Alimentos</td><td class="num">$ 3.150.000</td><td><span class="m-badge ok"><span class="dot"></span>Al día</span></td></tr>
+                        <tr class="danger"><td>Transportes Maule SpA</td><td class="num">76.998.201-4</td><td>Servicios</td><td class="num">$ 21.700.000</td><td><span class="m-badge danger"><span class="dot"></span>Morosa</span></td></tr>
+                        <tr><td>Óptica Visión Clara</td><td class="num">77.512.660-1</td><td>Comercial</td><td class="num">$ 5.600.000</td><td><span class="m-badge warn"><span class="dot"></span>Por vencer</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

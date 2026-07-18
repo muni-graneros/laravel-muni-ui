@@ -102,8 +102,37 @@ php artisan vendor:publish --tag=muni-ui-css   # → resources/css/vendor/muni-u
 | `<x-muni::data-table>` | `columns` (array), `empty`; el slot son los `<tr data-muni-row>` |
 | `<x-muni::pagination>` | `current`, `total`, `url` (closure fn(\$p)), `info` |
 
+### Interactivos (requieren Alpine 3)
+
+| Componente | Props principales |
+|-----------|-------------------|
+| `<x-muni::dropdown>` | `align` (start/end), `width`; slot `trigger` + ítems `<x-muni::dropdown-item>` |
+| `<x-muni::dropdown-item>` | `href`, `icon`, `tone` (default/danger) |
+| `<x-muni::modal>` | `title`, `maxWidth`; slots `trigger`, `footer` |
+| `<x-muni::tabs>` | `tabs` (array de labels), `default`; paneles `<x-muni::tab-panel :index>` |
+| `<x-muni::toast-host>` | `position`; colocar UNA vez. Disparar: `$dispatch('muni-toast', {tone, title, message})` |
+
+```blade
+{{-- Modal --}}
+<x-muni::modal title="Dar de baja la patente">
+    <x-slot:trigger><x-muni::button variant="danger">Dar de baja</x-muni::button></x-slot:trigger>
+    Se marcará <b>{{ $patente->razon_social }}</b> como cesada.
+    <x-slot:footer>
+        <x-muni::button variant="ghost" x-on:click="open=false">Cancelar</x-muni::button>
+        <x-muni::button x-on:click="open=false; $dispatch('muni-toast',{tone:'ok',message:'Patente dada de baja'})">Confirmar</x-muni::button>
+    </x-slot:footer>
+</x-muni::modal>
+
+{{-- Toast: colocar el host una vez, disparar desde cualquier parte --}}
+<x-muni::toast-host />
+<button x-on:click="$dispatch('muni-toast',{tone:'ok',title:'Guardado',message:'Cambios guardados.'})">Guardar</button>
+```
+
 Todos respetan `prefers-reduced-motion`, tienen estados `:focus-visible` con anillo de foco
 accesible (`--muni-ring`), y micro-interacciones de hover/active con transiciones tokenizadas.
+Los interactivos usan **Alpine 3 core** (sin plugins): en feria/discapacidad/licencias ya viene
+con Filament; en apps sin Filament, `npm i alpinejs` y `Alpine.start()`. El CSS del paquete trae
+la regla `[x-cloak]` para evitar el flash inicial.
 
 **Firma del sistema:** la morosidad no es un badge redondo suelto — una fila
 `<tr data-muni-row class="muni-row--danger">` pinta una franja de estado en el borde

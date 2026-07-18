@@ -18,6 +18,10 @@
    fija su tema explícitamente (los paneles del ecosistema no son auto-dark). */
 @custom-variant dark (&:where([data-muni-theme=dark], [data-muni-theme=dark] *));
 
+/* Los componentes interactivos (modal/dropdown/tabs/toast) usan Alpine 3. `x-cloak`
+   los oculta hasta que Alpine inicializa, evitando el flash de contenido sin estado. */
+[x-cloak] { display: none !important; }
+
 /* ── Preset LIGHT (por defecto) — linaje `.om` (discapacidad) ───────────────── */
 :root,
 [data-muni-theme="light"] {

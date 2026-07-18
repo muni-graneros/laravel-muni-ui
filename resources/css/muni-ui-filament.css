@@ -36,14 +36,13 @@
     box-shadow: inset 0 -2px 0 0 color-mix(in srgb, var(--mg-lima) 55%, transparent);
 }
 
-/* Ítem de navegación activo: barra lateral de acento + fondo petróleo suave */
-.fi-sidebar-item.fi-active > .fi-sidebar-item-button,
-.fi-sidebar-item-button.fi-active {
+/* Ítem de navegación activo: barra lateral de acento + fondo petróleo suave.
+   Filament v5: `.fi-active` va en `.fi-sidebar-item`; el botón es `.fi-sidebar-item-btn`. */
+.fi-sidebar-item.fi-active .fi-sidebar-item-btn {
     position: relative;
     background-color: color-mix(in srgb, var(--mg-petroleo) 9%, transparent);
 }
-.fi-sidebar-item.fi-active > .fi-sidebar-item-button::before,
-.fi-sidebar-item-button.fi-active::before {
+.fi-sidebar-item.fi-active .fi-sidebar-item-btn::before {
     content: "";
     position: absolute;
     inset-inline-start: 0;
@@ -93,12 +92,10 @@
 .dark .fi-sidebar-header {
     box-shadow: inset 0 -2px 0 0 color-mix(in srgb, var(--mg-lima) 40%, transparent);
 }
-.dark .fi-sidebar-item.fi-active > .fi-sidebar-item-button,
-.dark .fi-sidebar-item-button.fi-active {
+.dark .fi-sidebar-item.fi-active .fi-sidebar-item-btn {
     background-color: color-mix(in srgb, var(--mg-celeste) 12%, transparent);
 }
-.dark .fi-sidebar-item.fi-active > .fi-sidebar-item-button::before,
-.dark .fi-sidebar-item-button.fi-active::before {
+.dark .fi-sidebar-item.fi-active .fi-sidebar-item-btn::before {
     background: var(--mg-celeste);
 }
 .dark .fi-sidebar-group-label {

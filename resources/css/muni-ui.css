@@ -8,15 +8,12 @@
    Los valores son VERBATIM de los CSS de producción (feria.css / discapacidad.css)
    para que un sistema del ecosistema pueda migrar sin cambiar su identidad.
 
-   Uso en la app (Tailwind v4):
-     @import "tailwindcss";
-     @import "../../vendor/muni-graneros/laravel-muni-ui/resources/css/muni-ui.css";
-     @source "../../vendor/muni-graneros/laravel-muni-ui/resources/views/**/*.blade.php";
+   Este archivo es CSS PLANO: funciona en Tailwind v3, v4 o sin Tailwind. Los componentes
+   usan `style` inline con `var(--muni-*)`, así que no dependen de utilidades Tailwind.
+     - App con scoped CSS (feria/discapacidad, TW3): `@import` desde su .css.
+     - App Tailwind v4: `@import` tras `@import "tailwindcss"` + opcional `muni-ui-tailwind.css`
+       para las utilidades `bg-muni-*` y la variante `dark:`.
    ============================================================================ */
-
-/* El tema oscuro se activa por atributo, no por prefers-color-scheme: cada sistema
-   fija su tema explícitamente (los paneles del ecosistema no son auto-dark). */
-@custom-variant dark (&:where([data-muni-theme=dark], [data-muni-theme=dark] *));
 
 /* Los componentes interactivos (modal/dropdown/tabs/toast) usan Alpine 3. `x-cloak`
    los oculta hasta que Alpine inicializa, evitando el flash de contenido sin estado. */
@@ -141,31 +138,4 @@
 /* Respeta la preferencia de movimiento reducido en todo el sistema. */
 @media (prefers-reduced-motion: reduce) {
     :root { --muni-dur: 0ms; }
-}
-
-/* ── Puente a utilidades Tailwind (opcional) ────────────────────────────────
-   Expone los tokens como colores de Tailwind (`bg-muni-surface`, `text-muni-muted`…)
-   para quien prefiera utilidades a `var()`. `inline` re-lee la variable en runtime,
-   así el cambio de `data-muni-theme` re-tiñe sin recompilar. */
-@theme inline {
-    --color-muni-bg: var(--muni-bg);
-    --color-muni-surface: var(--muni-surface);
-    --color-muni-surface-2: var(--muni-surface-2);
-    --color-muni-surface-3: var(--muni-surface-3);
-    --color-muni-panel: var(--muni-panel);
-    --color-muni-text: var(--muni-text);
-    --color-muni-muted: var(--muni-muted);
-    --color-muni-hint: var(--muni-hint);
-    --color-muni-border: var(--muni-border);
-    --color-muni-accent: var(--muni-accent);
-    --color-muni-ok: var(--muni-ok-fg);
-    --color-muni-warn: var(--muni-warn-fg);
-    --color-muni-danger: var(--muni-danger-fg);
-    --color-muni-info: var(--muni-info-fg);
-
-    --font-muni-sans: var(--muni-font-sans);
-    --font-muni-mono: var(--muni-font-mono);
-
-    --radius-muni: var(--muni-radius);
-    --radius-muni-lg: var(--muni-radius-lg);
 }

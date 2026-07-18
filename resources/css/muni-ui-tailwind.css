@@ -1,0 +1,34 @@
+/* ============================================================================
+   muni-ui-tailwind.css — Puente OPCIONAL a Tailwind v4.
+   ----------------------------------------------------------------------------
+   Solo para apps en Tailwind v4 que quieran, además de los componentes:
+     - la variante `dark:` ligada a data-muni-theme
+     - utilidades de color `bg-muni-*`, `text-muni-*`, `border-muni-*`
+   Importar DESPUÉS de `@import "tailwindcss"` y de `muni-ui.css`.
+   Las apps en Tailwind v3 NO deben importar este archivo (usa sintaxis v4).
+   ============================================================================ */
+
+@custom-variant dark (&:where([data-muni-theme=dark], [data-muni-theme=dark] *));
+
+@theme inline {
+    --color-muni-bg: var(--muni-bg);
+    --color-muni-surface: var(--muni-surface);
+    --color-muni-surface-2: var(--muni-surface-2);
+    --color-muni-surface-3: var(--muni-surface-3);
+    --color-muni-panel: var(--muni-panel);
+    --color-muni-text: var(--muni-text);
+    --color-muni-muted: var(--muni-muted);
+    --color-muni-hint: var(--muni-hint);
+    --color-muni-border: var(--muni-border);
+    --color-muni-accent: var(--muni-accent);
+    --color-muni-ok: var(--muni-ok-fg);
+    --color-muni-warn: var(--muni-warn-fg);
+    --color-muni-danger: var(--muni-danger-fg);
+    --color-muni-info: var(--muni-info-fg);
+
+    --font-muni-sans: var(--muni-font-sans);
+    --font-muni-mono: var(--muni-font-mono);
+
+    --radius-muni: var(--muni-radius);
+    --radius-muni-lg: var(--muni-radius-lg);
+}

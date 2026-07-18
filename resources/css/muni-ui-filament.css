@@ -1,212 +1,126 @@
 /* ============================================================================
-   Tema Filament municipal — Municipalidad de Graneros
-   Tesis: "instrumento de gobierno". Superficies de papel institucional, tinta
-   petróleo, la franja como firma, estado activo inconfundible. NO genérico.
+   Tema Filament municipal — Municipalidad de Graneros · "Sala de Gobierno"
+   Riesgo estético: barra lateral OSCURA petróleo con acentos oro/lima y escudo
+   con resplandor. Panel autoritario e inconfundible, no un Filament genérico.
    ============================================================================ */
 :root{
-    --mg-lima:#adcd60; --mg-petroleo:#355a63; --mg-petroleo-d:#0d3a44; --mg-oro:#eab02c;
-    --mg-naranja:#c76421; --mg-celeste:#7ccbe1; --mg-carmin:#ca3048;
-    --mg-papel:#f4f1e8; --mg-papel-2:#eae5d7; --mg-borde:#ddd7c6; --mg-tinta:#20302f;
+    --mg-lima:#adcd60; --mg-lima-br:#c3e07a; --mg-petroleo:#355a63; --mg-petroleo-d:#0d3a44;
+    --mg-tinta-d:#08252b; --mg-oro:#eab02c; --mg-oro-br:#f5c542; --mg-naranja:#c76421;
+    --mg-celeste:#7ccbe1; --mg-carmin:#ca3048;
+    --mg-papel:#f6f3ea; --mg-papel-2:#efece1; --mg-borde:#e2ddce; --mg-tinta:#20302f;
+    --mg-sb-txt:#cfe3e1; --mg-sb-mut:#7ea3a3;
 }
 
-/* ── Tipografía: más carácter (pesos y tracking institucionales) ───────────── */
-.fi-body { background-color:#faf7ef; }
-.fi-main .fi-header-heading { font-weight:800; letter-spacing:-.02em; color:var(--mg-petroleo-d); font-size:1.75rem; }
-
-/* ── BARRA LATERAL: panel de papel institucional ───────────────────────────── */
-.fi-sidebar, .fi-sidebar-nav { background:var(--mg-papel) !important; border-inline-end:1px solid var(--mg-borde); }
+/* ══ BARRA LATERAL OSCURA — el gran cambio ══════════════════════════════════ */
+.fi-sidebar, .fi-sidebar-nav {
+    background:linear-gradient(185deg,#10424c 0%, #0b2f37 55%, #082228 100%) !important;
+    border-inline-end:1px solid #0a2930 !important;
+    box-shadow:inset -18px 0 40px -30px #000;
+}
 .fi-sidebar-header {
-    background:#fff !important;
-    border-bottom:1px solid var(--mg-borde);
-    box-shadow:0 3px 0 0 var(--mg-lima), 0 4px 10px -6px rgba(13,58,68,.25);
+    background:linear-gradient(180deg,#0e3b45,#0a2c34) !important;
+    border-bottom:1px solid #0a2930 !important;
+    box-shadow:0 3px 0 0 rgba(173,205,96,.55), 0 10px 24px -12px #000;
 }
-/* Etiqueta de grupo: rótulo oficial con tick */
+/* Escudo con resplandor */
+.fi-sidebar-header img, .fi-topbar-logo img, .fi-logo img { filter:drop-shadow(0 0 10px rgba(173,205,96,.45)); }
+
+/* Etiquetas de grupo: rótulo dorado con tick */
 .fi-sidebar-group-label {
-    position:relative; color:var(--mg-petroleo) !important; font-weight:800;
-    letter-spacing:.08em; text-transform:uppercase; font-size:.66rem; padding-inline-start:.85rem;
+    position:relative; color:var(--mg-oro-br) !important; font-weight:800;
+    letter-spacing:.1em; text-transform:uppercase; font-size:.64rem; padding-inline-start:.9rem; opacity:.95;
 }
-.fi-sidebar-group-label::before {
-    content:""; position:absolute; inset-inline-start:0; top:50%; transform:translateY(-50%);
-    width:5px; height:5px; border-radius:1px; background:var(--mg-oro);
-}
-/* Ítems */
-.fi-sidebar-item-btn { border-radius:9px; font-weight:600; transition:background .15s,color .15s; }
-.fi-sidebar-item-btn:hover { background:color-mix(in srgb,var(--mg-petroleo) 9%,transparent) !important; }
-/* Ítem ACTIVO: píldora petróleo SÓLIDA con texto claro (inconfundible) */
+.fi-sidebar-group-label::before{ content:""; position:absolute; inset-inline-start:0; top:50%; transform:translateY(-50%); width:5px; height:5px; border-radius:1px; background:var(--mg-lima); box-shadow:0 0 6px var(--mg-lima); }
+.fi-sidebar-group .fi-icon-btn { color:var(--mg-sb-mut) !important; }
+
+/* Ítems: texto e icono claros */
+.fi-sidebar-item-btn { border-radius:10px; font-weight:600; transition:all .16s; }
+.fi-sidebar-item-label { color:var(--mg-sb-txt) !important; }
+.fi-sidebar-item-icon { color:var(--mg-sb-mut) !important; }
+.fi-sidebar-item-btn:hover { background:rgba(255,255,255,.06) !important; }
+.fi-sidebar-item-btn:hover .fi-sidebar-item-label { color:#fff !important; }
+.fi-sidebar-item-btn:hover .fi-sidebar-item-icon { color:var(--mg-lima-br) !important; }
+
+/* Ítem ACTIVO: píldora con brillo lima→oro y resplandor */
 .fi-sidebar-item.fi-active .fi-sidebar-item-btn {
-    background:linear-gradient(120deg,var(--mg-petroleo),var(--mg-petroleo-d)) !important;
-    box-shadow:0 8px 18px -8px rgba(13,58,68,.55), inset 0 1px 0 rgba(255,255,255,.08);
-    font-weight:700;
+    background:linear-gradient(120deg, rgba(173,205,96,.22), rgba(234,176,44,.16)) !important;
+    box-shadow:inset 0 0 0 1px rgba(173,205,96,.45), 0 8px 20px -8px rgba(0,0,0,.6);
+    font-weight:800; position:relative;
 }
-.fi-sidebar-item.fi-active .fi-sidebar-item-btn,
 .fi-sidebar-item.fi-active .fi-sidebar-item-btn .fi-sidebar-item-label,
-.fi-sidebar-item.fi-active .fi-sidebar-item-btn .fi-sidebar-item-icon { color:#fff !important; }
-.fi-sidebar-item.fi-active .fi-sidebar-item-btn::before {
-    content:""; position:absolute; inset-inline-start:-4px; top:9px; bottom:9px;
-    width:3px; border-radius:3px; background:var(--mg-lima);
-}
+.fi-sidebar-item.fi-active .fi-sidebar-item-btn { color:#fff !important; }
+.fi-sidebar-item.fi-active .fi-sidebar-item-btn .fi-sidebar-item-icon { color:var(--mg-lima-br) !important; }
+.fi-sidebar-item.fi-active .fi-sidebar-item-btn::before{ content:""; position:absolute; inset-inline-start:-4px; top:8px; bottom:8px; width:4px; border-radius:4px; background:linear-gradient(180deg,var(--mg-lima-br),var(--mg-oro)); box-shadow:0 0 10px rgba(173,205,96,.7); }
+/* Badges del sidebar (contadores) */
+.fi-sidebar-item-badge { background:var(--mg-oro) !important; color:#3a2a05 !important; font-weight:800; }
 
-/* ── BARRA SUPERIOR ─────────────────────────────────────────────────────────── */
-.fi-topbar > nav { background:#fff !important; border-bottom:1px solid var(--mg-borde); box-shadow:0 1px 12px -6px rgba(13,58,68,.15); }
+/* Colapsar/expandir grupos: chevron claro */
+.fi-sidebar-group-collapse-button { color:var(--mg-sb-mut) !important; }
 
-/* ── CONTENIDO: papel cálido ────────────────────────────────────────────────── */
-.fi-main-ctn, .fi-main { background-color:#faf7ef; }
+/* Pie institucional del sidebar (oscuro) */
+.mg-sidebar-foot{ margin-top:auto; padding:.9rem 1rem; border-top:1px solid rgba(255,255,255,.08); display:flex; align-items:center; gap:.6rem; background:linear-gradient(180deg,transparent,rgba(0,0,0,.25)); }
+.mg-sidebar-foot img{ width:28px; height:28px; object-fit:contain; filter:drop-shadow(0 0 6px rgba(173,205,96,.4)); }
+.mg-sidebar-foot b{ font-size:.72rem; font-weight:800; color:#fff; line-height:1.1; display:block; }
+.mg-sidebar-foot span{ font-size:.64rem; color:var(--mg-sb-mut); }
+.fi-sidebar-nav{ display:flex; flex-direction:column; } .fi-sidebar-nav-groups{ flex:1; }
 
-/* ── TARJETAS / SECCIONES / WIDGETS: documento oficial ─────────────────────── */
-.fi-section, .fi-wi-stats-overview-stat, .fi-wi {
-    border:1px solid var(--mg-borde) !important; border-radius:16px !important; background:#fff;
-    box-shadow:0 1px 2px rgba(13,58,68,.04), 0 10px 28px -16px rgba(13,58,68,.22) !important;
-}
-/* Stat: acento superior petróleo + número grande */
-.fi-wi-stats-overview-stat { border-top:3px solid var(--mg-petroleo) !important; }
-.fi-wi-stats-overview-stat-value { font-weight:800 !important; letter-spacing:-.02em; color:var(--mg-petroleo-d); }
-.fi-section-header-heading { font-weight:700; color:var(--mg-petroleo-d); }
-
-/* ── Botones primarios: profundidad institucional ──────────────────────────── */
-.fi-btn.fi-color-primary, .fi-btn-color-primary { box-shadow:0 8px 18px -10px rgba(13,58,68,.5); }
-
-/* ── LOGIN: cinturón + tarjeta como cédula oficial ─────────────────────────── */
-.fi-simple-layout { background:#faf7ef !important; }
-.fi-simple-layout::before {
-    content:""; position:fixed; top:0; left:0; right:0; height:5px; z-index:60;
-    background:linear-gradient(90deg,var(--mg-lima) 0 14.28%,var(--mg-petroleo) 14.28% 28.57%,var(--mg-oro) 28.57% 42.85%,var(--mg-naranja) 42.85% 57.14%,var(--mg-celeste) 57.14% 71.42%,var(--mg-carmin) 71.42% 85.71%,#9c9b9b 85.71% 100%);
-}
-.fi-simple-main { border:1px solid var(--mg-borde) !important; border-radius:18px !important; box-shadow:0 30px 70px -35px rgba(13,58,68,.5) !important; }
-.fi-simple-main::before { content:""; display:block; height:3px; margin:-1.5rem -1.5rem 1.5rem; border-radius:16px 16px 0 0; background:linear-gradient(90deg,var(--mg-lima),var(--mg-petroleo) 40%,var(--mg-oro)); }
-
-/* ── MODO OSCURO ────────────────────────────────────────────────────────────── */
-.dark .fi-body, .dark .fi-main-ctn, .dark .fi-main { background-color:#0b1417 !important; }
-.dark .fi-sidebar, .dark .fi-sidebar-nav { background:#0f1c20 !important; border-color:#20343a; }
-.dark .fi-sidebar-header { background:#0d181c !important; border-color:#20343a; box-shadow:0 3px 0 0 color-mix(in srgb,var(--mg-lima) 55%,transparent); }
-.dark .fi-sidebar-group-label { color:var(--mg-celeste) !important; }
-.dark .fi-topbar > nav { background:#0f1c20 !important; border-color:#20343a; }
-.dark .fi-section, .dark .fi-wi, .dark .fi-wi-stats-overview-stat { background:#111f24 !important; border-color:#20343a !important; }
-.dark .fi-main .fi-header-heading, .dark .fi-wi-stats-overview-stat-value { color:#e6f1f0; }
-
-/* ── Micro-motion institucional (sutil, respeta reduced-motion) ────────────── */
-@keyframes mg-rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
-.fi-wi, .fi-section { animation: mg-rise .45s cubic-bezier(.22,1,.36,1) both; }
-@media (prefers-reduced-motion: reduce) { .fi-wi, .fi-section { animation:none; } }
-
-/* Buscador de la barra superior: forma institucional */
-.fi-global-search-field .fi-input-wrp, .fi-topbar .fi-input-wrp {
-    border-radius:10px; border:1px solid var(--mg-borde);
-    box-shadow:inset 0 1px 2px rgba(13,58,68,.05);
-}
+/* ══ BARRA SUPERIOR: cristal cálido ═════════════════════════════════════════ */
+.fi-topbar > nav { background:color-mix(in srgb,#fff 82%, var(--mg-papel)) !important; backdrop-filter:saturate(1.2) blur(6px); border-bottom:1px solid var(--mg-borde); box-shadow:0 4px 20px -12px rgba(13,58,68,.25); }
+.fi-topbar .fi-input-wrp, .fi-global-search-field .fi-input-wrp { border-radius:11px; border:1px solid var(--mg-borde); box-shadow:inset 0 1px 2px rgba(13,58,68,.05); }
 .fi-global-search-field .fi-input-wrp:focus-within { border-color:var(--mg-petroleo); box-shadow:0 0 0 3px color-mix(in srgb,var(--mg-petroleo) 18%,transparent); }
+.fi-topbar .fi-avatar { box-shadow:0 0 0 2px #fff,0 0 0 3px color-mix(in srgb,var(--mg-petroleo) 55%,transparent); }
 
-/* Badges: pastilla con carácter */
-.fi-badge { font-weight:700; letter-spacing:.01em; border-radius:8px; }
+/* ══ CONTENIDO: papel cálido ════════════════════════════════════════════════ */
+.fi-body, .fi-main-ctn, .fi-main { background-color:#f8f5ec !important; }
 
-/* Avatar del usuario: anillo institucional */
-.fi-topbar .fi-avatar, .fi-user-menu-trigger .fi-avatar { box-shadow:0 0 0 2px #fff, 0 0 0 3px color-mix(in srgb,var(--mg-petroleo) 45%,transparent); }
+/* Cabecera de página: título grande + regla franja */
+.fi-header-heading { font-weight:800 !important; letter-spacing:-.02em; color:var(--mg-petroleo-d) !important; font-size:1.9rem !important; }
+.fi-main > .fi-header, .fi-page > .fi-header { position:relative; padding-bottom:1rem; }
+.fi-main > .fi-header::after, .fi-page > .fi-header::after { content:""; position:absolute; left:0; bottom:0; width:72px; height:3px; border-radius:2px; background:linear-gradient(90deg,var(--mg-petroleo),var(--mg-lima),var(--mg-oro)); }
 
-/* Stat: número aún más protagonista */
-.fi-wi-stats-overview-stat-value { font-size:2.1rem !important; line-height:1.05; }
+/* ══ TARJETAS / SECCIONES / WIDGETS ════════════════════════════════════════ */
+.fi-section, .fi-wi-stats-overview-stat, .fi-wi {
+    border:1px solid var(--mg-borde) !important; border-radius:18px !important; background:#fff;
+    box-shadow:0 1px 2px rgba(13,58,68,.04), 0 14px 34px -20px rgba(13,58,68,.28) !important;
+}
+.fi-wi-stats-overview-stat { position:relative; overflow:hidden; border-top:3px solid var(--mg-petroleo) !important; background:linear-gradient(180deg,color-mix(in srgb,var(--mg-petroleo) 5%,#fff),#fff) !important; }
+.fi-wi-stats-overview-stat::after{ content:""; position:absolute; top:0; right:0; width:130px; height:130px; pointer-events:none; background:radial-gradient(circle at 100% 0, color-mix(in srgb,var(--mg-petroleo) 12%,transparent), transparent 70%); }
+.fi-wi-stats-overview-stat-value { font-weight:800 !important; letter-spacing:-.02em; color:var(--mg-petroleo-d) !important; font-size:2.4rem !important; line-height:1.05; }
 .fi-wi-stats-overview-stat-label { font-weight:600; color:var(--mg-tinta); }
+.fi-section-header-heading { position:relative; padding-inline-start:.85rem; font-weight:700; color:var(--mg-petroleo-d); }
+.fi-section-header-heading::before{ content:""; position:absolute; inset-inline-start:0; top:50%; transform:translateY(-50%); width:4px; height:1.05em; border-radius:2px; background:linear-gradient(180deg,var(--mg-petroleo),var(--mg-lima)); }
 
-/* Tablas: cabecera institucional */
-.fi-ta-header-cell { background:color-mix(in srgb,var(--mg-papel) 45%,#fff); font-weight:700; color:var(--mg-petroleo); text-transform:uppercase; letter-spacing:.03em; font-size:.7rem; }
-.fi-ta-row:hover { background:color-mix(in srgb,var(--mg-petroleo) 4%,transparent); }
-
-/* ══ v6: entrada escalonada ("que caigan"), formularios, botones, modales ════ */
-
-/* Caída escalonada de widgets/tarjetas (alineados en su grilla) */
-@keyframes mg-fall { from { opacity:0; transform:translateY(-14px); } 60% { opacity:1; } to { opacity:1; transform:none; } }
-.fi-wi, .fi-section, .fi-ta { animation: mg-fall .5s cubic-bezier(.34,1.3,.64,1) both; }
-.fi-wi:nth-child(1){animation-delay:.02s} .fi-wi:nth-child(2){animation-delay:.08s}
-.fi-wi:nth-child(3){animation-delay:.14s} .fi-wi:nth-child(4){animation-delay:.2s}
-.fi-wi:nth-child(5){animation-delay:.26s} .fi-wi:nth-child(6){animation-delay:.32s}
-@media (prefers-reduced-motion: reduce){ .fi-wi,.fi-section,.fi-ta{ animation:none !important; } }
-
-/* Formularios: campos con identidad municipal */
-.fi-input-wrp { border-radius:10px !important; border:1px solid var(--mg-borde); transition:border-color .15s, box-shadow .15s; }
-.fi-input-wrp:focus-within { border-color:var(--mg-petroleo) !important; box-shadow:0 0 0 3px color-mix(in srgb,var(--mg-petroleo) 18%,transparent) !important; }
-.fi-fo-field-wrp-label, .fi-fo-field-wrp .fi-fo-field-label { font-weight:600; color:var(--mg-tinta); }
-
-/* Botones: forma y profundidad institucional */
-.fi-btn { border-radius:10px !important; font-weight:600; }
-.fi-btn.fi-color-primary, .fi-btn-color-primary { box-shadow:0 8px 18px -10px rgba(13,58,68,.5); }
+/* ══ BOTONES / BADGES / FORM / TABLAS ══════════════════════════════════════ */
+.fi-btn { border-radius:11px !important; font-weight:600; }
+.fi-btn.fi-color-primary, .fi-btn-color-primary { box-shadow:0 10px 22px -10px rgba(13,58,68,.55); background-image:linear-gradient(180deg,rgba(255,255,255,.1),transparent); }
 .fi-btn:active { transform:translateY(1px); }
-
-/* Modales: cabecera con cinta institucional */
-.fi-modal-window { border-radius:18px !important; overflow:hidden; border:1px solid var(--mg-borde); box-shadow:0 40px 80px -30px rgba(13,58,68,.55) !important; }
-.fi-modal-header { border-bottom:1px solid var(--mg-borde); }
-.fi-modal-window::before { content:""; display:block; height:4px; background:linear-gradient(90deg,var(--mg-lima),var(--mg-petroleo) 45%,var(--mg-oro)); }
-
-/* Tabs: subrayado petróleo */
+.fi-badge { font-weight:700; border-radius:8px; }
+.fi-input-wrp { border-radius:11px !important; border:1px solid var(--mg-borde); }
+.fi-input-wrp:focus-within { border-color:var(--mg-petroleo) !important; box-shadow:0 0 0 3px color-mix(in srgb,var(--mg-petroleo) 18%,transparent) !important; }
+.fi-ta-header-cell { background:color-mix(in srgb,var(--mg-papel) 40%,#fff); font-weight:700; color:var(--mg-petroleo); text-transform:uppercase; letter-spacing:.03em; font-size:.7rem; }
+.fi-ta-row:hover { background:color-mix(in srgb,var(--mg-petroleo) 4%,transparent); }
+.fi-modal-window { border-radius:20px !important; overflow:hidden; box-shadow:0 44px 90px -32px rgba(13,58,68,.6) !important; }
+.fi-modal-window::before{ content:""; display:block; height:4px; background:linear-gradient(90deg,var(--mg-lima),var(--mg-petroleo) 45%,var(--mg-oro)); }
+.fi-dropdown-panel { border-radius:14px !important; border:1px solid var(--mg-borde); box-shadow:0 24px 54px -26px rgba(13,58,68,.45) !important; }
 .fi-tabs-item.fi-active { color:var(--mg-petroleo-d) !important; }
-.fi-tabs-item.fi-active::after, .fi-tabs-item[aria-selected="true"]::after { background:var(--mg-petroleo) !important; }
 
-/* Dropdowns / menús: tarjeta institucional */
-.fi-dropdown-panel { border-radius:12px !important; border:1px solid var(--mg-borde); box-shadow:0 20px 50px -24px rgba(13,58,68,.4) !important; }
+/* ══ ENTRADA ESCALONADA ════════════════════════════════════════════════════ */
+@keyframes mg-fall{ from{opacity:0;transform:translateY(-14px)} 60%{opacity:1} to{opacity:1;transform:none} }
+.fi-wi, .fi-section, .fi-ta { animation:mg-fall .5s cubic-bezier(.34,1.3,.64,1) both; }
+.fi-wi:nth-child(2){animation-delay:.07s} .fi-wi:nth-child(3){animation-delay:.13s} .fi-wi:nth-child(4){animation-delay:.19s} .fi-wi:nth-child(5){animation-delay:.25s} .fi-wi:nth-child(6){animation-delay:.31s}
+@media (prefers-reduced-motion:reduce){ .fi-wi,.fi-section,.fi-ta{animation:none !important} }
 
-/* Paginación y notificaciones */
-.fi-pagination .fi-btn { border-radius:8px !important; }
-.fi-no-notification { border-radius:14px !important; border-inline-start:3px solid var(--mg-petroleo) !important; }
+/* ══ DEFENSA iconos gigantes en páginas custom ═════════════════════════════ */
+.fi-main-ctn a > svg, .fi-main-ctn button > svg, .fi-main-ctn label > svg { width:1.15rem !important; height:1.15rem !important; flex:none; }
 
-/* Responsive: en móvil, el sidebar overlay conserva el papel institucional */
-@media (max-width: 1024px){
-    .fi-sidebar { box-shadow:0 20px 60px -20px rgba(13,58,68,.5); }
-    .fi-main .fi-header-heading { font-size:1.4rem; }
-}
+/* ══ LOGIN: cinta + tarjeta oficial ════════════════════════════════════════ */
+.fi-simple-layout { background:#f8f5ec !important; }
+.fi-simple-layout::before{ content:""; position:fixed; top:0; left:0; right:0; height:5px; z-index:60; background:linear-gradient(90deg,var(--mg-lima) 0 14.28%,var(--mg-petroleo) 14.28% 28.57%,var(--mg-oro) 28.57% 42.85%,var(--mg-naranja) 42.85% 57.14%,var(--mg-celeste) 57.14% 71.42%,var(--mg-carmin) 71.42% 85.71%,#9c9b9b 85.71% 100%); }
+.fi-simple-main { border:1px solid var(--mg-borde) !important; border-radius:20px !important; box-shadow:0 34px 80px -38px rgba(13,58,68,.55) !important; }
 
-/* ══ v6b: defensa contra iconos sin tamaño en páginas custom ════════════════
-   Algunas páginas Filament custom usan utilidades del app-Tailwind (h-4 w-4)
-   que no se compilan en el contexto del panel → los heroicons salen gigantes.
-   Los iconos dentro de enlaces/botones SIEMPRE deben ser pequeños. No afecta a
-   los SVG de gráficos (no son hijos directos de <a>/<button>). */
-.fi-main-ctn a > svg, .fi-main-ctn button > svg,
-.fi-main-ctn a > .fi-icon, .fi-main-ctn label > svg {
-    width:1.15rem !important; height:1.15rem !important; flex:none;
-}
-
-/* ══ v7: riqueza visual — tarjetas, cabeceras, profundidad institucional ════ */
-
-/* Cabecera de página: título grande + regla de franja debajo */
-.fi-main > .fi-header, .fi-page > .fi-header { position:relative; padding-bottom:1rem; margin-bottom:.5rem; }
-.fi-main > .fi-header::after, .fi-page > .fi-header::after {
-    content:""; position:absolute; left:0; bottom:0; width:64px; height:3px; border-radius:2px;
-    background:linear-gradient(90deg,var(--mg-petroleo),var(--mg-lima));
-}
-.fi-header-heading { font-size:1.85rem !important; }
-
-/* Tarjetas de estadística: lavado de color superior + acento vivo */
-.fi-wi-stats-overview-stat {
-    position:relative; overflow:hidden;
-    background:linear-gradient(180deg, color-mix(in srgb,var(--mg-petroleo) 4%, #fff), #fff) !important;
-}
-.fi-wi-stats-overview-stat::after {
-    content:""; position:absolute; top:0; right:0; width:120px; height:120px; pointer-events:none;
-    background:radial-gradient(circle at 100% 0, color-mix(in srgb,var(--mg-petroleo) 10%,transparent), transparent 70%);
-}
-.fi-wi-stats-overview-stat-value { font-size:2.3rem !important; }
-.fi-wi-stats-overview-stat-description { font-weight:600; }
-
-/* Secciones: encabezado con tick de acento */
-.fi-section-header { position:relative; }
-.fi-section-header-heading { padding-inline-start:.85rem; position:relative; }
-.fi-section-header-heading::before {
-    content:""; position:absolute; inset-inline-start:0; top:50%; transform:translateY(-50%);
-    width:4px; height:1.05em; border-radius:2px; background:linear-gradient(180deg,var(--mg-petroleo),var(--mg-lima));
-}
-
-/* Barra superior: título del panel con más presencia */
-.fi-topbar { backdrop-filter:saturate(1.1); }
-
-/* Footer institucional de la barra lateral (inyectado por render hook) */
-.mg-sidebar-foot {
-    margin-top:auto; padding:.9rem 1rem; border-top:1px solid var(--mg-borde);
-    display:flex; align-items:center; gap:.6rem; font-family:inherit;
-}
-.mg-sidebar-foot img { width:26px; height:26px; object-fit:contain; }
-.mg-sidebar-foot b { font-size:.72rem; font-weight:800; color:var(--mg-petroleo); line-height:1.1; display:block; }
-.mg-sidebar-foot span { font-size:.66rem; color:var(--mg-tinta); opacity:.7; }
-.fi-sidebar-nav { display:flex; flex-direction:column; }
-.fi-sidebar-nav-groups { flex:1; }
-
-/* Botón "Nuevo/Crear" y acciones primarias: gradiente institucional sutil */
-.fi-btn.fi-color-primary { background-image:linear-gradient(180deg, color-mix(in srgb,#fff 8%, transparent), transparent); }
-
-/* Enlaces de acción en tablas (Editar/Borrar): peso */
-.fi-ta-actions .fi-link { font-weight:600; }
+/* ══ MODO OSCURO (el panel ya oscuro) ══════════════════════════════════════ */
+.dark .fi-body, .dark .fi-main-ctn, .dark .fi-main { background-color:#081418 !important; }
+.dark .fi-section, .dark .fi-wi, .dark .fi-wi-stats-overview-stat { background:#0f2025 !important; border-color:#1c343a !important; }
+.dark .fi-topbar > nav { background:#0d1c20 !important; border-color:#1c343a; }
+.dark .fi-header-heading, .dark .fi-wi-stats-overview-stat-value { color:#eaf5f3 !important; }
+.dark .fi-ta-header-cell { background:#0f2025; color:var(--mg-lima-br); }

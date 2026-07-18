@@ -1,86 +1,110 @@
-/* Tema Filament municipal — Municipalidad de Graneros (identidad marcada, no genérica) */
+/* ============================================================================
+   Tema Filament municipal — Municipalidad de Graneros
+   Tesis: "instrumento de gobierno". Superficies de papel institucional, tinta
+   petróleo, la franja como firma, estado activo inconfundible. NO genérico.
+   ============================================================================ */
 :root{
-    --mg-lima:#adcd60; --mg-petroleo:#355a63; --mg-petroleo-d:#00404c; --mg-oro:#eab02c;
+    --mg-lima:#adcd60; --mg-petroleo:#355a63; --mg-petroleo-d:#0d3a44; --mg-oro:#eab02c;
     --mg-naranja:#c76421; --mg-celeste:#7ccbe1; --mg-carmin:#ca3048;
-    --mg-crema:#f7f5ef; --mg-crema-2:#efece2; --mg-borde:#e4e0d4;
+    --mg-papel:#f4f1e8; --mg-papel-2:#eae5d7; --mg-borde:#ddd7c6; --mg-tinta:#20302f;
 }
 
-/* ── Barra lateral: superficie institucional de papel, no blanco genérico ──── */
-.fi-sidebar, .fi-sidebar-nav {
-    background-color: var(--mg-crema) !important;
-    border-inline-end: 1px solid var(--mg-borde);
-}
+/* ── Tipografía: más carácter (pesos y tracking institucionales) ───────────── */
+.fi-body { background-color:#faf7ef; }
+.fi-main .fi-header-heading { font-weight:800; letter-spacing:-.02em; color:var(--mg-petroleo-d); font-size:1.75rem; }
+
+/* ── BARRA LATERAL: panel de papel institucional ───────────────────────────── */
+.fi-sidebar, .fi-sidebar-nav { background:var(--mg-papel) !important; border-inline-end:1px solid var(--mg-borde); }
 .fi-sidebar-header {
-    background-color: var(--mg-crema) !important;
-    border-bottom: 1px solid var(--mg-borde);
-    box-shadow: inset 0 -3px 0 0 color-mix(in srgb, var(--mg-lima) 70%, transparent);
+    background:#fff !important;
+    border-bottom:1px solid var(--mg-borde);
+    box-shadow:0 3px 0 0 var(--mg-lima), 0 4px 10px -6px rgba(13,58,68,.25);
 }
-/* Grupos: etiqueta institucional */
+/* Etiqueta de grupo: rótulo oficial con tick */
 .fi-sidebar-group-label {
-    color: var(--mg-petroleo) !important;
-    font-weight: 700;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-    font-size: .68rem;
+    position:relative; color:var(--mg-petroleo) !important; font-weight:800;
+    letter-spacing:.08em; text-transform:uppercase; font-size:.66rem; padding-inline-start:.85rem;
 }
-/* Ítems: hover cálido */
-.fi-sidebar-item-btn:hover {
-    background-color: color-mix(in srgb, var(--mg-petroleo) 8%, transparent) !important;
+.fi-sidebar-group-label::before {
+    content:""; position:absolute; inset-inline-start:0; top:50%; transform:translateY(-50%);
+    width:5px; height:5px; border-radius:1px; background:var(--mg-oro);
 }
-/* Ítem ACTIVO: píldora petróleo sólida + barra de acento */
+/* Ítems */
+.fi-sidebar-item-btn { border-radius:9px; font-weight:600; transition:background .15s,color .15s; }
+.fi-sidebar-item-btn:hover { background:color-mix(in srgb,var(--mg-petroleo) 9%,transparent) !important; }
+/* Ítem ACTIVO: píldora petróleo SÓLIDA con texto claro (inconfundible) */
 .fi-sidebar-item.fi-active .fi-sidebar-item-btn {
-    position: relative;
-    background-color: color-mix(in srgb, var(--mg-petroleo) 16%, #ffffff) !important;
-    font-weight: 700;
-    border: 1px solid color-mix(in srgb, var(--mg-petroleo) 22%, transparent);
+    background:linear-gradient(120deg,var(--mg-petroleo),var(--mg-petroleo-d)) !important;
+    box-shadow:0 8px 18px -8px rgba(13,58,68,.55), inset 0 1px 0 rgba(255,255,255,.08);
+    font-weight:700;
 }
 .fi-sidebar-item.fi-active .fi-sidebar-item-btn,
 .fi-sidebar-item.fi-active .fi-sidebar-item-btn .fi-sidebar-item-label,
-.fi-sidebar-item.fi-active .fi-sidebar-item-btn .fi-sidebar-item-icon {
-    color: var(--mg-petroleo-d) !important;
-}
+.fi-sidebar-item.fi-active .fi-sidebar-item-btn .fi-sidebar-item-icon { color:#fff !important; }
 .fi-sidebar-item.fi-active .fi-sidebar-item-btn::before {
-    content:""; position:absolute; inset-inline-start:0; top:7px; bottom:7px;
-    width:4px; border-radius:0 4px 4px 0; background:var(--mg-petroleo);
+    content:""; position:absolute; inset-inline-start:-4px; top:9px; bottom:9px;
+    width:3px; border-radius:3px; background:var(--mg-lima);
 }
 
-/* ── Barra superior: base papel con borde institucional ────────────────────── */
-.fi-topbar > nav {
-    background-color: color-mix(in srgb, var(--mg-crema) 55%, #ffffff) !important;
-    border-bottom: 1px solid var(--mg-borde);
-}
+/* ── BARRA SUPERIOR ─────────────────────────────────────────────────────────── */
+.fi-topbar > nav { background:#fff !important; border-bottom:1px solid var(--mg-borde); box-shadow:0 1px 12px -6px rgba(13,58,68,.15); }
 
-/* ── Contenido: fondo cálido en vez de gris frío ───────────────────────────── */
-.fi-main-ctn, .fi-main {
-    background-color: #fcfbf7;
-}
+/* ── CONTENIDO: papel cálido ────────────────────────────────────────────────── */
+.fi-main-ctn, .fi-main { background-color:#faf7ef; }
 
-/* ── Tarjetas / secciones / widgets: borde cálido, radio y sombra propios ──── */
+/* ── TARJETAS / SECCIONES / WIDGETS: documento oficial ─────────────────────── */
 .fi-section, .fi-wi-stats-overview-stat, .fi-wi {
-    border: 1px solid var(--mg-borde) !important;
-    border-radius: 14px !important;
-    box-shadow: 0 1px 2px rgba(53,90,99,.04), 0 6px 20px -12px rgba(53,90,99,.18) !important;
+    border:1px solid var(--mg-borde) !important; border-radius:16px !important; background:#fff;
+    box-shadow:0 1px 2px rgba(13,58,68,.04), 0 10px 28px -16px rgba(13,58,68,.22) !important;
 }
-.fi-wi-stats-overview-stat {
-    border-top: 3px solid color-mix(in srgb, var(--mg-petroleo) 55%, transparent) !important;
-}
+/* Stat: acento superior petróleo + número grande */
+.fi-wi-stats-overview-stat { border-top:3px solid var(--mg-petroleo) !important; }
+.fi-wi-stats-overview-stat-value { font-weight:800 !important; letter-spacing:-.02em; color:var(--mg-petroleo-d); }
+.fi-section-header-heading { font-weight:700; color:var(--mg-petroleo-d); }
 
-/* ── Encabezados: tracking institucional ───────────────────────────────────── */
-.fi-header-heading { letter-spacing:-.015em; color:var(--mg-petroleo-d); }
+/* ── Botones primarios: profundidad institucional ──────────────────────────── */
+.fi-btn.fi-color-primary, .fi-btn-color-primary { box-shadow:0 8px 18px -10px rgba(13,58,68,.5); }
 
-/* ── Login: cinturón + sello ───────────────────────────────────────────────── */
+/* ── LOGIN: cinturón + tarjeta como cédula oficial ─────────────────────────── */
+.fi-simple-layout { background:#faf7ef !important; }
 .fi-simple-layout::before {
     content:""; position:fixed; top:0; left:0; right:0; height:5px; z-index:60;
     background:linear-gradient(90deg,var(--mg-lima) 0 14.28%,var(--mg-petroleo) 14.28% 28.57%,var(--mg-oro) 28.57% 42.85%,var(--mg-naranja) 42.85% 57.14%,var(--mg-celeste) 57.14% 71.42%,var(--mg-carmin) 71.42% 85.71%,#9c9b9b 85.71% 100%);
 }
+.fi-simple-main { border:1px solid var(--mg-borde) !important; border-radius:18px !important; box-shadow:0 30px 70px -35px rgba(13,58,68,.5) !important; }
+.fi-simple-main::before { content:""; display:block; height:3px; margin:-1.5rem -1.5rem 1.5rem; border-radius:16px 16px 0 0; background:linear-gradient(90deg,var(--mg-lima),var(--mg-petroleo) 40%,var(--mg-oro)); }
 
-/* ── Modo oscuro ───────────────────────────────────────────────────────────── */
-.dark .fi-sidebar, .dark .fi-sidebar-nav, .dark .fi-sidebar-header { background-color:#0f1a1e !important; border-color:#22343a; }
-.dark .fi-sidebar-header { box-shadow: inset 0 -3px 0 0 color-mix(in srgb, var(--mg-lima) 45%, transparent); }
+/* ── MODO OSCURO ────────────────────────────────────────────────────────────── */
+.dark .fi-body, .dark .fi-main-ctn, .dark .fi-main { background-color:#0b1417 !important; }
+.dark .fi-sidebar, .dark .fi-sidebar-nav { background:#0f1c20 !important; border-color:#20343a; }
+.dark .fi-sidebar-header { background:#0d181c !important; border-color:#20343a; box-shadow:0 3px 0 0 color-mix(in srgb,var(--mg-lima) 55%,transparent); }
 .dark .fi-sidebar-group-label { color:var(--mg-celeste) !important; }
-.dark .fi-main-ctn, .dark .fi-main { background-color:#0b1417; }
-.dark .fi-sidebar-item.fi-active .fi-sidebar-item-btn { background-color:color-mix(in srgb,var(--mg-celeste) 16%,transparent)!important; }
-.dark .fi-sidebar-item.fi-active .fi-sidebar-item-btn::before { background:var(--mg-celeste); }
-.dark .fi-sidebar-item.fi-active .fi-sidebar-item-btn,
-.dark .fi-sidebar-item.fi-active .fi-sidebar-item-btn .fi-sidebar-item-label,
-.dark .fi-sidebar-item.fi-active .fi-sidebar-item-btn .fi-sidebar-item-icon { color:#e6f1f0 !important; }
+.dark .fi-topbar > nav { background:#0f1c20 !important; border-color:#20343a; }
+.dark .fi-section, .dark .fi-wi, .dark .fi-wi-stats-overview-stat { background:#111f24 !important; border-color:#20343a !important; }
+.dark .fi-main .fi-header-heading, .dark .fi-wi-stats-overview-stat-value { color:#e6f1f0; }
+
+/* ── Micro-motion institucional (sutil, respeta reduced-motion) ────────────── */
+@keyframes mg-rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+.fi-wi, .fi-section { animation: mg-rise .45s cubic-bezier(.22,1,.36,1) both; }
+@media (prefers-reduced-motion: reduce) { .fi-wi, .fi-section { animation:none; } }
+
+/* Buscador de la barra superior: forma institucional */
+.fi-global-search-field .fi-input-wrp, .fi-topbar .fi-input-wrp {
+    border-radius:10px; border:1px solid var(--mg-borde);
+    box-shadow:inset 0 1px 2px rgba(13,58,68,.05);
+}
+.fi-global-search-field .fi-input-wrp:focus-within { border-color:var(--mg-petroleo); box-shadow:0 0 0 3px color-mix(in srgb,var(--mg-petroleo) 18%,transparent); }
+
+/* Badges: pastilla con carácter */
+.fi-badge { font-weight:700; letter-spacing:.01em; border-radius:8px; }
+
+/* Avatar del usuario: anillo institucional */
+.fi-topbar .fi-avatar, .fi-user-menu-trigger .fi-avatar { box-shadow:0 0 0 2px #fff, 0 0 0 3px color-mix(in srgb,var(--mg-petroleo) 45%,transparent); }
+
+/* Stat: número aún más protagonista */
+.fi-wi-stats-overview-stat-value { font-size:2.1rem !important; line-height:1.05; }
+.fi-wi-stats-overview-stat-label { font-weight:600; color:var(--mg-tinta); }
+
+/* Tablas: cabecera institucional */
+.fi-ta-header-cell { background:color-mix(in srgb,var(--mg-papel) 45%,#fff); font-weight:700; color:var(--mg-petroleo); text-transform:uppercase; letter-spacing:.03em; font-size:.7rem; }
+.fi-ta-row:hover { background:color-mix(in srgb,var(--mg-petroleo) 4%,transparent); }

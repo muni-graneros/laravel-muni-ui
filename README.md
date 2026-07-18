@@ -180,9 +180,21 @@ la regla `[x-cloak]` para evitar el flash inicial.
 `<tr data-muni-row class="muni-row--danger">` pinta una franja de estado en el borde
 izquierdo (banda de libro mayor), y los RUT/cifras usan `.muni-num` (mono tabular).
 
-## Demo
+## Demos (`demo/`)
 
-`demo/index.html` — showcase de los componentes en ambos temas (abrir en el navegador).
+Todas self-contained (Alpine inline, sin CDN).
+
+**Componentes y sistema**
+- `index.html` — panel de datos en ambos temas · `interactive.html` — modal/dropdown/tabs/toasts
+- `showcase.html` — sala de control cívica con consola viva · `templates.html` — galería de pantallas (landing, login, paneles por rol, error)
+- `app.html` — **dashboard de patentes funcional completo** (command palette ⌘K, charts, tabla sortable, drawer, modal, toasts)
+
+**Landings novedosas por sistema** — cada una con identidad propia anclada a su mundo
+- `landing-hub.html` — hub del ecosistema (dark mode universal en vivo)
+- `landing-licencias.html` — "la ruta" (carretera en perspectiva, señalética vial)
+- `landing-discapacidad.html` — "accesibilidad como belleza" (controles reales de a11y)
+- `landing-control-acceso.html` — "terminal de vigilancia" (feed biométrico en vivo)
+- `landing-patentes.html` — "el libro de rentas" (sello municipal, cifras que respiran)
 
 ## Roadmap
 

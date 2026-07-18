@@ -1,0 +1,106 @@
+/* ============================================================================
+   muni-ui-filament.css — Identidad municipal para los paneles Filament v5.
+   ----------------------------------------------------------------------------
+   CSS PLANO (sin compilación Tailwind): se sirve tal cual y se inyecta con un
+   render hook (STYLES_AFTER) para que los paneles del ecosistema NO se vean
+   como un Filament genérico, sino como parte de la Municipalidad de Graneros.
+
+   Publicar:  php artisan vendor:publish --tag=muni-ui-filament --force
+   Inyectar:  ->renderHook(PanelsRenderHook::STYLES_AFTER,
+                fn () => '<link rel="stylesheet" href="'.asset('vendor/muni-ui/filament.css').'">')
+
+   Sobrescribe clases fi-* de Filament v5. Respeta el modo claro y oscuro del
+   panel. La paleta institucional (--mg-*) es la del escudo y la franja oficial.
+   ============================================================================ */
+
+:root {
+    --mg-lima: #adcd60;
+    --mg-petroleo: #355a63;
+    --mg-petroleo-d: #00404c;
+    --mg-oro: #eab02c;
+    --mg-naranja: #c76421;
+    --mg-celeste: #7ccbe1;
+    --mg-carmin: #ca3048;
+    --mg-tinta: #12333b;
+}
+
+/* ── Barra superior: base petróleo institucional con la franja encima ──────── */
+.fi-topbar > nav {
+    border-bottom: 1px solid color-mix(in srgb, var(--mg-petroleo) 18%, transparent);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--mg-petroleo) 6%, transparent);
+}
+
+/* ── Barra lateral: cabecera con acento institucional ──────────────────────── */
+.fi-sidebar-header {
+    border-bottom: 1px solid color-mix(in srgb, var(--mg-petroleo) 12%, transparent);
+    box-shadow: inset 0 -2px 0 0 color-mix(in srgb, var(--mg-lima) 55%, transparent);
+}
+
+/* Ítem de navegación activo: barra lateral de acento + fondo petróleo suave */
+.fi-sidebar-item.fi-active > .fi-sidebar-item-button,
+.fi-sidebar-item-button.fi-active {
+    position: relative;
+    background-color: color-mix(in srgb, var(--mg-petroleo) 9%, transparent);
+}
+.fi-sidebar-item.fi-active > .fi-sidebar-item-button::before,
+.fi-sidebar-item-button.fi-active::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: var(--mg-petroleo);
+}
+
+/* Grupos del menú lateral: etiqueta con carácter institucional */
+.fi-sidebar-group-label {
+    color: color-mix(in srgb, var(--mg-petroleo) 75%, transparent);
+    letter-spacing: .04em;
+}
+
+/* ── Encabezados de página y secciones: subrayado de la franja ─────────────── */
+.fi-header-heading {
+    letter-spacing: -0.015em;
+}
+.fi-section {
+    border-color: color-mix(in srgb, var(--mg-petroleo) 12%, transparent);
+}
+
+/* ── Página de login: cinturón institucional + sello ───────────────────────── */
+.fi-simple-layout {
+    position: relative;
+}
+.fi-simple-layout::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    z-index: 60;
+    background: linear-gradient(90deg,
+        var(--mg-lima) 0 14.28%, var(--mg-petroleo) 14.28% 28.57%,
+        var(--mg-oro) 28.57% 42.85%, var(--mg-naranja) 42.85% 57.14%,
+        var(--mg-celeste) 57.14% 71.42%, var(--mg-carmin) 71.42% 85.71%,
+        #9c9b9b 85.71% 100%);
+}
+.fi-simple-main {
+    border-top: 3px solid color-mix(in srgb, var(--mg-petroleo) 20%, transparent);
+    box-shadow: 0 20px 60px -30px color-mix(in srgb, var(--mg-petroleo) 55%, transparent);
+}
+
+/* ── Modo oscuro del panel: ajustar acentos para contraste ─────────────────── */
+.dark .fi-sidebar-header {
+    box-shadow: inset 0 -2px 0 0 color-mix(in srgb, var(--mg-lima) 40%, transparent);
+}
+.dark .fi-sidebar-item.fi-active > .fi-sidebar-item-button,
+.dark .fi-sidebar-item-button.fi-active {
+    background-color: color-mix(in srgb, var(--mg-celeste) 12%, transparent);
+}
+.dark .fi-sidebar-item.fi-active > .fi-sidebar-item-button::before,
+.dark .fi-sidebar-item-button.fi-active::before {
+    background: var(--mg-celeste);
+}
+.dark .fi-sidebar-group-label {
+    color: color-mix(in srgb, var(--mg-celeste) 80%, transparent);
+}

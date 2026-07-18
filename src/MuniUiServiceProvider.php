@@ -30,5 +30,12 @@ class MuniUiServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../resources/images' => public_path('vendor/muni-ui'),
         ], 'muni-ui-images');
+
+        // Tema Filament municipal (CSS plano) → public/vendor/muni-ui/filament.css.
+        // Se inyecta con un render hook para que los paneles no se vean genéricos:
+        //   php artisan vendor:publish --tag=muni-ui-filament --force
+        $this->publishes([
+            __DIR__.'/../resources/css/muni-ui-filament.css' => public_path('vendor/muni-ui/filament.css'),
+        ], 'muni-ui-filament');
     }
 }

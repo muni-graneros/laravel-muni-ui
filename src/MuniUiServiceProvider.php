@@ -23,5 +23,12 @@ class MuniUiServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../resources/css/muni-ui.css' => resource_path('css/vendor/muni-ui.css'),
         ], 'muni-ui-css');
+
+        // Escudo oficial del municipio. `<x-muni::gob-escudo>` lo sirve desde
+        // public/vendor/muni-ui/, así que hay que publicarlo en cada sistema:
+        //   php artisan vendor:publish --tag=muni-ui-images
+        $this->publishes([
+            __DIR__.'/../resources/images' => public_path('vendor/muni-ui'),
+        ], 'muni-ui-images');
     }
 }

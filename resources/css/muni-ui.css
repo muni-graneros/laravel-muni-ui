@@ -22,6 +22,24 @@
 
 [x-cloak] { display: none !important; }
 
+/* ── Identidad institucional (INVARIANTE) ────────────────────────────────────
+   Paleta oficial de la Municipalidad de Graneros, extraída de los assets del
+   sitio madre (municipalidadgraneros.cl: escudo + franja inferior de 7 colores).
+   NO cambian con el tema: la identidad del municipio es la misma en claro y
+   oscuro. Los componentes <x-muni::gob-*> (barra, franja, escudo, footer) las
+   usan para que cada subdominio se lea como parte del sitio municipal. */
+:root {
+    --muni-gob-lima: #adcd60;
+    --muni-gob-verde-dark: #7fa33f;
+    --muni-gob-petroleo: #355a63;
+    --muni-gob-petroleo-dark: #00404c;
+    --muni-gob-oro: #eab02c;
+    --muni-gob-naranja: #c76421;
+    --muni-gob-celeste: #7ccbe1;
+    --muni-gob-carmin: #ca3048;
+    --muni-gob-gris: #9c9b9b;
+}
+
 /* ── Valores LIGHT (default) — linaje `.om` (discapacidad) ──────────────────── */
 :root {
     --muni-bg: #f5f6f8;

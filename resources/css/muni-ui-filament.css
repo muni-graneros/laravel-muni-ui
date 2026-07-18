@@ -99,8 +99,11 @@
 .fi-input-wrp:focus-within { border-color:var(--mg-petroleo) !important; box-shadow:0 0 0 3px color-mix(in srgb,var(--mg-petroleo) 18%,transparent) !important; }
 .fi-ta-header-cell { background:color-mix(in srgb,var(--mg-papel) 40%,#fff); font-weight:700; color:var(--mg-petroleo); text-transform:uppercase; letter-spacing:.03em; font-size:.7rem; }
 .fi-ta-row:hover { background:color-mix(in srgb,var(--mg-petroleo) 4%,transparent); }
-.fi-modal-window { border-radius:20px !important; overflow:hidden; box-shadow:0 44px 90px -32px rgba(13,58,68,.6) !important; }
-.fi-modal-window::before{ content:""; display:block; height:4px; background:linear-gradient(90deg,var(--mg-lima),var(--mg-petroleo) 45%,var(--mg-oro)); }
+/* OJO: nada de overflow:hidden aquí — recorta el área scrollable del modal y deja
+   los formularios largos sin poder bajar ni ver los botones de cerrar/guardar.
+   La cinta lleva su propio radio superior para respetar las esquinas. */
+.fi-modal-window { border-radius:20px !important; box-shadow:0 44px 90px -32px rgba(13,58,68,.6) !important; }
+.fi-modal-window::before{ content:""; display:block; height:4px; border-radius:20px 20px 0 0; background:linear-gradient(90deg,var(--mg-lima),var(--mg-petroleo) 45%,var(--mg-oro)); }
 .fi-dropdown-panel { border-radius:14px !important; border:1px solid var(--mg-borde); box-shadow:0 24px 54px -26px rgba(13,58,68,.45) !important; }
 .fi-tabs-item.fi-active { color:var(--mg-petroleo-d) !important; }
 

@@ -8,7 +8,14 @@
    Las apps en Tailwind v3 NO deben importar este archivo (usa sintaxis v4).
    ============================================================================ */
 
-@custom-variant dark (&:where([data-muni-theme=dark], [data-muni-theme=dark] *));
+/* La variante `dark:` cubre TODOS los activadores del sistema: nuestro atributo,
+   la clase `.dark` de Filament/Tailwind, y [data-theme=dark]. Así `dark:bg-muni-*`
+   funciona igual dentro de un panel Filament que en una PWA. */
+@custom-variant dark (&:where(
+    [data-muni-theme=dark], [data-muni-theme=dark] *,
+    [data-theme=dark], [data-theme=dark] *,
+    .dark, .dark *
+));
 
 @theme inline {
     --color-muni-bg: var(--muni-bg);

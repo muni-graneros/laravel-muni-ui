@@ -1,65 +1,59 @@
 /* ============================================================================
    laravel-muni-ui — Sistema de diseño del ecosistema municipal de Graneros
    ----------------------------------------------------------------------------
-   Contrato de tokens `--muni-*` con dos presets seleccionables por
-   `data-muni-theme` en <html>:
-     - "light"  → linaje `.om` (discapacidad): institucional sereno, teal.
-     - "dark"   → linaje `.fc` (feria): terminal de datos, alto contraste.
-   Los valores son VERBATIM de los CSS de producción (feria.css / discapacidad.css)
-   para que un sistema del ecosistema pueda migrar sin cambiar su identidad.
+   Contrato de tokens `--muni-*` con dos presets:
+     - "light" → linaje `.om` (discapacidad): institucional sereno, teal.
+     - "dark"  → linaje `.fc` (feria): terminal de datos, alto contraste.
+   Valores VERBATIM de los CSS de producción (feria.css / discapacidad.css).
 
-   Este archivo es CSS PLANO: funciona en Tailwind v3, v4 o sin Tailwind. Los componentes
-   usan `style` inline con `var(--muni-*)`, así que no dependen de utilidades Tailwind.
-     - App con scoped CSS (feria/discapacidad, TW3): `@import` desde su .css.
-     - App Tailwind v4: `@import` tras `@import "tailwindcss"` + opcional `muni-ui-tailwind.css`
-       para las utilidades `bg-muni-*` y la variante `dark:`.
+   DARK MODE UNIVERSAL — se activa con CUALQUIERA de estos mecanismos, para ser
+   compatible con todo el ecosistema a la vez:
+     · `data-muni-theme="dark"`  → nuestro, tema fijo (feria/disc).
+     · `.dark`                    → Filament y la estrategia de clase de Tailwind.
+     · `[data-theme="dark"]`      → convención de otras UI / PWA-SPA.
+     · `@media (prefers-color-scheme: dark)` → PWA/SPA que sigue el OS (fallback).
+   Jerarquía: light por defecto → dark por preferencia del OS → activadores
+   explícitos de clase/atributo (ganan sobre el OS) → `data-muni-theme` explícito
+   (override final, para congelar el tema de un sistema con identidad fija).
+
+   CSS PLANO: funciona en Tailwind v3, v4 o sin Tailwind. Los componentes usan
+   `style` inline con `var(--muni-*)`, no dependen de utilidades Tailwind.
    ============================================================================ */
 
-/* Los componentes interactivos (modal/dropdown/tabs/toast) usan Alpine 3. `x-cloak`
-   los oculta hasta que Alpine inicializa, evitando el flash de contenido sin estado. */
 [x-cloak] { display: none !important; }
 
-/* ── Preset LIGHT (por defecto) — linaje `.om` (discapacidad) ───────────────── */
-:root,
-[data-muni-theme="light"] {
-    /* Superficies */
+/* ── Valores LIGHT (default) — linaje `.om` (discapacidad) ──────────────────── */
+:root {
     --muni-bg: #f5f6f8;
     --muni-surface: #ffffff;
     --muni-surface-2: #f5f6f8;
     --muni-surface-3: #eceef2;
     --muni-panel: #ffffff;
 
-    /* Texto y bordes */
     --muni-text: #1a1d24;
     --muni-muted: #5a6070;
     --muni-hint: #6b7280;
     --muni-border: #e0e3ea;
     --muni-border-2: #c8ccd6;
 
-    /* Acento institucional (teal Graneros) */
     --muni-accent: #0f766e;
     --muni-accent-strong: #115e59;
     --muni-accent-soft: #f0fdfa;
     --muni-on-accent: #ffffff;
 
-    /* Estados semánticos: tripletes fg / bg / border */
     --muni-ok-fg: #0f7a5a;
     --muni-ok-bg: #e2f5ee;
     --muni-ok-border: #0f7a5a;
-
     --muni-warn-fg: #c47a10;
     --muni-warn-bg: #fef3dc;
     --muni-warn-border: #c47a10;
-
     --muni-danger-fg: #b03030;
     --muni-danger-bg: #fdeaea;
     --muni-danger-border: #b03030;
-
     --muni-info-fg: #1f5fb0;
     --muni-info-bg: #e6effb;
     --muni-info-border: #1f5fb0;
 
-    /* Forma y elevación */
     --muni-radius: 10px;
     --muni-radius-lg: 14px;
     --muni-radius-sm: 7px;
@@ -67,72 +61,140 @@
     --muni-shadow-md: 0 4px 16px rgba(16, 24, 40, 0.10);
     --muni-shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.14);
 
-    /* Interacción: anillo de foco accesible + transiciones (modernidad = detalle) */
     --muni-ring: 0 0 0 3px color-mix(in srgb, var(--muni-accent) 30%, transparent);
     --muni-ease: cubic-bezier(0.22, 1, 0.36, 1);
     --muni-dur: 160ms;
 
-    /* Tipografía */
     --muni-font-sans: 'DM Sans', system-ui, sans-serif;
     --muni-font-mono: 'DM Mono', ui-monospace, monospace;
 
-    /* Cromo estructural */
     --muni-topbar-h: 56px;
     --muni-glow: none;
 }
 
-/* ── Preset DARK — linaje `.fc` (feria): terminal de datos ──────────────────── */
-[data-muni-theme="dark"] {
+/* ── Bloque de valores DARK (reutilizado por todos los activadores) ──────────── */
+/* Regla 1: preferencia del OS (PWA/SPA sin control explícito). El :not() permite
+   que un sistema con tema fijo en light (feria/disc con data-muni-theme="light")
+   NO se oscurezca aunque el usuario tenga el OS en modo oscuro. */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-muni-theme="light"]):not([data-theme="light"]):not(.light) {
+        --muni-bg: #0b0f14;
+        --muni-surface: #111620;
+        --muni-surface-2: #181e2a;
+        --muni-surface-3: #1c2333;
+        --muni-panel: #1c2333;
+        --muni-text: #e2e8f4;
+        --muni-muted: #7a8ba8;
+        --muni-hint: #4a5a74;
+        --muni-border: #2a3347;
+        --muni-border-2: #3a4560;
+        --muni-accent: #f59e0b;
+        --muni-accent-strong: #d97706;
+        --muni-accent-soft: #2d1d00;
+        --muni-on-accent: #0b0f14;
+        --muni-ok-fg: #22c55e;
+        --muni-ok-bg: #0d2d1a;
+        --muni-ok-border: #166534;
+        --muni-warn-fg: #f59e0b;
+        --muni-warn-bg: #2d1d00;
+        --muni-warn-border: #92400e;
+        --muni-danger-fg: #ef4444;
+        --muni-danger-bg: #2d0d0d;
+        --muni-danger-border: #991b1b;
+        --muni-info-fg: #3b82f6;
+        --muni-info-bg: #0d1a2d;
+        --muni-info-border: #1e3a5f;
+        --muni-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.35);
+        --muni-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+        --muni-shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.55);
+        --muni-ring: 0 0 0 3px color-mix(in srgb, var(--muni-accent) 35%, transparent);
+        --muni-font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --muni-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+        --muni-topbar-h: 52px;
+        --muni-glow: 0 0 6px currentColor;
+    }
+}
+
+/* Regla 2: activadores EXPLÍCITOS de dark — Filament (.dark), Tailwind class,
+   [data-theme=dark] y nuestro data-muni-theme=dark. Vienen DESPUÉS del media query
+   en la cascada, así que ganan sobre la preferencia del OS. */
+[data-muni-theme="dark"],
+[data-theme="dark"],
+.dark {
     --muni-bg: #0b0f14;
     --muni-surface: #111620;
     --muni-surface-2: #181e2a;
     --muni-surface-3: #1c2333;
     --muni-panel: #1c2333;
-
     --muni-text: #e2e8f4;
     --muni-muted: #7a8ba8;
     --muni-hint: #4a5a74;
     --muni-border: #2a3347;
     --muni-border-2: #3a4560;
-
     --muni-accent: #f59e0b;
     --muni-accent-strong: #d97706;
     --muni-accent-soft: #2d1d00;
     --muni-on-accent: #0b0f14;
-
     --muni-ok-fg: #22c55e;
     --muni-ok-bg: #0d2d1a;
     --muni-ok-border: #166534;
-
     --muni-warn-fg: #f59e0b;
     --muni-warn-bg: #2d1d00;
     --muni-warn-border: #92400e;
-
     --muni-danger-fg: #ef4444;
     --muni-danger-bg: #2d0d0d;
     --muni-danger-border: #991b1b;
-
     --muni-info-fg: #3b82f6;
     --muni-info-bg: #0d1a2d;
     --muni-info-border: #1e3a5f;
-
-    --muni-radius: 8px;
-    --muni-radius-lg: 12px;
-    --muni-radius-sm: 6px;
     --muni-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.35);
     --muni-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
     --muni-shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.55);
-
     --muni-ring: 0 0 0 3px color-mix(in srgb, var(--muni-accent) 35%, transparent);
-    --muni-ease: cubic-bezier(0.22, 1, 0.36, 1);
-    --muni-dur: 160ms;
-
     --muni-font-sans: 'IBM Plex Sans', system-ui, sans-serif;
     --muni-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
-
     --muni-topbar-h: 52px;
-    /* Firma del tema oscuro: los dots de estado tienen resplandor (glow terminal). */
     --muni-glow: 0 0 6px currentColor;
+}
+
+/* Regla 3: override EXPLÍCITO a light. Congela el tema claro de un sistema con
+   identidad fija (discapacidad) aunque el OS esté en dark o Filament ponga .dark
+   en un ancestro. Al venir el último, gana la cascada a igual especificidad. */
+[data-muni-theme="light"] {
+    --muni-bg: #f5f6f8;
+    --muni-surface: #ffffff;
+    --muni-surface-2: #f5f6f8;
+    --muni-surface-3: #eceef2;
+    --muni-panel: #ffffff;
+    --muni-text: #1a1d24;
+    --muni-muted: #5a6070;
+    --muni-hint: #6b7280;
+    --muni-border: #e0e3ea;
+    --muni-border-2: #c8ccd6;
+    --muni-accent: #0f766e;
+    --muni-accent-strong: #115e59;
+    --muni-accent-soft: #f0fdfa;
+    --muni-on-accent: #ffffff;
+    --muni-ok-fg: #0f7a5a;
+    --muni-ok-bg: #e2f5ee;
+    --muni-ok-border: #0f7a5a;
+    --muni-warn-fg: #c47a10;
+    --muni-warn-bg: #fef3dc;
+    --muni-warn-border: #c47a10;
+    --muni-danger-fg: #b03030;
+    --muni-danger-bg: #fdeaea;
+    --muni-danger-border: #b03030;
+    --muni-info-fg: #1f5fb0;
+    --muni-info-bg: #e6effb;
+    --muni-info-border: #1f5fb0;
+    --muni-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 2px 8px rgba(16, 24, 40, 0.06);
+    --muni-shadow-md: 0 4px 16px rgba(16, 24, 40, 0.10);
+    --muni-shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.14);
+    --muni-ring: 0 0 0 3px color-mix(in srgb, var(--muni-accent) 30%, transparent);
+    --muni-font-sans: 'DM Sans', system-ui, sans-serif;
+    --muni-font-mono: 'DM Mono', ui-monospace, monospace;
+    --muni-topbar-h: 56px;
+    --muni-glow: none;
 }
 
 /* Respeta la preferencia de movimiento reducido en todo el sistema. */

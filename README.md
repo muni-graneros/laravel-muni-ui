@@ -18,6 +18,27 @@ El paquete NO impone un look. Empaqueta la **maquinaria** (tokens, componentes) 
 Un sistema existente puede **sobreescribir los tokens** (`--muni-*`) para conservar su
 identidad propia sin tocar los componentes.
 
+## Dark mode universal
+
+El sistema activa el tema oscuro con **cualquiera** de estos mecanismos, para convivir con
+todo el ecosistema a la vez — no hay que elegir uno:
+
+| Mecanismo | Para qué |
+|-----------|----------|
+| `<html class="dark">` | **Filament** (su toggle) y Tailwind class-strategy |
+| `<html data-muni-theme="dark">` | Nuestro atributo — congela un tema fijo (feria/disc) |
+| `<html data-theme="dark">` | Convención de otras UI / PWA-SPA |
+| `@media (prefers-color-scheme: dark)` | PWA/SPA que sigue el OS (fallback automático) |
+
+**Jerarquía** (de menor a mayor prioridad): light por defecto → dark por preferencia del OS →
+activadores de clase/atributo (ganan sobre el OS) → `data-muni-theme` explícito (override final).
+
+- Dentro de un **panel Filament**: no pongas `data-muni-theme` — los `<x-muni::*>` siguen
+  automáticamente el toggle `.dark` de Filament.
+- Un **sistema con identidad fija** (discapacidad siempre claro): pon `data-muni-theme="light"`
+  y queda inmune al OS y a un `.dark` de un ancestro.
+- Una **PWA que sigue el OS**: no pongas nada — `prefers-color-scheme` decide.
+
 ## Requisitos
 
 - PHP 8.3+, Laravel 12 o 13
@@ -127,6 +148,27 @@ php artisan vendor:publish --tag=muni-ui-css   # → resources/css/vendor/muni-u
 <x-muni::toast-host />
 <button x-on:click="$dispatch('muni-toast',{tone:'ok',title:'Guardado',message:'Cambios guardados.'})">Guardar</button>
 ```
+
+### Formularios, navegación y plantillas de página
+
+| Componente | Props principales |
+|-----------|-------------------|
+| `<x-muni::input>` | `label`, `name`, `type`, `error`, `hint`, `icon`, `required` |
+| `<x-muni::select>` | `label`, `name`, `options`, `selected`, `placeholder`, `error` |
+| `<x-muni::switch>` | `label`, `name`, `checked`, `description` (Alpine) |
+| `<x-muni::sidebar>` | `width`; slot con `<x-muni::nav-section>` + `<x-muni::nav-item>` (colapsa en móvil) |
+| `<x-muni::nav-item>` | `href`, `icon`, `active`, `badge` |
+| `<x-muni::nav-section>` | `title` |
+| `<x-muni::breadcrumb>` | `items` (array de `['label','url'?]`) |
+| `<x-muni::tooltip>` | `text`, `placement` (top/bottom/left/right) (Alpine) |
+| `<x-muni::avatar>` | `name` (iniciales), `src`, `size`, `tone` |
+| `<x-muni::progress>` | `value`, `max`, `tone`, `label`, `showValue` |
+| `<x-muni::skeleton>` | `width`, `height`, `rounded` (shimmer) |
+| `<x-muni::empty-state>` | `title`, `description`, `icon`; slot `actions` |
+| `<x-muni::command-palette>` | `items`, `placeholder`, `hotkey` — ⌘K/Ctrl+K (Alpine) |
+| `<x-muni::auth-shell>` | `theme`, `title`, `system`, `subtitle`, `logo`; slots `aside`, `head` — layout login/registro |
+| `<x-muni::dashboard-shell>` | `theme`, `system`, `subtitle`, `status`, `user`; slots `sidebar`, `topbar` — layout de panel |
+| `<x-muni::error-page>` | `code`, `title`, `message`, `home`, `theme` — 403/404/500/503 |
 
 Todos respetan `prefers-reduced-motion`, tienen estados `:focus-visible` con anillo de foco
 accesible (`--muni-ring`), y micro-interacciones de hover/active con transiciones tokenizadas.

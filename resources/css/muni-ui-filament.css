@@ -124,3 +124,7 @@
 .dark .fi-topbar > nav { background:#0d1c20 !important; border-color:#1c343a; }
 .dark .fi-header-heading, .dark .fi-wi-stats-overview-stat-value { color:#eaf5f3 !important; }
 .dark .fi-ta-header-cell { background:#0f2025; color:var(--mg-lima-br); }
+
+/* Tabs de relation managers: alineadas con el contenido, no centradas (Filament
+   les pone margin-inline:auto por defecto y quedaban flotando en medio). */
+.fi-sc-tabs > .fi-tabs { margin-inline: 0 !important; }

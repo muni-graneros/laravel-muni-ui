@@ -29,5 +29,8 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "suggest": {
+        "filament/filament": "Para usar el plugin MuniPanel que viste los paneles con la identidad municipal."
+    }
 }

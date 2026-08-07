@@ -23,7 +23,13 @@ const puerto = meta('reverb-port')
 // que debería quedar en `window` llega a existir, y la página carga pero no
 // responde a nada. Un entorno sin Reverb configurado debe perder el tiempo real,
 // no la interfaz completa.
-const claveReverb = import.meta.env.VITE_REVERB_APP_KEY;
+// La clave se lee del meta tag, NO del bundle: `import.meta.env` se hornea al
+// construir la imagen, donde VITE_REVERB_APP_KEY no existe, y el bundle sale con
+// `undefined`. Reverb rechaza entonces cada conexión y nada parece roto —los
+// contenedores healthy, el handshake manual responde 101—, así que la avería no
+// se ve. El fallback a la variable queda para `npm run dev` local.
+const claveReverb = document.querySelector('meta[name="reverb-key"]')?.getAttribute('content')
+    || import.meta.env.VITE_REVERB_APP_KEY;
 
 if (!claveReverb) {
     console.warn('[echo] sin clave de Reverb: el tiempo real queda desactivado.');

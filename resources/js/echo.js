@@ -17,9 +17,21 @@ const puerto = meta('reverb-port')
     ? Number(meta('reverb-port'))
     : (window.location.port ? Number(window.location.port) : (isHttps ? 443 : 80));
 
-window.Echo = new Echo({
+// Sin clave NO se instancia. pusher-js lanza en el constructor si la clave falta,
+// y como este módulo se importa desde `app.js` antes que todo lo demás, esa
+// excepción se lleva puesto el bundle entero: Alpine no se registra, nada de lo
+// que debería quedar en `window` llega a existir, y la página carga pero no
+// responde a nada. Un entorno sin Reverb configurado debe perder el tiempo real,
+// no la interfaz completa.
+const claveReverb = import.meta.env.VITE_REVERB_APP_KEY;
+
+if (!claveReverb) {
+    console.warn('[echo] sin clave de Reverb: el tiempo real queda desactivado.');
+}
+
+window.Echo = !claveReverb ? undefined : new Echo({
     broadcaster: 'reverb',
-    key: import.meta.env.VITE_REVERB_APP_KEY,
+    key: claveReverb,
     wsHost: host,
     wsPort: puerto,
     wssPort: puerto,

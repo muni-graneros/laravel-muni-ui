@@ -127,6 +127,12 @@
 .dark .fi-topbar > nav { background:#0d1c20 !important; border-color:#1c343a; }
 .dark .fi-header-heading, .dark .fi-wi-stats-overview-stat-value { color:#eaf5f3 !important; }
 .dark .fi-ta-header-cell { background:#0f2025; color:var(--mg-lima-br); }
+/* El título de cada tarjeta. Mismo motivo que los tres de abajo: arriba se
+   pinta de petróleo oscuro y el bloque oscuro no lo enumeraba, así que sobre la
+   tarjeta oscura quedaba en 1,36:1 —medido con getComputedStyle en el escritorio
+   de web-graneros, el 2026-08-18—. Con el color que ya usa el título de página
+   sube a 15:1. */
+.dark .fi-section-header-heading { color:#eaf5f3 !important; }
 
 /* Huecos del bloque oscuro de arriba, encontrados midiendo en el navegador el
    2026-08-17 (adopción de la Ley 21.719 en discapacidad). Los tres salen del

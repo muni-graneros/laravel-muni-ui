@@ -128,6 +128,32 @@
 .dark .fi-header-heading, .dark .fi-wi-stats-overview-stat-value { color:#eaf5f3 !important; }
 .dark .fi-ta-header-cell { background:#0f2025; color:var(--mg-lima-br); }
 
+/* Huecos del bloque oscuro de arriba, encontrados midiendo en el navegador el
+   2026-08-17 (adopción de la Ley 21.719 en discapacidad). Los tres salen del
+   mismo motivo: este archivo NO deriva el modo oscuro de tokens, sino que lo
+   escribe selector por selector, así que toda clase que no esté enumerada más
+   arriba se queda con su valor claro sin que nadie se entere.
+
+   1. `.fi-ta-ctn` — el contenedor de las TABLAS. Es el hueco caro: quedaba con
+      fondo blanco mientras el texto de las celdas tomaba el color del tema
+      oscuro. Contraste 1:1 y desaparecían nombres, RUT, teléfonos y fechas de
+      cualquier listado. Filament trae su propia regla oscura para esta clase,
+      pero vive en `@layer components` y cualquier regla sin capa —como las de
+      este archivo— le gana.
+   2. `.fi-simple-layout` — el lienzo del login. Con la tarjeta ya oscura, el
+      fondo seguía en papel claro.
+   3. El anillo de foco. `--mg-petroleo` al 18% se diseñó contra papel: medido
+      sobre superficie oscura daba ~1,1:1 el halo y ~1,9:1 el borde, bajo el 3:1
+      que WCAG 2.2 exige para indicadores no textuales (1.4.11 y 2.4.11). Con
+      `--mg-lima-br` el borde queda sobre 12:1. No es cosmético: los sistemas del
+      Estado lo tienen obligado por el Decreto N°1/2015 SEGPRES. */
+.dark .fi-ta-ctn { background:#0f2025 !important; border-color:#1c343a; }
+.dark .fi-simple-layout { background:#081418 !important; }
+.dark .fi-input-wrp:focus-within {
+    border-color:var(--mg-lima-br) !important;
+    box-shadow:0 0 0 3px color-mix(in srgb,var(--mg-lima-br) 35%,transparent) !important;
+}
+
 /* Tabs de relation managers: alineadas con el contenido, no centradas (Filament
    les pone margin-inline:auto por defecto y quedaban flotando en medio). */
 .fi-sc-tabs > .fi-tabs { margin-inline: 0 !important; }

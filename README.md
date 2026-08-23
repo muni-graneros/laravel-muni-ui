@@ -196,6 +196,63 @@ Todas self-contained (Alpine inline, sin CDN).
 - `landing-control-acceso.html` — "terminal de vigilancia" (feed biométrico en vivo)
 - `landing-patentes.html` — "el libro de rentas" (sello municipal, cifras que respiran)
 
+## Panel ARCOP (Ley 21.719)
+
+El ciclo de solicitudes ARCOP —recepción en el mesón y resolución fundada, con
+sus plazos, su bitácora y su semáforo de vencimiento— viene como plugin de
+panel, para que los sistemas del ecosistema lo hereden en vez de escribirlo cada
+uno. La maquinaria legal vive en `muni-graneros/laravel-muni-shared`
+(`Muni\Shared\Privacidad`); acá vive la pantalla.
+
+```php
+use Muni\Ui\Filament\Privacidad\PanelArcopPlugin;
+
+->plugin(
+    PanelArcopPlugin::make()
+        // Obligatorio: quién es el titular y cómo se lo busca en ESTE sistema.
+        ->titulares(BuscadorDePersonas::class)
+        // Opcional: por defecto usa los nombres que genera Shield para el
+        // recurso (view_any_solicitud, create_solicitud) más
+        // resolver_solicitud_arcop.
+        ->permisos(resolver: Permisos::RESOLVER_SOLICITUD_ARCOP)
+        // Cómo se llama, en el mesón de este sistema, lo que el solicitante
+        // presenta para acreditar su identidad.
+        ->credencial(
+            etiqueta: 'RUN leído de la cédula',
+            ayuda: 'El de la cédula que el solicitante tiene en la mano, no el que dicta.',
+            comoSeAcredita: 'La identidad se acredita con la cédula en el mesón.',
+        )
+        // Qué deja de hacer este sistema cuando un bloqueo queda vigente.
+        ->alcanceDelCese(CeseDeTratamiento::queCesa())
+)
+```
+
+Lo que el sistema adoptante tiene que poner de su lado:
+
+1. `PRIVACIDAD_SISTEMA` en el `.env` (aísla sus solicitudes de las de los demás
+   sistemas: `privacidad_solicitudes` es una tabla compartida por el ecosistema).
+2. Un modelo que implemente `Muni\Shared\Privacidad\Contratos\TitularDeDatos`.
+3. Un buscador que implemente `Muni\Ui\Filament\Privacidad\Contratos\BuscaTitulares`.
+4. Un `VerificadorIdentidad` enlazado en el contenedor: el panel no decide cómo
+   se acredita la identidad, solo le entrega el contexto del mostrador.
+5. Sus permisos, si no usa los nombres por defecto.
+
+### Lo que este plugin NO hace, y hay que leerlo antes de montarlo
+
+**Heredar el panel da la superficie para recibir y resolver solicitudes; no hace
+que el sistema cumpla.** El candado que hace cesar de verdad un tratamiento —qué
+pantalla, qué CSV, qué correo y qué job dejan de tocar a esa persona— depende del
+mapeo tratamiento→finalidad de cada sistema, y este paquete no lo conoce ni lo
+puede ejecutar. En `discapacidad-graneros` ese candado es una clase propia
+(`App\Privacidad\CeseDeTratamiento`) y se escribió después del panel: hasta
+entonces el panel prometía un cese que no ocurría.
+
+Un sistema que monte este plugin y no escriba su candado va a certificarle por
+escrito a un vecino un cese que no ocurre. Por eso `alcanceDelCese()` arranca sin
+declarar, y mientras no se declare el aviso al funcionario dice exactamente eso:
+que este sistema no declaró qué deja de hacer y que hay que confirmarlo antes de
+decirle al titular que su tratamiento cesó.
+
 ## Roadmap
 
 - Capa 2: primitivas BlatUI (button/input/dialog…) re-teñidas con estos tokens (requiere Alpine).

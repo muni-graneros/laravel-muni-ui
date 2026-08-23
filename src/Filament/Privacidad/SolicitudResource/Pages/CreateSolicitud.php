@@ -3,7 +3,6 @@
 namespace Muni\Ui\Filament\Privacidad\SolicitudResource\Pages;
 
 use Muni\Ui\Filament\Privacidad\SolicitudResource;
-use App\Models\Persona;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Support\Exceptions\Halt;
@@ -16,6 +15,7 @@ use Muni\Shared\Privacidad\RepresentacionRequerida;
 use Muni\Shared\Privacidad\Solicitante;
 use Muni\Shared\Privacidad\Solicitudes;
 use Muni\Shared\Privacidad\TipoDeSolicitud;
+use Muni\Ui\Filament\Privacidad\PanelArcopPlugin;
 
 /**
  * Recepción de una solicitud ARCOP en el mesón.
@@ -48,16 +48,29 @@ class CreateSolicitud extends CreateRecord
      */
     protected function handleRecordCreation(array $data): Model
     {
-        $titular = Persona::query()->whereKey((int) $data['titular_id'])->firstOrFail();
+        // Quién es el titular lo resuelve el buscador que declaró el
+        // adoptante: el paquete conoce el contrato `TitularDeDatos` y ningún
+        // modelo concreto.
+        $titular = PanelArcopPlugin::actual()->buscador()->encontrar($data['titular_id']);
+
+        if ($titular === null) {
+            $this->rechazar(
+                'Ese titular ya no está en el registro',
+                'El registro elegido no existe hoy en este sistema. Volvé a buscarlo antes de recibir la solicitud: '
+                .'una solicitud sin titular no se puede tramitar ni responder.',
+            );
+        }
+
         $solicitante = Solicitante::from((string) $data['solicitante']);
 
-        // La acreditación la construye el verificador enchufado
-        // (`VerificacionPresencialCedula` en este sistema), no esta página: qué
-        // cuenta como identidad acreditada es una decisión del sistema
-        // adoptante, y el panel solo le entrega el contexto del mesón.
+        // La acreditación la construye el verificador enchufado, no esta
+        // página: qué cuenta como identidad acreditada es una decisión del
+        // sistema adoptante —la cédula en el mesón en uno, otra cosa en otro— y
+        // el panel solo le entrega el contexto del mostrador. La credencial va
+        // con el nombre que le puso el adoptante en el formulario.
         $verificacion = app(VerificadorIdentidad::class)->verificar([
             'titular' => $titular,
-            'run' => (string) ($data['run_cedula'] ?? ''),
+            'credencial' => (string) ($data['credencial'] ?? ''),
             'funcionario_id' => auth()->id(),
         ]);
 

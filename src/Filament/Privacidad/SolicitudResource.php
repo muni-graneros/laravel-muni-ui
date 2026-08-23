@@ -2,11 +2,6 @@
 
 namespace Muni\Ui\Filament\Privacidad;
 
-use Muni\Ui\Filament\Privacidad\SolicitudResource\Pages\CreateSolicitud;
-use Muni\Ui\Filament\Privacidad\SolicitudResource\Pages\ListSolicitudes;
-use App\Models\Persona;
-use App\Privacidad\PropagaSupresionAlMaestro;
-use App\Support\Permisos;
 use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Radio;
@@ -26,6 +21,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Str;
+use Muni\Shared\Privacidad\Contratos\PropagaSupresion;
 use Muni\Shared\Privacidad\Contratos\TitularDeDatos;
 use Muni\Shared\Privacidad\EstadoDeSolicitud;
 use Muni\Shared\Privacidad\ExportacionDeDatos;
@@ -40,6 +36,9 @@ use Muni\Shared\Privacidad\Supresiones;
 use Muni\Shared\Privacidad\SupresionNoProcede;
 use Muni\Shared\Privacidad\SupresionNoPropagada;
 use Muni\Shared\Privacidad\TipoDeSolicitud;
+use Muni\Ui\Filament\Privacidad\Contratos\BuscaTitulares;
+use Muni\Ui\Filament\Privacidad\SolicitudResource\Pages\CreateSolicitud;
+use Muni\Ui\Filament\Privacidad\SolicitudResource\Pages\ListSolicitudes;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
 
@@ -58,22 +57,6 @@ use Throwable;
  * la lista blanca de campos rectificables, la propagación al maestro, el
  * levantamiento del bloqueo y la bitácora. Un `Solicitud::update()` en el panel
  * se las saltaría todas.
- *
- * ATENCIÓN — copia literal todavía acoplada al sistema adoptante. Este archivo
- * acaba de mudarse desde `discapacidad-graneros` SIN rediseñarse, y hoy sigue
- * apuntando a cuatro cosas que el paquete no tiene y que NO puede adivinar:
- *
- *   1. `App\Models\Persona` como titular (el paquete solo conoce el contrato
- *      `TitularDeDatos`),
- *   2. el buscador de titulares por RUT contra `personas.nro_documento_norm`,
- *   3. `App\Support\Permisos::RESOLVER_SOLICITUD_ARCOP` (los nombres de
- *      permiso son del adoptante),
- *   4. el texto de {@see self::queCesaDeVerdad()}, que describe lo que hace
- *      `App\Privacidad\CeseDeTratamiento` de discapacidad y de ningún otro
- *      sistema.
- *
- * Cortar esas cuatro es el paso siguiente; mientras estén, este recurso no lo
- * puede montar nadie más que discapacidad.
  *
  * `privacidad_solicitudes` es una tabla COMPARTIDA por todo el ecosistema
  * (cada sistema adoptante escribe ahí con su propio `sistema`), así que
@@ -115,11 +98,12 @@ class SolicitudResource extends Resource
      * Este recurso autoriza con overrides y NO con una policy, al revés que
      * todos los demás del repo, y conviene saber por qué antes de "corregirlo".
      *
-     * `Solicitud` vive en `Muni\Shared\Privacidad\Modelos`, no en
-     * `App\Models`, así que el autodescubrimiento de Laravel —que empareja
-     * `App\Models\X` con `App\Policies\XPolicy`— no la encuentra. Una
-     * `App\Policies\SolicitudPolicy` escrita siguiendo la convención del repo
-     * queda **inerte**: se llegó a escribir una, se comprobó con
+     * `Solicitud` vive en `Muni\Shared\Privacidad\Modelos`, no en el
+     * `App\Models` del adoptante, así que el autodescubrimiento de Laravel
+     * —que empareja `App\Models\X` con `App\Policies\XPolicy`— no la
+     * encuentra. Una `App\Policies\SolicitudPolicy` escrita siguiendo la
+     * convención de un repo queda **inerte**: se llegó a escribir una en
+     * discapacidad, se comprobó con
      * `Gate::getPolicyFor()` que Laravel no resolvía ninguna, y se borró. Un
      * archivo de autorización que no autoriza es peor que no tenerlo, porque el
      * siguiente que lo lea va a creer que la regla vive ahí.
@@ -132,12 +116,12 @@ class SolicitudResource extends Resource
      */
     public static function canViewAny(): bool
     {
-        return auth()->user()?->can('view_any_solicitud') ?? false;
+        return auth()->user()?->can(self::plugin()->permisoVer()) ?? false;
     }
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->can('create_solicitud') ?? false;
+        return auth()->user()?->can(self::plugin()->permisoRecibir()) ?? false;
     }
 
     /**
@@ -146,12 +130,17 @@ class SolicitudResource extends Resource
      * funciones desde la pantalla «Roles» sin tocar código.
      *
      * No es una prohibición de acumularlas: ver
-     * {@see Permisos::RESOLVER_SOLICITUD_ARCOP} y
      * {@see self::advertenciaSeparacionDeFunciones()}.
      */
     public static function canResolver(): bool
     {
-        return auth()->user()?->can(Permisos::RESOLVER_SOLICITUD_ARCOP) ?? false;
+        return auth()->user()?->can(self::plugin()->permisoResolver()) ?? false;
+    }
+
+    /** La configuración que declaró el sistema adoptante en su PanelProvider. */
+    protected static function plugin(): PanelArcopPlugin
+    {
+        return PanelArcopPlugin::actual();
     }
 
     /**
@@ -167,24 +156,28 @@ class SolicitudResource extends Resource
     {
         return $schema->schema([
             Section::make('Quién viene y por quién')
-                ->description('La identidad se acredita con la cédula en el mesón: el sistema compara el RUN leído contra el del titular.')
+                ->description(self::plugin()->comoSeAcredita())
                 ->columns(2)
                 ->schema([
                     Select::make('titular_id')
                         ->label('Titular de los datos')
-                        ->helperText('Busca por RUT, nombre o apellido en el registro comunal.')
+                        ->helperText(self::plugin()->buscador()->comoSeBusca())
                         ->required()
                         ->searchable()
                         ->getSearchResultsUsing(fn (string $search): array => self::buscarTitulares($search))
-                        ->getOptionLabelUsing(fn (mixed $value): ?string => self::etiquetaDePersona(
-                            Persona::query()->whereKey((int) $value)->first(),
+                        ->getOptionLabelUsing(fn (mixed $value): ?string => self::etiquetaDeTitular(
+                            self::plugin()->buscador()->encontrar($value),
                         ))
                         ->columnSpanFull(),
-                    TextInput::make('run_cedula')
-                        ->label('RUN leído de la cédula')
-                        ->helperText('El de la cédula que el solicitante tiene en la mano, no el que dicta.')
+                    // Lo que el solicitante presenta para acreditar su
+                    // identidad. El panel no sabe qué es —cédula, padrón,
+                    // licencia—: se lo entrega tal cual al VerificadorIdentidad
+                    // que enchufó el adoptante, que es quien decide.
+                    TextInput::make('credencial')
+                        ->label(self::plugin()->etiquetaCredencial())
+                        ->helperText(self::plugin()->ayudaCredencial())
                         ->required()
-                        ->maxLength(20),
+                        ->maxLength(50),
                     Select::make('solicitante')
                         ->label('Quién ejerce el derecho')
                         ->required()
@@ -226,49 +219,38 @@ class SolicitudResource extends Resource
     }
 
     /**
-     * Buscador de titulares por RUT, nombre o apellido.
+     * Los titulares que calzan con lo que el funcionario tipeó.
      *
-     * El RUT se busca por la columna generada e indexada `nro_documento_norm`
-     * (mismo criterio que `Persona::scopePorDocumento()`), no aplicando una
-     * función sobre `nro_documento`, que anularía el índice.
+     * El paquete no busca: le pregunta al buscador que declaró el adoptante
+     * ({@see BuscaTitulares}). Acá nació el acoplamiento más caro de este
+     * recurso —una consulta a `personas.nro_documento_norm`, que solo existe en
+     * discapacidad—, y por eso la búsqueda es un contrato y no una
+     * configuración de columnas: qué es "buscar una persona" cambia de sistema
+     * en sistema, y adivinarlo es lo que ataba el panel a un solo repo.
      *
-     * @return array<int, string>
+     * Público porque es lo que un test puede ejercitar sin montar el selector.
+     *
+     * @return array<int|string, string>
      */
     public static function buscarTitulares(string $search): array
     {
-        $termino = trim($search);
-
-        if ($termino === '') {
-            return [];
-        }
-
-        $comoRut = preg_replace('/[.\-\s]/', '', mb_strtolower($termino)) ?? '';
-
-        return Persona::query()
-            ->where(function (Builder $query) use ($termino, $comoRut): void {
-                $query->where('nro_documento_norm', 'like', $comoRut.'%')
-                    ->orWhere('nombres', 'like', '%'.$termino.'%')
-                    ->orWhere('apellidos', 'like', '%'.$termino.'%');
-            })
-            ->orderBy('apellidos')
-            ->limit(25)
-            ->get()
-            ->mapWithKeys(fn (Persona $persona): array => [
-                (int) $persona->getKey() => (string) self::etiquetaDePersona($persona),
-            ])
-            ->all();
+        return self::plugin()->buscador()->buscar($search);
     }
 
     /**
-     * El documento se muestra TAL COMO está guardado y no reformateado con
-     * `RutHelper::format()`: este registro también tiene titulares con pasaporte,
-     * y formatearlos como RUT los volvería irreconocibles en el buscador.
+     * Cómo se nombra a un titular en pantalla: por el contrato, nunca por
+     * columnas del adoptante.
+     *
+     * El documento se muestra TAL COMO lo devuelve `titularDocumento()` y no
+     * reformateado: hay registros con pasaporte y hay sistemas que no
+     * identifican por RUT, y darle formato de RUT a eso los vuelve
+     * irreconocibles en el buscador.
      */
-    public static function etiquetaDePersona(?Persona $persona): ?string
+    public static function etiquetaDeTitular(?TitularDeDatos $titular): ?string
     {
-        return $persona === null
+        return $titular === null
             ? null
-            : $persona->titularNombre().' — '.$persona->titularDocumento();
+            : $titular->titularNombre().' — '.$titular->titularDocumento();
     }
 
     /** Un tercero tiene que acompañar el documento; el titular solo acredita su identidad. */
@@ -314,7 +296,7 @@ class SolicitudResource extends Resource
                     ->color(fn (Solicitud $record): string => self::colorPlazo($record))
                     ->sortable(),
                 // El titular es un morph, y puede estar huérfano (anonimizado):
-                // se resuelve sin asumir que siempre es Persona.
+                // se resuelve por el contrato, sin asumir ningún modelo.
                 TextColumn::make('titular')
                     ->label('Titular')
                     ->getStateUsing(fn (Solicitud $record): string => self::etiquetaTitular($record))
@@ -480,23 +462,24 @@ class SolicitudResource extends Resource
     }
 
     /**
-     * Qué hace el sistema —en concreto— cuando un bloqueo queda vigente.
+     * Qué deja de hacer ESTE sistema cuando un bloqueo queda vigente.
      *
-     * Esta frase es la que el funcionario le repite al vecino, así que dice
-     * exactamente lo que `App\Privacidad\CeseDeTratamiento` ejecuta y nada más:
-     * las tres salidas que se frenan y las tres cosas que siguen igual. Si se
-     * agrega o se saca un punto de guarda allá, este texto cambia acá; el test
-     * del panel lo pincha.
+     * La frase es la que el funcionario le repite al vecino, así que la escribe
+     * el adoptante ({@see PanelArcopPlugin::alcanceDelCese()}) y no el paquete:
+     * el mapeo tratamiento→finalidad —qué pantalla, qué CSV, qué correo y qué
+     * job dejan de tocar a esa persona— es propio de cada sistema, y este
+     * paquete no lo conoce ni lo puede ejecutar.
+     *
+     * Que el default diga «no lo declaró» en vez de una frase tranquilizadora
+     * es deliberado: recibir y resolver solicitudes es la SUPERFICIE del
+     * cumplimiento, no el cumplimiento. Un sistema que herede el panel y no
+     * escriba su candado le certificaría por escrito a un vecino un cese que no
+     * ocurre — que es exactamente lo que pasaba en el sistema donde nació este
+     * recurso hasta que se escribió el candado.
      */
     public static function queCesaDeVerdad(): string
     {
-        return 'Para las finalidades bloqueadas el sistema deja de empujar a esta persona al maestro '
-            .'de personas, deja de mandarle correos, deja de incluirla en los CSV que se exportan del panel '
-            .'(atenciones, agenda y reporte comunal) y deja de mandar su historial al resumen con IA. '
-            .'NO cesa: sigue visible en las pantallas del panel y de '
-            .'la app —el equipo la necesita para atenderla y para tramitar esta misma solicitud—, sus datos '
-            .'siguen en la base, y lo que ya salió antes del bloqueo (correos enviados, archivos descargados, '
-            .'lo que el maestro ya recibió) no vuelve.';
+        return self::plugin()->textoDelCese();
     }
 
     /**
@@ -760,12 +743,13 @@ class SolicitudResource extends Resource
     /**
      * Por qué no se propagó, en las palabras del propagador.
      *
-     * El motivo lo escribe la implementación de `PropagaSupresion` de ESTE
-     * sistema ({@see PropagaSupresionAlMaestro}), que lo redacta
-     * en términos de configuración y nunca del titular porque la misma cadena
-     * termina en `privacidad_bitacora.datos`, que no está cifrada. El módulo no
-     * comprueba eso —lo dice en sus límites declarados— y este método tampoco:
-     * solo lo muestra.
+     * El motivo lo escribe la implementación de {@see PropagaSupresion} que
+     * enchufó el sistema adoptante. En discapacidad esa implementación lo
+     * redacta en términos de configuración y nunca del titular, porque la misma
+     * cadena termina en `privacidad_bitacora.datos`, que no está cifrada. El
+     * módulo no comprueba eso —lo dice en sus límites declarados—, este método
+     * tampoco (solo lo muestra) y el paquete no puede comprobárselo a nadie:
+     * quien escriba su propio propagador tiene que cuidarlo.
      *
      * El `null` no debería ocurrir en una supresión total (el contrato exige
      * motivo en `noCorrespondia()` y el rechazo aborta antes de llegar acá),
@@ -1073,8 +1057,8 @@ class SolicitudResource extends Resource
     }
 
     /**
-     * El titular es un morph (`Persona` hoy, potencialmente otro modelo en
-     * otro sistema adoptante) y puede estar huérfano: la anonimización por
+     * El titular es un morph —cada sistema adoptante declara el suyo— y puede
+     * estar huérfano: la anonimización por
      * retención anula `titular_id` a propósito. Ese caso se muestra como lo
      * que es, no como una fila rota.
      */

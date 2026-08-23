@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    name: Pest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      # `muni-graneros/laravel-muni-shared` es privado y entra como dependencia
+      # de DESARROLLO (el panel ARCOP se prueba contra el módulo de privacidad
+      # de verdad). Sin el token, `composer install` muere con un 404 que
+      # despista: parece que el paquete no existe.
+      - name: Credenciales del paquete privado
+        env:
+          COMPOSER_GH_TOKEN: ${{ secrets.COMPOSER_GH_TOKEN }}
+        run: |
+          if [ -n "${COMPOSER_GH_TOKEN:-}" ]; then
+            composer config --global --auth github-oauth.github.com "$COMPOSER_GH_TOKEN"
+          fi
+
+      - run: composer install --no-progress --prefer-dist
+
+      - name: Pest
+        run: ./vendor/bin/pest

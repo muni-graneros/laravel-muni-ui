@@ -169,3 +169,72 @@
 /* Tabs de relation managers: alineadas con el contenido, no centradas (Filament
    les pone margin-inline:auto por defecto y quedaban flotando en medio). */
 .fi-sc-tabs > .fi-tabs { margin-inline: 0 !important; }
+
+/* ══ FILEPOND: TARJETA DE VIDEO ═════════════════════════════════════════════
+   Deuda cobrada de web-graneros: esta regla vivía parchada a mano en su
+   AdminPanelProvider, con el propio comentario reconociendo que el arreglo
+   correspondía acá. Sin ella, FilePond dibuja el preview de video con la
+   altura de la fila del archivo (~44px, overflow oculto) y al ancho completo
+   del formulario: queda una franja angosta dentro de una caja gris estirada.
+   Se rearma como una tarjeta compacta que abraza el video —sirve para
+   vertical, cuadrado y horizontal— acotada al root que trae un <video>, para
+   no tocar los campos de imagen o documento.
+   El observer que marca `.has-video-preview` sobre el `.filepond--root` (un
+   MutationObserver, porque FilePond agrega el <video> después de la carga)
+   sigue viviendo en cada app host: este paquete no trae bundle JS propio (ver
+   CLAUDE.md). Sin ese observer copiado a la app, estas reglas no se activan.
+
+   Sobre los `!important` que quedan: no son residuo del `<style>` inline
+   original. Esta hoja se registra en `PanelsRenderHook::STYLES_AFTER`
+   (`MuniPanel::register()`), es decir justo después de los estilos propios de
+   Filament y sus paquetes —FilePond incluido—, así que a la hoja de FilePond
+   ya le gana por orden de cascada sin forzar nada. Lo que el orden de carga
+   NO resuelve es que FilePond reescribe posición y tamaño de estos nodos
+   escribiéndolos directo en el atributo `style` con su propio motor de
+   layout/animación: un estilo inline le gana a cualquier regla de hoja de
+   estilos que no lleve `!important`, sin importar cuándo se cargó esa hoja.
+   Por eso se conserva solo en `position`, `width`, `height`, `margin`,
+   `transform`, `overflow` de los contenedores de lista y en el tamaño/ajuste
+   del video: son las propiedades que ese motor toca. Colores, bordes,
+   sombras, tipografía y espaciados son decorativos y no compiten con nada
+   inline, así que quedan sin forzar. */
+.filepond--root.has-video-preview{width:100% !important;background:transparent;border:none;box-shadow:none}
+/* El drop-label ("Arrastra un archivo…") sigue existiendo debajo del preview;
+   sin ocultarlo tapa el video y, encima, sus íconos de abrir/descargar quedan
+   detrás y no se pueden pulsar. */
+.filepond--root.has-video-preview .filepond--drop-label{display:none !important;pointer-events:none !important}
+.filepond--root.has-video-preview .filepond--panel-root{background:transparent;border:none}
+/* Contenedores de lista: acá es donde FilePond fija por JS la altura de fila
+   (~44px) y el overflow oculto que aplasta el video. `position`, `overflow` y
+   `margin` van forzados porque esos valores los reescribe su motor de layout,
+   no solo su hoja de estilos. */
+.filepond--root.has-video-preview .filepond--list-scroller{position:relative !important;overflow:visible !important;margin:0 !important}
+.filepond--root.has-video-preview .filepond--list{position:relative !important;height:auto !important;display:flex;justify-content:center}
+.filepond--root.has-video-preview .filepond--item{position:relative !important;width:auto !important;height:auto !important;margin:0 !important}
+.filepond--root.has-video-preview .filepond--file-wrapper{position:relative !important;width:auto !important;height:auto !important}
+.filepond--root.has-video-preview .filepond--file{position:relative !important;display:flex;flex-direction:column;align-items:stretch;width:auto !important;height:auto !important;padding:.6rem;gap:.5rem}
+/* Tarjeta visual del video: cabecera con nombre/peso arriba (legible en claro
+   y oscuro) y fondo ceñido al contenido. `position`/`inset`/`width`/`height`/
+   `transform` forzados porque FilePond anima este panel escribiendo esas
+   propiedades inline durante la subida; el resto es solo la piel de la
+   tarjeta. */
+.filepond--root.has-video-preview .filepond--item-panel{position:absolute !important;inset:0 !important;width:auto !important;height:auto !important;transform:none !important;background:#f8fafc;border:1px solid #e2e8f0;border-radius:.75rem;box-shadow:0 1px 3px rgb(0 0 0 / .06)}
+.dark .filepond--root.has-video-preview .filepond--item-panel{background:#18181b;border-color:#27272a}
+.filepond--root.has-video-preview .filepond--file-info{position:relative !important;width:100% !important;max-width:100% !important;display:flex;justify-content:flex-start;gap:.5rem;align-items:center;margin:0 !important;transform:none !important;padding:0 2rem .35rem .25rem;border-bottom:1px solid #e2e8f0}
+.filepond--root.has-video-preview .filepond--file-info-main{color:#0f172a;font-weight:600;font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
+.filepond--root.has-video-preview .filepond--file-info-sub{color:#64748b;font-size:.72rem}
+.dark .filepond--root.has-video-preview .filepond--file-info-main{color:#f8fafc}
+.dark .filepond--root.has-video-preview .filepond--file-info-sub{color:#a1a1aa}
+.filepond--root.has-video-preview .filepond--media-preview-wrapper,.filepond--root.has-video-preview .filepond--media-preview{position:relative !important;width:auto !important;height:auto !important;overflow:visible !important;background:transparent;display:flex;justify-content:center}
+.filepond--root.has-video-preview .filepond--media-preview-wrapper:before{display:none !important}
+/* El video: altura fija define el tamaño de toda la tarjeta. `object-fit`
+   forzado porque el plugin de preview de FilePond calcula y escribe su propio
+   ajuste inline al leer las dimensiones reales del archivo. */
+.filepond--root.has-video-preview video{position:relative !important;display:block !important;height:340px !important;width:auto !important;max-width:100% !important;object-fit:contain !important;background:#000;border-radius:.5rem}
+/* La X (quitar) va arriba a la derecha, clicable por encima de todo; abrir y
+   descargar quedan visibles en la cabecera. Sin forzar z-index/pointer-events
+   el drop-label oculto (ver arriba) los sigue tapando y dejan de responder al
+   clic, aunque se vean. */
+.filepond--root.has-video-preview .filepond--file-action-button{position:absolute !important;top:.5rem !important;right:.5rem !important;left:auto !important;bottom:auto !important;z-index:20 !important;pointer-events:auto !important;background:rgba(0,0,0,.55);color:#fff}
+.filepond--root.has-video-preview .filepond--open-icon,.filepond--root.has-video-preview .filepond--download-icon{position:relative !important;z-index:20 !important;pointer-events:auto !important;opacity:1 !important;color:#334155}
+.dark .filepond--root.has-video-preview .filepond--open-icon,.dark .filepond--root.has-video-preview .filepond--download-icon{color:#cbd5e1}

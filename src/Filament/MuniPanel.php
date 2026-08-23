@@ -73,6 +73,17 @@ class MuniPanel implements Plugin
                 PanelsRenderHook::STYLES_AFTER,
                 fn (): string => '<link rel="stylesheet" href="'.self::asset('vendor/muni-ui/filament.css').'">',
             )
+            // Enciende la tarjeta de video de FilePond que arma el CSS de
+            // arriba: sin este observador, la clase `.has-video-preview`
+            // nunca se pone y esas reglas no hacen nada. `data-navigate-once`
+            // es obligatorio en ESTA etiqueta (no en el archivo JS): sin él,
+            // cada navegación por wire:navigate vuelve a ejecutar el script y
+            // apila un observador nuevo encima del anterior en vez de
+            // reemplazarlo.
+            ->renderHook(
+                PanelsRenderHook::BODY_END,
+                fn (): string => '<script data-navigate-once src="'.self::asset('vendor/muni-ui/filepond-video.js').'"></script>',
+            )
             // Franja institucional del ecosistema sobre la barra superior.
             ->renderHook(
                 PanelsRenderHook::TOPBAR_BEFORE,

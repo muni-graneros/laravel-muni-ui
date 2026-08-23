@@ -34,8 +34,12 @@ class MuniUiServiceProvider extends ServiceProvider
         // Tema Filament municipal (CSS plano) → public/vendor/muni-ui/filament.css.
         // Se inyecta con un render hook para que los paneles no se vean genéricos:
         //   php artisan vendor:publish --tag=muni-ui-filament --force
+        // El observador de FilePond va en el MISMO tag: es lo que activa la
+        // clase `.has-video-preview` que usa ese CSS, así que quien publica
+        // el tema publica también lo que lo enciende, sin comando aparte.
         $this->publishes([
             __DIR__.'/../resources/css/muni-ui-filament.css' => public_path('vendor/muni-ui/filament.css'),
+            __DIR__.'/../resources/js/filepond-video.js' => public_path('vendor/muni-ui/filepond-video.js'),
         ], 'muni-ui-filament');
     }
 }

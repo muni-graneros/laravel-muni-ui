@@ -356,6 +356,10 @@ class SolicitudResource extends Resource
     private static function accionTomar(): Action
     {
         return Action::make('tomar')
+            // Sin `->slideOver()`, a diferencia de las tres acciones que
+            // llevan formulario: esto es un sí/no de dos líneas, y sacar un
+            // panel de alto completo para preguntarlo es más ruidoso que el
+            // cuadro centrado. Lo mismo vale para «exportar».
             ->label('Tomar')
             ->icon('heroicon-o-hand-raised')
             ->color('info')
@@ -389,6 +393,12 @@ class SolicitudResource extends Resource
     private static function accionResolver(): Action
     {
         return Action::make('resolver')
+            // Se abre desde la orilla, no como cuadro centrado. Un diálogo
+            // centrado se dimensiona por su contenido y con un formulario de
+            // varios campos queda alto y recortado: había que desplazar dentro
+            // del cuadro para llegar al botón. El panel lateral ocupa el alto
+            // completo de la ventana y desplaza donde corresponde.
+            ->slideOver()
             ->label('Resolver')
             ->icon('heroicon-o-check-badge')
             ->color('success')
@@ -493,6 +503,12 @@ class SolicitudResource extends Resource
     private static function accionRectificar(): Action
     {
         return Action::make('rectificar')
+            // Se abre desde la orilla, no como cuadro centrado. Un diálogo
+            // centrado se dimensiona por su contenido y con un formulario de
+            // varios campos queda alto y recortado: había que desplazar dentro
+            // del cuadro para llegar al botón. El panel lateral ocupa el alto
+            // completo de la ventana y desplaza donde corresponde.
+            ->slideOver()
             ->label('Rectificar')
             ->icon('heroicon-o-pencil-square')
             ->color('warning')
@@ -567,6 +583,12 @@ class SolicitudResource extends Resource
     private static function accionSuprimir(): Action
     {
         return Action::make('suprimir')
+            // Se abre desde la orilla, no como cuadro centrado. Un diálogo
+            // centrado se dimensiona por su contenido y con un formulario de
+            // varios campos queda alto y recortado: había que desplazar dentro
+            // del cuadro para llegar al botón. El panel lateral ocupa el alto
+            // completo de la ventana y desplaza donde corresponde.
+            ->slideOver()
             ->label('Suprimir')
             ->icon('heroicon-o-trash')
             ->color('danger')

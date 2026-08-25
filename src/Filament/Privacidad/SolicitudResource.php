@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Str;
+use Muni\Shared\Privacidad\Ciclo\EntregaDeCopia;
 use Muni\Shared\Privacidad\Ciclo\EstadoDePlazo;
 use Muni\Shared\Privacidad\Ciclo\EtiquetaDeTitular;
 use Muni\Shared\Privacidad\Ciclo\PlazoLegal;
@@ -809,10 +810,12 @@ class SolicitudResource extends Resource
             ->color('gray')
             // Oculta en una solicitud RECHAZADA: entregar la copia de todos modos
             // sería la comunicación de datos que la resolución acaba de negar.
+            // Las tres condiciones —tipo que da derecho, solicitud no rechazada y
+            // titular vigente— las decide el módulo: acá se pregunta, no se
+            // repiten. Vivían escritas dos veces y los paneles ya se habían
+            // separado una vez por eso.
             ->visible(fn (Solicitud $record): bool => self::canResolver()
-                && in_array($record->tipo, [TipoDeSolicitud::Acceso, TipoDeSolicitud::Portabilidad], true)
-                && $record->estado !== EstadoDeSolicitud::Rechazada
-                && $record->titular instanceof TitularDeDatos)
+                && EntregaDeCopia::procede($record))
             ->action(fn (Solicitud $record): StreamedResponse => self::expediente($record));
     }
 

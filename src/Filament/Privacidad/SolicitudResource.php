@@ -21,6 +21,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Str;
+use Muni\Shared\Privacidad\Ciclo\EstadoDePlazo;
+use Muni\Shared\Privacidad\Ciclo\EtiquetaDeTitular;
+use Muni\Shared\Privacidad\Ciclo\PlazoLegal;
+use Muni\Shared\Privacidad\Ciclo\PreviaDeSupresion;
+use Muni\Shared\Privacidad\Ciclo\ResultadosDisponibles;
+use Muni\Shared\Privacidad\Ciclo\SeparacionDeFunciones;
+use Muni\Shared\Privacidad\Contratos\BuscaTitulares;
 use Muni\Shared\Privacidad\Contratos\PropagaSupresion;
 use Muni\Shared\Privacidad\Contratos\TitularDeDatos;
 use Muni\Shared\Privacidad\EstadoDeSolicitud;
@@ -36,7 +43,6 @@ use Muni\Shared\Privacidad\Supresiones;
 use Muni\Shared\Privacidad\SupresionNoProcede;
 use Muni\Shared\Privacidad\SupresionNoPropagada;
 use Muni\Shared\Privacidad\TipoDeSolicitud;
-use Muni\Ui\Filament\Privacidad\Contratos\BuscaTitulares;
 use Muni\Ui\Filament\Privacidad\SolicitudResource\Pages\CreateSolicitud;
 use Muni\Ui\Filament\Privacidad\SolicitudResource\Pages\ListSolicitudes;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -248,9 +254,7 @@ class SolicitudResource extends Resource
      */
     public static function etiquetaDeTitular(?TitularDeDatos $titular): ?string
     {
-        return $titular === null
-            ? null
-            : $titular->titularNombre().' — '.$titular->titularDocumento();
+        return EtiquetaDeTitular::de($titular);
     }
 
     /** Un tercero tiene que acompañar el documento; el titular solo acredita su identidad. */
@@ -461,14 +465,7 @@ class SolicitudResource extends Resource
      */
     private static function efectoSobreElBloqueo(Solicitud $solicitud, EstadoDeSolicitud $resultado): string
     {
-        $cesa = $resultado->esAcogida()
-            && $solicitud->tipo === TipoDeSolicitud::Oposicion;
-
-        if (! $cesa) {
-            return 'Si había un bloqueo por esta solicitud, el módulo lo levantó.';
-        }
-
-        return 'El bloqueo queda DEFINITIVO: el tratamiento cesa. '.self::queCesaDeVerdad();
+        return self::plugin()->alcance()->efectoSobreElBloqueo($solicitud->tipo, $resultado);
     }
 
     /**
@@ -663,22 +660,13 @@ class SolicitudResource extends Resource
      */
     public static function previaDeSupresion(Solicitud $solicitud): ?string
     {
-        $titular = $solicitud->titular;
-
-        if (! $titular instanceof TitularDeDatos) {
-            return null;
-        }
-
-        return app(Supresiones::class)->evaluar($titular)->explicacion();
+        return PreviaDeSupresion::de($solicitud);
     }
 
     /** La previa, junto con el aviso de separación de funciones si corresponde. */
     private static function antesDeSuprimir(Solicitud $solicitud): string
     {
-        return trim(implode("\n\n", array_filter([
-            self::advertenciaSeparacionDeFunciones($solicitud),
-            self::previaDeSupresion($solicitud),
-        ])));
+        return PreviaDeSupresion::antesDeSuprimir($solicitud, auth()->id());
     }
 
     /**
@@ -694,6 +682,18 @@ class SolicitudResource extends Resource
      * qué contestó el maestro de personas, y hasta que eso diga «aceptada» el
      * panel no tiene con qué afirmar que la identidad dejó de servirse por RUT a
      * los otros siete sistemas.
+     */
+    /**
+     * NOTA de la extracción al núcleo: este aviso NO se delegó en
+     * `Muni\Shared\Privacidad\Ciclo\ResumenDeSupresion`, y es a propósito. El
+     * texto de acá distingue tres desenlaces —el maestro aceptó, el maestro
+     * rechazó, y nadie habló con el maestro (con su motivo)— y la clase del
+     * núcleo hoy solo distingue dos. Delegarlo empobrecería lo que se le puede
+     * decir al titular, que es lo contrario de para qué se extrajo el núcleo.
+     *
+     * Queda pendiente para cuando el panel Blade lo necesite: ahí se enriquece
+     * `ResumenDeSupresion` con el motivo de no propagación y se migran LOS DOS
+     * paneles a la misma redacción, no uno solo.
      */
     private static function avisarSupresion(ResultadoDeSupresion $resultado): void
     {
@@ -862,24 +862,12 @@ class SolicitudResource extends Resource
      */
     public static function resultadosDisponibles(Solicitud $solicitud): array
     {
-        $resultados = match ($solicitud->tipo) {
-            TipoDeSolicitud::Rectificacion, TipoDeSolicitud::Supresion => [EstadoDeSolicitud::Rechazada],
-            default => [EstadoDeSolicitud::Acogida, EstadoDeSolicitud::AcogidaParcial, EstadoDeSolicitud::Rechazada],
-        };
-
-        return collect($resultados)
-            ->mapWithKeys(fn (EstadoDeSolicitud $estado): array => [$estado->value => self::etiquetaEstado($estado)])
-            ->all();
+        return ResultadosDisponibles::para($solicitud->tipo);
     }
 
     private static function notaDeResultados(Solicitud $solicitud): ?string
     {
-        return match ($solicitud->tipo) {
-            TipoDeSolicitud::Rectificacion => 'Para acogerla, usa «Rectificar»: acoger sin corregir dejaría el dato como está.',
-            TipoDeSolicitud::Supresion => 'Para acogerla, usa «Suprimir»: acoger sin suprimir sellaría un borrado que no ocurrió. '
-                .'El rechazo sí se resuelve acá, con tu propio fundamento.',
-            default => null,
-        };
+        return ResultadosDisponibles::nota($solicitud->tipo);
     }
 
     /**
@@ -984,14 +972,7 @@ class SolicitudResource extends Resource
      */
     public static function advertenciaSeparacionDeFunciones(Solicitud $solicitud): ?string
     {
-        $registro = $solicitud->getAttribute('user_registro_id');
-
-        if ($registro === null || $registro !== auth()->id()) {
-            return null;
-        }
-
-        return 'Esta solicitud la recibiste tú. Resolverla tú mismo concentra la recepción y la resolución en '
-            .'una sola persona: si hay alguien más que pueda resolverla, mejor que la resuelva esa persona.';
+        return SeparacionDeFunciones::advertencia($solicitud, auth()->id());
     }
 
     /**
@@ -1024,13 +1005,7 @@ class SolicitudResource extends Resource
 
     public static function etiquetaEstado(EstadoDeSolicitud $estado): string
     {
-        return match ($estado) {
-            EstadoDeSolicitud::Recibida => 'Recibida',
-            EstadoDeSolicitud::EnTramite => 'En trámite',
-            EstadoDeSolicitud::Acogida => 'Acogida',
-            EstadoDeSolicitud::AcogidaParcial => 'Acogida parcial',
-            EstadoDeSolicitud::Rechazada => 'Rechazada',
-        };
+        return $estado->etiqueta();
     }
 
     /**
@@ -1039,31 +1014,17 @@ class SolicitudResource extends Resource
      */
     public static function etiquetaPlazo(Solicitud $solicitud): string
     {
-        if ($solicitud->estado->estaResuelta()) {
-            return 'Resuelta';
-        }
-
-        $dias = $solicitud->diasRestantes();
-
-        if ($dias < 0) {
-            return 'Vencida';
-        }
-
-        // Mismo umbral que Solicitud::scopePorVencer().
-        if ($dias <= 5) {
-            return 'Por vencer';
-        }
-
-        return 'En plazo';
+        return PlazoLegal::de($solicitud)->etiqueta();
     }
 
+    /** El color es lo ÚNICO que pone el panel: el estado lo decide el módulo. */
     public static function colorPlazo(Solicitud $solicitud): string
     {
-        return match (self::etiquetaPlazo($solicitud)) {
-            'Resuelta' => 'gray',
-            'Vencida' => 'danger',
-            'Por vencer' => 'warning',
-            default => 'success',
+        return match (PlazoLegal::de($solicitud)) {
+            EstadoDePlazo::Resuelta => 'gray',
+            EstadoDePlazo::Vencida => 'danger',
+            EstadoDePlazo::PorVencer => 'warning',
+            EstadoDePlazo::EnPlazo => 'success',
         };
     }
 
@@ -1075,7 +1036,7 @@ class SolicitudResource extends Resource
      */
     public static function estaAnonimizada(Solicitud $solicitud): bool
     {
-        return $solicitud->getAttribute('titular_id') === null;
+        return EtiquetaDeTitular::estaAnonimizada($solicitud);
     }
 
     /**
@@ -1086,23 +1047,7 @@ class SolicitudResource extends Resource
      */
     public static function etiquetaTitular(Solicitud $solicitud): string
     {
-        if (self::estaAnonimizada($solicitud)) {
-            return 'Caso anonimizado';
-        }
-
-        $titular = $solicitud->titular;
-
-        if ($titular === null) {
-            // titular_id existe pero el registro relacionado ya no: huérfano
-            // sin haber pasado por la anonimización del módulo.
-            return 'Titular no disponible';
-        }
-
-        if ($titular instanceof TitularDeDatos) {
-            return $titular->titularNombre().' ('.$titular->titularDocumento().')';
-        }
-
-        return class_basename($titular).' #'.$titular->getKey();
+        return EtiquetaDeTitular::deLaSolicitud($solicitud);
     }
 
     public static function getPages(): array

@@ -5,7 +5,8 @@ namespace Muni\Ui\Filament\Privacidad;
 use Filament\Contracts\Plugin;
 use Filament\Facades\Filament;
 use Filament\Panel;
-use Muni\Ui\Filament\Privacidad\Contratos\BuscaTitulares;
+use Muni\Shared\Privacidad\Ciclo\AlcanceDelCese;
+use Muni\Shared\Privacidad\Contratos\BuscaTitulares;
 
 /**
  * El ciclo ARCOP de la Ley 21.719 —recepción y resolución de solicitudes— como
@@ -207,12 +208,22 @@ class PanelArcopPlugin implements Plugin
      * funcionario es más útil —y más honesto con el vecino— que una frase
      * tranquilizadora que el paquete no puede sostener.
      */
+    /**
+     * El alcance declarado, como objeto del módulo.
+     *
+     * El texto por defecto —el que dice que el sistema NO lo declaró— vive en el
+     * módulo y no acá: el panel Blade tiene que decir exactamente lo mismo, y
+     * dos redacciones distintas del mismo silencio son dos promesas distintas al
+     * vecino.
+     */
+    public function alcance(): AlcanceDelCese
+    {
+        return new AlcanceDelCese($this->alcanceDelCese);
+    }
+
     public function textoDelCese(): string
     {
-        return $this->alcanceDelCese
-            ?? 'Este sistema no declaró qué deja de hacer con los datos de esta persona cuando el bloqueo queda '
-            .'vigente. Antes de decirle al titular que su tratamiento cesó, confirmarlo con informática: el bloqueo '
-            .'queda anotado, pero que se respete depende de un candado que este sistema tiene que haber escrito.';
+        return $this->alcance()->texto();
     }
 
     public function register(Panel $panel): void

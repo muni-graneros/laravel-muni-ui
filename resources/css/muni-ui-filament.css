@@ -106,6 +106,19 @@
 .fi-modal-window::before{ content:""; display:block; height:4px; border-radius:20px 20px 0 0; background:linear-gradient(90deg,var(--mg-lima),var(--mg-petroleo) 45%,var(--mg-oro)); }
 .fi-dropdown-panel { border-radius:14px !important; border:1px solid var(--mg-borde); box-shadow:0 24px 54px -26px rgba(13,58,68,.45) !important; }
 .fi-tabs-item.fi-active { color:var(--mg-petroleo-d) !important; }
+/*
+ * La pestaña activa en oscuro, que también faltaba.
+ *
+ * `--mg-petroleo-d` (#0d3a44) sobre el fondo oscuro del panel (#081418) da
+ * 1,52:1: la pestaña SELECCIONADA sería la menos legible de la fila, justo al
+ * revés de lo que tiene que pasar. Se usa `--mg-lima-br`, el mismo acento que
+ * este archivo ya emplea sobre fondo oscuro para el encabezado de tabla: 12,69:1.
+ *
+ * No se detectó en uso —el CAD de Seguridad Pública no tiene pestañas— sino
+ * revisando el archivo entero después de encontrar el de las etiquetas de KPI.
+ * Cualquier sistema del ecosistema que sí las use lo tiene activo.
+ */
+.dark .fi-tabs-item.fi-active { color:var(--mg-lima-br) !important; }
 
 /* ══ ENTRADA ESCALONADA ════════════════════════════════════════════════════ */
 @keyframes mg-fall{ from{opacity:0;transform:translateY(-14px)} 60%{opacity:1} to{opacity:1;transform:none} }
@@ -132,6 +145,24 @@
 .dark .fi-section, .dark .fi-wi, .dark .fi-wi-stats-overview-stat { background:#0f2025 !important; border-color:#1c343a !important; }
 .dark .fi-topbar > nav { background:#0d1c20 !important; border-color:#1c343a; }
 .dark .fi-header-heading, .dark .fi-wi-stats-overview-stat-value { color:#eaf5f3 !important; }
+/*
+ * La ETIQUETA del KPI, que faltaba.
+ *
+ * La regla clara de más arriba la pinta con `--mg-tinta` (#20302f), correcta
+ * sobre papel. Sin esta contraparte quedaba en 1,22:1 sobre la tarjeta oscura
+ * (#0f2025), contra un mínimo AA de 4,5:1: en la pantalla se veían los NÚMEROS y
+ * no se veía qué significaba cada uno. Se detectó midiendo en el navegador —en
+ * una captura parecen «tenues», no ausentes— en el CAD de Seguridad Pública, y
+ * afecta a todo sistema del ecosistema que use widgets de estadísticas en oscuro.
+ *
+ * Va con `--mg-sb-mut`, el tono que este mismo paquete ya usa para texto
+ * atenuado sobre fondo oscuro: 6,11:1 sobre la tarjeta, claramente legible y
+ * subordinado al valor (15:1), que es la jerarquía que corresponde.
+ *
+ * Hace falta `!important` porque la regla clara de este archivo también lo
+ * lleva; sin él ganaría la de arriba por orden.
+ */
+.dark .fi-wi-stats-overview-stat-label { color:var(--mg-sb-mut) !important; }
 .dark .fi-ta-header-cell { background:#0f2025; color:var(--mg-lima-br); }
 /* El título de cada tarjeta. Mismo motivo que los tres de abajo: arriba se
    pinta de petróleo oscuro y el bloque oscuro no lo enumeraba, así que sobre la

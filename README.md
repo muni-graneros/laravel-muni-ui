@@ -39,6 +39,22 @@ activadores de clase/atributo (ganan sobre el OS) → `data-muni-theme` explíci
   y queda inmune al OS y a un `.dark` de un ancestro.
 - Una **PWA que sigue el OS**: no pongas nada — `prefers-color-scheme` decide.
 
+### Al agregar una regla de color a `muni-ui-filament.css`
+
+Toda regla que fije `color` para el modo claro necesita su contraparte `.dark`. No es una
+recomendación de estilo: las reglas de este archivo llevan `!important` y ganan sobre las
+de Filament —que vienen con `:where(.dark, .dark *)`, especificidad CERO a propósito—, así
+que **la variante clara se aplica también en oscuro** y el texto queda encima de un fondo
+para el que no fue pensado.
+
+Pasó dos veces y las dos se descubrieron midiendo, no mirando: la etiqueta de los KPI
+quedaba en 1,22:1 y la pestaña activa en 1,52:1, contra un mínimo AA de 4,5:1. En una
+captura se ven «tenues», no ausentes.
+
+Los tonos para fondo oscuro ya existen y conviene reutilizarlos en vez de inventar:
+`--mg-sb-txt` para texto principal, `--mg-sb-mut` para atenuado, `--mg-lima-br` para
+acento.
+
 ## Requisitos
 
 - PHP 8.3+, Laravel 12 o 13
@@ -73,6 +89,23 @@ Para personalizar los tokens por proyecto, publica el CSS y edítalo:
 ```bash
 php artisan vendor:publish --tag=muni-ui-css   # → resources/css/vendor/muni-ui.css
 ```
+
+### Al ACTUALIZAR el paquete en un sistema
+
+Subir la versión **no aplica nada por sí solo**: el tema de Filament y el escudo son
+artefactos ya copiados a `public/vendor/muni-ui/`, y ahí se quedan hasta que se los vuelva
+a publicar. Un sistema puede estar en la última versión y seguir sirviendo el CSS viejo,
+sin ninguna señal de que algo quedó atrás.
+
+```bash
+composer update muni-graneros/laravel-muni-ui
+php artisan vendor:publish --tag=muni-ui-filament --force   # el tema; SIN --force no pisa
+php artisan vendor:publish --tag=muni-ui-images --force     # solo si cambió el escudo
+npm run build                                               # si el sistema tiene tema propio
+```
+
+Y reiniciar el servidor de aplicación si corre con Octane: el manifiesto de Vite queda
+cacheado en el proceso.
 
 ## Uso
 

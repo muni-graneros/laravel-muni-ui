@@ -84,6 +84,15 @@ class MuniPanel implements Plugin
                 PanelsRenderHook::BODY_END,
                 fn (): string => '<script data-navigate-once src="'.self::asset('vendor/muni-ui/filepond-video.js').'"></script>',
             )
+            // Le devuelve el nombre a los selects con buscador. Filament los
+            // pinta como un botón y deja el `<label>` apuntando a un id que no
+            // existe, así que el lector de pantalla anuncia «Seleccione una
+            // opción» en vez de la etiqueta del campo. Mismo `data-navigate-once`
+            // y por el mismo motivo que el de arriba.
+            ->renderHook(
+                PanelsRenderHook::BODY_END,
+                fn (): string => '<script data-navigate-once src="'.self::asset('vendor/muni-ui/nombre-accesible-select.js').'"></script>',
+            )
             // Franja institucional del ecosistema sobre la barra superior.
             ->renderHook(
                 PanelsRenderHook::TOPBAR_BEFORE,

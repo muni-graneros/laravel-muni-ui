@@ -40,6 +40,7 @@ class MuniUiServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../resources/css/muni-ui-filament.css' => public_path('vendor/muni-ui/filament.css'),
             __DIR__.'/../resources/js/filepond-video.js' => public_path('vendor/muni-ui/filepond-video.js'),
+            __DIR__.'/../resources/js/nombre-accesible-select.js' => public_path('vendor/muni-ui/nombre-accesible-select.js'),
         ], 'muni-ui-filament');
     }
 }

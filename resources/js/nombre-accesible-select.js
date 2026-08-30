@@ -2,11 +2,14 @@
  * Le devuelve el nombre a los selects CON BUSCADOR del panel.
  *
  * Filament no pinta un `<select>` cuando el campo es `searchable()`: pinta un
- * botón que abre una lista, y deja el `<label>` apuntando con `for` a un id que
- * NO existe en la página. El resultado, medido en el navegador, es que quien
- * navega con lector de pantalla oye «Seleccione una opción» en vez de la
- * etiqueta del campo. Es WCAG 4.1.2 (nombre, función, valor), y afecta al campo
- * más importante de la recepción de solicitudes ARCOP: el titular de los datos.
+ * BOTÓN que abre una lista. Y un `<label for>` no le da nombre a un botón —solo
+ * nombra controles de formulario—, así que el nombre accesible del control
+ * termina siendo su propio texto: «Seleccione una opción». Medido en el
+ * navegador, y pasa igual cuando el `for` resuelve al botón y cuando apunta a un
+ * id inexistente, que de las dos formas lo pinta Filament según la pantalla.
+ *
+ * Es WCAG 4.1.2 (nombre, función, valor), y afecta al campo más importante de la
+ * recepción de solicitudes ARCOP: el titular de los datos.
  *
  * No hay forma de arreglarlo desde el campo: `extraInputAttributes()` -la vía
  * que documenta Filament para esto- no alcanza al botón, comprobado. Así que se
@@ -26,19 +29,16 @@
     function nombrarSelectsConBuscador() {
         // `.fi-fo-field` es el contenedor que comparten la etiqueta y el
         // control; `.fi-fo-field-wrp` NO los agrupa a los dos.
-        var etiquetas = document.querySelectorAll('.fi-fo-field label[for]');
+        var etiquetas = document.querySelectorAll('.fi-fo-field label');
 
         for (var i = 0; i < etiquetas.length; i++) {
             var etiqueta = etiquetas[i];
-
-            // Si el `for` resuelve, el campo ya está bien: no se toca.
-            if (document.getElementById(etiqueta.getAttribute('for'))) {
-                continue;
-            }
-
             var campo = etiqueta.closest('.fi-fo-field');
             var control = campo && campo.querySelector('button');
 
+            // Solo interesan los campos cuyo control es un botón, que son los
+            // selects con buscador. Si el campo tiene un `<input>` o un
+            // `<select>` de verdad, su `<label for>` ya lo nombra.
             if (! control) {
                 continue;
             }

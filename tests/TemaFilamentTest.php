@@ -113,3 +113,71 @@ it('toda regla de color tiene su contraparte en modo oscuro', function () {
         implode(' | ', array_unique($sinContraparte)),
     );
 });
+
+/*
+ * EL PUENTE HACIA LOS COMPONENTES.
+ *
+ * Los componentes <x-muni::*> leen tokens «--muni-*». El tema del panel solo
+ * definía los «--mg-*», así que dentro de Filament esos componentes salían con
+ * las variables vacías: la barra de chart-bar se dibujaba con el alto correcto
+ * y «background:none», y el esqueleto de carga quedaba invisible. Sin un solo
+ * error en consola — por eso los paneles del ecosistema no los usaban.
+ */
+/**
+ * El contenido de un bloque CSS, desde su selector hasta la primera llave que
+ * lo cierra.
+ *
+ * Hace falta porque buscar el token en TODO el archivo daba un falso verde: los
+ * mismos nombres se redefinen en el bloque `.dark`, así que quitarlos del
+ * `:root` no rompía nada. Comprobado quitando `--muni-text` a mano.
+ */
+function bloqueDelTema(string $selector): string
+{
+    $tema = temaFilament();
+    $inicio = mb_strpos($tema, $selector);
+
+    if ($inicio === false) {
+        return '';
+    }
+
+    $fin = mb_strpos($tema, '}', $inicio);
+
+    return mb_substr($tema, $inicio, $fin === false ? null : $fin - $inicio);
+}
+
+it('el tema define los tokens que leen los componentes', function () {
+    $tema = bloqueDelTema(':root{');
+
+    // Los que más usan los componentes del paquete. Si falta uno, el componente
+    // que lo lea se ve roto y nada lo avisa.
+    $obligatorios = [
+        '--muni-text', '--muni-muted', '--muni-border', '--muni-accent',
+        '--muni-surface', '--muni-surface-2', '--muni-radius', '--muni-radius-sm',
+        '--muni-ease', '--muni-dur', '--muni-font-sans', '--muni-font-mono',
+        '--muni-ok-fg', '--muni-warn-fg', '--muni-info-fg', '--muni-danger-fg',
+        '--muni-shadow', '--muni-ring',
+    ];
+
+    foreach ($obligatorios as $token) {
+        // `toContain` con un segundo argumento busca OTRA cadena, no muestra un
+        // mensaje: hay que preguntar por el booleano para poder explicar el fallo.
+        expect(str_contains($tema, $token.':'))->toBeTrue(
+            "El tema no define «{$token}»: los componentes que lo leen se verán rotos y sin avisar"
+        );
+    }
+});
+
+it('los tokens de estado cambian en modo oscuro', function () {
+
+    // No es cosmético: como TEXTO sobre el papel del panel, los tonos del
+    // cinturón institucional dan 1,62 (lima), 1,76 (oro) y 1,65 (celeste),
+    // contra el 4,5:1 que exige WCAG AA. En claro van versiones oscurecidas y
+    // en oscuro los institucionales, que ahí rinden 9:1.
+    $bloqueOscuro = bloqueDelTema('.dark {');
+
+    foreach (['--muni-ok-fg', '--muni-warn-fg', '--muni-info-fg', '--muni-danger-fg', '--muni-accent'] as $token) {
+        expect(str_contains($bloqueOscuro, $token.':'))->toBeTrue(
+            "«{$token}» no se redefine en oscuro: quedaría el valor pensado para fondo claro"
+        );
+    }
+});

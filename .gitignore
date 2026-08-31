@@ -2,3 +2,7 @@
 composer.lock
 /.phpunit.cache/
 demo/vendor/
+
+# direnv (tokens por frente; NUNCA versionar)
+.envrc
+.direnv/

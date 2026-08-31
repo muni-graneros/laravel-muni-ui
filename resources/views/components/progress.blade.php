@@ -21,7 +21,16 @@
             @if ($showValue)<span style="font-family:var(--muni-font-mono);font-size:12px;font-variant-numeric:tabular-nums;color:var(--muni-text);">{{ $pct }}%</span>@endif
         </div>
     @endif
+    {{--
+        El nombre accesible es obligatorio: sin él, un lector de pantalla
+        anuncia «barra de progreso, 64 %» sin decir progreso DE QUÉ, y en una
+        pantalla con varias no hay forma de distinguirlas. Se reutiliza la
+        etiqueta visible para que lo que se oye y lo que se ve coincidan; si no
+        se pasó ninguna, queda un nombre genérico, que sigue siendo mejor que
+        ninguno. Quien necesite otro texto puede pasar aria-label.
+    --}}
     <div role="progressbar" aria-valuenow="{{ $pct }}" aria-valuemin="0" aria-valuemax="100"
+         aria-label="{{ $attributes->get('aria-label', $label ?: 'Progreso') }}"
          style="height:7px;border-radius:999px;background:var(--muni-surface-3);overflow:hidden;">
         <div style="height:100%;width:{{ $pct }}%;border-radius:999px;background:{{ $color }};transition:width .5s var(--muni-ease);"></div>
     </div>

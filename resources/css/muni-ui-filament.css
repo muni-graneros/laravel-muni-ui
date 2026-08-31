@@ -9,6 +9,87 @@
     --mg-celeste:#7ccbe1; --mg-carmin:#ca3048;
     --mg-papel:#f6f3ea; --mg-papel-2:#efece1; --mg-borde:#e2ddce; --mg-tinta:#20302f;
     --mg-sb-txt:#cfe3e1; --mg-sb-mut:#7ea3a3;
+
+    /* ── Puente hacia los componentes <x-muni::*> ───────────────────────────
+       Los componentes del paquete leen tokens «--muni-*», y este tema solo
+       definía los «--mg-*». Dentro del panel quedaban con las variables
+       vacías: la barra de <x-muni::chart-bar> se dibujaba con el alto correcto
+       pero con «background:none», y el esqueleto de carga salía invisible.
+       Ningún error en consola — simplemente no se veían, y por eso nadie los
+       usaba en el panel.
+
+       Los de estado NO son los del cinturón institucional: medidos como texto
+       sobre el papel del panel dan lima 1,62 · oro 1,76 · celeste 1,65, muy por
+       debajo del 4,5:1 que exige WCAG AA. Se usan versiones oscurecidas de esos
+       mismos tonos (5,3 a 6,4) y el cinturón queda para franjas y fondos, que
+       es donde se ve bien. En modo oscuro se invierte: ahí los institucionales
+       rinden 9:1 y son los correctos.
+       ──────────────────────────────────────────────────────────────────── */
+    --muni-text:        var(--mg-tinta);
+    --muni-muted:       #5c6f6d;
+    --muni-hint:        #5f6e6c;
+
+    --muni-surface:     #ffffff;
+    --muni-surface-2:   var(--mg-papel);
+    --muni-surface-3:   var(--mg-papel-2);
+
+    --muni-border:      var(--mg-borde);
+    --muni-border-2:    #cfc7b3;
+
+    --muni-accent:      var(--mg-petroleo);
+    --muni-on-accent:   #ffffff;
+
+    --muni-ok-fg:       #4a6b1f;
+    --muni-warn-fg:     #8a5a00;
+    --muni-info-fg:     #1d5f75;
+    --muni-danger-fg:   #a3132a;
+    --muni-danger-border: #e0a3ad;
+
+    --muni-radius:      10px;
+    --muni-radius-sm:   7px;
+    --muni-radius-lg:   14px;
+
+    --muni-shadow:      0 1px 2px rgba(16,24,40,.04), 0 2px 8px rgba(16,24,40,.06);
+    --muni-shadow-md:   0 4px 16px rgba(16,24,40,.10);
+    --muni-shadow-lg:   0 12px 32px rgba(16,24,40,.14);
+    --muni-ring:        0 0 0 3px color-mix(in srgb, var(--muni-accent) 30%, transparent);
+    --muni-glow:        none;
+
+    --muni-ease:        cubic-bezier(.22, 1, .36, 1);
+    --muni-dur:         160ms;
+
+    /* La tipografía la manda el panel: pedir aquí una familia propia haría que
+       un componente suelto se viera distinto al resto de la pantalla. */
+    --muni-font-sans:   inherit;
+    --muni-font-mono:   ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* En oscuro mandan los tonos institucionales: sobre la superficie del panel
+   (#0f2025) rinden entre 7:1 y 10:1, muy por encima del mínimo. */
+.dark {
+    --muni-text:        #eaf5f3;
+    --muni-muted:       #94a3b8;
+    --muni-hint:        #7e8ea0;
+
+    --muni-surface:     #0f2025;
+    --muni-surface-2:   #0d1c20;
+    --muni-surface-3:   #142a30;
+
+    --muni-border:      #1c343a;
+    --muni-border-2:    #2a4a52;
+
+    --muni-accent:      var(--mg-celeste);
+    --muni-on-accent:   #08252b;
+
+    --muni-ok-fg:       var(--mg-lima);
+    --muni-warn-fg:     var(--mg-oro-br);
+    --muni-info-fg:     var(--mg-celeste);
+    --muni-danger-fg:   #ff8195;
+    --muni-danger-border: #6b2430;
+
+    --muni-shadow:      0 1px 2px rgba(0,0,0,.30), 0 2px 8px rgba(0,0,0,.35);
+    --muni-shadow-md:   0 4px 16px rgba(0,0,0,.40);
+    --muni-shadow-lg:   0 12px 32px rgba(0,0,0,.50);
 }
 
 /* ══ BARRA LATERAL OSCURA — el gran cambio ══════════════════════════════════ */

@@ -62,9 +62,9 @@
     --muni-ok-fg: #0f7a5a;
     --muni-ok-bg: #e2f5ee;
     --muni-ok-border: #0f7a5a;
-    --muni-warn-fg: #c47a10;
+    --muni-warn-fg: #8a5a00;
     --muni-warn-bg: #fef3dc;
-    --muni-warn-border: #c47a10;
+    --muni-warn-border: #8a5a00;
     --muni-danger-fg: #b03030;
     --muni-danger-bg: #fdeaea;
     --muni-danger-border: #b03030;
@@ -103,7 +103,7 @@
         --muni-panel: #1c2333;
         --muni-text: #e2e8f4;
         --muni-muted: #7a8ba8;
-        --muni-hint: #4a5a74;
+        --muni-hint: #7a8ba8;
         --muni-border: #2a3347;
         --muni-border-2: #3a4560;
         --muni-accent: #f59e0b;
@@ -146,7 +146,7 @@
     --muni-panel: #1c2333;
     --muni-text: #e2e8f4;
     --muni-muted: #7a8ba8;
-    --muni-hint: #4a5a74;
+    --muni-hint: #7a8ba8;
     --muni-border: #2a3347;
     --muni-border-2: #3a4560;
     --muni-accent: #f59e0b;
@@ -196,9 +196,9 @@
     --muni-ok-fg: #0f7a5a;
     --muni-ok-bg: #e2f5ee;
     --muni-ok-border: #0f7a5a;
-    --muni-warn-fg: #c47a10;
+    --muni-warn-fg: #8a5a00;
     --muni-warn-bg: #fef3dc;
-    --muni-warn-border: #c47a10;
+    --muni-warn-border: #8a5a00;
     --muni-danger-fg: #b03030;
     --muni-danger-bg: #fdeaea;
     --muni-danger-border: #b03030;

@@ -29,6 +29,7 @@
     --muni-muted:       #5c6f6d;
     --muni-hint:        #5f6e6c;
 
+    --muni-bg:          #f8f5ec;
     --muni-surface:     #ffffff;
     --muni-surface-2:   var(--mg-papel);
     --muni-surface-3:   var(--mg-papel-2);
@@ -36,14 +37,35 @@
     --muni-border:      var(--mg-borde);
     --muni-border-2:    #cfc7b3;
 
-    --muni-accent:      var(--mg-petroleo);
-    --muni-on-accent:   #ffffff;
+    --muni-accent:        var(--mg-petroleo);
+    --muni-accent-strong: var(--mg-petroleo-d);
+    --muni-accent-soft:   color-mix(in srgb, var(--mg-petroleo) 10%, #fff);
+    --muni-on-accent:     #ffffff;
 
     --muni-ok-fg:       #4a6b1f;
+    --muni-ok-bg:       #e6f0da;
+    --muni-ok-border:   #4a6b1f;
     --muni-warn-fg:     #8a5a00;
+    --muni-warn-bg:     #f7ecd2;
+    --muni-warn-border: #8a5a00;
     --muni-info-fg:     #1d5f75;
+    --muni-info-bg:     #dce8f0;
+    --muni-info-border: #1d5f75;
     --muni-danger-fg:   #a3132a;
+    --muni-danger-bg:   #f7dde1;
     --muni-danger-border: #e0a3ad;
+
+    /* Cinturón institucional: los mismos 7 colores del escudo, expuestos como
+       tokens `--muni-*` para que <x-muni::gob-*> los lea sin depender de que
+       el host publique este tema (ver hallazgo de tokens faltantes). */
+    --muni-gob-lima:           var(--mg-lima);
+    --muni-gob-petroleo:       var(--mg-petroleo);
+    --muni-gob-petroleo-dark:  var(--mg-petroleo-d);
+    --muni-gob-oro:            var(--mg-oro);
+    --muni-gob-naranja:        var(--mg-naranja);
+    --muni-gob-celeste:        var(--mg-celeste);
+    --muni-gob-carmin:         var(--mg-carmin);
+    --muni-gob-gris:           #9c9b9b;
 
     --muni-radius:      10px;
     --muni-radius-sm:   7px;
@@ -57,6 +79,7 @@
 
     --muni-ease:        cubic-bezier(.22, 1, .36, 1);
     --muni-dur:         160ms;
+    --muni-topbar-h:    56px;
 
     /* La tipografía la manda el panel: pedir aquí una familia propia haría que
        un componente suelto se viera distinto al resto de la pantalla. */
@@ -71,6 +94,7 @@
     --muni-muted:       #94a3b8;
     --muni-hint:        #7e8ea0;
 
+    --muni-bg:          #081418;
     --muni-surface:     #0f2025;
     --muni-surface-2:   #0d1c20;
     --muni-surface-3:   #142a30;
@@ -78,18 +102,28 @@
     --muni-border:      #1c343a;
     --muni-border-2:    #2a4a52;
 
-    --muni-accent:      var(--mg-celeste);
-    --muni-on-accent:   #08252b;
+    --muni-accent:        var(--mg-celeste);
+    --muni-accent-strong: var(--mg-lima-br);
+    --muni-accent-soft:   color-mix(in srgb, var(--mg-celeste) 14%, transparent);
+    --muni-on-accent:     #08252b;
 
     --muni-ok-fg:       var(--mg-lima);
+    --muni-ok-bg:       color-mix(in srgb, var(--mg-lima) 18%, #0f2025);
+    --muni-ok-border:   var(--mg-lima);
     --muni-warn-fg:     var(--mg-oro-br);
+    --muni-warn-bg:     color-mix(in srgb, var(--mg-oro-br) 18%, #0f2025);
+    --muni-warn-border: var(--mg-oro-br);
     --muni-info-fg:     var(--mg-celeste);
+    --muni-info-bg:     color-mix(in srgb, var(--mg-celeste) 18%, #0f2025);
+    --muni-info-border: var(--mg-celeste);
     --muni-danger-fg:   #ff8195;
+    --muni-danger-bg:   color-mix(in srgb, #ff8195 18%, #0f2025);
     --muni-danger-border: #6b2430;
 
     --muni-shadow:      0 1px 2px rgba(0,0,0,.30), 0 2px 8px rgba(0,0,0,.35);
     --muni-shadow-md:   0 4px 16px rgba(0,0,0,.40);
     --muni-shadow-lg:   0 12px 32px rgba(0,0,0,.50);
+    --muni-topbar-h:    52px;
 }
 
 /* ══ BARRA LATERAL OSCURA — el gran cambio ══════════════════════════════════ */
@@ -202,7 +236,7 @@
 .dark .fi-tabs-item.fi-active { color:var(--mg-lima-br) !important; }
 
 /* ══ ENTRADA ESCALONADA ════════════════════════════════════════════════════ */
-@keyframes mg-fall{ from{opacity:0;transform:translateY(-14px)} 60%{opacity:1} to{opacity:1;transform:none} }
+@keyframes mg-fall{ from{transform:translateY(-14px)} to{transform:none} }
 /* El relleno va 'backwards', NUNCA 'both'. Con 'both' el navegador retiene el
    fotograma final y, aunque diga transform:none, lo computa como matriz identidad:
    eso basta para crear un containing block y los modales y paneles laterales

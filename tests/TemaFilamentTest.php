@@ -148,15 +148,26 @@ function bloqueDelTema(string $selector): string
 it('el tema define los tokens que leen los componentes', function () {
     $tema = bloqueDelTema(':root{');
 
-    // Los que más usan los componentes del paquete. Si falta uno, el componente
-    // que lo lea se ve roto y nada lo avisa.
-    $obligatorios = [
-        '--muni-text', '--muni-muted', '--muni-border', '--muni-accent',
-        '--muni-surface', '--muni-surface-2', '--muni-radius', '--muni-radius-sm',
-        '--muni-ease', '--muni-dur', '--muni-font-sans', '--muni-font-mono',
-        '--muni-ok-fg', '--muni-warn-fg', '--muni-info-fg', '--muni-danger-fg',
-        '--muni-shadow', '--muni-ring',
-    ];
+    /*
+     * DERIVADO, no a mano. La lista literal que tenía este test vigilaba 18
+     * nombres mientras los componentes ya leían 46: agregar un `var(--muni-x)`
+     * nuevo a un componente pasaba en verde aunque el tema nunca lo definiera.
+     * Se barren TODOS los `resources/views/components/*.blade.php` en vez de
+     * confiar en que quien agrega un token también actualice esta lista.
+     */
+    $vistas = glob(__DIR__.'/../resources/views/components/*.blade.php') ?: [];
+
+    $leidos = [];
+
+    foreach ($vistas as $vista) {
+        preg_match_all('/var\(--muni-[a-z0-9-]+/', file_get_contents($vista), $coincidencias);
+        $leidos = [...$leidos, ...$coincidencias[0]];
+    }
+
+    $obligatorios = array_values(array_unique(array_map(
+        fn (string $var) => substr($var, 4), // 'var(--muni-x' → '--muni-x'
+        $leidos,
+    )));
 
     foreach ($obligatorios as $token) {
         // `toContain` con un segundo argumento busca OTRA cadena, no muestra un
@@ -180,4 +191,20 @@ it('los tokens de estado cambian en modo oscuro', function () {
             "«{$token}» no se redefine en oscuro: quedaría el valor pensado para fondo claro"
         );
     }
+});
+
+it('la animación de entrada no arranca invisible (LCP)', function () {
+    // `.fi-wi/.fi-section/.fi-ta` cubren casi toda pantalla de los 8 paneles.
+    // Animar su `opacity` desde 0 hace que el navegador no cuente el contenido
+    // como pintado hasta que la animación llega a 60%: hasta 0,81s de retraso
+    // acumulado con el escalonado por `nth-child`. El desplazamiento (transform)
+    // se queda: no afecta cuándo el contenido se considera "pintado".
+    $keyframe = bloqueDelTema('@keyframes mg-fall{');
+
+    // `toContain` con un segundo argumento busca OTRA cadena, no muestra un
+    // mensaje (ver el mismo candado más arriba): hay que preguntar por el
+    // booleano para poder explicar el fallo.
+    expect(str_contains($keyframe, 'opacity:0'))->toBeFalse(
+        'El keyframe mg-fall arranca en opacity:0: el elemento LCP tarda hasta 0,81s en pintarse.'
+    );
 });

@@ -12,6 +12,4 @@ use RuntimeException;
  * leer los permisos del adoptante. Fallar acá, con el nombre del método que
  * falta, es mucho más barato que un panel que abre y no encuentra a nadie.
  */
-class PanelArcopNoRegistrado extends RuntimeException
-{
-}
+class PanelArcopNoRegistrado extends RuntimeException {}

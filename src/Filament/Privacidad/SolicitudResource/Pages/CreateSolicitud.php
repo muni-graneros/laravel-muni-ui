@@ -2,7 +2,6 @@
 
 namespace Muni\Ui\Filament\Privacidad\SolicitudResource\Pages;
 
-use Muni\Ui\Filament\Privacidad\SolicitudResource;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Support\Exceptions\Halt;
@@ -16,6 +15,7 @@ use Muni\Shared\Privacidad\Solicitante;
 use Muni\Shared\Privacidad\Solicitudes;
 use Muni\Shared\Privacidad\TipoDeSolicitud;
 use Muni\Ui\Filament\Privacidad\PanelArcopPlugin;
+use Muni\Ui\Filament\Privacidad\SolicitudResource;
 
 /**
  * Recepción de una solicitud ARCOP en el mesón.

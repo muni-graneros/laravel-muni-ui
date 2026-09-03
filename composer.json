@@ -13,7 +13,9 @@
         "muni-graneros/laravel-muni-shared": "^1.16",
         "orchestra/testbench": "^9.0|^10.0|^11.0",
         "pestphp/pest": "^3.0|^4.0",
-        "pestphp/pest-plugin-livewire": "^3.0|^4.0"
+        "pestphp/pest-plugin-livewire": "^3.0|^4.0",
+        "laravel/pint": "^1.13",
+        "larastan/larastan": "^3.10"
     },
     "autoload": {
         "psr-4": {
@@ -50,6 +52,8 @@
         }
     },
     "scripts": {
-        "test": "pest"
+        "test": "pest",
+        "stan": "phpstan analyse --memory-limit=1G",
+        "lint": "pint --test"
     }
 }

@@ -3,13 +3,16 @@
     'maxWidth' => '480px',
 ])
 
-{{-- Modal accesible (Alpine 3). El slot `trigger` abre; Escape / click en el fondo /
-     botón × cierran. Bloquea el scroll del body mientras está abierto y devuelve el foco
-     al panel al abrir. El slot `footer` es opcional (acciones). --}}
+@php $tituloId = 'muni-modal-title-'.uniqid(); @endphp
+
+{{-- Modal accesible (Alpine 3 + plugin Focus, ya presente en el bundle de Livewire de
+     los paneles). El slot `trigger` abre; Escape / click en el fondo / botón × cierran.
+     `x-trap.inert.noscroll` atrapa el foco dentro del diálogo (Tab/Shift+Tab no se
+     escapan), bloquea el scroll del body y —al cerrar, sin el modificador `.noreturn`—
+     devuelve el foco solo a quien lo abrió. El slot `footer` es opcional (acciones). --}}
 <div
     x-data="{ open: false }"
     @keydown.escape.window="open = false"
-    x-effect="document.body.style.overflow = open ? 'hidden' : ''"
 >
     @isset($trigger)
         <div @click="open = true" style="display:inline-flex;">{{ $trigger }}</div>
@@ -19,8 +22,10 @@
         <div
             x-show="open"
             x-cloak
+            x-trap.inert.noscroll="open"
             role="dialog"
             aria-modal="true"
+            aria-labelledby="{{ $tituloId }}"
             style="position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;"
         >
             {{-- Fondo --}}
@@ -45,7 +50,7 @@
                 ]) }}
             >
                 <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid var(--muni-border);">
-                    <h2 style="margin:0;font-size:15px;font-weight:700;color:var(--muni-text);">{{ $title }}</h2>
+                    <h2 id="{{ $tituloId }}" style="margin:0;font-size:15px;font-weight:700;color:var(--muni-text);">{{ $title }}</h2>
                     <button type="button" @click="open = false" aria-label="Cerrar" class="muni-modal-x">
                         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><path d="M5 5l10 10M15 5L5 15" stroke-linecap="round"/></svg>
                     </button>

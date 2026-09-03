@@ -4,11 +4,16 @@
     'width' => '400px',
 ])
 
-@php $isRight = $side !== 'left'; @endphp
+@php
+    $isRight = $side !== 'left';
+    $tituloId = 'muni-drawer-title-'.uniqid();
+@endphp
 
-{{-- Panel lateral deslizante (Alpine 3). El slot `trigger` abre; Escape / click en el fondo
-     cierran. Bloquea el scroll del body. --}}
-<div x-data="{ open:false }" @keydown.escape.window="open=false" x-effect="document.body.style.overflow = open ? 'hidden' : ''" {{ $attributes }}>
+{{-- Panel lateral deslizante (Alpine 3 + plugin Focus, ya presente en el bundle de
+     Livewire de los paneles). El slot `trigger` abre; Escape / click en el fondo cierran.
+     `x-trap.inert.noscroll` atrapa el foco (Tab/Shift+Tab no se escapan), bloquea el
+     scroll del body y devuelve el foco a quien lo abrió al cerrar. --}}
+<div x-data="{ open:false }" @keydown.escape.window="open=false" {{ $attributes }}>
     @isset($trigger)<div @click="open=true" style="display:inline-flex;">{{ $trigger }}</div>@endisset
 
     <template x-teleport="body">
@@ -18,12 +23,12 @@
                  x-transition:leave="muni-fade" x-transition:leave-start="muni-fade-1" x-transition:leave-end="muni-fade-0"
                  style="position:absolute;inset:0;background:rgba(10,14,20,.5);backdrop-filter:blur(2px);"></div>
 
-            <div x-show="open" role="dialog" aria-modal="true"
+            <div x-show="open" x-trap.inert.noscroll="open" role="dialog" aria-modal="true" aria-labelledby="{{ $tituloId }}"
                  x-transition:enter="muni-drawer" x-transition:enter-start="{{ $isRight ? 'muni-drawer-r0' : 'muni-drawer-l0' }}" x-transition:enter-end="muni-drawer-1"
                  x-transition:leave="muni-drawer" x-transition:leave-start="muni-drawer-1" x-transition:leave-end="{{ $isRight ? 'muni-drawer-r0' : 'muni-drawer-l0' }}"
                  style="position:absolute;top:0;bottom:0;{{ $isRight ? 'right:0;' : 'left:0;' }}width:{{ $width }};max-width:92vw;display:flex;flex-direction:column;background:var(--muni-surface);border-{{ $isRight ? 'left' : 'right' }}:1px solid var(--muni-border);box-shadow:var(--muni-shadow-lg);">
                 <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--muni-border);">
-                    <h2 style="margin:0;font-family:var(--muni-font-sans);font-size:15px;font-weight:700;color:var(--muni-text);">{{ $title }}</h2>
+                    <h2 id="{{ $tituloId }}" style="margin:0;font-family:var(--muni-font-sans);font-size:15px;font-weight:700;color:var(--muni-text);">{{ $title }}</h2>
                     <button type="button" @click="open=false" aria-label="Cerrar" class="muni-drawer__x">
                         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><path d="M5 5l10 10M15 5L5 15" stroke-linecap="round"/></svg>
                     </button>

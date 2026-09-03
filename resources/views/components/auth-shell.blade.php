@@ -11,8 +11,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>    <x-muni::reverb-meta />
-{{ $title }} · {{ $system }}</title>
+    {{-- La meta va FUERA del <title>: dentro es RCDATA, o sea texto, así que
+         el marcado se vería en la pestaña y la <meta> no existiría como
+         elemento (echo.js se quedaba sin clave y el tiempo real, apagado). --}}
+    <x-muni::reverb-meta />
+    <title>{{ $title }} · {{ $system }}</title>
     {{ $head ?? '' }}
     <style>
         *,*::before,*::after{ box-sizing:border-box; }

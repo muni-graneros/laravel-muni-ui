@@ -55,7 +55,8 @@
         .muni-cal__dow { text-align:center; font-family:var(--muni-font-mono); font-size:10.5px; font-weight:600; color:var(--muni-hint); padding-bottom:6px; }
         .muni-cal__day { aspect-ratio:1; border:none; background:transparent; color:var(--muni-text); border-radius:var(--muni-radius-sm); font-family:var(--muni-font-mono); font-size:12.5px; cursor:pointer; transition:background var(--muni-dur) var(--muni-ease); }
         .muni-cal__day:hover { background:var(--muni-surface-2); }
-        .muni-cal__day:focus-visible { outline:none; box-shadow:var(--muni-ring); }
+        /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
+        .muni-cal__day:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:-2px; box-shadow:var(--muni-ring); }
         .muni-cal__day--on { background:var(--muni-accent); color:var(--muni-on-accent); font-weight:700; }
     </style>
 @endonce

@@ -40,7 +40,8 @@
                     <svg viewBox="0 0 20 20" fill="none" stroke="var(--muni-muted)" stroke-width="1.6" width="17" height="17"><circle cx="9" cy="9" r="6"/><path d="M18 18l-4.5-4.5" stroke-linecap="round"/></svg>
                     <input x-ref="input" x-model="q" @keydown.down.prevent="move(1)" @keydown.up.prevent="move(-1)" @keydown.enter.prevent="go()"
                            :placeholder="'{{ $placeholder }}'" autocomplete="off"
-                           style="flex:1;border:none;outline:none;background:transparent;font-family:inherit;font-size:15px;color:var(--muni-text);">
+                           class="muni-cmdk__input"
+                           style="flex:1;border:none;background:transparent;font-family:inherit;font-size:15px;color:var(--muni-text);">
                     <kbd style="font-family:var(--muni-font-mono);font-size:10.5px;padding:3px 6px;border:1px solid var(--muni-border);border-radius:5px;color:var(--muni-muted);">esc</kbd>
                 </div>
                 <div style="max-height:52vh;overflow-y:auto;padding:6px;">
@@ -66,5 +67,9 @@
         .muni-fade{transition:opacity var(--muni-dur) var(--muni-ease);}.muni-fade-0{opacity:0}.muni-fade-1{opacity:1}
         .muni-pop{transition:opacity var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease);}
         .muni-pop-0{opacity:0;transform:scale(.97) translateY(-8px)}.muni-pop-1{opacity:1;transform:scale(1) translateY(0)}
+        /* La caja de búsqueda venía con `outline:none` en el atributo style y sin
+           nada que lo reemplazara: no había NINGÚN indicador de foco. El offset es
+           negativo porque el diálogo lleva `overflow:hidden` y recortaría el anillo. */
+        .muni-cmdk__input:focus { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:-2px; }
     </style>
 @endonce

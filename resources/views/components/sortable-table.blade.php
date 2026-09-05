@@ -77,6 +77,7 @@
         .muni-st tbody tr:hover { background:var(--muni-surface-2); }
         .muni-st__danger td:first-child { box-shadow:inset 3px 0 0 var(--muni-danger-fg); color:var(--muni-danger-fg); font-weight:600; }
         .muni-st__search { width:100%; padding:9px 12px; font-family:var(--muni-font-sans); font-size:13px; color:var(--muni-text); background:var(--muni-surface); border:1px solid var(--muni-border); border-radius:var(--muni-radius-sm); }
-        .muni-st__search:focus { outline:none; border-color:var(--muni-accent); box-shadow:var(--muni-ring); }
+        /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
+        .muni-st__search:focus { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:2px; border-color:var(--muni-accent); box-shadow:var(--muni-ring); }
     </style>
 @endonce

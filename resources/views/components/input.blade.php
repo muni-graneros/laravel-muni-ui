@@ -47,7 +47,8 @@
 @once
     <style>
         .muni-input::placeholder { color: var(--muni-hint); }
-        .muni-input:focus { outline: none; border-color: var(--muni-accent); box-shadow: var(--muni-ring); }
+        /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
+        .muni-input:focus { outline: 3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset: 2px; border-color: var(--muni-accent); box-shadow: var(--muni-ring); }
         .muni-input:disabled { background: var(--muni-surface-2); color: var(--muni-muted); cursor: not-allowed; }
     </style>
 @endonce

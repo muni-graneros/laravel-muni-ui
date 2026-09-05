@@ -34,7 +34,8 @@
             color:var(--muni-muted);background:transparent;border:none;cursor:pointer;white-space:nowrap;
             transition:color var(--muni-dur) var(--muni-ease); }
         .muni-tab:hover { color:var(--muni-text); }
-        .muni-tab:focus-visible { outline:none;box-shadow:var(--muni-ring);border-radius:var(--muni-radius-sm); }
+        /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
+        .muni-tab:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:-2px; box-shadow:var(--muni-ring); border-radius:var(--muni-radius-sm); }
         .muni-tab--on { color:var(--muni-accent); }
         .muni-tab--on::after { content:"";position:absolute;left:8px;right:8px;bottom:-1px;height:2px;
             background:var(--muni-accent);border-radius:2px 2px 0 0; }

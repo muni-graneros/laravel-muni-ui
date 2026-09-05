@@ -23,7 +23,8 @@
             font-family:var(--muni-font-sans); font-size:13.5px; font-weight:500; color:var(--muni-muted); text-decoration:none;
             transition:background var(--muni-dur) var(--muni-ease),color var(--muni-dur) var(--muni-ease); }
         .muni-nav-item:hover { background:var(--muni-surface-2); color:var(--muni-text); }
-        .muni-nav-item:focus-visible { outline:none; box-shadow:var(--muni-ring); }
+        /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
+        .muni-nav-item:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:-2px; box-shadow:var(--muni-ring); }
         .muni-nav-item--active { background:var(--muni-accent-soft); color:var(--muni-accent); font-weight:600; }
         .muni-nav-item__icon { display:inline-flex; flex-shrink:0; width:18px; height:18px; }
         .muni-nav-item__icon svg { width:18px; height:18px; }

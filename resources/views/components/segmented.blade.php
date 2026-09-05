@@ -29,7 +29,11 @@
             border-radius:calc(var(--muni-radius-sm) - 2px);cursor:pointer;white-space:nowrap;
             transition:background var(--muni-dur) var(--muni-ease),color var(--muni-dur) var(--muni-ease); }
         .muni-seg:hover { color:var(--muni-text); }
-        .muni-seg:has(input:focus-visible) { box-shadow:var(--muni-ring); }
+        /* Mismo caso que el switch: el radio real va con opacity:0 y 0×0, así que
+           sin este outline el foco no se ve en cuanto la box-shadow se pierde.
+           Offset negativo para que el anillo quede dentro de la píldora, que solo
+           tiene 3px de padding en el contenedor. */
+        .muni-seg:has(input:focus-visible) { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:-2px; box-shadow:var(--muni-ring); }
         .muni-seg--on { background:var(--muni-surface);color:var(--muni-text);box-shadow:var(--muni-shadow); }
     </style>
 @endonce

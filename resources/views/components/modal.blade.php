@@ -74,7 +74,8 @@
     <style>
         .muni-modal-x { display:inline-flex;padding:6px;border:none;background:transparent;color:var(--muni-muted);border-radius:var(--muni-radius-sm);cursor:pointer;transition:background var(--muni-dur) var(--muni-ease),color var(--muni-dur) var(--muni-ease); }
         .muni-modal-x:hover { background:var(--muni-surface-3);color:var(--muni-text); }
-        .muni-modal-x:focus-visible { outline:none;box-shadow:var(--muni-ring); }
+        /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
+        .muni-modal-x:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:2px; box-shadow:var(--muni-ring); }
         .muni-fade { transition:opacity var(--muni-dur) var(--muni-ease); }
         .muni-fade-0 { opacity:0; } .muni-fade-1 { opacity:1; }
         .muni-pop { transition:opacity var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease); }

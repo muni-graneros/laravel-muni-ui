@@ -41,6 +41,14 @@
     --muni-accent-strong: var(--mg-petroleo-d);
     --muni-accent-soft:   color-mix(in srgb, var(--mg-petroleo) 10%, #fff);
     --muni-on-accent:     #ffffff;
+    /* Color del INDICADOR DE FOCO de los componentes <x-muni::*>. Va aparte de
+       `--muni-ring` porque el anillo es una `box-shadow` y aquí dentro se pierde:
+       medido en el panel de licencias-graneros, el foco de un input se computaba
+       `oklab(0 0 0 / 0) 0px 0px 0px 0px`. El indicador real es un `outline`, que
+       la cadena de sombras de Tailwind/Filament no toca.
+       Medido: #355a63 sobre #ffffff = 7,52:1 · sobre --muni-surface-3 #efece1 =
+       6,35:1 (peor caso de este bloque). Mínimo WCAG 2.2 AA (1.4.11): 3:1. */
+    --muni-focus:         var(--mg-petroleo);
 
     --muni-ok-fg:       #4a6b1f;
     --muni-ok-bg:       #e6f0da;
@@ -106,6 +114,10 @@
     --muni-accent-strong: var(--mg-lima-br);
     --muni-accent-soft:   color-mix(in srgb, var(--mg-celeste) 14%, transparent);
     --muni-on-accent:     #08252b;
+    /* Ver el comentario del bloque claro. Medido: #7ccbe1 sobre --muni-surface
+       #0f2025 = 9,16:1 · sobre --muni-surface-3 #142a30 = 8,18:1 (peor caso).
+       Mínimo exigido: 3:1. */
+    --muni-focus:         var(--mg-celeste);
 
     --muni-ok-fg:       var(--mg-lima);
     --muni-ok-bg:       color-mix(in srgb, var(--mg-lima) 18%, #0f2025);

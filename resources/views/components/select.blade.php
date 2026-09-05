@@ -51,6 +51,7 @@
 
 @once
     <style>
-        .muni-select:focus { outline: none; border-color: var(--muni-accent); box-shadow: var(--muni-ring); }
+        /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
+        .muni-select:focus { outline: 3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset: 2px; border-color: var(--muni-accent); box-shadow: var(--muni-ring); }
     </style>
 @endonce

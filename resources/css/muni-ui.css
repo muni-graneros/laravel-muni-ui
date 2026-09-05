@@ -80,6 +80,20 @@
     --muni-shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.14);
 
     --muni-ring: 0 0 0 3px color-mix(in srgb, var(--muni-accent) 30%, transparent);
+    /* Color del INDICADOR DE FOCO, separado de `--muni-ring` a propósito.
+       `--muni-ring` es una `box-shadow`, y la box-shadow es una sola propiedad
+       que cualquier hoja de la aplicación anfitriona puede pisar entera: medido
+       dentro del panel de Filament de licencias-graneros, el foco del input se
+       computaba `oklab(0 0 0 / 0) 0px 0px 0px 0px`, o sea NADA. Como los
+       componentes además traían `outline:none`, al tabular no aparecía ningún
+       indicador. Por eso el indicador real pasa a ser un `outline`, que ninguna
+       cadena de sombras de Tailwind/Filament toca, y el anillo queda como halo
+       decorativo. WCAG 2.2 AA 2.4.7 y 1.4.11 (3:1), obligatorio en sistemas del
+       Estado por el Decreto N°1/2015 SEGPRES.
+       Contraste medido con la fórmula de luminancia relativa W3C:
+       #0f766e sobre --muni-surface #ffffff = 5,47:1 · sobre --muni-surface-3
+       #eceef2 = 4,71:1 (el peor caso de este bloque). Mínimo exigido: 3:1. */
+    --muni-focus: #0f766e;
     --muni-ease: cubic-bezier(0.22, 1, 0.36, 1);
     --muni-dur: 160ms;
 
@@ -126,6 +140,10 @@
         --muni-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
         --muni-shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.55);
         --muni-ring: 0 0 0 3px color-mix(in srgb, var(--muni-accent) 35%, transparent);
+        /* Ver el comentario del bloque claro. Medido: #f59e0b sobre
+           --muni-surface #111620 = 8,43:1 · sobre --muni-surface-3 #1c2333 =
+           7,31:1 (peor caso). Mínimo exigido: 3:1. */
+        --muni-focus: #f59e0b;
         --muni-font-sans: 'IBM Plex Sans', system-ui, sans-serif;
         --muni-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
         --muni-topbar-h: 52px;
@@ -169,6 +187,10 @@
     --muni-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
     --muni-shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.55);
     --muni-ring: 0 0 0 3px color-mix(in srgb, var(--muni-accent) 35%, transparent);
+    /* Ver el comentario del bloque claro. Medido: #f59e0b sobre
+       --muni-surface #111620 = 8,43:1 · sobre --muni-surface-3 #1c2333 =
+       7,31:1 (peor caso). Mínimo exigido: 3:1. */
+    --muni-focus: #f59e0b;
     --muni-font-sans: 'IBM Plex Sans', system-ui, sans-serif;
     --muni-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
     --muni-topbar-h: 52px;
@@ -209,6 +231,9 @@
     --muni-shadow-md: 0 4px 16px rgba(16, 24, 40, 0.10);
     --muni-shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.14);
     --muni-ring: 0 0 0 3px color-mix(in srgb, var(--muni-accent) 30%, transparent);
+    /* Ver el comentario del bloque LIGHT por defecto: mismos valores y mismas
+       mediciones (5,47:1 sobre --muni-surface, 4,71:1 sobre --muni-surface-3). */
+    --muni-focus: #0f766e;
     --muni-font-sans: 'DM Sans', system-ui, sans-serif;
     --muni-font-mono: 'DM Mono', ui-monospace, monospace;
     --muni-topbar-h: 56px;

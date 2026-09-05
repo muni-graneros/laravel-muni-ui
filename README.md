@@ -107,6 +107,22 @@ npm run build                                               # si el sistema tien
 Y reiniciar el servidor de aplicación si corre con Octane: el manifiesto de Vite queda
 cacheado en el proceso.
 
+#### Cómo saber si un sistema quedó atrás
+
+El síntoma no se ve: el panel carga, no hay error en consola y los componentes salen con
+las variables vacías. La comprobación barata es comparar la copia publicada con la del
+paquete instalado:
+
+```bash
+diff public/vendor/muni-ui/filament.css vendor/muni-graneros/laravel-muni-ui/resources/css/muni-ui-filament.css
+```
+
+Cualquier salida significa que hay que republicar con `--force`. El 2026-09-04, los nueve
+sistemas del ecosistema servían una copia anterior a los 19 tokens del puente
+`--muni-*`: `--muni-accent-strong`, `--muni-danger-bg` y `--muni-ok-bg` no existían en
+ninguna, así que el `:hover` del botón primario y el fondo de los avisos de peligro
+quedaban sin valor.
+
 ## Uso
 
 ```blade

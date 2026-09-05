@@ -30,6 +30,9 @@
         .muni-switch__thumb { display:block; width:16px; height:16px; margin:2px; border-radius:50%; background:var(--muni-surface); box-shadow:0 1px 3px rgba(0,0,0,.25); transition:transform var(--muni-dur) var(--muni-ease); }
         .muni-switch--on { background:var(--muni-accent); border-color:var(--muni-accent); }
         .muni-switch--on .muni-switch__thumb { transform:translateX(16px); }
-        input:focus-visible + .muni-switch { box-shadow:var(--muni-ring); }
+        /* El <input> real va con opacity:0 y 0×0, así que el contorno nativo del
+           navegador no se ve: el ÚNICO indicador de foco era esta box-shadow, y la
+           box-shadow se pierde dentro del panel de Filament (ver --muni-focus). */
+        input:focus-visible + .muni-switch { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:2px; box-shadow:var(--muni-ring); }
     </style>
 @endonce

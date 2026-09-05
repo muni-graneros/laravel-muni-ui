@@ -30,7 +30,8 @@
 
 @once
     <style>
-        .muni-btn:focus-visible { outline: none; box-shadow: var(--muni-ring); }
+        /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
+        .muni-btn:focus-visible { outline: 3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset: 2px; box-shadow: var(--muni-ring); }
         .muni-btn:active { transform: translateY(1px); }
         .muni-btn__icon { display: inline-flex; }
         .muni-btn__icon svg { width: 15px; height: 15px; }

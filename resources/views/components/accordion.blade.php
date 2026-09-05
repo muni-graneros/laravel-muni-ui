@@ -40,7 +40,8 @@
         .muni-acc__item + .muni-acc__item { border-top:1px solid var(--muni-border); }
         .muni-acc__head { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; padding:15px 18px; background:transparent; border:none; cursor:pointer; font-family:var(--muni-font-sans); font-size:14px; font-weight:600; color:var(--muni-text); text-align:left; transition:background var(--muni-dur) var(--muni-ease); }
         .muni-acc__head:hover { background:var(--muni-surface-2); }
-        .muni-acc__head:focus-visible { outline:none; box-shadow:inset var(--muni-ring); }
+        /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
+        .muni-acc__head:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:-3px; box-shadow:inset var(--muni-ring); }
         .muni-acc__chevron { color:var(--muni-muted); transition:transform var(--muni-dur) var(--muni-ease); display:inline-flex; }
         .muni-acc__chevron--open { transform:rotate(180deg); }
         .muni-acc__body { padding:0 18px 16px; font-family:var(--muni-font-sans); font-size:13.5px; color:var(--muni-muted); line-height:1.6; }

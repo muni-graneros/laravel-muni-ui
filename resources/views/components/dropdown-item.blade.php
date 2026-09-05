@@ -28,7 +28,8 @@
 @once
     <style>
         .muni-dd-item:hover { background: var(--muni-surface-2); }
-        .muni-dd-item:focus-visible { outline: none; box-shadow: var(--muni-ring); }
+        /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
+        .muni-dd-item:focus-visible { outline: 3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset: -2px; box-shadow: var(--muni-ring); }
         .muni-dd-item svg { width: 15px; height: 15px; }
     </style>
 @endonce

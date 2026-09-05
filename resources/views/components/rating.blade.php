@@ -35,7 +35,8 @@
     <style>
         .muni-star { background:none; border:none; padding:0 1px; font-size:20px; line-height:1; color:var(--muni-border-2); cursor:pointer; transition:color var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease); }
         .muni-star:hover { transform:scale(1.15); }
-        .muni-star:focus-visible { outline:none; box-shadow:var(--muni-ring); border-radius:4px; }
+        /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
+        .muni-star:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:2px; box-shadow:var(--muni-ring); border-radius:4px; }
         .muni-star--on { color:var(--star); text-shadow:var(--muni-glow); }
     </style>
 @endonce

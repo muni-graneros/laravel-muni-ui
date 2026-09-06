@@ -3,6 +3,7 @@
     'rows' => [],
     'empty' => 'Sin resultados.',
     'searchable' => false,
+    'caption' => null,
 ])
 
 @php
@@ -10,6 +11,11 @@
     // $rows: array de arrays asociativos por key. Cada fila puede traer '_tone'=>'danger' para la franja.
     $colsJson = json_encode(array_values($columns), JSON_UNESCAPED_UNICODE | JSON_HEX_APOS | JSON_HEX_QUOT);
     $rowsJson = json_encode(array_values($rows), JSON_UNESCAPED_UNICODE | JSON_HEX_APOS | JSON_HEX_QUOT);
+    /* El id del buscador NO puede salir de uniqid(): cambiaría en cada render y bajo
+       Livewire rompería la relación <label for> ↔ <input id> justo después del primer
+       refresco, además de ensuciar el diff. Se deriva de las columnas, que son lo que
+       identifica a esta tabla, y el consumidor puede imponer el suyo con `id`. */
+    $buscadorId = ($attributes->get('id') ?: 'muni-st-'.substr(sha1($colsJson ?: ''), 0, 8)).'-q';
 @endphp
 
 <div
@@ -18,9 +24,20 @@
         rows: {{ $rowsJson }},
         sortKey:null, sortDir:1, q:'',
         sort(k){ if(this.sortKey===k){ this.sortDir*=-1; } else { this.sortKey=k; this.sortDir=1; } },
+        /* Lo que lee el lector de pantalla al cambiar el orden: `aria-sort` solo
+           se anuncia al recorrer la tabla, y quien pulsa el botón se queda sin
+           confirmación de que la lista cambió. */
+        get anuncioOrden(){
+            if(!this.sortKey){ return ''; }
+            const c = this.cols.find(c => c.key === this.sortKey);
+            return `Tabla ordenada por ${(c && c.label) || this.sortKey}, ${this.sortDir===1 ? 'ascendente' : 'descendente'}.`;
+        },
         get view(){
             let r = this.rows;
-            if(this.q.trim()){ const t=this.q.toLowerCase(); r = r.filter(row => Object.values(row).some(v => String(v).toLowerCase().includes(t))); }
+            /* Las claves que empiezan con `_` son metadatos de la fila (`_tone`
+               pinta la franja roja): no se ven en ninguna columna, así que
+               filtrar por ellas esconde filas por un dato invisible. */
+            if(this.q.trim()){ const t=this.q.toLowerCase(); r = r.filter(row => Object.entries(row).some(([k,v]) => !k.startsWith('_') && String(v).toLowerCase().includes(t))); }
             if(this.sortKey){ const k=this.sortKey,d=this.sortDir; r=[...r].sort((a,b)=>{ let x=a[k],y=b[k]; const nx=parseFloat(String(x).replace(/[^0-9.-]/g,'')), ny=parseFloat(String(y).replace(/[^0-9.-]/g,'')); if(!isNaN(nx)&&!isNaN(ny)){ return (nx-ny)*d; } return String(x).localeCompare(String(y),'es')*d; }); }
             return r;
         }
@@ -29,22 +46,44 @@
 >
     @if ($searchable)
         <div style="margin-bottom:12px;position:relative;max-width:280px;">
-            <input x-model="q" placeholder="Buscar…" class="muni-st__search">
+            {{-- El placeholder no es nombre accesible: desaparece al escribir y no
+                 todos los lectores lo anuncian (WCAG 2.2 AA 3.3.2 y 4.1.2). --}}
+            <label for="{{ $buscadorId }}" class="muni-sr">Buscar en la tabla</label>
+            <input id="{{ $buscadorId }}" x-model="q" placeholder="Buscar…" class="muni-st__search">
         </div>
     @endif
 
+    <div class="muni-sr" role="status" aria-live="polite" x-text="anuncioOrden"></div>
+
     <div style="overflow-x:auto;border:1px solid var(--muni-border);border-radius:var(--muni-radius);background:var(--muni-surface);">
         <table class="muni-st">
+            @isset($caption)
+                <caption class="muni-sr">{{ $caption }}</caption>
+            @endisset
             <thead>
                 <tr>
                     <template x-for="c in cols" :key="c.key">
-                        <th :style="`text-align:${c.align||'left'}`" :class="(c.sortable!==false) && 'muni-st__sortable'" @click="c.sortable!==false && sort(c.key)">
-                            <span style="display:inline-flex;align-items:center;gap:5px;">
+                        {{-- `aria-sort` va en el <th>, nunca en el botón: el rol
+                             columnheader es el que lo lleva. `null` en una columna
+                             no ordenable hace que Alpine borre el atributo. --}}
+                        <th
+                            scope="col"
+                            :style="`text-align:${c.align||'left'}`"
+                            :class="(c.sortable!==false) && 'muni-st__sortable'"
+                            :aria-sort="c.sortable===false ? null : (sortKey===c.key ? (sortDir===1 ? 'ascending' : 'descending') : 'none')"
+                        >
+                            {{-- Un <button> real, no el <th> con tabindex: así el
+                                 foco, Enter y Espacio los pone el navegador y no
+                                 hace falta escribir manejadores de teclado. --}}
+                            <template x-if="c.sortable!==false">
+                                <button type="button" class="muni-st__sort" @click="sort(c.key)">
+                                    <span x-text="c.label"></span>
+                                    <span class="muni-st__arrow" aria-hidden="true" :style="sortKey===c.key ? 'opacity:1' : 'opacity:.3'" x-text="sortKey===c.key ? (sortDir===1?'↑':'↓') : '↕'"></span>
+                                </button>
+                            </template>
+                            <template x-if="c.sortable===false">
                                 <span x-text="c.label"></span>
-                                <template x-if="c.sortable!==false">
-                                    <span class="muni-st__arrow" :style="sortKey===c.key ? 'opacity:1' : 'opacity:.3'" x-text="sortKey===c.key ? (sortDir>0?'↑':'↓') : '↕'"></span>
-                                </template>
-                            </span>
+                            </template>
                         </th>
                     </template>
                 </tr>
@@ -67,10 +106,16 @@
 
 @once
     <style>
+        /* Oculto a la vista, presente en el árbol de accesibilidad: `display:none`
+           y `visibility:hidden` lo sacarían y la etiqueta dejaría de contar. */
+        .muni-sr { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
         .muni-st { width:100%; border-collapse:collapse; font-family:var(--muni-font-sans); font-size:12.5px; }
         .muni-st th { text-align:left; white-space:nowrap; padding:9px 12px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--muni-muted); background:var(--muni-surface-2); border-bottom:1px solid var(--muni-border); }
-        .muni-st__sortable { cursor:pointer; user-select:none; transition:color var(--muni-dur) var(--muni-ease); }
-        .muni-st__sortable:hover { color:var(--muni-text); }
+        .muni-st__sortable { user-select:none; }
+        .muni-st__sort { display:inline-flex; align-items:center; gap:5px; min-height:24px; padding:0 4px; margin:0 -4px; font:inherit; color:inherit; background:none; border:0; border-radius:var(--muni-radius-sm); cursor:pointer; transition:color var(--muni-dur) var(--muni-ease); }
+        .muni-st__sort:hover { color:var(--muni-text); }
+        /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
+        .muni-st__sort:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:2px; }
         .muni-st__arrow { font-family:var(--muni-font-mono); font-size:11px; }
         .muni-st td { padding:9px 12px; border-bottom:1px solid var(--muni-border); white-space:nowrap; color:var(--muni-text); }
         .muni-st tbody tr { transition:background var(--muni-dur) var(--muni-ease); }

@@ -3,7 +3,17 @@
     'maxWidth' => '480px',
 ])
 
-@php $tituloId = 'muni-modal-title-'.uniqid(); @endphp
+@php
+    /* El id del título NO puede salir de uniqid(): cambiaba en cada render y bajo
+       Livewire eso rehace el <h2> y el aria-labelledby en cada actualización, así
+       que el diff reemplaza nodos que no cambiaron y cualquier aria-labelledby
+       externo queda apuntando a un id que ya no existe. Se deriva, por este orden:
+       1) del `id` que dé el consumidor —lo recomendado cuando hay más de un modal
+          con el mismo título en la página—, o
+       2) del propio título, estable entre renders mientras la prop no cambie. */
+    $dialogoId = $attributes->get('id') ?: 'muni-modal-'.substr(sha1((string) $title), 0, 8);
+    $tituloId = $dialogoId.'-title';
+@endphp
 
 {{-- Modal accesible (Alpine 3 + plugin Focus, ya presente en el bundle de Livewire de
      los paneles). El slot `trigger` abre; Escape / click en el fondo / botón × cierran.
@@ -12,7 +22,7 @@
      devuelve el foco solo a quien lo abrió. El slot `footer` es opcional (acciones). --}}
 <div
     x-data="{ open: false }"
-    @keydown.escape.window="open = false"
+    @keydown.escape.window="open && (open = false)"
 >
     @isset($trigger)
         <div @click="open = true" style="display:inline-flex;">{{ $trigger }}</div>
@@ -25,7 +35,9 @@
             x-trap.inert.noscroll="open"
             role="dialog"
             aria-modal="true"
-            aria-labelledby="{{ $tituloId }}"
+            {{-- Sin `title` el aria-labelledby apuntaría a un <h2> vacío y el diálogo se
+                 anunciaría sin nombre: en ese caso se cae a un aria-label genérico. --}}
+            @if(filled($title)) aria-labelledby="{{ $tituloId }}" @else aria-label="Ventana de diálogo" @endif
             style="position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;"
         >
             {{-- Fondo --}}
@@ -76,6 +88,9 @@
         .muni-modal-x:hover { background:var(--muni-surface-3);color:var(--muni-text); }
         /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
         .muni-modal-x:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:2px; box-shadow:var(--muni-ring); }
+        /* .muni-fade* las definen también drawer y command-palette, cada uno en su propio bloque de estilos
+           de una sola vez: este bloque tiene que bastarse solo, porque una página puede
+           traer el modal y ninguno de los otros dos. */
         .muni-fade { transition:opacity var(--muni-dur) var(--muni-ease); }
         .muni-fade-0 { opacity:0; } .muni-fade-1 { opacity:1; }
         .muni-pop { transition:opacity var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease); }

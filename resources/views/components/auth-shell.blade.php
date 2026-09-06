@@ -31,6 +31,10 @@
     </style>
 </head>
 <body>
+    {{-- Primer elemento del documento: `position:fixed` lo deja fuera de la
+         grilla del body, así que no ocupa una columna. --}}
+    <x-muni::skip-link />
+
     <aside class="muni-auth-aside">
         <div style="position:relative;display:flex;align-items:center;gap:11px;">
             <div style="height:40px;display:flex;align-items:center;padding:5px 12px;background:#fff;border-radius:var(--muni-radius-sm);">
@@ -49,7 +53,8 @@
         <div style="position:relative;font-size:11.5px;color:var(--muni-hint);">© {{ date('Y') }} {{ $system }}</div>
     </aside>
 
-    <main class="muni-auth-main">
+    {{-- `tabindex="-1"`: sin él el salto mueve el scroll pero no el punto de lectura. --}}
+    <main id="muni-contenido" tabindex="-1" class="muni-auth-main">
         <div class="muni-auth-card">
             <div style="margin-bottom:24px;">
                 <h1 style="margin:0;font-size:23px;font-weight:800;letter-spacing:-.02em;">{{ $title }}</h1>

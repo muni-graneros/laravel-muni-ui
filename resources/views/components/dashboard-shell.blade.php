@@ -25,12 +25,17 @@
         .muni-ds__top{ position:sticky; top:0; z-index:40; height:var(--muni-topbar-h); display:flex; align-items:center; gap:12px; padding:0 18px; background:var(--muni-surface); border-bottom:1px solid var(--muni-border); }
         .muni-ds__burger{ display:none; padding:6px; border:none; background:transparent; color:var(--muni-text); cursor:pointer; border-radius:var(--muni-radius-sm); }
         @media (max-width:899px){ .muni-ds__burger{ display:inline-flex; } }
-        .muni-ds__main{ flex:1; padding:24px; max-width:1280px; width:100%; margin:0 auto; }
+        /* `.muni-ds__top` es sticky: sin este margen el destino del salto aterriza debajo de la cabecera. */
+        .muni-ds__main{ flex:1; padding:24px; max-width:1280px; width:100%; margin:0 auto; scroll-margin-top:var(--muni-topbar-h); }
         .muni-ds__scrim{ display:none; position:fixed; inset:0; z-index:140; background:rgba(10,14,20,.5); }
         @media (max-width:899px){ .muni-ds__scrim.on{ display:block; } }
     </style>
 </head>
 <body>
+    {{-- Antes del menú lateral: si va después, el teclado tabula los ~15 ítems
+         del menú justo antes de encontrar el atajo para saltárselos. --}}
+    <x-muni::skip-link />
+
     {{ $sidebar ?? '' }}
 
     <div class="muni-ds__col">
@@ -50,7 +55,8 @@
             @if ($user)<x-muni::avatar :name="$user" size="md" />@endif
         </header>
 
-        <main class="muni-ds__main">
+        {{-- `tabindex="-1"`: sin él el salto mueve el scroll pero no el punto de lectura. --}}
+        <main id="muni-contenido" tabindex="-1" class="muni-ds__main">
             {{ $slot }}
         </main>
     </div>

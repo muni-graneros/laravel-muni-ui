@@ -25,11 +25,17 @@
     </style>
 </head>
 <body>
+    {{-- Primero de todo: el salto tiene que ganarle en orden de tabulación a la
+         cabecera. El destino es el <main> de más abajo. --}}
+    <x-muni::skip-link />
+
     <x-muni::topbar :system="$system" :subtitle="$subtitle" :status="$status">
         {{ $topbar ?? '' }}
     </x-muni::topbar>
 
-    <main style="max-width:{{ $maxWidth }};margin:0 auto;padding:24px 16px 48px;">
+    {{-- `tabindex="-1"` es lo que hace que el salto mueva el PUNTO DE LECTURA y no
+         solo el scroll; `scroll-margin-top` evita que el topbar fijo lo tape. --}}
+    <main id="muni-contenido" tabindex="-1" style="max-width:{{ $maxWidth }};margin:0 auto;padding:24px 16px 48px;scroll-margin-top:var(--muni-topbar-h);">
         {{ $slot }}
     </main>
 </body>

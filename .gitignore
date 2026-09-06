@@ -6,3 +6,9 @@ demo/vendor/
 # direnv (tokens por frente; NUNCA versionar)
 .envrc
 .direnv/
+
+# caché de la reja de accesibilidad (axe-core se descarga o llega por npm)
+/scripts/.cache/
+/node_modules/
+a11y-informe.json
+.venv-a11y/

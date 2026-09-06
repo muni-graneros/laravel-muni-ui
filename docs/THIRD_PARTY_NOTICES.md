@@ -144,6 +144,22 @@ Lo que los analistas encontraron al leer cada licencia y que no se ve en la tabl
 - **`themeselection/sneat-html-admin-template-free`**: Único repo del lote con dos archivos de licencia: LICENSE con Copyright (c) 2022 ThemeSelection y además LICENSE.md con Copyright (c) 2021 [ThemeSelection](https://themeselection.com/). Mismo texto MIT, distinto año y titular enlazado; conviene registrar ambos por si se cita la procedencia. La petición de crédito está en README.md línea 178, con el mismo fragmento de enlace al sitio del proveedor.
 - **`themeselection/sneat-vuetify-vuejs-admin-template-free`**: LICENSE MIT estándar sin añadidos. Petición de crédito en README.md línea 139. El repo distribuye dos copias del proyecto (javascript-version y typescript-version) bajo la misma licencia raíz; ninguna de las dos trae archivo de licencia propio.
 
+## Herramientas de verificación
+
+No informan el diseño de ningún componente: son dependencias de desarrollo que el paquete ejecuta
+para comprobarse a sí mismo. Se registran acá porque su licencia no es la misma que la de las
+fuentes de arriba.
+
+| Herramienta | Versión | SPDX | Para qué | Se distribuye |
+|---|---|---|---|---|
+| [axe-core](https://github.com/dequelabs/axe-core) | 4.10.2 | **MPL-2.0** | motor de reglas de `scripts/a11y-check.py` | no: es dependencia de desarrollo |
+| [Playwright](https://github.com/microsoft/playwright) | según el entorno | Apache-2.0 | abre las demos y mide en un navegador real | no: es dependencia de desarrollo |
+
+**Sobre axe-core y la MPL-2.0.** Es copyleft por archivo: obliga a publicar las modificaciones de
+los archivos cubiertos, no del proyecto que los usa. Acá se ejecuta sin modificarlo y no se
+redistribuye dentro del paquete, así que no arrastra obligación. Si alguna vez se copiara o se
+parcheara un archivo suyo, ese archivo queda bajo MPL-2.0 y hay que publicarlo.
+
 ## Qué informó a qué
 
 Esta tabla se llena en la Fase 3: cada componente nuevo anota aquí de qué referencia salió su

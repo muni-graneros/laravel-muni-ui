@@ -3,7 +3,7 @@
     'default' => 0,
     'id' => null,
     'label' => null,
-    'activacion' => 'auto',
+    'activation' => 'auto',
 ])
 
 @php
@@ -22,17 +22,17 @@
      */
     $grupoId = $id ?: 'muni-tabs-'.substr(sha1(json_encode(array_values((array) $tabs), JSON_UNESCAPED_UNICODE) ?: ''), 0, 8);
     $activo = (int) $default;
-    $manual = $activacion === 'manual';
+    $manual = $activation === 'manual';
 @endphp
 
 {{-- Pestañas (Alpine 3 core, patrón «tabs» de las WAI-ARIA APG). `tabs` es un array
      de etiquetas; los paneles van en el slot como <x-muni::tab-panel> en el mismo
-     orden. Teclado: ←/→ circulares, Home, End y —con activacion="manual"— Enter o
+     orden. Teclado: ←/→ circulares, Home, End y —con activation="manual"— Enter o
      Espacio, que resuelve el <button> nativo sin manejador propio.
 
      `focused` va aparte de `active` para permitir la activación manual: con
      wire:model, activar en cada flecha dispararía una petición Livewire por pulsación.
-     Con activacion="auto" (el default, retrocompatible) `focused` sigue a `active`. --}}
+     Con activation="auto" (el default, retrocompatible) `focused` sigue a `active`. --}}
 <div
     id="{{ $grupoId }}"
     x-data="{

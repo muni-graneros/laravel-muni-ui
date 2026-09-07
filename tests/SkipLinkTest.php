@@ -50,11 +50,11 @@ it('rinde un ancla al contenido principal con el texto por defecto en español',
     expect(trim($m[1]))->toBe('Saltar al contenido principal');
 });
 
-it('la prop destino cambia el href sin tocar nada más', function () {
-    $html = Blade::render('<x-muni::skip-link destino="#formulario" />');
+it('la prop target cambia el href sin tocar nada más', function () {
+    $html = Blade::render('<x-muni::skip-link target="#formulario" />');
 
     expect(str_contains($html, 'href="#formulario"'))->toBeTrue(
-        'La prop `destino` no cambia el href: el componente queda atado a un id fijo.'
+        'La prop `target` no cambia el href: el componente queda atado a un id fijo.'
     );
     expect(str_contains($html, 'href="#muni-contenido"'))->toBeFalse(
         'El destino por defecto sigue emitiéndose junto con el que pidió el consumidor.'

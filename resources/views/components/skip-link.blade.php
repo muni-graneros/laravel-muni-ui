@@ -1,5 +1,5 @@
 @props([
-    'destino' => '#muni-contenido',
+    'target' => '#muni-contenido',
 ])
 
 {{-- ENLACE DE SALTO AL CONTENIDO (WCAG 2.2 nivel A, 2.4.1 «Evitar bloques»).
@@ -29,7 +29,7 @@
      intentaría navegar a la página en vez de mover el foco dentro de esta. --}}
 
 <a
-    href="{{ $destino }}"
+    href="{{ $target }}"
     {{ $attributes->merge(['class' => 'muni-skip-link']) }}
 >
     @if ($slot->isEmpty())

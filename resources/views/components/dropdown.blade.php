@@ -10,8 +10,16 @@
 {{-- Menú desplegable (Alpine 3). El slot `trigger` es el botón; el slot por defecto son
      los ítems (usar <x-muni::dropdown-item>). Cierra al hacer click fuera o con Escape. --}}
 <div x-data="{ open: false }" @keydown.escape.window="open = false" style="position:relative;display:inline-block;">
+    {{-- `trigger` es obligatorio en la práctica, pero si falta el componente NO puede
+         reventar la página entera con «Undefined variable»: un desplegable sin botón es
+         un hueco visual, no un error 500. Se emite el botón igual —así el menú sigue
+         siendo alcanzable con teclado— y el aviso queda en el HTML para quien lo mire. --}}
     <div @click="open = ! open" :aria-expanded="open" aria-haspopup="menu" style="display:inline-flex;">
-        {{ $trigger }}
+        @isset($trigger)
+            {{ $trigger }}
+        @else
+            {{-- Sin slot `trigger`: hay que pasarle uno. --}}
+        @endisset
     </div>
 
     <div

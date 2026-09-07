@@ -86,7 +86,7 @@
 
 @once
     <style>
-        .muni-switch { display:inline-block; width:38px; height:22px; border-radius:999px; background:var(--muni-surface-3); border:1px solid var(--muni-border); transition:background var(--muni-dur) var(--muni-ease),border-color var(--muni-dur) var(--muni-ease); }
+        .muni-switch { display:inline-block; width:38px; height:22px; border-radius:999px; background:var(--muni-surface-3); border:1px solid var(--muni-field-border); transition:background var(--muni-dur) var(--muni-ease),border-color var(--muni-dur) var(--muni-ease); }
         .muni-switch__thumb { display:block; width:16px; height:16px; margin:2px; border-radius:50%; background:var(--muni-surface); box-shadow:0 1px 3px rgba(0,0,0,.25); transition:transform var(--muni-dur) var(--muni-ease); }
         .muni-switch--on { background:var(--muni-accent); border-color:var(--muni-accent); }
         .muni-switch--on .muni-switch__thumb { transform:translateX(16px); }

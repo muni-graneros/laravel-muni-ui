@@ -71,7 +71,7 @@
                 'class' => 'muni-select',
                 'style' => 'width:100%;padding:10px 34px 10px 12px;appearance:none;'
                     .'font-family:var(--muni-font-sans);font-size:13.5px;color:var(--muni-text);'
-                    .'background:var(--muni-surface);border:1px solid '.($error ? 'var(--muni-danger-border)' : 'var(--muni-border)').';'
+                    .'background:var(--muni-surface);border:1px solid '.($error ? 'var(--muni-danger-border)' : 'var(--muni-field-border)').';'
                     .'border-radius:var(--muni-radius-sm);cursor:pointer;transition:border-color var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease);',
             ]) }}
         >

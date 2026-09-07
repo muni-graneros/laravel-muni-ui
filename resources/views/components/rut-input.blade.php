@@ -124,6 +124,10 @@
      * impresa como texto en la página, sin un solo error.
      */
     $muniRutExtra = $muniRutDvError ? ['aria-invalid' => 'true'] : [];
+
+    if ($muniRutStyle !== '') {
+        $muniRutExtra['style'] = $muniRutStyle;
+    }
 @endphp
 
 <div
@@ -211,7 +215,6 @@
         spellcheck="false"
         maxlength="12"
         :class="trim('muni-num '.$attributes->get('class'))"
-        :style="$muniRutStyle !== '' ? $muniRutStyle : null"
         :value="$muniRutDisplay !== '' ? $muniRutDisplay : null"
         :aria-describedby="$muniRutVerdictId"
         x-ref="field"

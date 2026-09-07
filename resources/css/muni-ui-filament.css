@@ -36,6 +36,10 @@
 
     --muni-border:      var(--mg-borde);
     --muni-border-2:    #cfc7b3;
+    /* Límite de un control: 1.4.11 pide 3:1 y el beige del panel no llegaba
+       (1,4:1 sobre el papel). Ver DESIGN §7: el token se declara acá TAMBIÉN
+       porque muni-ui.css no se carga dentro de un panel Filament. */
+    --muni-field-border: #90815b;
 
     --muni-accent:        var(--mg-petroleo);
     --muni-accent-strong: var(--mg-petroleo-d);
@@ -109,6 +113,7 @@
 
     --muni-border:      #1c343a;
     --muni-border-2:    #2a4a52;
+    --muni-field-border: #467c89;
 
     --muni-accent:        var(--mg-celeste);
     --muni-accent-strong: var(--mg-lima-br);

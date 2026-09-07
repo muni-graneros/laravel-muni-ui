@@ -79,3 +79,61 @@ it('el bloque que congela el tema claro declara el mismo hint que :root', functi
     expect($m[1][0])->toBe($m[1][3], 'El :root y el bloque [data-muni-theme="light"] declaran hints distintos.');
     expect($m[1][1])->toBe($m[1][2], 'El media query y los activadores explícitos declaran hints distintos.');
 });
+
+/*
+ * WCAG 2.2 AA 1.4.11 pide 3:1 para la información visual que identifica un
+ * componente de interfaz. En un campo de formulario ese componente es el borde:
+ * es lo único que dice dónde empieza y dónde termina.
+ *
+ * Los bordes generales del paquete no dan, y no tienen por qué: --muni-border y
+ * --muni-border-2 son separadores, donde 1.4.11 no aplica. Medidos daban 1,28:1 y
+ * 1,61:1 en claro; 1,43:1 y 1,90:1 en oscuro. Por eso los controles usan un token
+ * propio, --muni-field-border, y por eso esta prueba existe: si alguien lo aclara
+ * para que «se vea más suave», el candado cae acá.
+ */
+it('--muni-field-border pasa 1.4.11 (3:1) sobre las superficies de los dos temas', function () {
+    $bloques = [
+        'Valores LIGHT (default)' => ['surface', 'bg', 'surface-3'],
+        'Regla 2: activadores EXPLÍCITOS de dark' => ['surface', 'surface-2', 'surface-3', 'bg'],
+    ];
+
+    foreach ($bloques as $ancla => $superficies) {
+        $bloque = bloqueTrasAncla(cssMuniUi(), $ancla);
+        $borde = tokenHex($bloque, 'field-border');
+
+        foreach ($superficies as $nombre) {
+            $superficie = tokenHex($bloque, $nombre);
+
+            expect(ratioContraste($borde, $superficie))->toBeGreaterThanOrEqual(3.0,
+                "--muni-field-border ({$borde}) sobre --muni-{$nombre} ({$superficie}) no llega a 3:1. ".
+                'El borde es lo único que delimita el campo.'
+            );
+        }
+    }
+});
+
+it('los controles de formulario usan el token de borde de campo, no el de separador', function () {
+    $controles = ['input', 'select', 'textarea', 'checkbox', 'switch'];
+
+    foreach ($controles as $nombre) {
+        $fuente = file_get_contents(__DIR__."/../resources/views/components/{$nombre}.blade.php");
+
+        // Ojo: `toContain($x, 'mensaje')` NO acepta mensaje — el segundo argumento
+        // es otra aguja que se busca en el sujeto. Por eso va con str_contains.
+        expect(str_contains($fuente, '--muni-field-border'))->toBeTrue(
+            "«{$nombre}» dibuja su límite con un token de separador. Medido, eso da entre 1,1:1 y ".
+            '1,9:1, muy por debajo del 3:1 que exige 1.4.11 para identificar un control.'
+        );
+    }
+});
+
+it('el tema del panel también declara el token, porque muni-ui.css no se carga ahí', function () {
+    // Ver DESIGN §7: MuniPanel solo inyecta filament.css. Un token declarado
+    // únicamente en muni-ui.css deja el borde del campo sin color dentro del panel,
+    // y sin un solo error en consola.
+    $tema = file_get_contents(__DIR__.'/../resources/css/muni-ui-filament.css');
+
+    expect(substr_count($tema, '--muni-field-border:'))->toBe(2,
+        'El puente del tema Filament tiene que declarar --muni-field-border en claro Y en .dark.'
+    );
+});

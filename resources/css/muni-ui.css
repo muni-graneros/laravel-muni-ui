@@ -53,6 +53,15 @@
     --muni-hint: #656c79;
     --muni-border: #e0e3ea;
     --muni-border-2: #c8ccd6;
+    /* Límite de un control de formulario. WCAG 2.2 AA 1.4.11 pide 3:1 para la
+       información visual que identifica un componente de interfaz, y el borde es
+       lo ÚNICO que dice dónde empieza y termina un campo. Medido, los bordes
+       generales no daban: --muni-border 1,28:1 y --muni-border-2 1,61:1 en claro;
+       1,43:1 y 1,90:1 en oscuro. Este token es más oscuro a propósito y SOLO se
+       usa en controles: los separadores y las tarjetas siguen con --muni-border,
+       donde 1.4.11 no aplica. Medido: 3,73:1 sobre --muni-surface y 3,22:1 sobre
+       --muni-surface-3, que es el peor caso. */
+    --muni-field-border: #7b849c;
 
     --muni-accent: #0f766e;
     --muni-accent-strong: #115e59;
@@ -120,6 +129,7 @@
         --muni-hint: #7a8ba8;
         --muni-border: #2a3347;
         --muni-border-2: #3a4560;
+        --muni-field-border: #5f719d;
         --muni-accent: #f59e0b;
         --muni-accent-strong: #d97706;
         --muni-accent-soft: #2d1d00;
@@ -167,6 +177,7 @@
     --muni-hint: #7a8ba8;
     --muni-border: #2a3347;
     --muni-border-2: #3a4560;
+    --muni-field-border: #5f719d;
     --muni-accent: #f59e0b;
     --muni-accent-strong: #d97706;
     --muni-accent-soft: #2d1d00;
@@ -211,6 +222,15 @@
     --muni-hint: #656c79;
     --muni-border: #e0e3ea;
     --muni-border-2: #c8ccd6;
+    /* Límite de un control de formulario. WCAG 2.2 AA 1.4.11 pide 3:1 para la
+       información visual que identifica un componente de interfaz, y el borde es
+       lo ÚNICO que dice dónde empieza y termina un campo. Medido, los bordes
+       generales no daban: --muni-border 1,28:1 y --muni-border-2 1,61:1 en claro;
+       1,43:1 y 1,90:1 en oscuro. Este token es más oscuro a propósito y SOLO se
+       usa en controles: los separadores y las tarjetas siguen con --muni-border,
+       donde 1.4.11 no aplica. Medido: 3,73:1 sobre --muni-surface y 3,22:1 sobre
+       --muni-surface-3, que es el peor caso. */
+    --muni-field-border: #7b849c;
     --muni-accent: #0f766e;
     --muni-accent-strong: #115e59;
     --muni-accent-soft: #f0fdfa;

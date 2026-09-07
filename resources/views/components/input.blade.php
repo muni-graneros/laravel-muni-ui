@@ -80,7 +80,7 @@
                 'class' => 'muni-input',
                 'style' => 'width:100%;padding:10px 12px;'.($icon ? 'padding-left:36px;' : '')
                     .'font-family:var(--muni-font-sans);font-size:13.5px;color:var(--muni-text);'
-                    .'background:var(--muni-surface);border:1px solid '.($error ? 'var(--muni-danger-border)' : 'var(--muni-border)').';'
+                    .'background:var(--muni-surface);border:1px solid '.($error ? 'var(--muni-danger-border)' : 'var(--muni-field-border)').';'
                     .'border-radius:var(--muni-radius-sm);transition:border-color var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease);',
             ]) }}
         >

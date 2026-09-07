@@ -135,7 +135,7 @@
             'style' => 'width:100%;padding:10px 12px;resize:vertical;'
                 .'min-height:calc('.$muniRows.' * 1.5em + 22px);max-height:40vh;overflow-y:auto;'
                 .'font-family:var(--muni-font-sans);font-size:13.5px;line-height:1.5;color:var(--muni-text);'
-                .'background:var(--muni-surface);border:1px solid '.($error ? 'var(--muni-danger-border)' : 'var(--muni-border)').';'
+                .'background:var(--muni-surface);border:1px solid '.($error ? 'var(--muni-danger-border)' : 'var(--muni-field-border)').';'
                 .'border-radius:var(--muni-radius-sm);transition:border-color var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease);',
         ]) }}
     >{{ $slot }}</textarea>

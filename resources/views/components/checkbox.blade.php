@@ -137,7 +137,7 @@
            centrado dentro. El riel de switch mide 38x22 y no llega. */
         .muni-checkbox-hit { position:relative; flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; }
         .muni-checkbox-input { position:absolute; inset:0; width:24px; height:24px; margin:0; opacity:0; cursor:pointer; }
-        .muni-checkbox { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border:1px solid var(--muni-muted); border-radius:calc(var(--muni-radius-sm) / 2); background:var(--muni-surface); color:var(--muni-on-accent); transition:background var(--muni-dur) var(--muni-ease),border-color var(--muni-dur) var(--muni-ease); }
+        .muni-checkbox { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border:1px solid var(--muni-field-border); border-radius:calc(var(--muni-radius-sm) / 2); background:var(--muni-surface); color:var(--muni-on-accent); transition:background var(--muni-dur) var(--muni-ease),border-color var(--muni-dur) var(--muni-ease); }
         /* El borde sale de --muni-muted y NO de --muni-border: medido en el navegador,
            --muni-border-2 sobre la superficie da 1,61:1 en claro y 1,90:1 en oscuro, y una
            casilla SIN marcar no tiene más pista visual que ese borde. WCAG 2.2 AA 1.4.11

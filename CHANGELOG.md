@@ -50,8 +50,18 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 - `dropdown` lanzaba `Undefined variable $trigger` si se usaba sin ese slot.
 - Cayó el último `uniqid()` del paquete: los siete componentes que generaban ids así ahora los
   derivan del `name`.
+- **El borde de los controles de formulario fallaba 1.4.11 en los dos temas**: 1,28:1 y 1,61:1 en
+  claro, 1,43:1 y 1,90:1 en oscuro, contra el 3:1 que exige la norma para identificar un
+  componente. En un campo el borde es lo único que dice dónde empieza. Token nuevo
+  `--muni-field-border`, declarado también en el tema del panel.
 
 ### Hay que republicar
+**Sí, esta vez.** El token `--muni-field-border` se declara también en
+`muni-ui-filament.css`, porque `muni-ui.css` no se carga dentro de un panel. Todo sistema con
+`MuniPanel` tiene que correr `vendor:publish --tag=muni-ui-filament --force` o el borde de sus
+campos se quedará sin color dentro del panel, sin ningún error visible.
+
+Antes de eso era:
 Nada. Los cambios son de componentes Blade, que viajan en el paquete. No cambió
 `muni-ui-filament.css` ni los scripts del panel, así que **no hace falta**
 `vendor:publish --tag=muni-ui-filament --force` para esta tanda.

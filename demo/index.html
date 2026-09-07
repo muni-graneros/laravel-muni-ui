@@ -1,11 +1,15 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>laravel-muni-ui · Sistema de diseño municipal</title>
 <style>
     [data-muni-theme="light"] {
         --muni-bg:#f5f6f8; --muni-surface:#fff; --muni-surface-2:#f5f6f8; --muni-surface-3:#eceef2;
-        --muni-text:#1a1d24; --muni-muted:#5a6070; --muni-hint:#6b7280; --muni-border:#e0e3ea; --muni-border-2:#c8ccd6;
+        --muni-text:#1a1d24; --muni-muted:#5a6070; --muni-hint:#656c79; --muni-border:#e0e3ea; --muni-border-2:#c8ccd6;
         --muni-accent:#0f766e; --muni-accent-strong:#115e59; --muni-on-accent:#fff;
         --muni-ok-fg:#0f7a5a; --muni-ok-bg:#e2f5ee; --muni-ok-border:#0f7a5a;
-        --muni-warn-fg:#c47a10; --muni-warn-bg:#fef3dc; --muni-warn-border:#c47a10;
+        --muni-warn-fg:#8a5a00; --muni-warn-bg:#fef3dc; --muni-warn-border:#8a5a00;
         --muni-danger-fg:#b03030; --muni-danger-bg:#fdeaea; --muni-danger-border:#b03030;
         --muni-info-fg:#1f5fb0; --muni-info-bg:#e6effb; --muni-info-border:#1f5fb0;
         --muni-radius:10px; --muni-radius-lg:14px; --muni-radius-sm:7px;
@@ -16,7 +20,7 @@
     }
     [data-muni-theme="dark"] {
         --muni-bg:#0b0f14; --muni-surface:#111620; --muni-surface-2:#181e2a; --muni-surface-3:#1c2333;
-        --muni-text:#e2e8f4; --muni-muted:#7a8ba8; --muni-hint:#4a5a74; --muni-border:#2a3347; --muni-border-2:#3a4560;
+        --muni-text:#e2e8f4; --muni-muted:#7a8ba8; --muni-hint:#7a8ba8; --muni-border:#2a3347; --muni-border-2:#3a4560;
         --muni-accent:#f59e0b; --muni-accent-strong:#d97706; --muni-on-accent:#0b0f14;
         --muni-ok-fg:#22c55e; --muni-ok-bg:#0d2d1a; --muni-ok-border:#166534;
         --muni-warn-fg:#f59e0b; --muni-warn-bg:#2d1d00; --muni-warn-border:#92400e;
@@ -35,7 +39,7 @@
     .page-head { max-width:1320px; margin:0 auto; padding:40px 24px 4px; }
     .page-head h1 { margin:0; font-family:ui-monospace,monospace; font-size:22px; font-weight:700; letter-spacing:-.02em; color:#f2f4f8; }
     .page-head p { margin:6px 0 0; font-size:13.5px; color:#8a8f9c; max-width:70ch; line-height:1.5; }
-    .page-head .roster { margin-top:12px; font-family:ui-monospace,monospace; font-size:11px; color:#6b7180; }
+    .page-head .roster { margin-top:12px; font-family:ui-monospace,monospace; font-size:11px; color:#747b8b; }
     .panels { display:grid; grid-template-columns:1fr 1fr; gap:20px; max-width:1520px; margin:0 auto; padding:20px 24px 48px; }
     @media (max-width:1040px){ .panels { grid-template-columns:1fr; } }
     .theme-panel { border-radius:16px; overflow:hidden; border:1px solid #23262e; background:var(--muni-bg); color:var(--muni-text); font-family:var(--muni-font-sans); }
@@ -175,3 +179,5 @@
         panel('light', 'data-muni-theme="light" · DM Sans / DM Mono · teal institucional') +
         panel('dark', 'data-muni-theme="dark" · IBM Plex Sans / Mono · ámbar sobre tinta');
 </script>
+
+</html>

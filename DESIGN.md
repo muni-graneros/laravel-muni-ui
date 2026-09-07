@@ -129,7 +129,26 @@ Corolario del ecosistema: los números de un KPI cuentan desde cero, la tarjeta 
 invisible no cuenta como pintado y el LCP se va con la animación; medido, el desvanecido costaba
 536 ms contra 240 ms del desplazamiento.
 
-## 7. La firma del sistema
+## 7. Por qué los componentes repiten su CSS, y por qué no hay que «arreglarlo»
+
+Varios componentes declaran la misma utilidad en su propio bloque `@once`: la de ocultar algo
+visualmente sin sacarlo del árbol de accesibilidad. Parece duplicación que pide limpieza. **No lo
+es, y moverla a `muni-ui.css` rompería el paquete dentro de los paneles.**
+
+El motivo es el modelo de distribución. `MuniPanel` inyecta en un panel Filament **solo**
+`vendor/muni-ui/filament.css`; `muni-ui.css` no se carga ahí, lo compila el Vite del sistema
+anfitrión para sus vistas públicas. Un componente que dependiera de una clase declarada únicamente
+en `muni-ui.css` se vería sin esa clase dentro del panel, sin un solo error en consola.
+
+Ese error ya ocurrió, y salió caro: los componentes leían `--muni-*`, esos tokens solo existían en
+`muni-ui.css`, y dentro del panel renderizaban con el tamaño correcto y sin color. La barra de un
+gráfico salía con `background:none` porque un degradado con una variable vacía es inválido y se
+descarta. Nadie lo vio hasta que alguien escribió a mano un gráfico de barras que ya existía.
+
+La regla, entonces: **lo que un componente necesita para verse bien viaja con el componente**, en su
+`@once`. Los tokens sí van al CSS, porque el tema del panel los puentea a propósito.
+
+## 8. La firma del sistema
 
 Tres cosas hacen que una pantalla se reconozca como de este ecosistema y no como un panel genérico:
 
@@ -140,7 +159,7 @@ Tres cosas hacen que una pantalla se reconozca como de este ecosistema y no como
   las unidades es una columna que no se puede leer de un vistazo.
 - **El cinturón institucional** de siete colores en las franjas, no en el texto.
 
-## 8. Lo que no se hace
+## 9. Lo que no se hace
 
 - **No escribir un color literal** en un componente, salvo `transparent`, `currentColor` e
   `inherit`. Si necesitas un tono nuevo, se agrega como token en el paquete, no en el host.
@@ -162,7 +181,7 @@ Tres cosas hacen que una pantalla se reconozca como de este ecosistema y no como
 - **No renombrar props ni tokens.** Todo cambio es aditivo mientras la versión sea 0.x y haya nueve
   sistemas consumiendo.
 
-## 9. Antes de dar por terminado un componente
+## 10. Antes de dar por terminado un componente
 
 - La reja pasa: `npm run a11y`.
 - Hay una prueba que falla si el defecto vuelve.

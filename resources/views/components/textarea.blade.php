@@ -13,7 +13,7 @@
      * Campo de texto largo: la «descripción del requerimiento» del ingreso público de
      * Atención al Vecino y el relato del procedimiento en terreno de seguridad.
      *
-     * Identificador del campo. NUNCA uniqid() (DESIGN §8): cambia en cada render, rompe
+     * Identificador del campo. NUNCA uniqid() (DESIGN §10): cambia en cada render, rompe
      * el `for` de la etiqueta y ensucia el diffing de Livewire. Mismo patrón determinista
      * que ya usan tabs.blade.php, sortable-table.blade.php e input.blade.php: manda el
      * `id` que pase el consumidor y, si no lo pasa, se deriva de datos estables.
@@ -192,7 +192,7 @@
         /* Camino PRINCIPAL del crecimiento: cero JS, cero reflow y —al ser CSS— sobrevive
            al morph de Livewire, que es justo donde el truco de medir scrollHeight en
            x-init se pierde y el alto vuelve al de fábrica tras cada round-trip.
-           Va dentro de @supports como mejora progresiva (DESIGN §8); donde no exista,
+           Va dentro de @supports como mejora progresiva (DESIGN §10); donde no exista,
            el x-data de arriba se enciende solo y mide. El `resize` se conserva para que
            el funcionario pueda agrandar a mano. */
         @supports (field-sizing: content) {

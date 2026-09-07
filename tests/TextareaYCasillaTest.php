@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Blade;
 | Los dos nacen con las condiciones que costaron caro en el resto del paquete
 | ya escritas como prueba:
 |
-| 1. EL ID NO SALE DE `uniqid()` (DESIGN §8). Cambia en cada render, rompe el
+| 1. EL ID NO SALE DE `uniqid()` (DESIGN §10). Cambia en cada render, rompe el
 |    `for` de la etiqueta y ensucia el diffing de Livewire. Sale del `name`
 |    saneado —`items[0][rut]` no es un id válido— y el `id` que pase el
 |    consumidor manda.
@@ -405,7 +405,7 @@ it('el campo largo funciona sin JS: manda el rows y el crecimiento es mejora', f
     );
 
     expect((bool) preg_match('/@supports[^{]*field-sizing/i', $css))->toBeTrue(
-        'Se usa `field-sizing` sin `@supports`: CSS moderno va como mejora progresiva (DESIGN §8).'
+        'Se usa `field-sizing` sin `@supports`: CSS moderno va como mejora progresiva (DESIGN §10).'
     );
 });
 
@@ -447,7 +447,7 @@ it('el movimiento sale de los tokens y ninguno usa directivas de un solo major',
     // El paquete se instala en Livewire 3 (personas-graneros) y en Livewire 4.
     foreach (['@island', 'wire:show', 'wire:sort', '#[Transition]'] as $prohibida) {
         expect(str_contains($fuente, $prohibida))->toBeFalse(sprintf(
-            '«%s» usa «%s», que no existe en los dos majors de Livewire (DESIGN §8).',
+            '«%s» usa «%s», que no existe en los dos majors de Livewire (DESIGN §10).',
             $componente, $prohibida
         ));
     }

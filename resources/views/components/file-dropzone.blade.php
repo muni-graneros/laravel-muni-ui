@@ -9,7 +9,7 @@
 
 @php
     /*
-     * Identificador de la zona. NUNCA uniqid() (DESIGN §8): cambia en cada render, así
+     * Identificador de la zona. NUNCA uniqid() (DESIGN §10): cambia en cada render, así
      * que bajo Livewire el `for` de la etiqueta y el `aria-describedby` de la ayuda
      * quedan apuntando a un id que ya no existe, y el diff reemplaza nodos que no
      * cambiaron. Sale del `name`, saneado —un name con notación de arreglo produciría

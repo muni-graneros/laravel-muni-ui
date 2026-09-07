@@ -10,7 +10,7 @@
 
 @php
     /*
-     * Identificador del campo. NUNCA uniqid() (DESIGN §8): cambia en cada render,
+     * Identificador del campo. NUNCA uniqid() (DESIGN §10): cambia en cada render,
      * rompe el `for` de la etiqueta y ensucia el diffing de Livewire. Mismo patrón
      * determinista que ya usan tabs.blade.php y tab-panel.blade.php: manda el `id`
      * que pase el consumidor y, si no lo pasa, se deriva de datos estables.

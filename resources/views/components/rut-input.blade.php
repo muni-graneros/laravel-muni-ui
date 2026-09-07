@@ -83,7 +83,7 @@
 
     /*
      * El id se deriva del `name` igual que en input.blade.php y NUNCA de
-     * uniqid() (DESIGN §8): cambia en cada render, rompe el `for` de la etiqueta
+     * uniqid() (DESIGN §10): cambia en cada render, rompe el `for` de la etiqueta
      * y ensucia el diffing de Livewire. Acá se calcula además para poder nombrar
      * la región del veredicto y encadenarla en aria-describedby.
      */

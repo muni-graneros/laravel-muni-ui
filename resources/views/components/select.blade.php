@@ -13,7 +13,7 @@
     /*
      * Mismo bloque que input.blade.php: si cambia acá, cambia allá (y en switch).
      *
-     * Identificador determinista, NUNCA uniqid() (DESIGN §8): cambia en cada render,
+     * Identificador determinista, NUNCA uniqid() (DESIGN §10): cambia en cada render,
      * rompe el `for` de la etiqueta y ensucia el diffing de Livewire. Manda el `id`
      * que pase el consumidor; si no lo pasa, sale del `name` saneado —`items[0][rut]`
      * no es un selector válido y dos filas de un formulario repetido colisionarían—,

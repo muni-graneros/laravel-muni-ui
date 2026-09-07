@@ -148,7 +148,7 @@ descarta. Nadie lo vio hasta que alguien escribió a mano un gráfico de barras 
 La regla, entonces: **lo que un componente necesita para verse bien viaja con el componente**, en su
 `@once`. Los tokens sí van al CSS, porque el tema del panel los puentea a propósito.
 
-## 8. Cuatro trampas de Blade que ya se pisaron
+## 8. Cinco trampas de Blade que ya se pisaron
 
 Las cuatro fallan **en silencio**: no lanzan excepción, no aparecen en consola, y lo que se ve es
 casi lo que se esperaba.
@@ -164,6 +164,12 @@ casi lo que se esperaba.
   calcula por su cuenta, así que un `:aria-invalid="null"` apaga el `aria-invalid` que el hijo
   emitía por el error del servidor. Los atributos condicionales van por `->merge()`, nunca escritos
   a mano antes del derrame.
+- **Una directiva escrita como TEXTO dentro de un comentario se compila igual.** Blade no
+  distingue prosa de directiva: un comentario CSS que dice «esto reescribiría el `@once` entero»
+  abre un segundo bloque `@once` que nadie cierra, y el componente muere con
+  `unexpected end of file, expecting endif`. Peor: el error apunta al archivo compilado, no a la
+  línea del comentario. Si hay que nombrar una directiva en prosa, se escapa con `@@` o se
+  reescribe («el bloque de estilos»).
 - **`$attributes->merge()` reemplaza, no concatena**, salvo en `class` y `style`. Para encadenar un
   `aria-describedby` del consumidor hay que leerlo con `->get()`, unirlo a mano y sacarlo de la
   bolsa con `->except()` antes de fusionar. Sin el `except`, el valor de la bolsa gana y los ids
@@ -180,7 +186,7 @@ Tres cosas hacen que una pantalla se reconozca como de este ecosistema y no como
   las unidades es una columna que no se puede leer de un vistazo.
 - **El cinturón institucional** de siete colores en las franjas, no en el texto.
 
-## 9. Lo que no se hace
+## 10. Lo que no se hace
 
 - **No escribir un color literal** en un componente, salvo `transparent`, `currentColor` e
   `inherit`. Si necesitas un tono nuevo, se agrega como token en el paquete, no en el host.
@@ -202,7 +208,7 @@ Tres cosas hacen que una pantalla se reconozca como de este ecosistema y no como
 - **No renombrar props ni tokens.** Todo cambio es aditivo mientras la versión sea 0.x y haya nueve
   sistemas consumiendo.
 
-## 10. Antes de dar por terminado un componente
+## 11. Antes de dar por terminado un componente
 
 - La reja pasa: `npm run a11y`.
 - Hay una prueba que falla si el defecto vuelve.

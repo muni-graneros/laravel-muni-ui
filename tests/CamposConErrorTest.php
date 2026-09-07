@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Blade;
 |    encadenados en `aria-describedby` (es lo que documenta CoreUI para el modo
 |    servidor, que es el de Laravel).
 | 3. EL ID SALÍA DE `uniqid()` cuando no había `name`: cambia en cada render,
-|    rompe el `for` de la etiqueta y ensucia el diffing de Livewire (DESIGN §8).
+|    rompe el `for` de la etiqueta y ensucia el diffing de Livewire (DESIGN §10).
 | 4. `$attributes->merge()` REEMPLAZA, NO CONCATENA: el `aria-describedby` del
 |    consumidor ganaba y se perdían los ids del componente (o al revés). Hay que
 |    leerlo y encadenarlo a mano antes del merge.
@@ -217,7 +217,7 @@ it('el mensaje se anuncia cuando el error llega por Livewire, sin recarga', func
 
 it('el id del campo es el mismo en dos renders seguidos', function (string $componente) {
     // Sin `name` el id salía de uniqid(): cambiaba en cada render, rompía el
-    // `for` de la etiqueta y ensuciaba el diffing de Livewire (DESIGN §8).
+    // `for` de la etiqueta y ensuciaba el diffing de Livewire (DESIGN §10).
     $primero = atributoDe(controlDe(campoMuni($componente, ['label' => 'RUT'])), 'id');
     $segundo = atributoDe(controlDe(campoMuni($componente, ['label' => 'RUT'])), 'id');
 

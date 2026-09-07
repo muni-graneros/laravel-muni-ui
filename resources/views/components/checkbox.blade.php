@@ -27,7 +27,7 @@
 
 @php
     /*
-     * Identificador del control. NUNCA uniqid() (DESIGN §8): cambia en cada render,
+     * Identificador del control. NUNCA uniqid() (DESIGN §10): cambia en cada render,
      * rompe el `for` de la etiqueta y ensucia el diffing de Livewire. Mismo patrón
      * determinista que tabs.blade.php, sortable-table.blade.php e input.blade.php.
      *

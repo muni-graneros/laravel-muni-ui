@@ -34,7 +34,7 @@ use Illuminate\Support\Facades\Blade;
 |    muestra resuelta en pantalla.
 | 6. EL RANGO ES COHERENTE. Si el «hasta» es anterior al «desde», se dice en
 |    texto, no se deja salir un reporte vacío que nadie sabe explicar.
-| 7. NI `uniqid()` (DESIGN §8) NI UN COLOR LITERAL (DESIGN §1), salvo el
+| 7. NI `uniqid()` (DESIGN §10) NI UN COLOR LITERAL (DESIGN §1), salvo el
 |    `#767676` canónico del respaldo del outline.
 |
 | Se prueba con `expect(bool)->toBeTrue('mensaje')`: en Pest el segundo

@@ -79,7 +79,7 @@
 
     /*
      * El id se deriva del `name` igual que en input.blade.php y NUNCA de uniqid()
-     * (DESIGN §8): cambia en cada render, rompe el `for` de la etiqueta y ensucia
+     * (DESIGN §10): cambia en cada render, rompe el `for` de la etiqueta y ensucia
      * el diffing de Livewire.
      */
     $muniDateId = function (?string $name, string $fallback): string {

@@ -12,3 +12,4 @@ demo/vendor/
 /node_modules/
 a11y-informe.json
 .venv-a11y/
+/build/

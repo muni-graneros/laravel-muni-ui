@@ -140,7 +140,10 @@
         ]) }}
     >{{ $slot }}</textarea>
 
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+    {{-- En un teléfono el contador y la ayuda no caben en la misma línea: sin el
+         wrap, «Cuenta qué pasó, dónde y cuándo» se parte en cuatro líneas de dos
+         palabras. Con `flex-wrap` el contador baja entero a la suya. --}}
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:2px 12px;">
         {{-- La ayuda y el error CONVIVEN, cada uno con su id: perder el «cuenta qué
              pasó, dónde y cuándo» justo cuando el vecino se equivocó es dejarlo sin la
              instrucción para corregir.
@@ -149,7 +152,7 @@
              Livewire el error llega en un round-trip sin recargar, así que un <span> que
              nace de la nada no lo lee ningún lector (WCAG 2.2 AA 4.1.3) y además empuja
              el contenido de abajo. --}}
-        <div role="status" aria-live="polite" style="display:flex;flex-direction:column;gap:2px;min-height:15px;flex:1 1 auto;">
+        <div role="status" aria-live="polite" style="display:flex;flex-direction:column;gap:2px;min-height:15px;flex:1 1 12rem;">
             @if ($hint)
                 <span id="{{ $muniHintId }}" style="font-size:11.5px;line-height:15px;color:var(--muni-hint);">{{ $hint }}</span>
             @endif

@@ -306,6 +306,38 @@ it('la casilla ofrece un blanco de pulsación de al menos 24x24', function () {
     }
 });
 
+it('el borde de la casilla sin marcar llega a 3:1 contra la superficie', function () {
+    // Una casilla SIN marcar no tiene más pista visual que su borde: si ese borde no
+    // se distingue del papel, el control es invisible. WCAG 2.2 AA 1.4.11 pide 3:1
+    // para el límite de un control de formulario. Medido en el navegador, el token
+    // --muni-border-2 daba 1,61:1 en claro y 1,90:1 en oscuro.
+    expect((bool) preg_match('/\.muni-checkbox\s*\{([^}]*)\}/', cssCampoNuevo('checkbox'), $regla))->toBeTrue(
+        'No existe la regla .muni-checkbox, que es la que dibuja la casilla.'
+    );
+
+    expect((bool) preg_match('/border\s*:[^;]*var\(\s*--(muni-[a-z0-9-]+)/i', $regla[1], $token))->toBeTrue(
+        'El borde de la casilla no sale de un token del paquete.'
+    );
+
+    $bloques = [
+        'claro' => bloqueTrasAncla(cssMuniUi(), 'Valores LIGHT (default)'),
+        'oscuro' => bloqueTrasAncla(cssMuniUi(), 'Regla 2: activadores EXPLÍCITOS de dark'),
+    ];
+
+    foreach ($bloques as $nombre => $bloque) {
+        $borde = tokenHex($bloque, substr($token[1], strlen('muni-')));
+        $fondo = tokenHex($bloque, 'surface');
+
+        expect($borde)->not->toBeNull("No se pudo leer --{$token[1]} en el bloque {$nombre}.");
+        expect($fondo)->not->toBeNull("No se pudo leer --muni-surface en el bloque {$nombre}.");
+
+        expect(ratioContraste((string) $borde, (string) $fondo))->toBeGreaterThanOrEqual(3.0, sprintf(
+            '%s: el borde de la casilla (--%s, %s) sobre la superficie (%s) da %.2f:1, bajo el 3:1 de WCAG 2.2 AA 1.4.11.',
+            $nombre, $token[1], $borde, $fondo, ratioContraste((string) $borde, (string) $fondo)
+        ));
+    }
+});
+
 it('la casilla no necesita Alpine para funcionar', function () {
     // La ficha lo declara: es un control nativo. El estado paralelo de Alpine
     // (`x-model` sobre un input que ya lleva `checked`) es doble verdad.

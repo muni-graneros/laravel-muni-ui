@@ -7,7 +7,19 @@
     'maxMb' => 10,
 ])
 
-@php $dzId = 'muni-dz-'.uniqid(); @endphp
+@php
+    /*
+     * Identificador de la zona. NUNCA uniqid() (DESIGN §8): cambia en cada render, así
+     * que bajo Livewire el `for` de la etiqueta y el `aria-describedby` de la ayuda
+     * quedan apuntando a un id que ya no existe, y el diff reemplaza nodos que no
+     * cambiaron. Sale del `name`, saneado —un name con notación de arreglo produciría
+     * un id inválido— y con un trozo de hash para que dos zonas con nombres que se
+     * sanean igual no colisionen. El `id` que pase el consumidor manda sobre todo.
+     */
+    $dzId = $attributes->get('id')
+        ?: 'muni-dz-'.trim((string) preg_replace('/[^A-Za-z0-9_-]+/', '-', (string) $name), '-')
+            .'-'.substr(sha1((string) $name), 0, 6);
+@endphp
 
 {{-- Zona de carga de archivos (Alpine 3 core). Arrastrar y soltar + lista de lo adjuntado.
      El `<input type="file">` REAL sigue siendo el control —envuelto, nunca sustituido—: de él

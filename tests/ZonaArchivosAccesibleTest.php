@@ -323,3 +323,35 @@ it('las props públicas no cambiaron de nombre', function () {
         'arrastrar y soltar nativo y la activación por teclado.'
     );
 });
+
+/*
+ * Añadida al integrar la tanda: era el último componente del paquete que seguía
+ * resolviendo su id con uniqid(). Los otros seis lo abandonaron en esta misma
+ * tanda y DESIGN §8 lo prohíbe; este se había quedado atrás.
+ */
+it('el id de la zona es estable entre renders y respeta el del consumidor', function () {
+    $fuente = (string) preg_replace(
+        ['#/\*.*?\*/#s', '#\{\{--.*?--\}\}#s'],
+        '',
+        file_get_contents(__DIR__.'/../resources/views/components/file-dropzone.blade.php')
+    );
+
+    expect(str_contains($fuente, 'uniqid('))->toBeFalse(
+        'La zona arma su id con uniqid(): cambia en cada render y bajo Livewire deja el <label for> '.
+        'y el aria-describedby apuntando a un id que ya no existe.'
+    );
+
+    $render = fn (string $extra = '') => Blade::render('<x-muni::file-dropzone name="informe" '.$extra.' />');
+
+    preg_match('/id="([^"]*muni-dz[^"]*)"/', $render(), $a);
+    preg_match('/id="([^"]*muni-dz[^"]*)"/', $render(), $b);
+
+    expect($a[1] ?? 'a')->not->toBeEmpty()
+        ->and($a[1] ?? 'a')->toBe($b[1] ?? 'b', 'Dos renders de la misma zona dan ids distintos.');
+
+    // Un name con notación de arreglo no puede producir un id inválido como selector.
+    $conArreglo = Blade::render('<x-muni::file-dropzone name="adjuntos[0][informe]" />');
+    preg_match('/id="([^"]*muni-dz[^"]*)"/', $conArreglo, $c);
+    expect($c[1] ?? '')->toMatch('/^[A-Za-z][A-Za-z0-9_-]*$/',
+        'El name con notación de arreglo produce un id que no es un selector válido.');
+});

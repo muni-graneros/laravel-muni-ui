@@ -165,6 +165,18 @@ parcheara un archivo suyo, ese archivo queda bajo MPL-2.0 y hay que publicarlo.
 Esta tabla se llena en la Fase 3: cada componente nuevo anota aquí de qué referencia salió su
 comportamiento. Mientras esté vacía, es que todavía no se portó nada.
 
-| Componente `<x-muni::*>` | Referencia que lo informó | Qué se tomó |
+Una fila por commit. Lo que se tomó es siempre comportamiento o composición: qué tecla hace qué,
+dónde va el foco, qué roles corresponden, qué bloques forman una pantalla. **Nunca markup, clases
+ni CSS.**
+
+| Componente | Referencia que lo informó | Qué se tomó |
 |---|---|---|
-| — | — | — |
+| `skip-link` | AdminLTE 4 — `src/scss/_accessibility.scss` y su inyección en `src/ts/` | Que el enlace no sirve sin resolver también el destino: al `<main>` hay que darle `id` y `tabindex="-1"`, o el ancla mueve el scroll y no el punto de lectura. La técnica de ocultamiento por recorte, nunca `display:none`. |
+| `tabs` + `tab-panel` | Flowbite React — entrada «pestañas» | Separar el índice **activo** del índice **enfocado**, que es lo que permite la activación manual sin disparar una petición por cada flecha, y mover el foco de verdad tras cambiar de pestaña. |
+| `sortable-table` | shadcn/ui — `apps/v4/registry/new-york-v4/blocks/dashboard-01/components/data-table.tsx` | La semántica del orden: un `<button>` dentro del `<th>` y el `aria-sort` en el `<th>`, no en el botón. El foco y las teclas los pone el navegador. |
+| `segmented` | daisyUI — `packages/daisyui/src/components/filter.css` | Resuelve el mismo caso, filtrar un listado con radios reales, y muestra cómo colgar el estilo del control que de verdad recibe el foco en vez de depender de `:has()`. |
+| `drawer` + `modal` | Flowbite Svelte — `src/lib/dialog/Dialog.svelte` | Que las dos piezas son la misma con distinta dirección y deben compartir contrato: mismo nombre accesible de respaldo, mismo cierre, mismo tratamiento del fondo. |
+| `file-dropzone` | Flowbite Svelte — `src/lib/forms/dropzone/Dropzone.svelte` | Envolver el `<input type="file">` nativo en vez de sustituirlo, que es lo que conserva el foco, la activación por teclado y el anuncio del nombre del archivo. Su propia carencia —no anunciar el resultado— es lo que acá sí se hizo. |
+
+Ninguna de esas fuentes aportó una línea de código a este paquete. Las seis piezas se escribieron
+desde cero con nuestros componentes y nuestros tokens.

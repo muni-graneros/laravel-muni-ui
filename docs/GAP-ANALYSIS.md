@@ -4,9 +4,13 @@ Qué se comparó: los **60 candidatos** que cinco analistas
 propusieron tras cruzar los 53 componentes del paquete contra las 262 piezas y las 122
 composiciones catalogadas en las nueve familias de referencias MIT.
 
-Después de fundir los que describían la misma pieza desde dominios distintos quedan
-**55 fichas**: 16 reparaciones de lo que ya existe,
-27 componentes nuevos y 12 composiciones de pantalla.
+Después de fundir los que describían la misma pieza desde dominios distintos quedaron **55
+fichas**: 16 reparaciones de lo que ya existe, 27 componentes nuevos y 12 composiciones de
+pantalla.
+
+**Este documento se poda a medida que se cierra trabajo.** Las seis fichas de la primera tanda ya
+salieron del cuerpo y están resumidas en la sección 0 con su commit. **Quedan 49 pendientes.** Si
+una ficha sigue acá, sigue sin hacerse.
 
 ## Antes de leer: dos advertencias sobre este documento
 
@@ -22,6 +26,22 @@ marcadas y su prioridad está vacía, no inventada.
 La consecuencia práctica de las dos advertencias es la misma: **este documento propone, no
 decide**. El orden de la última sección es una sugerencia.
 
+## 0. Ya está hecho
+
+Estas fichas se retiraron del cuerpo del documento: ya no son trabajo pendiente. Se dejan
+acá con su commit para no volver a proponerlas y para poder auditar qué cerró cada una.
+
+| Pieza | Commit | Qué se cerró |
+|---|---|---|
+| `skip-link` (era `enlace-salto`) | `b47d036` | Nuevo. Los tres armazones lo traen cableado con el destino enfocable. |
+| `tabs` | `f98fd3a` | Las flechas mueven el foco, más Home y End, y la relación pestaña–panel en las dos direcciones. |
+| `sortable-table` | `c769aed` | El orden sale de un botón real: alcanzable con teclado, con aria-sort y región viva. |
+| `segmented` | `62a51a2` | Respaldo de foco fuera de @supports y role=radiogroup con nombre. |
+| `drawer + modal` (era `drawer`) | `d83e67d` | Ids deterministas, nombre accesible de respaldo y movimiento reducido respetado. |
+| `file-dropzone` | `29bf1a8` | Se cierra la inyección en Alpine, aparece el foco, se anuncia el resultado y se valida el límite. |
+
+Todas llevan prueba que falla si el defecto vuelve, y la suite pasó de 48 a 100 pruebas.
+
 ## 1. Lo que hay que reparar antes de agregar nada
 
 Son defectos del paquete tal como está hoy. Van primero por una razón simple: agregar componentes
@@ -30,40 +50,17 @@ ecosistema ya tiene nueve.
 
 | Pieza | Prio | Qué resuelve | Trámite donde se usa | Esfuerzo |
 |---|---|---|---|---|
-| `file-dropzone` | 1 | Adjuntar documentos de un trámite sin que el foco desaparezca ni el resultado quede mudo. | El adjunto del informe médico y del certificado en el registro de la credencial de discapacida… | medio |
 | `dashboard-shell` | 2 | Que el armazón de escritorio se pueda usar de verdad en tablet y con lector de pantalla: hoy e… | El inspector de patentes con tablet abriendo el menú del panel de fiscalización en terreno; ho… | bajo |
 | `data-table` | 2 | Que la tabla ancha se pueda desplazar y leer sin mouse, y que cada celda sepa a que encabezado… | La bandeja del meson de licencias de conducir: RUT, nombre, clase, tipo de tramite, examen med… | bajo |
 | `input` | 2 | Que el error y el texto de ayuda de un campo lleguen al lector de pantalla y no solo al ojo (e… | El formulario público «Ingresa tu solicitud» de Atención al Vecino y el alta de patente comerc… | bajo |
 | `pagination` | 2 | Recorrer un listado largo del servidor sin activar por error los extremos inertes y sabiendo e… | El padron de patentes morosas de Rentas: 3.400 registros, 170 paginas, y un funcionario que ll… | bajo |
-| `segmented` | 2 | Un grupo de opciones excluyentes que se pueda recorrer con las flechas sin que la página se re… | El filtro «Todos / Pendientes / En trámite / Cerrados» sobre el listado de requerimientos de A… | bajo |
-| `sortable-table` | 2 | Que un funcionario que no usa mouse pueda ordenar un listado por columna. | El listado de patentes comerciales morosas en Rentas ordenado por monto adeudado: hoy un funci… | medio |
 | `stat` | 2 | Comparar dos cifras (hoy contra ayer, este mes contra el anterior) sin que el sentido de la co… | El tablero de la central de camaras de Seguridad Ciudadana, donde el turno compara los eventos… | bajo |
-| `tabs` | 2 | Que las pestañas cumplan el patrón: panel asociado a su pestaña, alcanzable y anunciado. | La ficha de una solicitud de licencia clase B en el mesón de Tránsito: Datos del solicitante ·… | bajo |
 | `toast-host` | 2 | Es el canal por el que los seis sistemas confirman que un trámite se guardó o falló. | «Solicitud N.º 2026-4831 ingresada — derivada a Obras» en la recepción de Atención al Vecino; … | medio |
 | `ring` | 3 | El avance circular: un porcentaje mostrado como arco. | El porcentaje de cupos ocupados de la agenda diaria de licencias; la proporción de solicitudes… | bajo |
 | `tooltip` | 3 | La ayuda breve de un control, sobre todo de los botones de solo icono de las filas. | Los botones de icono de la fila del listado de patentes morosas (ver, anular, imprimir orden d… | bajo |
 | `calendar` | 4 | Elegir un día en una rejilla de mes usando solo el teclado. | La agenda de licencias de conducir, donde el funcionario elige el día de la cita y solo alguno… | alto |
 | `sidebar` | 4 | Que la barra lateral cerrada deje de recibir el foco y que el estado se comporte igual al rota… | El mesón de Licencias en tablet, y el operador de la central de cámaras que navega el turno co… | medio |
 | `breadcrumb` | — | Que las migas sean una lista de verdad y que sus enlaces se distingan sin depender del color. | Cada pantalla del panel de Discapacidad: Inicio › Credenciales › Solicitud 2026-0412. | bajo |
-| `drawer` | — | Que el panel lateral de detalle no rompa el diffing de Livewire ni anime cuando el usuario pid… | Abrir la ficha de una solicitud desde el listado del mesón de Licencias sin perder el filtro n… | bajo |
-
-### `file-dropzone`
-
-**reparación** · prioridad 1 · esfuerzo medio
-
-**Qué resuelve.** Adjuntar documentos de un trámite sin que el foco desaparezca ni el resultado quede mudo.
-**Qué pasa hoy sin él.** El <input type=file> real está con opacity:0 cubriendo toda la zona (línea 22) y .muni-dz no tiene ninguna regla :focus-within: al llegar con Tab NO hay indicador visible de foco. Es 2.4.7 sin matices, no un detalle cosmético. Además elegir archivos actualiza files en Alpine sin ninguna región viva (4.1.3), no hay forma de quitar un archivo ya elegido (hay que reabrir el diálogo y elegir todo de nuevo) y el hint promete «hasta 10 MB» sin que nada valide ni muestre el error. Aparte, {{ $label }} se interpola dentro de una cadena de comillas simples en x-text (línea 26): una etiqueta con apóstrofo rompe el Alpine de la página entera.
-**Lo más parecido que ya existe.** Es el propio file-dropzone.
-**Referencia que lo hace mejor.** Flowbite Svelte, «zona de carga de archivos» — themesberg_flowbite-svelte/src/lib/forms/dropzone/Dropzone.svelte — De las cuatro implementaciones de subida del catálogo es la única que envuelve el input nativo en vez de sustituirlo —que es lo que nosotros ya hacemos bien— y por eso hereda foco, activación por teclado y anuncio del nombre del archivo. Su ficha señala con precisión lo único que le falta y que a nosotros también nos falta: región viva para el resultado del arrastre y para los errores de tipo y tamaño. La de Preline se descarta sola: depende de una beta de Dropzone.
-**Patrón.** ninguno: es un control de archivo nativo (el arrastrar y soltar necesita alternativa por teclado por 2.5.7 y ya la tiene, porque el input nativo abre el diálogo)
-**Teclas obligatorias.** Tab hasta el control con foco visible en la zona; Enter para abrir el diálogo del sistema; Espacio para abrir el diálogo del sistema; Tab hasta el botón Quitar de cada archivo; Enter/Espacio en Quitar, con el foco reubicado en el archivo vecino o en la zona
-**Alpine.** core
-**Riesgo.** Quitar UN archivo de un FileList obliga a reconstruir un DataTransfer nuevo y reasignarlo: es donde esto se rompe en Safari. Con Livewire 3 el x-data se reinicia en cada respuesta, la lista pintada se pierde mientras el archivo sigue dentro del input y la pantalla miente. La región viva no debe anunciar en cada dragover, solo en el drop y en el change.
-**Dónde se usa.** El adjunto del informe médico y del certificado en el registro de la credencial de discapacidad, y el respaldo del giro en la solicitud de patente comercial.
-
-> **Objeción del juez.** La mejor objeción es que este componente es hoy PEOR que no tener componente. Un `<x-muni::field>` con un `<input type="file">` desnudo ya trae, gratis y sin una línea de CSS, foco visible del navegador, activación por Enter y Espacio, y anuncio del nombre del archivo por el lector de pantalla: exactamente las tres cosas que el candidato pide presupuesto para recuperar. El paquete construyó un control por debajo de la plataforma y ahora pide horas para volver a empatar con ella. En un municipio con poco personal técnico, la opción honesta que hay que poner sobre la mesa es borrar `file-dropzone`, documentar «usá el input nativo dentro de field» y quedarse sin arrastrar y soltar, que en un back-office donde el archivo sale de la carpeta del escáner casi nadie usa. No la tomo porque el componente ya está desplegado en los paneles y borrarlo rompe a los consumidores, y porque la parte que restituye el cumplimiento son minutos, no días. Segunda objeción menor: el candidato vende como bug de apóstrofo lo que además es inyección de expresión —un label desde configuración o base de datos con `'+fetch(...)+'` se ejecuta— y esa es razón para arreglarlo aunque el resto se descarte.
->
-> **Corrección exigida.** Partir el candidato en dos, porque hoy mezcla una corrección legal barata con una funcionalidad cara y las condena a esperar juntas.  TRAMO A — prioridad 1, esfuerzo bajo, una tarde de verdad. (1) Regla `.muni-dz:focus-within` copiando literal el patrón de la casa (`outline:3px solid var(--muni-focus, var(--muni-accent,#767676)); outline-offset:2px; box-shadow:var(--muni-ring)`), con `outline-offset` positivo y no negativo porque la zona es grande. Usar `:focus-within`, NO `:has(input:focus-visible)` como hizo `segmented.blade.php`: `:focus-within` es universal desde 2017 y no necesita `@supports`, mientras que el `:has()` de segmented es una dependencia que acá no hace falta pagar. Verificar contraste 3:1 del anillo contra `--muni-surface-2` en claro Y contra el fondo del tema oscuro terminal. (2) Sacar `{{ $label }}` de dentro de la expresión Alpine: pasarlo por una propiedad del `x-data` (`label: @js($label)`) o, mejor, dejar el texto en el HTML y alternarlo con `x-show`, para que Blade no vuelva a escribir nunca dentro de una cadena JS. Cerrar con un test que meta un label con apóstrofo. (3) Región viva `role="status" aria-live="polite"` que anuncie solo en `change` y en `drop`, jamás en `dragover`, siguiendo lo que ya hace `toast-host.blade.php`, que es el único aria-live del paquete. (4) De paso, mientras se toca el archivo: el bloque `<style>` define `.mono` sin prefijo, una clase global que pisa o es pisada por cualquier `.mono` de la app anfitriona; renombrar a `.muni-num` reutilizando la definición que ya vive en `data-table.blade.php`, que además es la firma declarada del sistema y aquí ni siquiera lleva `font-variant-numeric:tabular-nums`.  TRAMO B — prioridad 3, esfuerzo medio honesto (no cabe en el mismo ticket). Botón Quitar por archivo con reconstrucción de `DataTransfer` y reubicación del foco, más validación de tipo y tamaño con el error en texto dentro de la misma región viva, para que el hint «hasta 10 MB» deje de ser una promesa que nada cumple. Antes de escribir esto hay que decidir el punto que el candidato deja abierto y es el que puede hacerlo inviable: con Livewire 3 y `wire:model` el archivo lo maneja el ciclo de subida temporal de Livewire, no el `FileList` del input, así que reconstruir el `DataTransfer` a mano puede quedar desincronizado con lo que el servidor ya recibió. Definir primero si el componente soporta `wire:model` o solo submit clásico de formulario; si soporta ambos, Quitar necesita dos caminos y ahí el esfuerzo deja de ser medio y pasa a alto. El riesgo de Safari que menciona el candidato es real y hay que probarlo en WebKit por Docker, no darlo por bueno.
 
 ### `dashboard-shell`
 
@@ -137,42 +134,6 @@ ecosistema ya tiene nueve.
 >
 > **Corrección exigida.** 1) CORREGIR EL DIAGNÓSTICO: el riesgo declarado («romper el CSS de los hosts que ya lo estilan, hay que versionarlo») es falso —cero adoptantes, cero estilos externos de `.muni-page`. Patch release, sin ceremonia. 2) QUITAR el `role=status`: en el caso de enlace con carga completa el navegador ya anuncia el documento nuevo, y con `wire:navigate` el nodo de la región se reemplaza, así que una región viva recién insertada no dispara nunca. Además el componente hoy no tiene mecanismo de paginación en sitio (solo href, sin prop de evento), así que no existe el caso en que funcione: sería una casilla marcada en falso en el checklist WCAG. Si algún día se agrega paginación en sitio, el anuncio va en una región persistente del `app-shell`, no dentro del `<nav>`. 3) QUITAR el «selector de filas por página»: es feature nueva con estado y cableado del host, no reparación, y es lo que rompe el esfuerzo «bajo» declarado. 4) ALCANCE QUE SÍ VA, y en este orden: (a) extremos como `<span class="muni-page muni-page--nav" aria-disabled="true">‹ Anterior</span>` —no focalizable, no activable, honesto, y NVDA/JAWS lo siguen leyendo en modo exploración; (b) sustituir `opacity:.4` por `color:var(--muni-hint)` para que el estado apagado tenga contraparte oscura y ratio medible en ambos temas (con opacity el propio anillo de foco se atenúa al 40%, rozando 1.4.11); (c) prop `paginator` que acepte `LengthAwarePaginator` y rellene current/total/href y el rango «Mostrando 21-40 de 387» sin armarlo a mano —guardar contra `simplePaginate()`, que devuelve `Paginator` sin `lastPage()`; (d) que `$url` no callable y sin paginator lance excepción en local en vez de emitir `#` en silencio. 5) DOCUMENTAR el `->withQueryString()`: paginar un padrón filtrado y perder el filtro en la página 2 es el bug municipal que de verdad va a aparecer. 6) Añadir test de render que afirme que en la página 1 no hay ningún `<a>` con `aria-disabled`, para que el defecto no vuelva.
 
-### `segmented`
-
-**reparación** · prioridad 2 · esfuerzo bajo
-
-**Qué resuelve.** Un grupo de opciones excluyentes que se pueda recorrer con las flechas sin que la página se recargue en cada tecla.
-**Qué pasa hoy sin él.** Cada radio lleva onchange="this.form && this.form.submit()" en línea (línea 16). Tres consecuencias: (1) recorrer el grupo con las flechas —la navegación nativa y obligatoria de un grupo de radios— envía el formulario en CADA movimiento, o sea WCAG 2.2 3.2.2 «Al recibir entradas»: con teclado atravesar las opciones es imposible; (2) el atributo en línea lo bloquea una CSP estricta sin unsafe-inline, que es la que ya corre en los sistemas, y ahí el filtro no hace nada en silencio; (3) form.submit() salta la validación HTML5 y cualquier wire:submit, así que en Livewire es una recarga completa. Encima el contenedor es role=group sin etiqueta, no un fieldset con legend.
-**Lo más parecido que ya existe.** Es el propio segmented.
-**Referencia que lo hace mejor.** daisyUI, «Filtro de opciones» — refs/saadeghi_daisyui/packages/daisyui/src/components/filter.css — Resuelve exactamente el mismo caso —filtrar un listado con radios— con cero JavaScript: el estado viaja en el formulario y el botón de limpiar es un <input type=reset> nativo. El envío queda donde debe estar (un botón explícito o un wire:model.live del consumidor), no en cada tecla. Su único defecto —el rótulo sacado de aria-label con content: attr()— no lo heredamos: nuestro texto ya está en el DOM.
-**Patrón.** ninguno propio: son radios nativos dentro de un fieldset; el patrón ARIA radiogroup solo aplicaría si los reimplementáramos, y no hay que hacerlo
-**Teclas obligatorias.** Tab entra al grupo por la opción marcada y sale del grupo entero; Flecha izquierda/derecha/arriba/abajo mueve y marca SIN enviar; Espacio marca la opción enfocada sin enviar
-**Alpine.** no
-**Riesgo.** Quitar el auto-envío cambia el comportamiento de los consumidores actuales, que lo usan como filtro instantáneo: hay que entregar la alternativa en el mismo cambio (wire:model.live o un botón «Aplicar») y documentarlo, o algún listado deja de filtrar sin avisar. Segundo: los id son {name}-{index}, así que dos grupos con el mismo name en una página colisionan.
-**Dónde se usa.** El filtro «Todos / Pendientes / En trámite / Cerrados» sobre el listado de requerimientos de Atención al Vecino y sobre la bandeja de solicitudes ARCOP.
-
-> **Objeción del juez.** La mejor objeción es que la respuesta correcta no sea reparar sino BORRAR. Con cero adopción en los seis sistemas, `segmented` es una pieza de museo: «filtrar un listado por estado» ya se resuelve con `filter-bar` + `select` (que sí tiene label, error y hint), o con `tabs` si el filtro merece ser navegación. Para un municipio con poquísimo personal técnico, cada componente vivo es superficie de mantenimiento y una decisión más que tomar; sacarlo del paquete y del README costaría lo mismo que arreglarlo y dejaría un componente menos que auditar. Contraargumento por el que igual voto «va»: el diff de reparación es más chico que el de eliminación (borrar obliga a reescribir README, INVENTORY y las dos propuestas de adopción), y un segmentado de 3-4 estados sobre una bandeja densa se lee mejor que un `<select>` para funcionarios que pasan el día ahí. Segunda objeción menor: el candidato vende su reemplazo (`wire:model.live`) como si fuera gratis, y no lo es — un round-trip de Livewire por cada flecha es justo el patrón que dispara el INP.
->
-> **Corrección exigida.** 1) Corregir el «riesgo» declarado: es falso. No hay consumidores (verificado con grep en todo ~/Dev), así que NO hace falta shim de compatibilidad, ni migración coordinada, ni documentar una ruptura. Se borra el `onchange` de la línea 16 y se acabó; el esfuerzo real es más bajo que «bajo». 2) Meter en el MISMO diff los otros dos defectos del control, que hoy son el verdadero riesgo legal: (a) el contenedor es `role="group"` SIN nombre accesible — pasarlo a `<fieldset>` + `<legend>` (o exigir `aria-label`), porque un filtro sin nombre incumple 1.3.1/4.1.2; (b) el anillo de foco depende por entero de `:has()` en la línea 36 sobre un input `opacity:0;width:0;height:0`, o sea que donde `:has()` no resuelva el control NO TIENE indicador de foco (2.4.7), y además CLAUDE.md exige CSS moderno solo dentro de `@supports`. Fallback concreto sin `:has()`: envolver el texto en un `<span>` y usar `.muni-seg input:focus-visible ~ span` como regla base, dejando el `:has()` como mejora dentro de `@supports selector(:has(*))`. 3) Ids: `{name}-{index}` colisiona con dos grupos del mismo `name` en una página. Añadir prop `id` con default único por instancia (`uniqid`/`Str::random`) y derivar `{$id}-{$index}`. 4) Documentar el reemplazo con su costo, no como si fuera gratis: por defecto `wire:model` + botón «Aplicar» (el de `filter-bar`); `wire:model.live` solo como opción, con la advertencia de que dispara un round-trip por flecha (riesgo INP) y de que el listado filtrado necesita un `role="status"` con el conteo de resultados para que el lector de pantalla sepa qué pasó. 5) Marcar el `uso_municipal` como proyectado, no actual: hoy nadie lo renderiza. La tarea se cierra de verdad cuando el filtro «Todos / Pendientes / En trámite / Cerrados» de Atención al Vecino lo estrena YA corregido; si no, esto queda como un arreglo sin testigo. Y agregarle prueba de render: INVENTORY:2089 deja constancia de que `segmented` es uno de los 41 componentes sin un solo `Blade::render()` en la suite.
-
-### `sortable-table`
-
-**reparación** · prioridad 2 · esfuerzo medio
-
-**Qué resuelve.** Que un funcionario que no usa mouse pueda ordenar un listado por columna.
-**Qué pasa hoy sin él.** El orden se dispara con @click sobre el <th>, que no es focusable (sin tabindex, sin role=button, sin @keydown): WCAG 2.1.1 nivel A incumplido, y por tanto el Decreto N°1/2015. Además las celdas se pintan con x-text, o sea solo texto plano: no admiten badge de estado ni botones de accion, asi que los sistemas terminan escribiendo la tabla a mano y repiten el mismo fallo con wire:click en un <th>.
-**Lo más parecido que ya existe.** Es el propio componente. data-table ni siquiera intenta ordenar.
-**Referencia que lo hace mejor.** Catalogo funcional: refs/shadcn-ui_ui/apps/v4/registry/new-york-v4/blocks/dashboard-01/components/data-table.tsx. La semantica (boton dentro del <th> + aria-sort en el <th>) sale de las APG: ninguna de las nueve familias emite aria-sort, y el ejemplo de orden de Flowbite (themesberg_flowbite/content/components/tables.md) es un antipatron declarado. — Es la unica que separa el control (el boton) del encabezado (el <th>), que es justo lo que falta; y su bloque demuestra que orden, seleccion y paginacion conviven sin pisarse.
-**Patrón.** grid (tabla con columnas ordenables): boton dentro del <th>, aria-sort en el <th>, un solo aria-sort distinto de none a la vez
-**Teclas obligatorias.** Tab (llegar al boton de cada columna); Enter; Space; anuncio del resultado en role=status al reordenar y al filtrar
-**Alpine.** core
-**Riesgo.** :key="ri" usa el indice de fila: al reordenar Alpine reutiliza nodos equivocados. El orden en cliente inyecta $rowsJson entero en el HTML: con 3.000 patentes es medio megabyte y un sort en el hilo principal, INP sobre 200 ms. La reparacion debe dejar la puerta abierta al orden en servidor (<a href> o wire:click en el <th>) o tapa un problema de rendimiento con un arreglo de accesibilidad.
-**Dónde se usa.** El listado de patentes comerciales morosas en Rentas ordenado por monto adeudado: hoy un funcionario que navega solo con teclado no puede ordenarlo.
-
-> **Objeción del juez.** La mejor objeción es BORRARLO, no repararlo. Un componente con adopción cero que duplica —peor— lo que Filament ya hace bien es pasivo de mantenimiento: se repara, se documenta, y sigue sin usarse mientras el bug ya se replicó al fork `kraftdo/laravel-kraftdo-ui/.../sortable-table.blade.php:41`. Además el candidato se apoya en dos hechos que verifiqué y son falsos: ningún sistema del ecosistema pone `wire:click`/`@click` en un `<th>` (cero ocurrencias fuera del propio componente y su fork), y no existe sistema de patentes ni Rentas, así que "el listado de patentes morosas ordenado por monto adeudado" es un trámite inventado, no uno que hoy falle. Contra eso pesa que el componente tiene API pública documentada en `docs/INVENTORY.md:1309` y aparece en el showcase: está publicado como apto, y el día que alguien lo adopte hereda el incumplimiento sin enterarse. Reparar es más barato que borrar solo si de paso se le quita la trampa de rendimiento; si no, mejor borrarlo y que los listados a mano usen `data-table` + orden en servidor.
->
-> **Corrección exigida.** 1) Cambiar la referencia: NO shadcn `data-table.tsx`, sino `vendor/filament/tables/resources/views/index.blade.php:1759-1795`, que está en el repo, es el mismo stack, ya es accesible y es la forma que los funcionarios ya usan a diario — `<th scope="col" aria-sort="ascending\|descending\|none">` con `<button type="button">` adentro. Copiar esa forma, no inventarla. 2) Arreglar `:key="ri"` (línea 53) con un prop `rowKey` obligatorio (id o RUT): en un listado de morosidad, reutilizar nodos al reordenar significa mostrar el RUT equivocado junto a la deuda equivocada. Eso es integridad de datos y pesa más que el teclado; si no se arregla, la reparación no va. 3) Etiquetar el input de la línea 32 (`aria-label` o `<label>` oculto visualmente) — mismo archivo, misma sesión. 4) Añadir la salida al orden en servidor (prop `sortUrl` callable que convierta el botón en `<a href>`, o `sortWire` para `wire:click`) y documentar techo duro (~300 filas) para el orden en cliente; sin eso se tapa un problema de INP con un parche de accesibilidad, como el propio candidato advierte. 5) SACAR del alcance las celdas ricas (badge/acciones): pasar de `x-text` a slots obliga a abandonar la API de `rows` en JSON y es un rediseño, no una reparación — va como candidato aparte. 6) Con ese recorte el esfuerzo "medio" es honesto (medio día con tests); con celdas ricas sería alto. 7) Exigir test de render: el componente hoy no tiene ninguno (`docs/INVENTORY.md:2089`), y sin él la regresión vuelve en el próximo `composer update`. 8) Propagar el mismo fix al fork `laravel-kraftdo-ui`, que tiene el bug idéntico.
-
 ### `stat`
 
 **reparación** · prioridad 2 · esfuerzo bajo
@@ -190,24 +151,6 @@ ecosistema ya tiene nueve.
 > **Objeción del juez.** El uso municipal declarado es aspiracional, no actual. `stat` no está renderizado en licencias, patentes, discapacidad, seguridad ciudadana, atención al vecino ni control de acceso: la única coincidencia fuera del paquete es la página vitrina de los scaffolds. Arreglar un componente que nadie renderiza es pulir la demo, y esa misma tarde puesta en `data-table` o `field` tocaría una pantalla que un funcionario sí abre todos los días. La contraargumentación que lo salva es el costo: son atributos, no lógica. Además, el riesgo declarado («integrado en cuatro paneles Filament, hay que revisar los CSS de los hosts») es falso y sobredimensiona el trabajo.
 >
 > **Corrección exigida.** 1) Bajar el `<dl>` a atributos: no hace falta reestructurar el DOM. Un `<dl>` con un solo par `<dt>/<dd>` no aporta sobre `role="group"` + `aria-labelledby` apuntando al id del rótulo, y es la única parte que rompía compatibilidad. Sin cambio de DOM, el riesgo de versionado desaparece. 2) Derivar el texto accesible de `deltaDir` en PHP («subió 12 %» / «bajó 12 %»), no confiar en que el host mande el signo; el test actual pasa `delta="+3"` por convención y una convención no es una garantía. Y agrandar la flecha (8px es ilegible), para que el dato tampoco dependa del color en pantalla. 3) Prerrequisito que el candidato no vio: `.muni-num` está definido SOLO dentro del `@once` de `data-table.blade.php`. Si `stat`/`kpi` lo usan, en cualquier página sin tabla las cifras pierden la mono tabular. Hay que promoverlo a `resources/css/muni-ui.css` antes. 4) Igual la clase visualmente oculta: NO existe en el paquete; créala en `muni-ui.css` (clip-path/1px, nunca `display:none`), no en un `@once` de un componente, o repite la misma trampa. 5) Para `ring`, la referencia es interna, no daisyUI: copiar el bloque de `progress.blade.php`, que ya resuelve `role="progressbar"` + `aria-valuenow` + nombre accesible desde el `label` visible. 6) El esfuerzo «bajo» es honesto para los puntos 1-5, pero NO para el `role="status"` del polling: una live region solo anuncia si el nodo persiste y cambia su contenido; si el morph de Livewire reemplaza el contenedor, no se anuncia nada. Eso es un contrato documentado con el host más verificación con lector de pantalla real. Sácalo del alcance o súbelo a esfuerzo medio, en una tarea aparte.
-
-### `tabs`
-
-**reparación** · prioridad 2 · esfuerzo bajo
-
-**Qué resuelve.** Que las pestañas cumplan el patrón: panel asociado a su pestaña, alcanzable y anunciado.
-**Qué pasa hoy sin él.** tab-panel no emite id, ni aria-labelledby, ni tabindex=0; tabs no emite aria-controls. El lector anuncia la pestaña pero nunca dice qué panel controla, y si el panel es solo texto (una ficha de antecedentes) tras la pestaña el Tab salta al siguiente control saltándose el contenido. Faltan Inicio y Fin. Antes de que Alpine hidrate, :aria-selected y :tabindex no existen en el HTML del servidor: en ese instante las N pestañas son tabulables y ninguna aparece seleccionada. Además tab-panel usa las clases muni-fade/-0/-1 que NO define: existen solo dentro de los @once de modal, drawer y command-palette, con valores distintos entre sí, así que la transición depende de si hay un modal en la página y de cuál se renderizó primero.
-**Lo más parecido que ya existe.** tabs ya trae lo caro y bien hecho: roving tabindex real (:tabindex="active === i ? 0 : -1"), flechas ←/→, <button type="button"> de verdad y role=tablist. Falta el cableado.
-**Referencia que lo hace mejor.** Flowbite React — familia Flowbite, entrada «pestañas» (themesberg/flowbite-react) — Es la única de las cuatro implementaciones de esa familia que separa el índice ACTIVO del índice ENFOCADO y mueve el foco en un efecto, o sea que permite recorrer las pestañas con flechas sin activarlas. Eso importa cuando cambiar de pestaña dispara una petición Livewire.
-**Patrón.** tabs
-**Teclas obligatorias.** ArrowLeft; ArrowRight; Home; End; Tab (entra y sale del tablist con una sola pulsación); Enter o Space si se opta por activación manual; tabindex=0 en el panel cuando no tiene controles propios
-**Alpine.** core
-**Riesgo.** Los ids deben ser estables entre renders: nada de uniqid(), que es lo que ya rompe modal, drawer, input y select bajo Livewire 3. Con activación automática y wire:model cada flecha dispara una petición: hay que ofrecer activación manual (flecha mueve, Enter activa). Mover el foco al panel al cambiar de pestaña puede pelear con la restauración de scroll de wire:navigate.
-**Dónde se usa.** La ficha de una solicitud de licencia clase B en el mesón de Tránsito: Datos del solicitante · Exámenes · Documentos · Historial.
-
-> **Objeción del juez.** El argumento de muni-fade es falso y hay que quitarlo: los tres @once (modal 79-80, drawer 47, command-palette 67) definen valores IDÉNTICOS para .muni-fade/-0/-1; el que difiere entre archivos es .muni-pop-0, que tab-panel no usa. El propio INVENTORY.md:1439 concluye «No rompe nada, pero el fade no ocurre»: la consecuencia real es cosmética, no una transición que depende de qué componente se renderizó primero. Quitado eso, queda una objeción de fondo: aria-controls es lo más citado y lo de menor rendimiento real (NVDA y VoiceOver lo ignoran en la práctica; solo JAWS lo aprovecha), y el tabindex=0 del panel únicamente salva al usuario de teclado vidente cuando el panel tiene scroll propio, cosa que este componente nunca declara. Es decir: higiene APG legítima, pero compitiendo con candidatos donde un funcionario de verdad no puede completar un trámite.
->
-> **Corrección exigida.** 1) Estrategia de ids, que es lo único que puede hundir la tarea: id como prop del consumidor o slug determinista derivado del MISMO dato en padre e hijo; nunca uniqid(). Ojo: @aware no sirve acá, porque Blade solo expone al hijo los datos pasados explícitamente al padre, no un id generado por defecto dentro de tabs; sin resolver esto la reparación reintroduce el bug de Livewire 3 que ella misma denuncia. 2) Emitir aria-selected y tabindex ESTÁTICOS en el render del servidor (default → true/0, resto → false/-1) junto a los bindings de Alpine, además de id/aria-controls/aria-labelledby en HTML plano: eso cierra la ventana de hidratación. 3) Agregar prop label (aria-label del tablist), que el candidato omite: hoy una ficha con dos tablists es indistinguible para el lector. 4) Sacar muni-fade de la justificación y tratarlo aparte: mover .muni-fade/-0/-1 a resources/css/muni-ui.css y borrarlo de los tres @once es un cambio transversal que toca modal, drawer y command-palette, y el conflicto real que ahí hay que arreglar es muni-pop. 5) Activación manual como prop activacion="auto\|manual" con default auto, retrocompatible, no como cambio de comportamiento. 6) No mover el foco al panel al cambiar de pestaña: dejarlo enfocable, pero no robar el foco (evita la pelea con la restauración de scroll de wire:navigate que el propio candidato nombra). 7) Esfuerzo: «bajo» es honesto para 2, 3 y 5; con la estrategia de ids y su regresión en tests/ComponentesRenderTest.php queda en medio-bajo, media jornada.
 
 ### `toast-host`
 
@@ -313,28 +256,10 @@ ecosistema ya tiene nueve.
 
 > **Sin juez.** El evaluador de este candidato no alcanzó a correr. La ficha es la propuesta del analista, sin contraste.
 
-### `drawer`
-
-**reparación** · **sin evaluar por un juez** · esfuerzo bajo
-
-**Qué resuelve.** Que el panel lateral de detalle no rompa el diffing de Livewire ni anime cuando el usuario pidió que no.
-**Qué pasa hoy sin él.** $tituloId = 'muni-drawer-title-'.uniqid() (línea 9) cambia en CADA render: bajo Livewire 3 el id del <h2> y el aria-labelledby se rehacen en cada actualización y el diff reemplaza nodos que no cambiaron. Con title=null el aria-labelledby apunta a un <h2> vacío y el diálogo queda sin nombre accesible. La transición del panel es transition:transform .28s literal (línea 48) en vez de var(--muni-dur), así que ignora prefers-reduced-motion, que el sistema sí honra poniendo --muni-dur:0ms en muni-ui.css línea 245. Y comparte los nombres .muni-fade* con modal y command-palette, cada uno en su @once: el primero que se renderice fija los valores de los otros dos.
-**Lo más parecido que ya existe.** — El drawer existe y su foco está bien: x-trap.inert.noscroll atrapa el foco, bloquea el scroll del body y lo devuelve al disparador.
-**Referencia que lo hace mejor.** Flowbite Svelte — themesberg_flowbite-svelte/src/lib/dialog/Dialog.svelte (entradas «panel lateral deslizante» y «ventana modal») — Hereda de <dialog> la trampa, el Escape y el fondo inerte en vez de reimplementarlos, y su hermano en HTML plano documenta el fallo contrario (N cajones dejan N listeners globales de Escape permanentes), que es exactamente el riesgo de nuestro @keydown.escape.window.
-**Patrón.** dialog (modal)
-**Teclas obligatorias.** Escape; Tab (atrapado); Shift+Tab (atrapado); retorno de foco al disparador
-**Alpine.** core + focus
-**Riesgo.** Un id estable exige un prop o derivarlo del título; dos drawers con el mismo título colisionarían. Subir .muni-fade* y .muni-pop* a muni-ui.css es lo correcto pero toca modal, command-palette y tab-panel a la vez: versión menor, no parche.
-**Dónde se usa.** Abrir la ficha de una solicitud desde el listado del mesón de Licencias sin perder el filtro ni la página del listado.
-
-> **Sin juez.** El evaluador de este candidato no alcanzó a correr. La ficha es la propuesta del analista, sin contraste.
-
-
 ## 2. Componentes que faltan
 
 | Pieza | Prio | Qué resuelve | Trámite donde se usa | Esfuerzo |
 |---|---|---|---|---|
-| `enlace-salto` | 1 | Saltarse la navegación repetida y llegar al contenido principal con una sola tecla. | La recepción de una solicitud ARCOP en Atención al Vecino: el funcionario entra a escribir, no… | bajo |
 | `alert` | 2 | Separar tres cosas que hoy son una sola: la nota fija de instrucciones del trámite, el mensaje… | La franja «Sistema en mantención el sábado 12» del panel de licencias; la nota de requisitos d… | bajo |
 | `anuncios` | 2 | Anunciar a un lector de pantalla lo que cambió en la página sin mover el foco. | El buscador por RUT del maestro de personas en la recepción de Atención al Vecino («3 resultad… | medio |
 | `area-texto` | 2 | Un campo largo que crece con el texto, dice cuánto queda y ata su error como el resto de los c… | La «descripción del requerimiento» en el ingreso público de Atención al Vecino y el fundamento… | bajo |
@@ -361,23 +286,6 @@ ecosistema ya tiene nueve.
 | `nav-grupo` | — | Agrupar ítems del menú en una sección plegable que declara su estado y se abre sola cuando la … | El panel de Seguridad Ciudadana, donde Cámaras, Rondas y Denuncias cuelgan de «Operaciones» y … | bajo |
 | `nav-menu` | — | Pintar el menú lateral completo desde un árbol de configuración, filtrando por permiso y marca… | El menú del panel de Licencias, donde «Exámenes médicos» solo lo ve el rol Médico y «Anular li… | medio |
 | `tabs-ruta` | — | Solapas que llevan a rutas distintas, sin cargar todos los paneles ni perder el estado al nave… | La ficha del vecino en Atención al Vecino (Solicitudes · Documentos · Historial de contactos),… | bajo |
-
-### `enlace-salto`
-
-**componente nuevo** · prioridad 1 · esfuerzo bajo
-
-**Qué resuelve.** Saltarse la navegación repetida y llegar al contenido principal con una sola tecla.
-**Qué pasa hoy sin él.** No existe: grep -rni "salto\|skip" sobre resources/ no devuelve nada, y ninguno de los tres armazones (app-shell, dashboard-shell, auth-shell) emite un <main> con id y tabindex=-1. Hoy, en el panel de Atención al Vecino, quien navega con teclado tabula por los ~15 ítems del menú en CADA página antes de llegar al primer campo. Es WCAG 2.4.1 nivel A: por el Decreto N°1/2015 de SEGPRES eso es incumplimiento legal, no deuda de diseño.
-**Referencia que lo hace mejor.** AdminLTE 4 — refs/ColorlibHQ_AdminLTE/src/scss/_accessibility.scss (más su inyección en src/ts/) — Además del enlace resuelve el destino: si el main no trae id se lo asigna y le agrega tabindex=-1 para que el salto mueva el foco de verdad y no solo el scroll, que es el error clásico del patrón. Sus dos defectos (se inyecta por JS, textos fijos en inglés) desaparecen al hacerlo en Blade.
-**Patrón.** ninguno: es contenido (ancla intra-página)
-**Teclas obligatorias.** Tab (lo revela como primer elemento enfocable del documento); Enter; el destino recibe el foco (tabindex=-1)
-**Alpine.** no
-**Riesgo.** Con el header sticky el foco puede quedar debajo de la cabecera tras el salto: el destino necesita scroll-margin-top: var(--muni-topbar-h). No puede ocultarse con display:none (los lectores no lo anunciarían): se posiciona fuera de pantalla y vuelve con :focus-visible. Debe emitirse antes de gob-bar/gob-stripe o el orden de tabulación lo deja después de la franja institucional.
-**Dónde se usa.** La recepción de una solicitud ARCOP en Atención al Vecino: el funcionario entra a escribir, no a navegar.
-
-> **Objeción del juez.** Que exista el componente no equivale a cumplir 2.4.1, y el riesgo real es que se marque el criterio como cerrado. El salto solo tapa el primer hueco: si el menú lateral, el `data-table` o los modales del panel siguen teniendo trampas de teclado, el municipio queda igual de expuesto con la falsa sensación de haberlo resuelto. Además, hoy nadie lo ha pedido: el beneficio es de cumplimiento y de riesgo legal, no productividad medible con los funcionarios actuales. La objeción no derriba el candidato —el criterio es nivel A y el costo es de horas— pero sí obliga a que se entregue con la verificación de teclado de punta a punta, no solo con el render del enlace.
->
-> **Corrección exigida.** 1) Nombre: `skip-link`, no `enlace-salto`. Todo el inventario está en inglés salvo el prefijo institucional `gob-*`; el texto visible sí en español ("Ir al contenido"). 2) Alcance real, que es lo que el candidato subestima: el componente solo es útil cableado, y son cuatro puntos, no uno. En los tres shells hay que emitirlo como primer hijo del `<body>` —en `dashboard-shell` antes del slot `{{ $sidebar }}`, y en `app-shell` antes de gob-bar/gob-stripe— y darle a cada `<main>` `id="muni-contenido" tabindex="-1"` más `scroll-margin-top: var(--muni-topbar-h)`, porque tanto `topbar.blade.php:16` como `.muni-ds__top` son sticky. 3) Falta el destino que importa: el trámite ARCOP citado corre sobre Filament, que no usa los shells. Hay que colgarlo en `src/Filament/MuniPanel.php` con `PanelsRenderHook::BODY_START` para el enlace y un `CONTENT_START` que emita el propio ancla `<div id="muni-contenido" tabindex="-1">`, sin depender de ids internos de Filament que pueden cambiar entre minors. 4) El `<a>` va plano, sin `wire:navigate`: Livewire interceptaría el clic e intentaría navegar en vez de mover el foco. 5) Oculto fuera de pantalla (nunca `display:none`) y de vuelta con `:focus-visible`, estilado con `var(--muni-accent)` sobre `var(--muni-surface)` con borde, verificando 4.5:1 en claro y oscuro. 6) Test en `tests/FocoVisibleTest.php`, y verificación con teclado real —Tab desde carga, Enter, comprobar `document.activeElement`— en los dos temas, escritorio y tablet. 7) Esfuerzo honesto: bajo para el componente, medio-bajo para el cableado en cuatro puntos y la verificación; un solo enlace ("Ir al contenido"), no tres.
 
 ### `alert`
 
@@ -1076,12 +984,12 @@ obliga a rehacer dos veces lo mismo.
 
 Son los defectos que impiden operar sin mouse o que dejan a un funcionario sin indicador de foco. No son mejoras: son cosas que hoy no se pueden hacer con el teclado. Van juntas porque las cinco se resuelven con el mismo trabajo de foco y de roles, y porque conviene medirlas de una sola pasada con la reja de accesibilidad.
 
-- `enlace-salto`
-- `sortable-table`
-- `tabs`
-- `file-dropzone`
-- `segmented`
-- `drawer`
+- ~~`enlace-salto`~~ — hecho en `b47d036`
+- ~~`sortable-table`~~ — hecho en `c769aed`
+- ~~`tabs`~~ — hecho en `f98fd3a`
+- ~~`file-dropzone`~~ — hecho en `29bf1a8`
+- ~~`segmented`~~ — hecho en `62a51a2`
+- ~~`drawer`~~ — hecho en `d83e67d`
 
 ### Tanda 2 — el cimiento de los formularios
 
@@ -1166,8 +1074,6 @@ Mejoras reales pero que no bloquean a nadie hoy, más dos piezas caras (el calen
 - `calendar`
 - `agenda-horas`
 - `kbd`
-
-
 
 
 ## 5. Lo que se descartó

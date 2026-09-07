@@ -166,7 +166,7 @@ quedaban sin valor.
 | `<x-muni::alert>` | `tone` (ok/warn/danger/info), `title`, `icon` (slot HTML) |
 | `<x-muni::card>` | `title`, `subtitle`, `flush`; slot `actions` |
 | `<x-muni::button>` | `variant` (primary/ghost/subtle/danger), `size` (sm/md/lg), `href`, `icon`, `type` |
-| `<x-muni::segmented>` | `name`, `options` (array), `value` — radios reales sin JS; o slot |
+| `<x-muni::segmented>` | `name`, `options` (array), `value`, `label` — radios reales sin JS; o slot |
 | `<x-muni::filter-bar>` | `action`, `method`; slots `submitLabel`, `actions` |
 | `<x-muni::field>` | `label`; el control (input/select) va en el slot |
 | `<x-muni::data-table>` | `columns` (array), `empty`; el slot son los `<tr data-muni-row>` |
@@ -179,7 +179,11 @@ quedaban sin valor.
 | `<x-muni::dropdown>` | `align` (start/end), `width`; slot `trigger` + ítems `<x-muni::dropdown-item>` |
 | `<x-muni::dropdown-item>` | `href`, `icon`, `tone` (default/danger) |
 | `<x-muni::modal>` | `title`, `maxWidth`; slots `trigger`, `footer` |
-| `<x-muni::tabs>` | `tabs` (array de labels), `default`; paneles `<x-muni::tab-panel :index>` |
+| `<x-muni::tabs>` | `tabs` (array de labels), `default`, `id`, `label`, `activation` (auto\|manual); paneles `<x-muni::tab-panel :index>` |
+| `<x-muni::tab-panel>` | `index` — panel de `<x-muni::tabs>`; se enlaza solo con su pestaña |
+| `<x-muni::skip-link>` | `target` (por defecto `#muni-contenido`) — va de primero en el `<body>`; los tres armazones ya lo traen |
+| `<x-muni::sortable-table>` | `columns`, `rows`, `empty`, `searchable`, `caption` — orden por teclado, `aria-sort` y buscador etiquetado |
+| `<x-muni::file-dropzone>` | `name`, `accept`, `label`, `hint`, `multiple`, `maxMb` — arrastrar y soltar con quitar y validación |
 | `<x-muni::toast-host>` | `position`; colocar UNA vez. Disparar: `$dispatch('muni-toast', {tone, title, message})` |
 
 ```blade
@@ -219,8 +223,10 @@ quedaban sin valor.
 | `<x-muni::dashboard-shell>` | `theme`, `system`, `subtitle`, `status`, `user`; slots `sidebar`, `topbar` — layout de panel |
 | `<x-muni::error-page>` | `code`, `title`, `message`, `home`, `theme` — 403/404/500/503 |
 
-Todos respetan `prefers-reduced-motion`, tienen estados `:focus-visible` con anillo de foco
-accesible (`--muni-ring`), y micro-interacciones de hover/active con transiciones tokenizadas.
+Casi todos respetan `prefers-reduced-motion` y tienen `:focus-visible`. **Casi, no todos:**
+`docs/GAP-ANALYSIS.md` lista los que no, medidos uno por uno. El indicador de foco real es un
+`outline` con `var(--muni-focus)`; el anillo `--muni-ring` va encima como halo, porque dentro de
+Filament la cadena de sombras se come la `box-shadow`.
 Los interactivos usan **Alpine 3 core** (sin plugins): en feria/discapacidad/licencias ya viene
 con Filament; en apps sin Filament, `npm i alpinejs` y `Alpine.start()`. El CSS del paquete trae
 la regla `[x-cloak]` para evitar el flash inicial.

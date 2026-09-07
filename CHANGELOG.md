@@ -22,6 +22,27 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 - `scripts/a11y-check.py` y `npm run a11y`: reja de accesibilidad que mide contraste real
   en claro y oscuro y corre axe-core. Falla ante cualquier violación grave o crítica.
 - `package.json`: existe solo para correr esa reja; el paquete sigue sin bundle propio.
+- `<x-muni::skip-link>`: enlace de salto al contenido, cableado en los tres armazones.
+- `DESIGN.md`, `SKILL.md` y `registry.json`: el contrato de diseño en prosa, la guía para construir
+  una pantalla, y el catálogo legible por máquina de los 54 componentes.
+- Props nuevas, todas aditivas: `tabs` gana `id`, `label` y `activation`; `sortable-table` gana
+  `caption`; `segmented` gana `label`; `file-dropzone` gana `maxMb`.
+
+### Corregido
+- **`file-dropzone` tumbaba el Alpine de la página entera** si la etiqueta traía un apóstrofo: el
+  texto se interpolaba dentro de una cadena de comillas simples.
+- **`sortable-table` no se podía ordenar sin mouse**: el clic iba en un `<th>` no enfocable.
+- **`tabs` movía la selección pero no el foco** al usar las flechas, y no tenía `Home` ni `End`.
+- **`segmented` se quedaba sin ningún indicador de foco** donde `:has()` no resuelve.
+- `modal` y `drawer` generaban el id de su título con `uniqid()`, que rompe el diff de Livewire y
+  deja cualquier `aria-labelledby` externo apuntando al vacío.
+- El mensaje de error de `file-dropzone` medía 4,17:1 en modo oscuro sobre la superficie del
+  anfitrión; ahora lleva fondo propio y no depende de dónde se ponga.
+
+### Hay que republicar
+Nada. Los cambios son de componentes Blade, que viajan en el paquete. No cambió
+`muni-ui-filament.css` ni los scripts del panel, así que **no hace falta**
+`vendor:publish --tag=muni-ui-filament --force` para esta tanda.
 
 ## [0.17.1] — 2026-09-05
 

@@ -3,6 +3,23 @@
 Generado el 2026-09-05 sobre `develop` (HEAD `647dd03`, último tag `v0.17.1`). Fase 0 del plan de
 modernización: **nada se creó ni se modificó en el paquete** para producir este documento.
 
+> **Es una foto, y nueve componentes ya cambiaron desde entonces.** Las fichas de abajo describen
+> defectos que en varios casos ya están corregidos, así que no sirven para decidir qué reparar: para
+> eso está `docs/GAP-ANALYSIS.md`, que sí se poda. Lo que cambió, y dónde mirar el estado real:
+>
+> | Componente | Commit | Qué dejó de ser cierto en su ficha |
+> |---|---|---|
+> | `skip-link` | `b47d036` | No existía. Es nuevo. |
+> | `app-shell`, `dashboard-shell`, `auth-shell` | `b47d036` | Ahora abren con el enlace de salto y su `<main>` es enfocable. |
+> | `tabs`, `tab-panel` | `f98fd3a` | El foco ya se mueve con las flechas; hay `Home`/`End`, `aria-controls` y `aria-labelledby`. Props nuevas: `id`, `label`, `activation`. |
+> | `sortable-table` | `c769aed` | Ya se ordena con teclado; hay `aria-sort`, `scope`, buscador etiquetado y región viva. Prop nueva: `caption`. |
+> | `segmented` | `62a51a2` | El foco ya no depende de `:has()`; es `role="radiogroup"`. Prop nueva: `label`. |
+> | `drawer`, `modal` | `d83e67d` | Ids deterministas y nombre accesible de respaldo. |
+> | `file-dropzone` | `29bf1a8` | Se cerró la inyección en Alpine; hay foco, región viva, quitar archivo y validación. Prop nueva: `maxMb`. |
+>
+> Para el estado vigente de props, slots, tokens y Alpine, la fuente es `registry.json`, que se
+> genera leyendo los archivos.
+
 Método: cuatro lectores de base (CSS/tokens, PHP y pruebas, demos, documentación y JS), trece
 lectores de componentes y **un verificador adversarial por componente** que releyó cada archivo y
 corrigió el registro; después, este renderizador cruzó cada registro con `grep` sobre el disco

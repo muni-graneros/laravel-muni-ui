@@ -139,6 +139,45 @@
       "example": "<x-muni::alert tone=\"info\"></x-muni::alert>"
     },
     {
+      "name": "announcer",
+      "tag": "<x-muni::announcer>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/announcer.blade.php",
+      "description": "La región viva COMPARTIDA de la página (WCAG 2.2 AA 4.1.3, Mensajes de estado)",
+      "props": [
+        {
+          "name": "message",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "assertive",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "clearAfter",
+          "type": "int",
+          "default": "5000",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-muni",
+          "x-ref"
+        ],
+        "plugins": []
+      },
+      "tokens": [],
+      "example": "<x-muni::announcer />"
+    },
+    {
       "name": "app-shell",
       "tag": "<x-muni::app-shell>",
       "type": "registry:blade-component",
@@ -707,6 +746,80 @@
       "example": "<x-muni::chart-donut />"
     },
     {
+      "name": "checkbox",
+      "tag": "<x-muni::checkbox>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/checkbox.blade.php",
+      "description": "Es un <input type=\"checkbox\"> REAL, no un <div role=\"checkbox\">:",
+      "props": [
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "name",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "description",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "error",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "required",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "default": "1",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-model"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-border-2",
+        "--muni-danger-bg",
+        "--muni-danger-border",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-on-accent",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::checkbox />"
+    },
+    {
       "name": "command-palette",
       "tag": "<x-muni::command-palette>",
       "type": "registry:blade-component",
@@ -906,6 +1019,165 @@
       "example": "<x-muni::data-table empty=\"Sin resultados para este filtro.\"></x-muni::data-table>"
     },
     {
+      "name": "date-input",
+      "tag": "<x-muni::date-input>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/date-input.blade.php",
+      "description": "Los dos extremos son UN dato:",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Fecha",
+          "required": false
+        },
+        {
+          "name": "name",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "value",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "min",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "max",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "error",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "hint",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "required",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "legend",
+          "type": "string",
+          "default": "Periodo",
+          "required": false
+        },
+        {
+          "name": "fromName",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "toName",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "fromLabel",
+          "type": "string",
+          "default": "Desde",
+          "required": false
+        },
+        {
+          "name": "toLabel",
+          "type": "string",
+          "default": "Hasta",
+          "required": false
+        },
+        {
+          "name": "fromValue",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "toValue",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "fromError",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "toError",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "toModel",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "modelModifier",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "fromName",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "hint",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "toName",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-bind",
+          "x-data",
+          "x-model",
+          "x-muni",
+          "x-on",
+          "x-ref",
+          "x-show",
+          "x-text"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-danger-fg",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-text"
+      ],
+      "example": "<x-muni::date-input label=\"Fecha\" />"
+    },
+    {
       "name": "drawer",
       "tag": "<x-muni::drawer>",
       "type": "registry:blade-component",
@@ -1053,6 +1325,10 @@
         {
           "name": "default",
           "description": "Contenido principal"
+        },
+        {
+          "name": "trigger",
+          "description": "Slot con nombre opcional"
         }
       ],
       "alpine": {
@@ -1198,6 +1474,76 @@
         "--muni-text"
       ],
       "example": "<x-muni::error-page theme=\"dark\" code=\"404\" />"
+    },
+    {
+      "name": "error-summary",
+      "tag": "<x-muni::error-summary>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/error-summary.blade.php",
+      "description": "El resumen que aparece tras un envío fallido:",
+      "props": [
+        {
+          "name": "errors",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "title",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "prefix",
+          "type": "string",
+          "default": "muni-",
+          "required": false
+        },
+        {
+          "name": "ids",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "level",
+          "type": "int",
+          "default": "2",
+          "required": false
+        },
+        {
+          "name": "focus",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-init",
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-danger-bg",
+        "--muni-danger-border",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-radius",
+        "--muni-radius-sm",
+        "--muni-text"
+      ],
+      "example": "<x-muni::error-summary />"
     },
     {
       "name": "field",
@@ -1544,7 +1890,7 @@
       "tag": "<x-muni::input>",
       "type": "registry:blade-component",
       "file": "resources/views/components/input.blade.php",
-      "description": "Componente input del sistema de diseño municipal",
+      "description": "La ayuda y el error CONVIVEN, cada uno con su id:",
       "props": [
         {
           "name": "label",
@@ -1598,6 +1944,7 @@
       "tokens": [
         "--muni-accent",
         "--muni-border",
+        "--muni-danger-bg",
         "--muni-danger-border",
         "--muni-danger-fg",
         "--muni-dur",
@@ -2171,6 +2518,74 @@
       "example": "<x-muni::ring />"
     },
     {
+      "name": "rut-input",
+      "tag": "<x-muni::rut-input>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/rut-input.blade.php",
+      "description": "El veredicto del dígito verificador",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "default": "RUT",
+          "required": false
+        },
+        {
+          "name": "name",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "value",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "error",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "hint",
+          "type": "string",
+          "default": "Formato 12.345.678-9. El dígito verificador puede ser la letra K.",
+          "required": false
+        },
+        {
+          "name": "required",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-bind",
+          "x-data",
+          "x-model",
+          "x-muni",
+          "x-on",
+          "x-ref",
+          "x-show",
+          "x-text"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-border",
+        "--muni-danger-border",
+        "--muni-danger-fg",
+        "--muni-font-mono",
+        "--muni-font-sans"
+      ],
+      "example": "<x-muni::rut-input label=\"RUT\" />"
+    },
+    {
       "name": "segmented",
       "tag": "<x-muni::segmented>",
       "type": "registry:blade-component",
@@ -2235,7 +2650,7 @@
       "tag": "<x-muni::select>",
       "type": "registry:blade-component",
       "file": "resources/views/components/select.blade.php",
-      "description": "Componente select del sistema de diseño municipal",
+      "description": "La ayuda y el error CONVIVEN, cada uno con su id, y los dos van encadenados en aria-describedby",
       "props": [
         {
           "name": "label",
@@ -2300,6 +2715,7 @@
       "tokens": [
         "--muni-accent",
         "--muni-border",
+        "--muni-danger-bg",
         "--muni-danger-border",
         "--muni-danger-fg",
         "--muni-dur",
@@ -2633,7 +3049,7 @@
       "tag": "<x-muni::switch>",
       "type": "registry:blade-component",
       "file": "resources/views/components/switch.blade.php",
-      "description": "Componente switch del sistema de diseño municipal",
+      "description": "El mensaje va FUERA del <label>:",
       "props": [
         {
           "name": "label",
@@ -2658,6 +3074,12 @@
           "type": "mixed",
           "default": "null",
           "required": false
+        },
+        {
+          "name": "error",
+          "type": "mixed",
+          "default": "null",
+          "required": false
         }
       ],
       "slots": [],
@@ -2672,11 +3094,14 @@
       "tokens": [
         "--muni-accent",
         "--muni-border",
+        "--muni-danger-bg",
+        "--muni-danger-fg",
         "--muni-dur",
         "--muni-ease",
         "--muni-focus",
         "--muni-font-sans",
         "--muni-muted",
+        "--muni-radius-sm",
         "--muni-ring",
         "--muni-surface",
         "--muni-surface-3",
@@ -2783,6 +3208,94 @@
         "--muni-text"
       ],
       "example": "<x-muni::tabs></x-muni::tabs>"
+    },
+    {
+      "name": "textarea",
+      "tag": "<x-muni::textarea>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/textarea.blade.php",
+      "description": "El crecimiento con el contenido es MEJORA, no requisito:",
+      "props": [
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "name",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "error",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "hint",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "required",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "rows",
+          "type": "int",
+          "default": "4",
+          "required": false
+        },
+        {
+          "name": "maxlength",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-init",
+          "x-on",
+          "x-ref",
+          "x-text"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-danger-bg",
+        "--muni-danger-border",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-hint",
+        "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::textarea></x-muni::textarea>"
     },
     {
       "name": "timeline",

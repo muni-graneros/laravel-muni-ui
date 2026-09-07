@@ -25,6 +25,11 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 - `<x-muni::skip-link>`: enlace de salto al contenido, cableado en los tres armazones.
 - `DESIGN.md`, `SKILL.md` y `registry.json`: el contrato de diseño en prosa, la guía para construir
   una pantalla, y el catálogo legible por máquina de los 54 componentes.
+- Seis componentes de formulario: `<x-muni::textarea>`, `<x-muni::checkbox>`,
+  `<x-muni::rut-input>`, `<x-muni::date-input>`, `<x-muni::error-summary>` y
+  `<x-muni::announcer>`.
+- Una vitrina que renderiza los componentes REALES en los dos temas, generada desde una
+  prueba, para que `npm run a11y` deje de medir las demos escritas a mano.
 - Props nuevas, todas aditivas: `tabs` gana `id`, `label` y `activation`; `sortable-table` gana
   `caption`; `segmented` gana `label`; `file-dropzone` gana `maxMb`.
 
@@ -38,6 +43,13 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
   deja cualquier `aria-labelledby` externo apuntando al vacío.
 - El mensaje de error de `file-dropzone` medía 4,17:1 en modo oscuro sobre la superficie del
   anfitrión; ahora lleva fondo propio y no depende de dónde se ponga.
+- **`--muni-hint` no llegaba a 4,5:1 en modo claro**: 4,16:1 sobre `--muni-surface-3` y 4,47:1
+  sobre `--muni-bg`, que son las superficies donde vive el texto de ayuda de un campo. Pasa de
+  `#6b7280` a `#656c79`. La prueba que ya existía cubría ese mismo token **solo en oscuro**.
+- El mismo fondo propio se extendió al mensaje de error de `input`, `select` y `switch`.
+- `dropdown` lanzaba `Undefined variable $trigger` si se usaba sin ese slot.
+- Cayó el último `uniqid()` del paquete: los siete componentes que generaban ids así ahora los
+  derivan del `name`.
 
 ### Hay que republicar
 Nada. Los cambios son de componentes Blade, que viajan en el paquete. No cambió

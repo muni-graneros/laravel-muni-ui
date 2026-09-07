@@ -148,7 +148,28 @@ descarta. Nadie lo vio hasta que alguien escribió a mano un gráfico de barras 
 La regla, entonces: **lo que un componente necesita para verse bien viaja con el componente**, en su
 `@once`. Los tokens sí van al CSS, porque el tema del panel los puentea a propósito.
 
-## 8. La firma del sistema
+## 8. Cuatro trampas de Blade que ya se pisaron
+
+Las cuatro fallan **en silencio**: no lanzan excepción, no aparecen en consola, y lo que se ve es
+casi lo que se esperaba.
+
+- **El derrame de atributos solo se compila si la expresión empieza literalmente por
+  `$attributes`.** `{{ $miBolsa }}` sobre una etiqueta de componente deja la etiqueta sin compilar
+  y la imprime como texto en la página. No hay error: hay un `<x-muni::input …/>` literal en el
+  HTML.
+- **`@js(...)` no se compila dentro de la etiqueta de un componente**, aunque sí en HTML plano. Y un
+  `@js` escrito en un comentario fuera de un bloque `@php` revienta con
+  `compileJs(): Argument #1 must be of type string, null given`.
+- **`:atributo="null"` sobre un componente hijo no desaparece: gana.** Pisa el valor que el hijo
+  calcula por su cuenta, así que un `:aria-invalid="null"` apaga el `aria-invalid` que el hijo
+  emitía por el error del servidor. Los atributos condicionales van por `->merge()`, nunca escritos
+  a mano antes del derrame.
+- **`$attributes->merge()` reemplaza, no concatena**, salvo en `class` y `style`. Para encadenar un
+  `aria-describedby` del consumidor hay que leerlo con `->get()`, unirlo a mano y sacarlo de la
+  bolsa con `->except()` antes de fusionar. Sin el `except`, el valor de la bolsa gana y los ids
+  que puso el componente se pierden.
+
+## 9. La firma del sistema
 
 Tres cosas hacen que una pantalla se reconozca como de este ecosistema y no como un panel genérico:
 

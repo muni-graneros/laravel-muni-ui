@@ -9,8 +9,8 @@ fichas**: 16 reparaciones de lo que ya existe, 27 componentes nuevos y 12 compos
 pantalla.
 
 **Este documento se poda a medida que se cierra trabajo.** Las seis fichas de la primera tanda ya
-salieron del cuerpo, y las tres primeras de la segunda también. Están resumidas en la sección 0
-con su commit. **Quedan 44 pendientes.** Si una ficha sigue acá, sigue sin hacerse.
+salieron del cuerpo, y las siete de la segunda también. Están resumidas en la sección 0 con su
+commit. **Quedan 42 pendientes.** Si una ficha sigue acá, sigue sin hacerse.
 
 ## Antes de leer: dos advertencias sobre este documento
 
@@ -44,6 +44,8 @@ acá con su commit para no volver a proponerlas y para poder auditar qué cerró
 | `error-summary` (era `resumen-errores`) | `12d9359` | Resumen tras un envío fallido: recuento en texto, cada error enlazado a su campo, y recibe el foco. |
 | `textarea` (era `area-texto`) | `87deb6b` | Campo largo con contador en texto, error atado y anunciado, y crecimiento como mejora sobre el rows. |
 | `checkbox` (era `casilla`) | `87deb6b` | Casilla nativa, nunca premarcada, con descripción atada y blanco de pulsación de 24 px. |
+| `rut-input` (era `campo-rut`) | `370b625` | Formatea mientras se escribe y valida el dígito verificador con módulo 11; el error se dice en texto. |
+| `date-input` (era `campo-fecha`) | `370b625` | Control de fecha nativo, con la ayuda en formato chileno y el rango desde/hasta coherente. |
 
 Todas llevan prueba que falla si el defecto vuelve, y la suite pasó de 48 a 100 pruebas.
 
@@ -248,8 +250,6 @@ ecosistema ya tiene nueve.
 |---|---|---|---|---|
 | `alert` | 2 | Separar tres cosas que hoy son una sola: la nota fija de instrucciones del trámite, el mensaje… | La franja «Sistema en mantención el sábado 12» del panel de licencias; la nota de requisitos d… | bajo |
 | `cabecera-tabla` | 2 | La franja entre el titulo y la tabla: titulo, contador de resultados, buscador, filtros rapido… | La bandeja de Atencion al Vecino: «Solicitudes (387)», pestanas ingresada / en revision / resu… | medio |
-| `campo-fecha` | 2 | Capturar una fecha, o un desde–hasta coherente, con etiqueta, error y validación de orden. | El desde–hasta de «Reporte de operación» y «Reporte de tendencias» en seguridad ciudadana y de… | bajo |
-| `campo-rut` | 2 | Escribir un RUT con el formato chileno y saber en el acto si el dígito verificador cuadra. | El ingreso de sesión del vecino en Atención al Vecino, donde el RUT ES el nombre de usuario, y… | bajo |
 | `cargando` | 2 | Decir que algo está en curso, en texto y no solo en movimiento, y decir cuándo terminó. | La búsqueda por RUT contra el maestro de personas en el mesón (tarda alrededor de un segundo);… | bajo |
 | `combobox` | 2 | Buscar y elegir un registro dentro de una lista larga escribiendo, en vez de desplegar mil opc… | El buscador de titular en la recepción de solicitudes ARCOP —el campo que hoy tapa el parche d… | alto |
 | `empty-state` | 2 | Distinguir «no hay datos» de «el filtro no encontro nada», que son dos problemas con dos salid… | El buscador de titular en la recepcion ARCOP: «no hay solicitudes ARCOP» es una cosa y «no hay… | bajo |
@@ -304,42 +304,6 @@ ecosistema ya tiene nueve.
 > **Objeción del juez.** Es un paquete de cinco cosas independientes (título, contador, buscador, facetas, modo lote) pegadas, y un componente Blade anónimo es justo lo peor para eso: no puede tener estado propio, así que el host termina pasándole por prop el contador, el término buscado, los filtros activos Y el número de seleccionados. Descontado eso, lo único que el componente realmente aporta sobre componer `page-header` + `filter-bar` + `segmented` que ya existen es el CSS de la franja, más unas 20 líneas de valor genuino: el contador en `role="status"` y los chips de «filtros aplicados / limpiar». Hay además un choque de HTML que el candidato no vio: `filter-bar` es un `<form method=get>` y «Derivar seleccionadas» es POST — no se pueden anidar formularios, así que el modo lote no cabe dentro de la franja de filtros sin usar el atributo `form=` apuntando a un `<form>` hermano. Y contra el «por_que_falta»: lo de los dos `<h1>` es humo, nadie pone dos `page-header` en una página.
 >
 > **Corrección exigida.** 1) Fuera `role="toolbar"` y el tabindex móvil, sin condiciones. Una franja que contiene un campo de texto NO puede ser toolbar: dentro de un input las flechas, Home y End le pertenecen al cursor de texto, y APG lo advierte explícitamente. Orden de Tab nativo y `<button>` reales. Esto elimina de golpe el mayor riesgo de accesibilidad y la mitad del esfuerzo. 2) El componente NO es dueño de la selección de filas. Recibe `:seleccionados="$n"` y pinta el modo lote; el checkbox por fila, el «seleccionar todo» y el estado indeterminado son trabajo de `data-table` o del componente Livewire del host. Si intenta sincronizar estado con filas que no renderiza, se rompe en cada re-render de Livewire. 3) El componente no emite ningún encabezado: el título se queda en `page-header`. Así el problema de los dos `<h1>` desaparece sin tocar nada. 4) Prerrequisito bloqueante: arreglar `segmented.blade.php:24`, que lleva `onchange="this.form && this.form.submit()"` — un handler inline que un CSP con nonce no habilita, porque el nonce no cubre handlers inline. Si no se arregla primero, la franja nueva hereda un filtro que bajo CSP estricta no aplica nada. 5) El esfuerzo declarado «medio» es deshonesto tal como está el alcance (facetas con contador por opción + chips + lote + roving tabindex es alto); con los recortes 1 y 2, «medio» pasa a ser verdad. 6) Renombrar a `table-toolbar`: los 53 componentes del paquete usan nombres en inglés salvo la familia `gob-*`, y `cabecera-tabla` sería el único genérico en español.
-
-### `campo-fecha`
-
-**componente nuevo** · prioridad 2 · esfuerzo bajo
-
-**Qué resuelve.** Capturar una fecha, o un desde–hasta coherente, con etiqueta, error y validación de orden.
-**Qué pasa hoy sin él.** Hoy hay una veintena de <input type="date"> sueltos repartidos por los sistemas (reporte-operacion y reporte-tendencias en seguridad, reportes-tramites en licencias, la agenda y el historial de discapacidad, el wizard de licencias, la auditoría de Atención al Vecino) y buena parte son pares desde/hasta sin etiqueta común, sin agrupación y sin nada que impida poner el «hasta» antes del «desde»: el reporte sale vacío y nadie sabe por qué.
-**Lo más parecido que ya existe.** calendar es una rejilla de mes suelta, sin campo de texto, sin max y sin modo rango; input acepta type="date" pero no ata el error ni agrupa los dos extremos.
-**Referencia que lo hace mejor.** Flowbite Svelte, «selector de hora» — themesberg_flowbite-svelte/src/lib/forms/timepicker/Timepicker.svelte — Lo que se toma de ahí es la DECISIÓN, no el dibujo: es la única pieza del catálogo que resuelve un campo temporal apoyándose en el control nativo del navegador en vez de reinventarlo, y su ficha dice exactamente lo que aquí importa: «la composición de rango sí necesita asociar ambos campos y validar el orden». Ese es el trabajo real. El teclado, el calendario del sistema y el formato local los pone el navegador gratis —incluido dd-mm-aaaa con la configuración regional chilena— y funciona en la tablet de terreno sin una línea de JS.
-**Patrón.** ninguno: son controles nativos dentro de un fieldset con legend cuando es rango
-**Teclas obligatorias.** Tab entre día, mes y año dentro del control nativo; Flechas arriba/abajo para incrementar cada segmento; Escritura directa de dígitos; Espacio/Enter en el botón de calendario del navegador; Ningún atajo propio: no interceptar teclas del control nativo
-**Alpine.** core
-**Riesgo.** El formato mostrado lo decide la configuración regional del equipo, no el sitio: un puesto del municipio en inglés muestra mm/dd/aaaa. Hay que dejarlo dicho en la ayuda con un ejemplo real («31-12-2026») y validar siempre en el servidor. El min/max nativo no impide teclear una fecha fuera de rango en todos los navegadores. El mensaje de «el hasta es anterior al desde» va en región viva y no debe aparecer mientras el usuario está a mitad de escribir el año.
-**Dónde se usa.** El desde–hasta de «Reporte de operación» y «Reporte de tendencias» en seguridad ciudadana y de «Reportes de trámites» en licencias; y la fecha de vencimiento de la licencia clase B en la ficha del conductor.
-
-> **Objeción del juez.** Los 9 pares viven dentro de páginas Filament, y Filament ya trae `DatePicker` con validación y asociación de error: sumar un componente muni-ui deja TRES maneras de construir un filtro de fechas en el mismo código base (formulario de Filament, `<x-muni::input>`, el nuevo rango), que es exactamente la dispersión que el candidato dice venir a cerrar. Y el componente no arregla nada por existir: el fallo real de seguridad ciudadana son dos líneas por archivo con la herramienta que ya está en el paquete, así que si nadie migra las pantallas quedan igual de rotas con el componente escrito. Segunda objeción menor: la «mejor referencia» (Timepicker de Flowbite Svelte) no aporta nada — la decisión de apoyarse en el control nativo ya es la práctica del paquete en licencias, no hace falta un catálogo Svelte para justificarla.
->
-> **Corrección exigida.** 1) Renombrar y reencuadrar a `rango-fechas`: SOLO el par desde/hasta. La fecha simple no se construye, se documenta que es `<x-muni::input type="date" min max>`, tal como ya lo hace licencias. 2) Prerrequisito, no opcional: arreglar `input.blade.php` para que el error y el hint lleven `id` y el input un `aria-describedby` — hoy pone `aria-invalid="true"` y nunca nombra el mensaje, y no hay UN solo `aria-describedby`, `role="alert"`, `fieldset` ni `legend` en todo el paquete; si no, `rango-fechas` sería la única pieza que ata el error y el resto queda a medias. 3) API con props explícitas `wire-desde` / `wire-hasta` (y el modificador), porque un solo attribute bag no puede repartir dos `wire:model` entre dos inputs; más `min`/`max` por extremo. 4) `fieldset` + `legend` con el nombre del periodo («Periodo del reporte»), el mensaje de orden en `aria-live="polite"` con debounce para que no salte a mitad del año, y ayuda con el ejemplo «31-12-2026» por el formato regional. 5) Absorber o descartar explícitamente los atajos Hoy/Semana/Mes que control-acceso-graneros ya tiene a mano en `reportes.blade.php` — decidirlo, no olvidarlo. 6) Esfuerzo: bajo→medio, no bajo. 7) Dejar escrito en la ficha que el componente NO valida: la regla `after_or_equal:desde` en el servidor es obligatoria, y de paso hay que blindar `Carbon::parse` en ReporteOperacion.php:118, que hoy revienta con una cadena mal formada. 8) Descartar `calendar` como alternativa y anotar su defecto: `disabled(d)` muta `min` con `setHours` y la rejilla no navega con flechas.
-
-### `campo-rut`
-
-**componente nuevo** · prioridad 2 · esfuerzo bajo
-
-**Qué resuelve.** Escribir un RUT con el formato chileno y saber en el acto si el dígito verificador cuadra.
-**Qué pasa hoy sin él.** Hoy es <input type="text" placeholder="12.345.678-9"> copiado a mano en al menos ocho vistas solo de Atención al Vecino (login, solicitar clave, restablecer clave, alta y edición de cuenta, alta de requerimiento público e interno), y en varias la etiqueta no tiene for y el input no tiene id. Sin inputmode, sin formateo y sin comprobación del DV hasta que vuelve el servidor: el vecino escribe «12345678-9», «12.345.678-9» o «123456789» y el sistema decide después. No hay ni un x-mask en todo el ecosistema, y el plugin Mask de Alpine no viaja en el bundle de Livewire: esto hay que resolverlo en core.
-**Lo más parecido que ya existe.** input sirve de base (etiqueta, error, hint, icono) pero no formatea, no valida y no separa el valor mostrado del valor enviado. .muni-num existe pero es para MOSTRAR un RUT en una tabla, no para capturarlo.
-**Referencia que lo hace mejor.** Sneat, «Formularios de alta y edición» — refs/themeselection_sneat-bootstrap-html-laravel-admin-template-free/resources/views/content/form-layout/form-layouts-vertical.blade.php (el bloque de campo con máscara de teléfono y con prefijo/sufijo fijo) — Es la única de las nueve familias que muestra el caso en Blade y no en JSX, y su propia ficha ya identifica el uso chileno: prefijo o sufijo fijo para el guión del RUT y para la unidad tributaria. No es un ejemplo a copiar en accesibilidad —le faltan los mensajes de error por campo y los obligatorios marcados en texto, y su ficha lo dice— pero la topología es la nuestra.
-**Patrón.** ninguno: es un <input type=text> con su etiqueta y su descripción
-**Teclas obligatorias.** Tab para entrar y salir; Escritura, Retroceso y Suprimir sin que la máscara pelee: borrar un carácter borra un carácter; Ctrl/Cmd+V pegando un RUT con o sin puntos y que se normalice; Ctrl/Cmd+A y Ctrl/Cmd+C sobre el valor completo
-**Alpine.** core
-**Riesgo.** Las máscaras son el caso clásico donde se rompe la edición: hay que formatear en blur y al pegar, NUNCA reescribir el valor en cada keydown, porque mueve el punto de inserción y hace que el lector de pantalla relea el campo entero. El valor enviado debe ser el normalizado, en un campo aparte del formateado. El error de DV se anuncia en blur, no mientras se escribe, y no impide seguir escribiendo. Sin Alpine (portal público con el JS caído) el campo tiene que seguir aceptando el RUT y que valide el servidor.
-**Dónde se usa.** El ingreso de sesión del vecino en Atención al Vecino, donde el RUT ES el nombre de usuario, y la búsqueda del titular por RUT en la recepción ARCOP.
-
-> **Objeción del juez.** atencionvecino NO depende de laravel-muni-ui: su `composer.json` solo trae `laravel-arcop-panel` y `laravel-muni-shared`. Crear el componente no arregla ni una vista hasta que se instale el paquete y se reescriban 7 formularios que hoy son Tailwind crudo con Bootstrap Icons; el trabajo caro está en el consumidor, no en el paquete, y el candidato lo cuenta como si el componente fuera el entregable completo. Y la mitad del uso declarado no resiste: el login por RUT es de funcionarios (`<title>Ingreso de Funcionarios</title>`, «Acceso de Funcionarios»), no del vecino, y la recepción ARCOP vive en `src/Filament/Privacidad/SolicitudResource.php`, un Resource de Filament que no consume un componente Blade anónimo sin envolverlo antes en un custom field —trabajo que el candidato no contabiliza y donde además no encontré ningún buscador por RUT hoy.
->
-> **Corrección exigida.** 1) Nombre: `rut-input`, hermano de `otp-input` y `file-dropzone` (el catálogo entero está en inglés; `campo-rut` mezcla idiomas). 2) Que componga `<x-muni::input>` en vez de duplicarlo: hereda label/for, error, hint e icono, y el componente solo aporta máscara y DV. 3) Paso 0 sin código, esta semana: adoptar `<x-muni::input inputmode="numeric" autocomplete="username">` y ponerle `for`/`id` a los 4 formularios que hoy no los tienen —eso cierra la brecha legal sin esperar el componente. 4) El DV puede ser **K**: `inputmode="numeric"` en iOS deja al vecino sin poder escribirla. Usar `inputmode="text"` (o numérico solo hasta el cuerpo), aceptar `k` minúscula y normalizarla; el `teclado_minimo` declarado no cubre este caso y debe hacerlo. 5) Portar `RutHelper::format()` tal cual y documentar que el cliente solo ADELANTA el veredicto: manda `RutValido` en el servidor, y si divergen gana PHP. 6) Definir el binding antes de codear: un solo `name`, valor normalizado en el input oculto, `wire:model` sobre ese oculto, con prueba real en Livewire 3 y en Livewire 4 —`x-model` de Alpine peleando con `wire:model` es el bug clásico de este patrón y no está en el análisis de riesgo. 7) Esfuerzo: bajo → **medio**. El módulo 11 son diez líneas; lo que cuesta es el doble valor, la degradación sin Alpine y las 4 capturas en claro/oscuro y escritorio/móvil.
 
 ### `cargando`
 
@@ -910,8 +874,8 @@ Todo esto comparte una sola pieza: atar el error al campo y anunciarlo cuando ll
 - ~~`anuncios`~~ — hecho en `12d9359`
 - ~~`area-texto`~~ — hecho en `87deb6b`
 - ~~`casilla`~~ — hecho en `87deb6b`
-- `campo-rut`
-- `campo-fecha`
+- ~~`campo-rut`~~ — hecho en `370b625`
+- ~~`campo-fecha`~~ — hecho en `370b625`
 
 ### Tanda 3 — la tabla, que es la pantalla más usada del ecosistema
 

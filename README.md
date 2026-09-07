@@ -209,6 +209,12 @@ quedaban sin valor.
 | `<x-muni::input>` | `label`, `name`, `type`, `error`, `hint`, `icon`, `required` |
 | `<x-muni::select>` | `label`, `name`, `options`, `selected`, `placeholder`, `error` |
 | `<x-muni::switch>` | `label`, `name`, `checked`, `description` (Alpine) |
+| `<x-muni::textarea>` | `label`, `name`, `error`, `hint`, `required`, `rows`, `maxlength` — contador en texto |
+| `<x-muni::checkbox>` | `label`, `name`, `checked`, `description`, `error`, `required`, `value` — nunca premarcada |
+| `<x-muni::rut-input>` | props de `input` — formatea 12.345.678-9 y valida el dígito verificador |
+| `<x-muni::date-input>` | props de `input`, más `min`/`max` — control nativo, ayuda en dd-mm-aaaa |
+| `<x-muni::error-summary>` | `errors` — resumen tras un envío fallido; recibe el foco y enlaza cada campo |
+| `<x-muni::announcer>` | — región viva compartida; va una vez por página, en el armazón |
 | `<x-muni::sidebar>` | `width`; slot con `<x-muni::nav-section>` + `<x-muni::nav-item>` (colapsa en móvil) |
 | `<x-muni::nav-item>` | `href`, `icon`, `active`, `badge` |
 | `<x-muni::nav-section>` | `title` |

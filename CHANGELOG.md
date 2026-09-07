@@ -30,6 +30,11 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
   `<x-muni::announcer>`.
 - Una vitrina que renderiza los componentes REALES en los dos temas, generada desde una
   prueba, para que `npm run a11y` deje de medir las demos escritas a mano.
+- `<x-muni::table-header>`: la franja entre el título y la tabla, con contador que distingue el
+  filtrado del total.
+- `sortable-table` gana selección en lote (`selectable`, `rowKey`, `selectionScope`,
+  `selectionTotal`, `selectionName`) y orden declarado por columna (`'sort'`).
+- `data-table` gana cabecera y primera columna fijas, alto máximo y densidad, todo opt-in.
 - Props nuevas, todas aditivas: `tabs` gana `id`, `label` y `activation`; `sortable-table` gana
   `caption`; `segmented` gana `label`; `file-dropzone` gana `maxMb`.
 
@@ -50,6 +55,14 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 - `dropdown` lanzaba `Undefined variable $trigger` si se usaba sin ese slot.
 - Cayó el último `uniqid()` del paquete: los siete componentes que generaban ids así ahora los
   derivan del `name`.
+- **El orden numérico de `sortable-table` estaba mal con formato chileno**: `1.240.000` se
+  convertía en `1,24`, así que el padrón de patentes morosas se ordenaba al revés.
+- **La región desplazable de `data-table` no se alcanzaba con teclado** y sus celdas no declaraban
+  a qué encabezado pertenecían.
+- **En `pagination` los extremos inertes seguían siendo enlaces activables**, el apagado se dibujaba
+  con opacidad —que arrastra el contraste— y la página actual solo se marcaba con color.
+- Las demos mostraban el ámbar de aviso corregido en agosto con su valor viejo (3,11:1), el gris de
+  ayuda a 3,19:1 y 2,59:1, y ninguna declaraba `<html lang>`.
 - **El borde de los controles de formulario fallaba 1.4.11 en los dos temas**: 1,28:1 y 1,61:1 en
   claro, 1,43:1 y 1,90:1 en oscuro, contra el 3:1 que exige la norma para identificar un
   componente. En un campo el borde es lo único que dice dónde empieza. Token nuevo
@@ -61,10 +74,8 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 `MuniPanel` tiene que correr `vendor:publish --tag=muni-ui-filament --force` o el borde de sus
 campos se quedará sin color dentro del panel, sin ningún error visible.
 
-Antes de eso era:
-Nada. Los cambios son de componentes Blade, que viajan en el paquete. No cambió
-`muni-ui-filament.css` ni los scripts del panel, así que **no hace falta**
-`vendor:publish --tag=muni-ui-filament --force` para esta tanda.
+El resto de los cambios son componentes Blade, que viajan dentro del paquete y no necesitan
+republicación.
 
 ## [0.17.1] — 2026-09-05
 

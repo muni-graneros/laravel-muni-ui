@@ -215,6 +215,7 @@ quedaban sin valor.
 | `<x-muni::date-input>` | props de `input`, más `min`/`max` — control nativo, ayuda en dd-mm-aaaa |
 | `<x-muni::error-summary>` | `errors` — resumen tras un envío fallido; recibe el foco y enlaza cada campo |
 | `<x-muni::announcer>` | — región viva compartida; va una vez por página, en el armazón |
+| `<x-muni::table-header>` | `title`, `count`, `total`; ranuras `search`, `filters`, `actions` — la franja sobre la tabla |
 | `<x-muni::sidebar>` | `width`; slot con `<x-muni::nav-section>` + `<x-muni::nav-item>` (colapsa en móvil) |
 | `<x-muni::nav-item>` | `href`, `icon`, `active`, `badge` |
 | `<x-muni::nav-section>` | `title` |

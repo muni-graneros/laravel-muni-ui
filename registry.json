@@ -993,12 +993,26 @@
           "type": "string",
           "default": "Sin resultados para este filtro.",
           "required": false
+        },
+        {
+          "name": "stickyColumn",
+          "type": "bool",
+          "default": "false",
+          "required": false
         }
       ],
       "slots": [
         {
           "name": "default",
           "description": "Contenido principal"
+        },
+        {
+          "name": "caption",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "label",
+          "description": "Slot con nombre opcional"
         }
       ],
       "alpine": {
@@ -1007,15 +1021,18 @@
         "plugins": []
       },
       "tokens": [
+        "--muni-accent",
         "--muni-border",
         "--muni-danger-fg",
+        "--muni-focus",
         "--muni-font-mono",
         "--muni-font-sans",
         "--muni-muted",
         "--muni-radius",
         "--muni-surface",
         "--muni-surface-2",
-        "--muni-text"
+        "--muni-text",
+        "--muni-topbar-h"
       ],
       "example": "<x-muni::data-table empty=\"Sin resultados para este filtro.\"></x-muni::data-table>"
     },
@@ -1358,12 +1375,12 @@
       "tag": "<x-muni::empty-state>",
       "type": "registry:blade-component",
       "file": "resources/views/components/empty-state.blade.php",
-      "description": "Componente empty-state del sistema de diseño municipal",
+      "description": "Dos vacíos que para el funcionario son opuestos:",
       "props": [
         {
           "name": "title",
-          "type": "string",
-          "default": "Sin resultados",
+          "type": "mixed",
+          "default": "null",
           "required": false
         },
         {
@@ -1377,31 +1394,82 @@
           "type": "mixed",
           "default": "null",
           "required": false
+        },
+        {
+          "name": "mode",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "filter",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "actionHref",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "actionLabel",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "announce",
+          "type": "bool",
+          "default": "false",
+          "required": false
         }
       ],
       "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
         {
           "name": "actions",
           "description": "Slot con nombre opcional"
         },
         {
+          "name": "actionLabel",
+          "description": "Slot con nombre opcional"
+        },
+        {
           "name": "icon",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "title",
           "description": "Slot con nombre opcional"
         }
       ],
       "alpine": {
-        "required": false,
-        "directives": [],
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
         "plugins": []
       },
       "tokens": [
+        "--muni-accent",
         "--muni-border",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-field-border",
+        "--muni-focus",
         "--muni-font-sans",
         "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-surface",
         "--muni-surface-2",
         "--muni-text"
       ],
-      "example": "<x-muni::empty-state title=\"Sin resultados\" />"
+      "example": "<x-muni::empty-state></x-muni::empty-state>"
     },
     {
       "name": "error-page",
@@ -2271,7 +2339,7 @@
       "tag": "<x-muni::pagination>",
       "type": "registry:blade-component",
       "file": "resources/views/components/pagination.blade.php",
-      "description": "Componente pagination del sistema de diseño municipal",
+      "description": "Un extremo inerte NO es un enlace",
       "props": [
         {
           "name": "current",
@@ -2284,24 +2352,14 @@
           "type": "int",
           "default": "1",
           "required": false
-        },
-        {
-          "name": "url",
-          "type": "mixed",
-          "default": "null",
-          "required": false
-        },
-        {
-          "name": "info",
-          "type": "mixed",
-          "default": "null",
-          "required": false
         }
       ],
       "slots": [],
       "alpine": {
-        "required": false,
-        "directives": [],
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
         "plugins": []
       },
       "tokens": [
@@ -2853,7 +2911,7 @@
       "tag": "<x-muni::sortable-table>",
       "type": "registry:blade-component",
       "file": "resources/views/components/sortable-table.blade.php",
-      "description": "El placeholder no es nombre accesible:",
+      "description": "Acotado al contenedor y NUNCA en `.window`:",
       "props": [
         {
           "name": "columns",
@@ -2884,21 +2942,38 @@
           "type": "mixed",
           "default": "null",
           "required": false
+        },
+        {
+          "name": "selectionTotal",
+          "type": "mixed",
+          "default": "null",
+          "required": false
         }
       ],
       "slots": [
         {
+          "name": "bulk",
+          "description": "Slot con nombre opcional"
+        },
+        {
           "name": "caption",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "rowKey",
           "description": "Slot con nombre opcional"
         }
       ],
       "alpine": {
         "required": true,
         "directives": [
+          "x-cloak",
           "x-data",
+          "x-effect",
           "x-for",
           "x-if",
           "x-model",
+          "x-show",
           "x-text"
         ],
         "plugins": []
@@ -2909,6 +2984,7 @@
         "--muni-danger-fg",
         "--muni-dur",
         "--muni-ease",
+        "--muni-field-border",
         "--muni-focus",
         "--muni-font-mono",
         "--muni-font-sans",
@@ -2918,6 +2994,7 @@
         "--muni-ring",
         "--muni-surface",
         "--muni-surface-2",
+        "--muni-surface-3",
         "--muni-text"
       ],
       "example": "<x-muni::sortable-table />"
@@ -3142,6 +3219,87 @@
       },
       "tokens": [],
       "example": "<x-muni::tab-panel :index=\"$index\"></x-muni::tab-panel>"
+    },
+    {
+      "name": "table-header",
+      "tag": "<x-muni::table-header>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/table-header.blade.php",
+      "description": "La franja entre el <h1> de la pantalla y la tabla:",
+      "props": [
+        {
+          "name": "title",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "level",
+          "type": "int",
+          "default": "2",
+          "required": false
+        },
+        {
+          "name": "total",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "filtered",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "unit",
+          "type": "string",
+          "default": "resultados",
+          "required": false
+        },
+        {
+          "name": "countLabel",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "actions",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "filters",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "search",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "totalCount",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-border",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-text"
+      ],
+      "example": "<x-muni::table-header></x-muni::table-header>"
     },
     {
       "name": "tabs",

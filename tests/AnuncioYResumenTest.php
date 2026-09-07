@@ -340,24 +340,55 @@ it('cada error es un enlace al id que arma input a partir del name', function ()
 });
 
 it('el foco se resuelve con getElementById, jamás con querySelector', function () {
-    // Las claves anidadas de Laravel (`direccion.calle`) producen ids válidos
-    // pero selectores CSS ROTOS: `#direccion.calle` es «id direccion con clase
-    // calle» y no encuentra nada. Se mira el HTML renderizado y no la fuente,
-    // que menciona `querySelector` en un comentario justamente para prohibirlo.
+    // Un id con punto o corchete es un id VÁLIDO pero un selector CSS ROTO:
+    // `#muni-direccion.calle` es «id direccion con clase calle» y no encuentra
+    // nada. Se mira el HTML renderizado y no la fuente, que menciona
+    // `querySelector` en un comentario justamente para prohibirlo.
     $html = Blade::render('<x-muni::error-summary :errors="$e" />', [
-        'e' => new MessageBag(['direccion.calle' => ['La calle es obligatoria.']]),
+        'e' => new MessageBag(['rut' => ['El RUT es obligatorio.']]),
     ]);
 
     expect(str_contains($html, 'getElementById'))->toBeTrue(
         'El resumen no resuelve el destino con `document.getElementById`.'
     );
     expect(str_contains($html, 'querySelector'))->toBeFalse(
-        'El resumen usa `querySelector`: con una clave anidada como `direccion.calle` el '.
-        'selector `#muni-direccion.calle` no encuentra el campo y el enlace no hace nada.'
+        'El resumen usa `querySelector`: un id con punto no se puede buscar con un '.
+        'selector CSS y el enlace no haría nada.'
+    );
+});
+
+it('una clave anidada se lista sin enlace mientras nadie declare su id', function () {
+    /*
+     * `name="direccion[calle]"` valida como `direccion.calle`, y el id que le pone
+     * `input.blade.php` lleva un trozo de `sha1('direccion[calle]')` que NO se puede
+     * reconstruir desde la clave de la bolsa. Un enlace a un id inventado es peor que
+     * ninguno: promete llegar al campo, no llega, y el usuario de teclado se queda con
+     * una parada muerta.
+     */
+    $bag = new MessageBag(['direccion.calle' => ['La calle es obligatoria.']]);
+
+    $html = Blade::render('<x-muni::error-summary :errors="$e" />', ['e' => $bag]);
+
+    expect((bool) preg_match('/<a\b/', $html))->toBeFalse(
+        'El resumen inventa un enlace para `direccion.calle`: ese id no existe en la '.
+        'página, así que el enlace no lleva a ninguna parte.'
+    );
+    expect(str_contains($html, 'La calle es obligatoria.'))->toBeTrue(
+        'El error de la clave anidada desapareció del resumen: sin enlace se lista igual, '.
+        'porque el mensaje sigue siendo información.'
+    );
+    expect((bool) preg_match('/\b1 error\b/u', strip_tags($html)))->toBeTrue(
+        'El error sin enlace no entra en el recuento.'
     );
 
-    expect((bool) preg_match('/href="#muni-direccion\.calle"/', $html))->toBeTrue(
-        'Una clave anidada no produce su enlace: `direccion.calle` es un id válido.'
+    // Declarado por el anfitrión, sí se enlaza.
+    $conId = Blade::render(
+        '<x-muni::error-summary :errors="$e" :ids="[\'direccion.calle\' => \'muni-direccion-calle-8f2a10\']" />',
+        ['e' => $bag]
+    );
+
+    expect((bool) preg_match('/href="#muni-direccion-calle-8f2a10"/', $conId))->toBeTrue(
+        'El mapa `ids` no permite declarar el id real de un campo anidado.'
     );
 });
 
@@ -469,4 +500,29 @@ it('la lista de errores se lee sobre el fondo del propio resumen', function () {
             ));
         }
     }
+});
+
+it('el enlace del resumen aterriza en el id que input pone de verdad', function () {
+    /*
+     * La prueba de integración del contrato. Todo lo demás compara contra la cadena
+     * `muni-rut` escrita a mano; acá se compara contra el id que `input.blade.php`
+     * emite REALMENTE. Si alguien cambia cómo se deriva el id del control, este
+     * candado cae y no se descubre en producción con un enlace muerto.
+     */
+    $campo = Blade::render('<x-muni::input name="rut" label="RUT" error="El RUT es obligatorio." />');
+
+    expect((bool) preg_match('/<input\b[^>]*\bid="([^"]+)"/', $campo, $m))->toBeTrue(
+        'No se pudo leer el id que `<x-muni::input name="rut">` le pone al control.'
+    );
+
+    $resumen = Blade::render('<x-muni::error-summary :errors="$e" />', [
+        'e' => new MessageBag(['rut' => ['El RUT es obligatorio.']]),
+    ]);
+
+    expect(str_contains($resumen, 'href="#'.$m[1].'"'))->toBeTrue(sprintf(
+        'El resumen enlaza a otro id que el que `input` emite (%s): el enlace no lleva al '.
+        'campo. El contrato es `prefijo + clave de la bolsa`, y si `input` lo cambia hay '.
+        'que mover la prop `prefix` o el mapa `ids`, no adivinar.',
+        $m[1]
+    ));
 });

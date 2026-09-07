@@ -54,15 +54,31 @@
     $total = count($lista);
 
     /*
-     * CONTRATO DE ID. `input.blade.php` y `select.blade.php` arman el id del control como
-     * `'muni-'.$name` (y sin `name` caen a `uniqid()`, que cambia en cada render). La bolsa
-     * `$errors`, en cambio, usa la clave pelada: `rut` → `#muni-rut`. Ese prefijo es el
-     * SUPUESTO de este componente, y por eso es una prop: un anfitrión que ponga sus propios
-     * ids pasa `prefix=""` o el suyo, y para un caso puntual —una clave anidada que en el
-     * HTML es `direccion[calle]`— pasa el mapa `:ids="['direccion.calle' => 'mi-id']"`.
+     * CONTRATO DE ID —leído de `input.blade.php`, no supuesto—. El id del control es, en
+     * orden: el `id` que pase el consumidor; si no, `'muni-'.$name`; y si el `name` trae
+     * caracteres que no son `[A-Za-z0-9_-]`, el componente los reemplaza por guiones y le
+     * pega un trozo de `sha1($name)`. La bolsa `$errors`, en cambio, usa la clave de
+     * validación: `rut` → `#muni-rut`, y ahí el enlace es exacto.
+     *
+     * LA TRAMPA: un campo `name="direccion[calle]"` valida como `direccion.calle`, y el
+     * id que `input` le pone lleva el hash de `direccion[calle]`, que NO se puede
+     * reconstruir desde la clave de la bolsa. Duplicar acá el algoritmo daría un id que
+     * PARECE correcto y no existe en la página, y un enlace muerto es peor que ninguno:
+     * promete llegar al campo y no llega. Por eso una clave que no sea `[A-Za-z0-9_-]+`
+     * se lista como TEXTO, sin enlace, salvo que el anfitrión declare el id verdadero:
+     *
+     *     <x-muni::error-summary :ids="['direccion.calle' => 'muni-direccion-calle-8f2a10']" />
+     *
+     * `prefix` cubre el otro caso, el del anfitrión que pone sus propios ids a mano.
      * NO se toca input/select desde acá.
      */
-    $idDe = fn (string $clave): string => (string) ($ids[$clave] ?? $prefix.$clave);
+    $idDe = function (string $clave) use ($ids, $prefix): ?string {
+        if (isset($ids[$clave])) {
+            return (string) $ids[$clave];
+        }
+
+        return preg_match('/^[A-Za-z0-9_-]+$/', $clave) ? $prefix.$clave : null;
+    };
 
     $nivel = min(6, max(2, (int) $level));
 
@@ -85,11 +101,15 @@
         `autofocus` no sirve: no dispara sobre un nodo insertado en un DOM ya cargado, que es
         exactamente el caso de Livewire. La guarda es un `data-*` en el propio nodo, así que
         vale una vez por nodo: si Livewire re-renderiza sin recrear el resumen, el foco NO se
-        le quita al usuario que está escribiendo. Con `:focus="false"` no se mueve nunca.
+        le quita al usuario que está escribiendo.
+        El foco convive con el `role="alert"` a sabiendas: algunos lectores anuncian la región
+        Y además leen el contenedor al enfocarlo, así que se puede oír dos veces. Se acepta
+        ese costo porque la alternativa —enterarse tarde o no enterarse— es peor. Un anfitrión
+        que prefiera solo el anuncio pasa `:focus="false"` y el foco no se mueve nunca.
      3. El foco del enlace se resuelve con `document.getElementById`, JAMÁS con
-        `querySelector`: las claves anidadas de Laravel (`direccion.calle`) son ids válidos
-        pero selectores CSS rotos —`#muni-direccion.calle` es «id direccion con clase calle»—.
-        El `href` se mantiene igual para que sin JS el salto nativo siga funcionando.
+        `querySelector`: un id con punto o corchete es válido pero es un selector CSS roto
+        —`#muni-direccion.calle` es «id direccion con clase calle»—. El `href` se mantiene
+        igual para que sin JS el salto nativo siga funcionando.
      4. La lista es contenido PRIMARIO y va en `--muni-text`, no en `--muni-muted`: sobre
         `--muni-danger-bg` el texto da 14,5:1 en los dos temas, y el título en `--muni-danger-fg`
         da 5,48:1 en claro y 4,75:1 en oscuro. --}}
@@ -119,9 +139,10 @@
 
         <ul class="muni-errsum__list">
             @foreach ($lista as $item)
+                @php $destino = $item['clave'] === null ? null : $idDe($item['clave']); @endphp
                 <li class="muni-errsum__item">
-                    @if ($item['clave'] !== null)
-                        <a href="#{{ $idDe($item['clave']) }}" class="muni-errsum__link" @click="enfocar($event)">{{ $item['mensaje'] }}</a>
+                    @if ($destino !== null)
+                        <a href="#{{ $destino }}" class="muni-errsum__link" @click="enfocar($event)">{{ $item['mensaje'] }}</a>
                     @else
                         <span class="muni-errsum__plain">{{ $item['mensaje'] }}</span>
                     @endif
@@ -143,12 +164,12 @@
             .muni-errsum__list { margin:0; padding:0 0 0 18px; list-style:disc; }
             .muni-errsum__item { font-size:13px; line-height:1.5; color:var(--muni-text); }
             .muni-errsum__item + .muni-errsum__item { margin-top:4px; }
-            /* Subrayado permanente: el enlace no puede distinguirse solo por el color. */
-            .muni-errsum__link { color:var(--muni-text); text-decoration:underline; text-underline-offset:2px; border-radius:var(--muni-radius-sm); transition:color var(--muni-dur) var(--muni-ease); }
+            /* Subrayado permanente: el enlace no puede distinguirse solo por el color.
+               `display:inline-block` con 24 px de alto mínimo es el área táctil de WCAG 2.2
+               AA 2.5.8, y este resumen se usa sobre todo desde el teléfono. */
+            .muni-errsum__link { display:inline-block; min-height:24px; padding:2px 0; color:var(--muni-text); text-decoration:underline; text-underline-offset:2px; border-radius:var(--muni-radius-sm); transition:color var(--muni-dur) var(--muni-ease); }
             .muni-errsum__link:hover { color:var(--muni-danger-fg); }
             .muni-errsum__link:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:2px; }
-            /* Área táctil de 24×24 px en el teléfono, que es donde este resumen más se usa. */
-            .muni-errsum__link { display:inline-block; min-height:24px; padding:2px 0; }
         </style>
     @endonce
 @endif

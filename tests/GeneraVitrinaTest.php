@@ -47,12 +47,17 @@ function ejemplosDeVitrina(): array
         'progress' => '<x-muni::progress :value="64" label="Avance del trámite" />',
         'timeline' => '<x-muni::timeline :items="[[\'title\' => \'Ingresada\', \'time\' => \'10:04\'], [\'title\' => \'Derivada a Obras\', \'time\' => \'11:20\', \'tone\' => \'ok\']]" />',
         'breadcrumb' => '<x-muni::breadcrumb :items="[[\'label\' => \'Inicio\', \'url\' => \'#\'], [\'label\' => \'Patentes\']]" />',
-        'pagination' => '<x-muni::pagination :current="3" :total="170" />',
+        // Con `url` los números son enlaces de verdad. Sin él salen como texto, y la
+        // reja mediría un componente que nadie usa así en producción.
+        'pagination' => '<x-muni::pagination :current="3" :total="170" :url="fn (int $p) => \'?pagina=\'.$p" />',
         'skeleton' => '<x-muni::skeleton width="60%" /> <x-muni::skeleton height="80px" />',
         'avatar' => '<x-muni::avatar name="Cesar Bugueño" />',
         'tabs' => '<x-muni::tabs :tabs="[\'Solicitante\', \'Documentos\']" label="Secciones de la solicitud">'
             .'<x-muni::tab-panel :index="0">Datos del solicitante.</x-muni::tab-panel>'
             .'<x-muni::tab-panel :index="1">Documentos adjuntos.</x-muni::tab-panel></x-muni::tabs>',
+        'table-header' => '<x-muni::table-header title="Patentes morosas" :total="3412" :filtered="120" unit="patentes" />',
+        'rut-input' => '<x-muni::rut-input label="RUT del titular" name="rut" />',
+        'date-input' => '<x-muni::date-input label="Vence el" name="vence" />',
         'sortable-table' => '<x-muni::sortable-table searchable caption="Patentes morosas"'
             .' :columns="[[\'key\' => \'rut\', \'label\' => \'RUT\'], [\'key\' => \'monto\', \'label\' => \'Monto\']]"'
             .' :rows="[[\'rut\' => \'12.345.678-9\', \'monto\' => \'520.000\', \'_tone\' => \'danger\'], [\'rut\' => \'9.876.543-2\', \'monto\' => \'80.000\']]" />',

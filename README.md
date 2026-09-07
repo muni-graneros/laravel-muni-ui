@@ -169,8 +169,8 @@ quedaban sin valor.
 | `<x-muni::segmented>` | `name`, `options` (array), `value`, `label` — radios reales sin JS; o slot |
 | `<x-muni::filter-bar>` | `action`, `method`; slots `submitLabel`, `actions` |
 | `<x-muni::field>` | `label`; el control (input/select) va en el slot |
-| `<x-muni::data-table>` | `columns` (array), `empty`; el slot son los `<tr data-muni-row>` |
-| `<x-muni::pagination>` | `current`, `total`, `url` (closure fn(\$p)), `info` |
+| `<x-muni::data-table>` | `columns`, `empty`, `caption`, `label`, `stickyHeader`, `stickyColumn`, `maxHeight`, `density`; el slot son los `<tr data-muni-row>` |
+| `<x-muni::pagination>` | `current`, `total`, `url` (closure fn(\$p)), `info`, `paginator` (LengthAwarePaginator) |
 
 ### Interactivos (requieren Alpine 3)
 
@@ -182,7 +182,7 @@ quedaban sin valor.
 | `<x-muni::tabs>` | `tabs` (array de labels), `default`, `id`, `label`, `activation` (auto\|manual); paneles `<x-muni::tab-panel :index>` |
 | `<x-muni::tab-panel>` | `index` — panel de `<x-muni::tabs>`; se enlaza solo con su pestaña |
 | `<x-muni::skip-link>` | `target` (por defecto `#muni-contenido`) — va de primero en el `<body>`; los tres armazones ya lo traen |
-| `<x-muni::sortable-table>` | `columns`, `rows`, `empty`, `searchable`, `caption` — orden por teclado, `aria-sort` y buscador etiquetado |
+| `<x-muni::sortable-table>` | `columns`, `rows`, `empty`, `searchable`, `caption`, `selectable`, `rowKey`, `selectionScope`, `selectionTotal`, `selectionName` — orden por teclado con formato chileno, `aria-sort` y selección en lote |
 | `<x-muni::file-dropzone>` | `name`, `accept`, `label`, `hint`, `multiple`, `maxMb` — arrastrar y soltar con quitar y validación |
 | `<x-muni::toast-host>` | `position`; colocar UNA vez. Disparar: `$dispatch('muni-toast', {tone, title, message})` |
 
@@ -215,7 +215,7 @@ quedaban sin valor.
 | `<x-muni::date-input>` | props de `input`, más `min`/`max` — control nativo, ayuda en dd-mm-aaaa |
 | `<x-muni::error-summary>` | `errors` — resumen tras un envío fallido; recibe el foco y enlaza cada campo |
 | `<x-muni::announcer>` | — región viva compartida; va una vez por página, en el armazón |
-| `<x-muni::table-header>` | `title`, `count`, `total`; ranuras `search`, `filters`, `actions` — la franja sobre la tabla |
+| `<x-muni::table-header>` | `title`, `level`, `total`, `filtered`, `unit`, `countLabel`; ranuras `search`, `filters`, `actions` |
 | `<x-muni::sidebar>` | `width`; slot con `<x-muni::nav-section>` + `<x-muni::nav-item>` (colapsa en móvil) |
 | `<x-muni::nav-item>` | `href`, `icon`, `active`, `badge` |
 | `<x-muni::nav-section>` | `title` |

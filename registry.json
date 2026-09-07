@@ -765,6 +765,12 @@
           "required": false
         },
         {
+          "name": "checked",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
           "name": "description",
           "type": "mixed",
           "default": "null",
@@ -995,9 +1001,39 @@
           "required": false
         },
         {
+          "name": "caption",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "stickyHeader",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
           "name": "stickyColumn",
           "type": "bool",
           "default": "false",
+          "required": false
+        },
+        {
+          "name": "maxHeight",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "density",
+          "type": "string",
+          "default": "normal",
           "required": false
         }
       ],
@@ -1092,6 +1128,12 @@
           "required": false
         },
         {
+          "name": "range",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
           "name": "legend",
           "type": "string",
           "default": "Periodo",
@@ -1141,6 +1183,12 @@
         },
         {
           "name": "toError",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "fromModel",
           "type": "mixed",
           "default": "null",
           "required": false
@@ -2352,6 +2400,24 @@
           "type": "int",
           "default": "1",
           "required": false
+        },
+        {
+          "name": "url",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "info",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "paginator",
+          "type": "mixed",
+          "default": "null",
+          "required": false
         }
       ],
       "slots": [],
@@ -2944,7 +3010,31 @@
           "required": false
         },
         {
+          "name": "selectable",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "rowKey",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "selectionScope",
+          "type": "string",
+          "default": "page",
+          "required": false
+        },
+        {
           "name": "selectionTotal",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "selectionName",
           "type": "mixed",
           "default": "null",
           "required": false

@@ -216,6 +216,7 @@ quedaban sin valor.
 | `<x-muni::error-summary>` | `errors` — resumen tras un envío fallido; recibe el foco y enlaza cada campo |
 | `<x-muni::announcer>` | — región viva compartida; va una vez por página, en el armazón |
 | `<x-muni::table-header>` | `title`, `level`, `total`, `filtered`, `unit`, `countLabel`; ranuras `search`, `filters`, `actions` |
+| `<x-muni::diff-campos>` | `changes`, `caption`, `empty`, `nilLabel` y los cuatro encabezados — tabla antes/después por campo; el estado se lee en texto, no en el color |
 | `<x-muni::sidebar>` | `width`; slot con `<x-muni::nav-section>` + `<x-muni::nav-item>` (colapsa en móvil) |
 | `<x-muni::nav-item>` | `href`, `icon`, `active`, `badge` |
 | `<x-muni::nav-section>` | `title` |

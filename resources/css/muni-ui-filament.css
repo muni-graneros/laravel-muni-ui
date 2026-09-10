@@ -504,4 +504,18 @@
     .fi-main{
         padding:0 !important;
     }
+
+    /* Y no solo esos dos: dentro del panel la hoja cuelga de una página de
+       Filament con su propio relleno, y un recurso puede envolverla en una
+       sección más. Atado a una lista fija de clases, el reset no existe para el
+       envoltorio que no esté enumerado: el relleno sobrevive a la impresión,
+       estrecha el documento en cada hoja y lo descuadra respecto de `@page`.
+       Se anula el relleno de CUALQUIER ancestro de la hoja.
+
+       Regla aparte a propósito: un selector no soportado invalida la LISTA
+       entera, y un motor sin `:has()` se quedaría también sin el reset de
+       arriba, que hoy sí funciona. */
+    :has(.muni-hoja){
+        padding:0 !important;
+    }
 }

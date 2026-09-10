@@ -256,8 +256,27 @@ it('numera las páginas y no rehace las reglas de tabla que ya emite data-table'
     $hoja = sinComentarios(fuenteDeLaVista('hoja'));
     $impresion = bloquesDeImpresion($hoja);
 
-    expect(str_contains($impresion, 'counter(page)'))->toBeTrue(
+    // El contador SOLO puede vivir en una caja de margen de @page. Pedido desde el
+    // pie del cuerpo no resuelve en ningún motor y degrada a «Página 0 de 0»
+    // (Chromium) o «Página de» (Firefox), medido con page.pdf() el 2026-09-10.
+    // Un acta municipal con una numeración inventada es peor que una sin numerar:
+    // dice algo, y lo que dice es mentira.
+    // Ojo: las reglas @page viven FUERA del @media print, así que hay que mirar
+    // la hoja entera, no solo los bloques de impresión.
+    $cajaDeMargen = (bool) preg_match('/@bottom-[a-z]+\s*\{[^}]*counter\(page\)/', $hoja);
+    expect($cajaDeMargen)->toBeTrue(
         'El pie no numera las páginas: una nómina de tres hojas sueltas no se puede recomponer.'
+    );
+
+    $fueraDeLaCaja = preg_replace('/@bottom-[a-z]+\s*\{[^}]*\}/', '', $hoja);
+    expect(str_contains($fueraDeLaCaja, 'counter(page)'))->toBeFalse(
+        'Hay un counter(page) fuera de una caja de margen de @page. Ahí no resuelve y se '.
+        'imprime «Página 0 de 0»: el documento sale con un dato falso en vez de sin dato.'
+    );
+
+    expect(str_contains($hoja, 'table-footer-group'))->toBeTrue(
+        'El pie no se repite reservando su alto: con position:fixed el contenido se imprime '.
+        'por debajo y los bordes de la tabla cruzan el folio.'
     );
 
     foreach (['table-header-group', 'muni-row--danger', 'muni-num'] as $ajeno) {

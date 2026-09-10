@@ -87,64 +87,103 @@
         </div>
     @endif
 
-    <header class="muni-hoja__membrete">
-        @if (filter_var($crest, FILTER_VALIDATE_BOOLEAN))
-            <x-muni::gob-escudo :size="56" :src="$crestSrc" class="muni-hoja__escudo" />
-        @endif
+    {{-- ARMAZÓN DE PAGINACIÓN: una tabla de una sola columna cuyo <tfoot> es el
+         pie del documento.
 
-        <div class="muni-hoja__organismo">
-            <p class="muni-hoja__org">{{ $organization }}</p>
-            @if (filled($unit))
-                <p class="muni-hoja__unidad">{{ $unit }}</p>
-            @endif
-        </div>
+         No es maquetación con tablas por nostalgia. Un pie `position:fixed` se
+         repite en cada hoja pero NO aparta el flujo: el contenido sigue llegando
+         hasta el borde inferior y se imprime POR DEBAJO del pie (medido a 200 ppp:
+         los bordes de la tabla atravesando el folio). Un grupo de pie de tabla es
+         lo único que los dos motores repiten en cada página RESERVÁNDOLE el alto,
+         que es lo que hacía falta.
 
-        <div class="muni-hoja__doc">
-            @if ($tipoDoc !== '')
-                <{{ $headingTag }} id="{{ $tituloId }}" class="muni-hoja__tipo">{{ $tipoDoc }}</{{ $headingTag }}>
-            @endif
+         En pantalla la tabla no existe: `display:contents` la disuelve y el
+         membrete, los datos, el cuerpo, la firma y el pie vuelven a ser hijos
+         directos de `.muni-hoja`, con el mismo reparto de siempre. `role` de
+         presentación porque no hay datos tabulares que anunciar: es armazón de
+         impresión, y sin él un lector de pantalla leería «tabla, 2 filas». --}}
+    <table class="muni-hoja__hojas" role="presentation">
+        <tbody>
+            <tr>
+                <td class="muni-hoja__celda">
+                    <div class="muni-hoja__lienzo">
+                        <header class="muni-hoja__membrete">
+                            @if (filter_var($crest, FILTER_VALIDATE_BOOLEAN))
+                                <x-muni::gob-escudo :size="56" :src="$crestSrc" class="muni-hoja__escudo" />
+                            @endif
 
-            @if ($folioTexto !== '')
-                <p class="muni-hoja__folio">{{ $folioTitulo }} <span class="muni-hoja__cifra">{{ $folioTexto }}</span></p>
-            @endif
+                            <div class="muni-hoja__organismo">
+                                <p class="muni-hoja__org">{{ $organization }}</p>
+                                @if (filled($unit))
+                                    <p class="muni-hoja__unidad">{{ $unit }}</p>
+                                @endif
+                            </div>
 
-            @if (filled($date))
-                <p class="muni-hoja__fecha">{{ $date }}</p>
-            @endif
-        </div>
-    </header>
+                            <div class="muni-hoja__doc">
+                                @if ($tipoDoc !== '')
+                                    <{{ $headingTag }} id="{{ $tituloId }}" class="muni-hoja__tipo">{{ $tipoDoc }}</{{ $headingTag }}>
+                                @endif
 
-    @if (isset($emisor) || isset($titular))
-        <div class="muni-hoja__datos">
-            @isset($emisor)
-                <div class="muni-hoja__dato">{{ $emisor }}</div>
-            @endisset
+                                @if ($folioTexto !== '')
+                                    <p class="muni-hoja__folio">{{ $folioTitulo }} <span class="muni-hoja__cifra">{{ $folioTexto }}</span></p>
+                                @endif
 
-            @isset($titular)
-                <div class="muni-hoja__dato">{{ $titular }}</div>
-            @endisset
-        </div>
-    @endif
+                                @if (filled($date))
+                                    <p class="muni-hoja__fecha">{{ $date }}</p>
+                                @endif
+                            </div>
+                        </header>
 
-    <div class="muni-hoja__cuerpo">{{ $slot }}</div>
+                        @if (isset($emisor) || isset($titular))
+                            <div class="muni-hoja__datos">
+                                @isset($emisor)
+                                    <div class="muni-hoja__dato">{{ $emisor }}</div>
+                                @endisset
 
-    @isset($firma)
-        <div class="muni-hoja__firma">{{ $firma }}</div>
-    @endisset
+                                @isset($titular)
+                                    <div class="muni-hoja__dato">{{ $titular }}</div>
+                                @endisset
+                            </div>
+                        @endif
 
-    <footer class="muni-hoja__pie">
-        @if ($folioTexto !== '' || $verificacionTexto !== '')
-            <p class="muni-hoja__verificar">
-                @if ($folioTexto !== ''){{ $folioTitulo }} <span class="muni-hoja__cifra">{{ $folioTexto }}</span>@endif
-                @if ($folioTexto !== '' && $verificacionTexto !== '') · @endif
-                @if ($verificacionTexto !== ''){{ $verificacionTexto }}@endif
-            </p>
-        @endif
+                        <div class="muni-hoja__cuerpo">{{ $slot }}</div>
 
-        {{-- El contador solo existe en papel: en pantalla no hay páginas que
-             numerar, así que el nodo no aporta nada al árbol de accesibilidad. --}}
-        <p class="muni-hoja__paginas" aria-hidden="true"><span class="muni-hoja__nro"></span></p>
-    </footer>
+                        @isset($firma)
+                            <div class="muni-hoja__firma">{{ $firma }}</div>
+                        @endisset
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+
+        {{-- El pie va DESPUÉS del cuerpo en el documento —es el orden que lee un
+             lector de pantalla y el que ve quien no imprime— y aun así el motor lo
+             repite al pie de cada hoja: el grupo de pie de tabla se coloca al final
+             de cada página, no donde esté escrito.
+
+             Acá NO se numera. Ningún motor resuelve `counter(page)` fuera de las
+             cajas de margen, y lo que salía impreso no era un hueco sino un dato
+             falso: «Página 0 de 0» en las cuatro hojas de un acta que se cita en un
+             Juzgado de Policía Local. La numeración vive en la caja de margen del
+             bloque de estilos, donde el motor que sabe numerar numera y el que no
+             sabe no dibuja nada. Lo que identifica el documento —el folio y la
+             leyenda de verificación— se imprime igual en las dos. --}}
+        <tfoot>
+            <tr>
+                <td class="muni-hoja__celda">
+                    <footer class="muni-hoja__pie">
+                        @if ($folioTexto !== '' || $verificacionTexto !== '')
+                            <p class="muni-hoja__verificar">
+                                @if ($folioTexto !== ''){{ $folioTitulo }} <span class="muni-hoja__cifra">{{ $folioTexto }}</span>@endif
+                                @if ($folioTexto !== '' && $verificacionTexto !== '') · @endif
+                                @if ($verificacionTexto !== ''){{ $verificacionTexto }}@endif
+                            </p>
+                        @endif
+                    </footer>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
 </section>
 
 @once
@@ -158,6 +197,19 @@
            aplicación y no solo para esta pieza. */
         .muni-hoja { box-sizing:border-box; width:216mm; max-width:100%; margin:0 auto; padding:14mm 16mm; display:flex; flex-direction:column; gap:14px; background:var(--muni-surface); color:var(--muni-text); border:1px solid var(--muni-border); border-radius:var(--muni-radius); box-shadow:var(--muni-shadow); font-family:var(--muni-font-sans); font-size:13px; line-height:1.5; }
         .muni-hoja *, .muni-hoja *::before, .muni-hoja *::after { box-sizing:border-box; }
+
+        /* EN PANTALLA LA TABLA DE PAGINACIÓN NO EXISTE. `display:contents` la
+           disuelve entera —tabla, grupos, filas y celdas— y sus nietos vuelven a
+           ser hijos directos del flex de `.muni-hoja`: el mismo reparto, el mismo
+           hueco de 14px y el mismo `margin-top:auto` del pie que antes de que el
+           armazón existiera. Solo en papel se convierte en tabla de verdad. */
+        .muni-hoja__hojas,
+        .muni-hoja__hojas > tbody,
+        .muni-hoja__hojas > tfoot,
+        .muni-hoja__hojas > tbody > tr,
+        .muni-hoja__hojas > tfoot > tr,
+        .muni-hoja__celda,
+        .muni-hoja__lienzo { display:contents; }
 
         .muni-hoja__acciones { display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:8px; }
         /* 44x44 mínimo: esto se pulsa desde la tablet del inspector en terreno. */
@@ -188,7 +240,6 @@
 
         .muni-hoja__pie { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:8px; margin-top:auto; padding-top:10px; border-top:1px solid var(--muni-border); font-size:11px; color:var(--muni-muted); }
         .muni-hoja__verificar { flex:1 1 240px; min-width:0; margin:0; }
-        .muni-hoja__paginas { display:none; margin:0; }
 
         @media (max-width: 640px) {
             .muni-hoja { padding:16px 14px; }
@@ -201,6 +252,24 @@
            salir con márgenes igual. Mismos valores, para que no diverjan. */
         @page { margin: 16mm 18mm; }
 
+        /* LA NUMERACIÓN, Y SOLO ACÁ.
+
+           Medido en Chromium 151 y Firefox 153: ningún motor resuelve
+           `counter(page)` fuera de las cajas de margen. Pedido desde el pie salía
+           «Página 0 de 0» en Chromium y «Página de» en Firefox, o sea un dato
+           FALSO impreso en un acta, que es peor que una hoja sin numerar. Pedido
+           desde la caja de margen, Chromium numera bien y Firefox —que no las
+           implementa— no dibuja absolutamente nada. Esa es la degradación que se
+           quiere: o el número correcto, o ningún número.
+
+           Regla `@page` aparte de la de los márgenes a propósito: un motor que se
+           atragante con la caja de margen descarta ESTA regla, y los márgenes de
+           arriba siguen en pie. Sin color: la caja de margen hereda del elemento
+           raíz y el papel ya se fuerza a la paleta clara. */
+        @page {
+            @bottom-right { content: "Página " counter(page) " de " counter(pages); font-family: var(--muni-font-sans); font-size: 9pt; }
+        }
+
         @media print {
             /* En papel la hoja NO es una tarjeta: el marco, la sombra y el ancho
                fijo los pone @page. Nada de print-color-adjust: los fondos no se
@@ -211,14 +280,25 @@
                ruido que además invita a pulsarlo. */
             .muni-hoja__acciones { display:none; }
             .muni-hoja__membrete { break-after:avoid; }
-            /* El pie se repite en cada hoja y numera las páginas. El soporte de
-               counter(page) fuera de las cajas de margen difiere entre motores:
-               donde no se resuelve el contador queda vacío y el resto del pie
-               —folio y leyenda de verificación— se imprime igual. Por eso el
-               número no es el único dato del pie. */
-            .muni-hoja__pie { position:fixed; left:0; right:0; bottom:0; margin:0; background:transparent; break-inside:avoid; }
-            .muni-hoja__paginas { display:block; }
-            .muni-hoja__nro::after { content:"Página " counter(page) " de " counter(pages); }
+
+            /* ACÁ SÍ ES UNA TABLA. Es el único armazón que los dos motores
+               repiten en cada hoja RESERVÁNDOLE el alto: con el pie
+               `position:fixed` de antes el contenido seguía bajando hasta el
+               borde y se imprimía por debajo del folio. La celda no lleva
+               relleno —los márgenes los pone `@page`— y el lienzo repone el
+               hueco de 14px que en pantalla da el flex de `.muni-hoja`. */
+            .muni-hoja__hojas { display:table; width:100%; border-collapse:collapse; }
+            .muni-hoja__hojas > tbody { display:table-row-group; }
+            .muni-hoja__hojas > tfoot { display:table-footer-group; }
+            .muni-hoja__hojas > tbody > tr, .muni-hoja__hojas > tfoot > tr { display:table-row; }
+            .muni-hoja__celda { display:table-cell; padding:0; }
+            .muni-hoja__lienzo { display:flex; flex-direction:column; gap:14px; }
+
+            /* El pie ya no se posiciona: lo coloca el grupo de pie de tabla al
+               final de cada hoja. Numerar no numera —eso vive en la caja de
+               margen—, pero el folio y la leyenda de verificación, que son lo que
+               permite rastrear el papel contra la bitácora, salen en todas. */
+            .muni-hoja__pie { margin:0; background:transparent; break-inside:avoid; }
         }
     </style>
 @endonce

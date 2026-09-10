@@ -376,4 +376,19 @@
     .muni-ds__main {
         padding: 0 !important;
     }
+
+    /* Y NO SOLO EL DEL ARMAZÓN DEL PAQUETE. Atado a esa única clase, el reset no
+       existía para el sistema que mete la hoja en un `<main>` propio, en una
+       tarjeta o en una página del panel: ahí el relleno sobrevivía a la
+       impresión, estrechaba el documento en cada hoja y lo descuadraba respecto
+       de los márgenes de `@page` (medido: la tabla de 70pt a 519pt contra un pie
+       de 51pt a 545pt). Se anula el relleno de CUALQUIER ancestro de la hoja, que
+       es exactamente donde el margen ya lo pone la caja de página.
+
+       Regla aparte de la de arriba a propósito: un selector no soportado
+       invalida la LISTA entera, así que escritas juntas un motor sin `:has()` se
+       quedaría también sin el reset del armazón, que hoy sí funciona. */
+    :has(.muni-hoja) {
+        padding: 0 !important;
+    }
 }

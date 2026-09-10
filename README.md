@@ -211,6 +211,7 @@ quedaban sin valor.
 | `<x-muni::switch>` | `label`, `name`, `checked`, `description` (Alpine) |
 | `<x-muni::textarea>` | `label`, `name`, `error`, `hint`, `required`, `rows`, `maxlength` — contador en texto |
 | `<x-muni::checkbox>` | `label`, `name`, `checked`, `description`, `error`, `required`, `value` — nunca premarcada |
+| `<x-muni::checkbox-group>` | `name` y `legend` (obligatorias), `options`, `selected`, `hint`, `error`, `required` — fieldset con legend; el error del grupo se dice una vez, no una por casilla |
 | `<x-muni::rut-input>` | props de `input` — formatea 12.345.678-9 y valida el dígito verificador |
 | `<x-muni::date-input>` | props de `input`, más `min`/`max` — control nativo, ayuda en dd-mm-aaaa |
 | `<x-muni::error-summary>` | `errors` — resumen tras un envío fallido; recibe el foco y enlaza cada campo |

@@ -148,9 +148,9 @@ descarta. Nadie lo vio hasta que alguien escribió a mano un gráfico de barras 
 La regla, entonces: **lo que un componente necesita para verse bien viaja con el componente**, en su
 `@once`. Los tokens sí van al CSS, porque el tema del panel los puentea a propósito.
 
-## 8. Seis trampas de Blade que ya se pisaron
+## 8. Cinco trampas de Blade que ya se pisaron
 
-Casi todas fallan **en silencio**: no lanzan excepción, no aparecen en consola, y lo que se ve es
+Las cuatro primeras fallan **en silencio**: no lanzan excepción, no aparecen en consola, y lo que se ve es
 casi lo que se esperaba.
 
 - **El derrame de atributos solo se compila si la expresión empieza literalmente por
@@ -164,19 +164,16 @@ casi lo que se esperaba.
   calcula por su cuenta, así que un `:aria-invalid="null"` apaga el `aria-invalid` que el hijo
   emitía por el error del servidor. Los atributos condicionales van por `->merge()`, nunca escritos
   a mano antes del derrame.
-- **Una directiva escrita como TEXTO dentro de un comentario se compila igual.** Blade no
-  distingue prosa de directiva: un comentario CSS que dice «esto reescribiría el `@once` entero»
+- **Una directiva escrita como TEXTO dentro de un comentario CSS se compila igual.** El comentario
+  de Blade `{{-- --}}` sí protege —`compileString()` borra los comentarios ANTES de compilar
+  directivas y etiquetas de componente, así que ahí puedes escribir tanto `@once` como
+  `<x-muni::algo>` sin riesgo—, pero un `/* */` dentro de un bloque `<style>` **no es un comentario
+  de Blade**: es texto que Blade compila. Un comentario CSS que dice «esto reescribiría el `@once`
+  entero»
   abre un segundo bloque `@once` que nadie cierra, y el componente muere con
   `unexpected end of file, expecting endif`. Peor: el error apunta al archivo compilado, no a la
   línea del comentario. Si hay que nombrar una directiva en prosa, se escapa con `@@` o se
   reescribe («el bloque de estilos»).
-- **Un comentario de Blade tampoco protege una etiqueta de componente.** Escribir
-  `{{-- ejemplo: <x-muni::tooltip …>…</x-muni::tooltip> --}}` como muestra de uso **la compila**:
-  el compilador de etiquetas corre ANTES de que se borre el comentario, así que el ejemplo se
-  convierte en código y el componente muere con `unexpected end of file, expecting endif`. Es la
-  misma causa que la trampa anterior, con otra cara: el comentario no es un escudo, es texto que
-  se procesa igual. Los ejemplos de uso dentro de un componente se escriben sin `<` ni `>`
-  («x-muni::tooltip con describe»), o se ponen en el README, que no lo compila nadie.
 - **`$attributes->merge()` reemplaza, no concatena**, salvo en `class` y `style`. Para encadenar un
   `aria-describedby` del consumidor hay que leerlo con `->get()`, unirlo a mano y sacarlo de la
   bolsa con `->except()` antes de fusionar. Sin el `except`, el valor de la bolsa gana y los ids

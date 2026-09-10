@@ -64,6 +64,44 @@ function cssAyudaBreve(): string
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $m[1]));
 }
 
+/**
+ * El contenido del bloque `@supports` del anclaje CSS, sin comentarios.
+ *
+ * Se recorta contando llaves y no con una expresión regular: el bloque tiene
+ * reglas anidadas, y un `.*` codicioso se comería también el bloque de impresión
+ * que viene después.
+ */
+function bloqueAnclaAyudaBreve(): string
+{
+    $css = cssAyudaBreve();
+    $inicio = strpos($css, '@supports');
+
+    if ($inicio === false) {
+        return '';
+    }
+
+    $abre = strpos($css, '{', $inicio);
+    $nivel = 0;
+
+    for ($i = $abre; $i < strlen($css); $i++) {
+        $nivel += $css[$i] === '{' ? 1 : ($css[$i] === '}' ? -1 : 0);
+
+        if ($nivel === 0) {
+            return substr($css, $abre + 1, $i - $abre - 1);
+        }
+    }
+
+    return '';
+}
+
+/** El CSS del componente SIN el bloque del anclaje: lo que ve la rama de respaldo. */
+function cssAyudaBreveSinAncla(): string
+{
+    $ancla = bloqueAnclaAyudaBreve();
+
+    return $ancla === '' ? cssAyudaBreve() : str_replace($ancla, '', cssAyudaBreve());
+}
+
 /** El HTML del componente con los atributos y el disparador dados. */
 function ayudaBreveHtml(string $atributos = 'text="Anular giro"', string $slot = '<button type="button" aria-label="Anular giro">X</button>'): string
 {
@@ -298,6 +336,102 @@ it('la burbuja escapa del contenedor con scroll', function () {
             "«{$moderno}» está fuera de un @supports: el CSS moderno va como mejora progresiva."
         );
     }
+});
+
+/*
+|--------------------------------------------------------------------------
+| 5 bis. D2: el anclaje CSS no puede encerrar la burbuja en el ancho del botón
+|--------------------------------------------------------------------------
+|
+| Medido en Chromium 151 y Firefox 153 el 2026-09-10: con
+| `position-area: top center` la región elegida pasa a ser el bloque contenedor
+| de la burbuja, o sea el ancho exacto del disparador, y el `max-width` de la
+| regla base queda sin efecto. Sobre un botón de icono de 25 px la burbuja salía
+| de 25x367 px, una letra por línea. Los dos motores entran hoy por esta rama.
+|
+| Lo que sigue fija las dos declaraciones que sueltan la caja. La medición viva
+| vive en docs/VERIFICACION-NAVEGADOR.md, fila D2; esto es el candado de PHP.
+*/
+
+it('el anclaje CSS no encierra la burbuja en el ancho del disparador', function () {
+    $ancla = bloqueAnclaAyudaBreve();
+
+    expect($ancla)->not->toBe('',
+        'No se encontró el bloque @supports del anclaje: el barrido está roto o la mejora desapareció.'
+    );
+
+    preg_match_all('/position-area\s*:\s*([^;}]+)/i', $ancla, $m);
+
+    expect(count($m[1]))->toBe(4,
+        'No hay exactamente cuatro reglas `position-area`, una por cada `placement` de la lista cerrada.'
+    );
+
+    foreach ($m[1] as $valor) {
+        $valor = trim($valor);
+
+        expect((bool) preg_match('/\bcenter\b/i', $valor))->toBeFalse(
+            "«position-area: {$valor}» usa `center` en el eje cruzado: esa celda de la rejilla ES el ".
+            'disparador, así que pasa a ser el bloque contenedor de la burbuja y el `max-width` no '.
+            'puede hacer nada. Medido: 25x367 px con las palabras partidas letra a letra (D2).'
+        );
+
+        expect((bool) preg_match('/\bspan-all\b/i', $valor))->toBeTrue(
+            "«position-area: {$valor}» no abre el eje cruzado con `span-all`: sin él la burbuja no ".
+            'se centra sobre el ancla (`anchor-center`) ni escapa de su ancho.'
+        );
+    }
+
+    foreach (['top', 'bottom', 'left', 'right'] as $lado) {
+        expect((bool) preg_match(
+            '/muni-tt__bubble--'.$lado.'\s*\{[^}]*position-area\s*:\s*'.$lado.'\s+span-all/i', $ancla
+        ))->toBeTrue("El lado «{$lado}» perdió su `position-area: {$lado} span-all`.");
+    }
+
+    expect((bool) preg_match('/width\s*:\s*max-content/i', $ancla))->toBeTrue(
+        'Falta `width: max-content` dentro del @supports: `span-all` suelta el eje cruzado, pero en '.
+        '`left` y `right` la franja lateral junto al borde de la pantalla mide unos 60 px y ahí la '.
+        'burbuja se vuelve a encoger. Con la caja suelta, `position-try-fallbacks` sí detecta el '.
+        'desbordamiento y voltea al lado opuesto.'
+    );
+
+    expect((bool) preg_match('/position-try-fallbacks\s*:[^;}]*flip-inline/i', $ancla))->toBeTrue(
+        'Sin `flip-inline` una ayuda `right` pegada al borde derecho no tiene a dónde voltear.'
+    );
+});
+
+it('el ancho suelto no se filtra fuera del anclaje y el tope sigue valiendo en el respaldo', function () {
+    $fuera = cssAyudaBreveSinAncla();
+
+    expect((bool) preg_match('/width\s*:\s*max-content/i', $fuera))->toBeFalse(
+        '`width: max-content` está fuera del @supports: en la rama de respaldo Alpine mide la '.
+        'burbuja y la recoloca, y un ancho intrínseco sin bloque contenedor que lo frene se sale '.
+        'de la pantalla antes de que el JS llegue a medirla (DESIGN §10).'
+    );
+
+    expect((bool) preg_match('/max-width\s*:\s*min\(\s*28ch\s*,\s*90vw\s*\)/i', $fuera))->toBeTrue(
+        'El tope de ancho salió de la regla base: tiene que valer en las DOS ramas, porque es lo '.
+        'único que hace envolver el texto largo cuando la caja ya está suelta.'
+    );
+});
+
+it('el componente ya no afirma que Firefox no sabe anclar', function () {
+    $fuente = fuenteAyudaBreve();
+
+    expect((bool) preg_match('/Safari y Firefox no lo tienen/i', $fuente))->toBeFalse(
+        'Vuelve a estar la afirmación falsa: Firefox 153 devuelve `true` en `CSS.supports()` para '.
+        '`anchor-name`, `anchor-scope` y `position-area`. Creerla es lo que dejó la rama moderna '.
+        'rota en producción, porque nadie pensaba que se usara.'
+    );
+
+    expect(str_contains($fuente, 'CSS.supports'))->toBeTrue(
+        'El componente no dice cómo se comprueba qué motor entra por la rama moderna: la próxima '.
+        'afirmación sobre soporte de navegadores se escribirá otra vez de memoria.'
+    );
+
+    expect(str_contains($fuente, 'Firefox 153'))->toBeTrue(
+        'Falta la medición fechada del soporte real. Sin versión medida, el comentario es una '.
+        'creencia, no un dato.'
+    );
 });
 
 /*

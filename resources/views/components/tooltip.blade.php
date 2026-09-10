@@ -75,10 +75,22 @@
      1. La burbuja es `position:fixed` y la coloca Alpine leyendo rectángulos. Con
         `position:absolute` la recortaba el `overflow:auto` de la tabla de datos,
         que es justo donde viven los botones de icono de la fila. El anchor positioning
-        hace lo mismo mejor y sin JS, pero Safari y Firefox no lo tienen todavía: entra
-        como mejora dentro de un bloque `@supports` y, donde existe, Alpine no coloca
-        nada. Ojo: `position:fixed` no escapa de un antepasado con `transform`,
-        `filter` o `will-change`, que crea bloque contenedor propio.
+        hace lo mismo mejor y sin JS, y entra como mejora dentro de un bloque
+        `@supports`; donde existe, Alpine no coloca nada. Ojo: `position:fixed` no
+        escapa de un antepasado con `transform`, `filter` o `will-change`, que crea
+        bloque contenedor propio.
+
+        SOBRE QUÉ MOTORES TOMAN LA RAMA MODERNA. Acá decía que «Safari y Firefox no
+        lo tienen todavía», y eso ya no es cierto: medido con `CSS.supports()` el
+        2026-09-10, Chromium 151 y Firefox 153 devuelven `true` para `anchor-name`,
+        `anchor-scope`, `position-area` y `justify-self: anchor-center`. O sea que
+        HOY los dos motores entran por la rama moderna y ninguno se queda en el
+        respaldo. Esa frase falsa es la razón de que la rama moderna llegara a
+        producción dibujando una tira vertical de 25×367 px con las palabras
+        partidas letra a letra: nadie la miró porque nadie creía que se usara.
+        WebKit no se midió en este arnés; ahí el respaldo de Alpine sigue siendo la
+        red y por eso se conserva. Si vuelves a escribir qué motor soporta qué,
+        mídelo con `CSS.supports()` antes.
      2. Ningún texto del anfitrión entra en una expresión de Alpine (la lección de
         `file-dropzone`): un apóstrofo descuadra las comillas y tumba el Alpine de la
         página ENTERA, y un texto venido de la base de datos con `'+fetch(…)+'` se
@@ -222,20 +234,43 @@
            ayudas de la misma tabla comparten el nombre del ancla y el navegador se
            queda con la última del documento, o sea que todas las burbujas se dibujan
            sobre el último botón de la nómina. Con scope, el nombre solo vale dentro
-           del envoltorio que lo declara. */
+           del envoltorio que lo declara.
+
+           LAS DOS DECLARACIONES QUE SUELTAN LA CAJA, y por qué no se pueden quitar.
+           `position-area` no es solo una colocación: la región elegida pasa a ser el
+           BLOQUE CONTENEDOR de la burbuja (css-anchor-position-1). Con `top center`
+           esa región es la celda central de la rejilla, o sea el ancho exacto del
+           disparador; una burbuja sin ancho propio se encoge dentro de él y el
+           `max-width` de arriba no puede hacer nada, porque el que manda es el
+           contenedor. Medido: sobre un botón de icono de 25 px la burbuja salía de
+           25×367 px, una tira de una letra por línea.
+
+             - `span-all` en el eje CRUZADO abre el bloque contenedor a la rejilla
+               entera y, de paso, cambia el alineamiento por omisión de ese eje a
+               `anchor-center`: la burbuja queda centrada sobre el ancla en vez de
+               estirada dentro de ella. (`top span-all` se serializa como `top`.)
+             - `width: max-content` la suelta también en el eje de la COLOCACIÓN.
+               Hace falta para `left` y `right`: cerca del borde de la pantalla la
+               franja lateral mide 60 px y sin esto la burbuja se vuelve a encoger
+               ahí. Con la caja suelta, `position-try-fallbacks` sí detecta el
+               desbordamiento y voltea al lado opuesto, que es lo que se quiere.
+
+           El `max-width` sigue siendo el tope real: `max-content` pide el ancho del
+           texto de un tirón y el `min(28ch, 90vw)` lo recorta y lo hace envolver. */
         @supports (anchor-scope: --muni-tt) {
             .muni-tt { anchor-name: --muni-tt; anchor-scope: --muni-tt; }
 
             .muni-tt__bubble {
                 position-anchor: --muni-tt;
                 margin: 7px;
+                width: max-content;
                 position-try-fallbacks: flip-block, flip-inline;
             }
 
-            .muni-tt__bubble--top { position-area: top center; }
-            .muni-tt__bubble--bottom { position-area: bottom center; }
-            .muni-tt__bubble--left { position-area: left center; }
-            .muni-tt__bubble--right { position-area: right center; }
+            .muni-tt__bubble--top { position-area: top span-all; }
+            .muni-tt__bubble--bottom { position-area: bottom span-all; }
+            .muni-tt__bubble--left { position-area: left span-all; }
+            .muni-tt__bubble--right { position-area: right span-all; }
         }
 
         /* Lo que se imprime es un acta. Una ayuda que quedó abierta al mandar a

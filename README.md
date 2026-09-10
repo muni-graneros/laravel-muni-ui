@@ -222,6 +222,7 @@ quedaban sin valor.
 | `<x-muni::nav-section>` | `title` |
 | `<x-muni::breadcrumb>` | `items` (array de `['label','url'?]`) |
 | `<x-muni::tooltip>` | `text`, `placement`, `describe`/`as` (Alpine) — la burbuja va `aria-hidden` por defecto: el nombre del botón va en su `aria-label`, no acá |
+| `<x-muni::popover>` | `id`, `label`, `align`, `width`, `closeLabel`; ranuras `trigger` y contenido — panel flotante sobre el atributo nativo `popover`; el slot admite un `<form method="get">` entero |
 | `<x-muni::avatar>` | `name` (iniciales), `src`, `size`, `tone` |
 | `<x-muni::progress>` | `value`, `max`, `tone`, `label`, `showValue` |
 | `<x-muni::skeleton>` | `width`, `height`, `rounded` (shimmer) |

@@ -10,7 +10,7 @@ pantalla.
 
 **Este documento se poda a medida que se cierra trabajo.** Las seis fichas de la primera tanda ya
 salieron del cuerpo, las siete de la segunda y tres de la tercera también. Están resumidas en la
-sección 0 con su commit. **Quedan 34 pendientes.** Si una ficha sigue acá, sigue sin hacerse.
+sección 0 con su commit. **Quedan 36 pendientes.** Si una ficha sigue acá, sigue sin hacerse.
 
 ## Antes de leer: dos advertencias sobre este documento
 
@@ -222,7 +222,8 @@ ecosistema ya tiene nueve.
 | `cargando` | 2 | Decir que algo está en curso, en texto y no solo en movimiento, y decir cuándo terminó. | La búsqueda por RUT contra el maestro de personas en el mesón (tarda alrededor de un segundo);… | bajo |
 | `combobox` | 2 | Buscar y elegir un registro dentro de una lista larga escribiendo, en vez de desplegar mil opc… | El buscador de titular en la recepción de solicitudes ARCOP —el campo que hoy tapa el parche d… | alto |
 | `popover` | 2 | Un panel flotante anclado a un disparador, con contenido y controles dentro, que no bloquea la… | El panel de filtros por estado y fecha de la bandeja de solicitudes de Atención al Vecino; la … | medio |
-| `timeline` | 2 | El historial de un expediente y el registro de accesos: quien, cuando, y que cambio de que a q… | La bitacora del expediente de una patente comercial (ingreso, observacion, resolucion) y el re… | bajo |
+| `checkbox-group` | 2 | Un grupo de casillas como un solo campo: fieldset con legend, y el error del grupo dicho una v… | Los requisitos que marca el funcionario al recibir una solicitud de patente y las categorías d… | bajo |
+| `field` (prop muerta) | 4 | La envoltura de campo de la filter-bar declara una prop `name` que no usa en ninguna parte. | Cualquier filtro de la bandeja de Atención al Vecino o del listado de patentes morosas. | bajo |
 | `campo-clave` | 3 | Escribir una contraseña pudiendo verla, y saber si es suficientemente robusta, con teclado y c… | El cambio de clave del funcionario y el restablecimiento de clave del vecino en Atención al Ve… | bajo |
 | `conmutador-tema` | 3 | Que el funcionario elija claro, oscuro o «seguir el sistema», que la elección se recuerde y qu… | El turno de noche de la central de cámaras de seguridad ciudadana; y el mesón de licencias, do… | medio |
 | `lista-descripcion` | 3 | El bloque de datos de una ficha como pares dato-valor con semantica real: <dl>/<dt>/<dd>. | La ficha del solicitante en la recepcion de licencias (RUT, nombre, domicilio, clase solicitad… | bajo |
@@ -308,6 +309,36 @@ ecosistema ya tiene nueve.
 > **Objeción del juez.** Los dos usos municipales que declara ya tienen dueño, y en un caso el reemplazo es peor. `filter-bar` mantiene los filtros en la URL justamente para que las descargas xlsx/csv los arrastren; un panel flotante con estado en Alpine pierde esa propiedad salvo que envuelva el mismo formulario GET. Y la «ficha resumida del titular al pinchar el RUT» es datos personales de un vecino flotando sobre un listado: bajo Ley 21.719 (minimización y trazabilidad de accesos) un `modal`/`drawer` es defendible mejor que un panel que aparece al pasar cerca, porque obliga a un acto explícito de apertura que se puede registrar. Dicho de otro modo: popover compra ergonomía, no capacidad, y hay que pagarla en un componente que debe estar correcto en cuatro navegadores, dos temas, tablet e impresión. Si `selector-fecha` y `combobox` no se van a construir, este componente solo no se paga.
 >
 > **Corrección exigida.** 1) Cambiar la base técnica: construirlo sobre el atributo NATIVO `popover` + `popovertarget`, no sobre una reimplementación de Radix/Pines. El top-layer nativo elimina el riesgo (1) —no se recorta dentro de una tabla con overflow ni hace falta `x-teleport`, lo que además evita que Livewire huerfane el panel al remorfear, problema que sí tiene el `modal` actual— y da light-dismiss, Esc y retorno de foco al invocador sin JS, que es el riesgo (2). 2) Descartar el truco de Pines de medir en invisible: con el panel ya en el top-layer se mide después de mostrarlo. El anclaje es un `getBoundingClientRect()` del disparador más un shim de ~20 líneas, y `@supports (anchor-name: --x)` lo sustituye por CSS Anchor Positioning puro donde exista (Chrome/Safari sí, Firefox no; nunca como única vía). 3) Corregir las referencias: `mejor_referencia` debe ser la especificación HTML del Popover API + el APG de disclosure; shadcn y Pines quedan solo como contrato de slots. 4) Poner `aria-expanded` EXPLÍCITO en el disparador: el mapeo implícito de `popovertarget` no es parejo entre navegadores. 5) Resetear el UA stylesheet de `[popover]` (`position:fixed; inset:0; margin:auto; border:solid; padding:.25em`) y no pelear `x-show` contra `showPopover()` — el estado lo lleva uno solo de los dos. 6) Añadir dos riesgos que faltan: en tablet y móvil el panel no se «corre a la izquierda», cambia a ancho completo anclado abajo por breakpoint; y como estos sistemas imprimen mucho, un popover abierto no debe salir en `@media print`. 7) Alcance: el slot por defecto debe poder ser un `<form method="get">` completo, para no perder los filtros en la URL. 8) El esfuerzo «medio» solo es honesto con esta arquitectura; con la que propone el candidato (teleport + listeners de scroll/resize + foco manual + flip) es alto.
+
+### `checkbox-group`
+
+**componente nuevo** · prioridad 2 · esfuerzo bajo · **sin juez**
+
+**Qué resuelve.** Un grupo de casillas tratado como un solo campo: `<fieldset>` con `<legend>`, y el error del grupo dicho una vez para el conjunto, no repetido en cada casilla.
+**Qué pasa hoy sin él.** `<x-muni::checkbox>` resuelve la casilla suelta —nativa, nunca premarcada, con descripción atada y blanco de pulsación de 24 px— pero un grupo de casillas no es la suma de sus casillas: sin `fieldset`/`legend` el lector de pantalla no dice de qué grupo forma parte cada una, y el error («elige al menos un requisito») no tiene dónde vivir. Hoy cada sistema lo arma con `<div>` y un `<p>` de error suelto.
+**Lo más parecido que ya existe.** `checkbox` (la pieza) y `error-summary` (el resumen del formulario, que enlaza a un campo, no a un grupo).
+**Referencia que lo hace mejor.** Pendiente: esta ficha se anotó desde la corrección del panel de jueces sobre `checkbox` y no llegó a evaluarse.
+**Patrón.** ninguno especial; `fieldset`/`legend` nativo, sin `role="group"` redundante
+**Teclas obligatorias.** Tab entra al grupo y recorre las casillas (no es un radiogroup: cada casilla es su propia parada); Espacio marca
+**Alpine.** no
+**Riesgo.** Bajo. El único punto real: el error del grupo tiene que atarse con `aria-describedby` al `fieldset`, no a cada `input`, o el lector lo repite tantas veces como casillas haya. Ley 21.719: un grupo de casillas de consentimiento **nunca** viene premarcado — el consentimiento pre-marcado no es consentimiento válido.
+**Dónde se usa.** Los requisitos que marca el funcionario al recibir una solicitud de patente comercial, y las categorías de discapacidad en la ficha de inscripción.
+
+> **Por qué está acá y no antes.** El panel de jueces la pidió como ficha aparte al corregir `checkbox`, y no quedó anotada en su momento. Es un error de contabilidad del backlog, no una decisión de descartarla.
+
+### `field` (prop muerta)
+
+**reparación** · prioridad 4 · esfuerzo bajo · **sin juez**
+
+**Qué resuelve.** `resources/views/components/field.blade.php` declara `@props(['label' => null, 'name' => null])` y **nunca usa `$name`**: la única aparición de la palabra en el archivo es la propia declaración.
+**Qué pasa hoy sin él.** Un consumidor que pase `name="estado"` creyendo que ata la etiqueta al control no obtiene nada, y no hay ningún error. La asociación hoy funciona por otra vía —el componente envuelve el control dentro de un `<label>`, que es asociación implícita válida— así que el defecto es de contrato, no de accesibilidad.
+**Lo más parecido que ya existe.** El propio `field`, usado solo por `filter-bar`.
+**Referencia que lo hace mejor.** No aplica.
+**Patrón.** ninguno
+**Teclas obligatorias.** ninguna propia
+**Alpine.** no
+**Riesgo.** El paquete es **aditivo**: quitar la prop está prohibido. Las dos salidas honestas son usarla (emitir `for` explícito además del anidamiento) o documentarla como aceptada y sin efecto. Elegir sin medir quién la pasa sería adivinar.
+**Dónde se usa.** Cualquier filtro de la bandeja de Atención al Vecino o del listado de patentes morosas.
 
 ### `campo-clave`
 
@@ -524,8 +555,6 @@ ecosistema ya tiene nueve.
 
 | Pieza | Prio | Qué resuelve | Trámite donde se usa | Esfuerzo |
 |---|---|---|---|---|
-| `bitacora-auditoria` | 2 | Quién vio o modificó qué ficha, cuándo, desde qué IP y con qué resultado; filtrable por actor,… | Registro de accesos a la ficha de una persona con discapacidad (dato de salud), al maestro de … | medio-alto |
-| `doc-imprimible` | 2 | La hoja tamaño carta que sale por impresora o PDF: membrete institucional con escudo, folio, b… | Certificado de inscripción en el Registro de Discapacidad; acta de fiscalización de patentes c… | medio (una hoja muni-print.css + … |
 | `ficha-persona` | 2 | La pantalla del sujeto: identidad arriba (foto, nombre, RUN en .muni-num, edad, domicilio, est… | Ficha del vecino en Atención al Vecino, ficha del titular en Licencias de Conducir, ficha de l… | medio |
 | `vitrina` | 2 | Una vitrina navegable, servida por el propio paquete, que muestra cada componente con sus vari… | No es un trámite: es la referencia que consultan los seis sistemas antes de inventar un compon… | medio |
 | `bandeja-trabajo` | 3 | La cola del funcionario: pestañas por estado, filtros facetados con contador, búsqueda, selecc… | Bandeja de solicitudes de Atención al Vecino (derivar a la unidad responsable), cola de solici… | alto |

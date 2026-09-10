@@ -11,7 +11,7 @@
     "El indicador de foco es un outline con var(--muni-focus), no una box-shadow: dentro de Filament la sombra se pierde.",
     "El movimiento usa var(--muni-dur), que baja a 0ms con prefers-reduced-motion.",
     "Los componentes deben funcionar en Livewire 3 y 4: nada de @island, wire:show, wire:sort ni #[Transition].",
-    "Antes de cerrar una pantalla: npm run a11y:vitrina (mide los componentes reales; npm run a11y añade las demos, que hoy arrastran deuda conocida)."
+    "Antes de cerrar una pantalla: npm run a11y:vitrina, que mide los componentes reales en claro y oscuro. npm run a11y suma las demos, que hoy arrastran deuda conocida."
   ],
   "components": [
     {
@@ -825,6 +825,152 @@
         "--muni-text"
       ],
       "example": "<x-muni::checkbox />"
+    },
+    {
+      "name": "combobox",
+      "tag": "<x-muni::combobox>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/combobox.blade.php",
+      "description": "El id elegido:",
+      "props": [
+        {
+          "name": "name",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "options",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "value",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "selectedLabel",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "search",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "model",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "searchModel",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "default": "Escribe para buscar…",
+          "required": false
+        },
+        {
+          "name": "listLabel",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "emptyText",
+          "type": "string",
+          "default": "Sin resultados.",
+          "required": false
+        },
+        {
+          "name": "clearLabel",
+          "type": "string",
+          "default": "Limpiar la búsqueda",
+          "required": false
+        },
+        {
+          "name": "hint",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "error",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "required",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "loading",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "selectedLabel",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-cloak",
+          "x-data",
+          "x-ref",
+          "x-show",
+          "x-transition"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-accent-soft",
+        "--muni-border",
+        "--muni-combo-ancla",
+        "--muni-danger-bg",
+        "--muni-danger-border",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-field-border",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-hint",
+        "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-shadow-lg",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::combobox :name=\"$name\" />"
     },
     {
       "name": "command-palette",
@@ -2685,6 +2831,89 @@
       "example": "<x-muni::pagination />"
     },
     {
+      "name": "popover",
+      "tag": "<x-muni::popover>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/popover.blade.php",
+      "description": "PANEL FLOTANTE anclado a un disparador, con contenido y controles dentro, que NO bloquea la página",
+      "props": [
+        {
+          "name": "id",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Filtros",
+          "required": false
+        },
+        {
+          "name": "align",
+          "type": "string",
+          "default": "end",
+          "required": false
+        },
+        {
+          "name": "width",
+          "type": "string",
+          "default": "320px",
+          "required": false
+        },
+        {
+          "name": "closeLabel",
+          "type": "string",
+          "default": "Cerrar",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "trigger",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "id",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-bind",
+          "x-data",
+          "x-init",
+          "x-on",
+          "x-ref",
+          "x-show"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-border-2",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-pop-sonda",
+        "--muni-radius-lg",
+        "--muni-radius-sm",
+        "--muni-shadow-lg",
+        "--muni-surface",
+        "--muni-surface-3",
+        "--muni-text"
+      ],
+      "example": "<x-muni::popover label=\"Filtros\"></x-muni::popover>"
+    },
+    {
       "name": "progress",
       "tag": "<x-muni::progress>",
       "type": "registry:blade-component",
@@ -3883,7 +4112,7 @@
       "tag": "<x-muni::tooltip>",
       "type": "registry:blade-component",
       "file": "resources/views/components/tooltip.blade.php",
-      "description": "Componente tooltip del sistema de diseño municipal",
+      "description": "Ayuda breve de un control (Alpine 3 core)",
       "props": [
         {
           "name": "text",
@@ -3895,6 +4124,18 @@
           "name": "placement",
           "type": "string",
           "default": "top",
+          "required": false
+        },
+        {
+          "name": "describe",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "as",
+          "type": "mixed",
+          "default": "null",
           "required": false
         }
       ],
@@ -3909,17 +4150,22 @@
         "directives": [
           "x-cloak",
           "x-data",
+          "x-muni",
+          "x-ref",
           "x-show",
           "x-transition"
         ],
         "plugins": []
       },
       "tokens": [
+        "--muni-dur",
+        "--muni-ease",
         "--muni-font-sans",
         "--muni-on-accent",
         "--muni-radius-sm",
         "--muni-shadow-md",
-        "--muni-text"
+        "--muni-text",
+        "--muni-tt"
       ],
       "example": "<x-muni::tooltip placement=\"top\"></x-muni::tooltip>"
     },

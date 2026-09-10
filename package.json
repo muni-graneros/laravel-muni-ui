@@ -11,7 +11,8 @@
     "a11y:claro": "python3 scripts/a11y-check.py --tema claro",
     "a11y:oscuro": "python3 scripts/a11y-check.py --tema oscuro",
     "a11y:informe": "python3 scripts/a11y-check.py --json a11y-informe.json",
-    "a11y:instalar": "python3 -m venv .venv-a11y && .venv-a11y/bin/pip install --upgrade pip playwright && .venv-a11y/bin/python -m playwright install chromium"
+    "a11y:instalar": "python3 -m venv .venv-a11y && .venv-a11y/bin/pip install --upgrade pip playwright && .venv-a11y/bin/python -m playwright install chromium",
+    "registro": "python3 scripts/gen-registry.py . registry.json"
   },
   "devDependencies": {
     "axe-core": "4.10.2"

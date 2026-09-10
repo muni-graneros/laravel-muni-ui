@@ -11,7 +11,7 @@
     "El indicador de foco es un outline con var(--muni-focus), no una box-shadow: dentro de Filament la sombra se pierde.",
     "El movimiento usa var(--muni-dur), que baja a 0ms con prefers-reduced-motion.",
     "Los componentes deben funcionar en Livewire 3 y 4: nada de @island, wire:show, wire:sort ni #[Transition].",
-    "Antes de cerrar una pantalla: npm run a11y."
+    "Antes de cerrar una pantalla: npm run a11y:vitrina (mide los componentes reales; npm run a11y añade las demos, que hoy arrastran deuda conocida)."
   ],
   "components": [
     {

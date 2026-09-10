@@ -150,7 +150,7 @@ Y en el navegador, sobre una pantalla con formulario y tabla:
    la página, que ahora cae en el enlace de salto.
 3. El borde de un campo vacío tiene que distinguirse del fondo.
 
-Si tienes el paquete clonado, `npm run a11y` mide contraste real y corre axe-core sobre las
+Si tienes el paquete clonado, `npm run a11y:vitrina` mide contraste real y corre axe-core sobre las
 demos en los dos temas.
 
 ---

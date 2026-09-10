@@ -1,17 +1,19 @@
 {
-    "name": "@muni-graneros/laravel-muni-ui",
-    "version": "0.17.1",
-    "private": true,
-    "description": "Herramientas de verificación del sistema de diseño municipal. El paquete no publica bundle: esto existe solo para correr la reja de accesibilidad.",
-    "license": "MIT",
-    "scripts": {
-        "a11y": "python3 scripts/a11y-check.py",
-        "a11y:claro": "python3 scripts/a11y-check.py --tema claro",
-        "a11y:oscuro": "python3 scripts/a11y-check.py --tema oscuro",
-        "a11y:informe": "python3 scripts/a11y-check.py --json a11y-informe.json",
-        "a11y:instalar": "python3 -m venv .venv-a11y && .venv-a11y/bin/pip install --upgrade pip playwright && .venv-a11y/bin/python -m playwright install chromium"
-    },
-    "devDependencies": {
-        "axe-core": "4.10.2"
-    }
+  "name": "@muni-graneros/laravel-muni-ui",
+  "version": "0.17.1",
+  "private": true,
+  "description": "Herramientas de verificación del sistema de diseño municipal. El paquete no publica bundle: esto existe solo para correr la reja de accesibilidad.",
+  "license": "MIT",
+  "scripts": {
+    "a11y": "python3 scripts/a11y-check.py",
+    "a11y:vitrina": "vendor/bin/pest --filter=GeneraVitrina && python3 scripts/a11y-check.py build/vitrina/claro.html build/vitrina/oscuro.html",
+    "a11y:demos": "python3 scripts/a11y-check.py demo/*.html",
+    "a11y:claro": "python3 scripts/a11y-check.py --tema claro",
+    "a11y:oscuro": "python3 scripts/a11y-check.py --tema oscuro",
+    "a11y:informe": "python3 scripts/a11y-check.py --json a11y-informe.json",
+    "a11y:instalar": "python3 -m venv .venv-a11y && .venv-a11y/bin/pip install --upgrade pip playwright && .venv-a11y/bin/python -m playwright install chromium"
+  },
+  "devDependencies": {
+    "axe-core": "4.10.2"
+  }
 }

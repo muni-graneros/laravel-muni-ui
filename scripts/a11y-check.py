@@ -247,7 +247,11 @@ def revisar(pagina: Path, temas: list[str], axe_src: str, ctx) -> list[dict]:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Reja de accesibilidad de laravel-muni-ui")
-    ap.add_argument("paginas", nargs="*", help="archivos HTML; por defecto todas las de demo/")
+    ap.add_argument(
+        "paginas",
+        nargs="*",
+        help="archivos HTML; por defecto la vitrina de componentes y todas las de demo/",
+    )
     ap.add_argument("--tema", choices=["claro", "oscuro", "ambos"], default="ambos")
     ap.add_argument("--axe", help="ruta a axe.min.js (si no, node_modules o caché)")
     ap.add_argument("--json", help="escribe el informe completo en este archivo")
@@ -268,18 +272,33 @@ def main() -> int:
             "por la distribución (PEP 668) y rechaza `pip install`.\n"
         )
 
-    paginas = [Path(p) for p in args.paginas] or sorted((RAIZ / "demo").glob("*.html"))
+    # La vitrina va PRIMERO y va por defecto. Se construyó justamente porque medir
+    # solo demo/*.html mide maquetas escritas a mano, no los componentes que se
+    # publican; dejarla fuera del conjunto por omisión anulaba su razón de existir.
+    # La genera `vendor/bin/pest --filter=GeneraVitrina`, y no está versionada, así
+    # que si falta se avisa en vez de fallar: la reja sigue sirviendo sin ella.
+    vitrina = sorted((RAIZ / "build/vitrina").glob("*.html"))
+    if args.paginas:
+        paginas = [Path(p) for p in args.paginas]
+    else:
+        paginas = vitrina + sorted((RAIZ / "demo").glob("*.html"))
+        if not vitrina:
+            print(
+                "Aviso: no hay vitrina en build/vitrina/. Se mide solo demo/*.html, que son\n"
+                "       maquetas escritas a mano y no los componentes reales. Genérala con:\n"
+                "         vendor/bin/pest --filter=GeneraVitrina\n"
+            )
     paginas = [p if p.is_absolute() else (RAIZ / p) for p in paginas]
     faltan = [p for p in paginas if not p.is_file()]
     if faltan:
         sys.exit("No existen: " + ", ".join(str(p) for p in faltan))
     if not paginas:
-        sys.exit("No hay demos que revisar en demo/*.html")
+        sys.exit("No hay nada que revisar: ni build/vitrina/*.html ni demo/*.html")
 
     temas = {"claro": ["light"], "oscuro": ["dark"], "ambos": ["light", "dark"]}[args.tema]
     axe_src = "" if args.sin_axe else axe_js(args.axe)
 
-    print(f"Revisando {len(paginas)} demo(s) × {len(temas)} tema(s) — umbral 4.5:1 texto normal, 3:1 texto grande\n")
+    print(f"Revisando {len(paginas)} página(s) × {len(temas)} tema(s) — umbral 4.5:1 texto normal, 3:1 texto grande\n")
 
     filas = []
     with sync_playwright() as p:

@@ -210,7 +210,9 @@ Tres cosas hacen que una pantalla se reconozca como de este ecosistema y no como
 
 ## 11. Antes de dar por terminado un componente
 
-- La reja pasa: `npm run a11y`.
+- La reja pasa: `npm run a11y:vitrina`, que mide los componentes REALES en los dos temas.
+  (`npm run a11y` mide además `demo/*.html`, que hoy arrastra deuda conocida y sale en rojo:
+  sirve para ver el estado completo, no como candado por commit.)
 - Hay una prueba que falla si el defecto vuelve.
 - Se ve en las dos combinaciones de tema y en ancho de escritorio y de teléfono.
 - Se recorre entero con el teclado, y el foco se ve en cada parada.

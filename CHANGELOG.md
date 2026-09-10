@@ -29,7 +29,8 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
   `<x-muni::rut-input>`, `<x-muni::date-input>`, `<x-muni::error-summary>` y
   `<x-muni::announcer>`.
 - Una vitrina que renderiza los componentes REALES en los dos temas, generada desde una
-  prueba, para que `npm run a11y` deje de medir las demos escritas a mano.
+  prueba, para que la reja deje de medir solo las demos escritas a mano. Se mide con
+  `npm run a11y:vitrina`, y la vitrina entra además en el conjunto por omisión de `npm run a11y`.
 - `<x-muni::table-header>`: la franja entre el título y la tabla, con contador que distingue el
   filtrado del total.
 - `sortable-table` gana selección en lote (`selectable`, `rowKey`, `selectionScope`,

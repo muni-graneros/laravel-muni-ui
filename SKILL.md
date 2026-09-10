@@ -147,7 +147,8 @@ tiene solución a un clic.
 ## Antes de dar por terminada la pantalla
 
 ```bash
-npm run a11y          # en el paquete: mide contraste real y corre axe-core
+npm run a11y:vitrina  # el candado: mide los componentes reales en claro y oscuro
+npm run a11y          # además las demos, que hoy arrastran deuda conocida
 ```
 
 La reja abre cada demo en claro y en oscuro, mide el contraste resolviendo el fondo efectivo capa

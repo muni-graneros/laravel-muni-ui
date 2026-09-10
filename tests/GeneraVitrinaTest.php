@@ -45,7 +45,21 @@ function ejemplosDeVitrina(): array
         'announcer' => '<x-muni::announcer />',
         'empty-state' => '<x-muni::empty-state title="Sin resultados" description="Ningún contribuyente coincide con el filtro." />',
         'progress' => '<x-muni::progress :value="64" label="Avance del trámite" />',
-        'timeline' => '<x-muni::timeline :items="[[\'title\' => \'Ingresada\', \'time\' => \'10:04\'], [\'title\' => \'Derivada a Obras\', \'time\' => \'11:20\', \'tone\' => \'ok\']]" />',
+        // Varios tonos a la vez porque la etiqueta de estado es TEXTO visible y hay
+        // un par de colores que medir por tono. Un ítem con `current`, otro con
+        // `actor` y otro con `detail`: el <summary> es una parada de tabulación
+        // nueva, y sin un ítem que lo emita la reja no mide ni su foco ni su
+        // contraste. El <details> arranca colapsado, así que lo de adentro no se
+        // mide acá: es lo mismo que ve el funcionario al abrir la pantalla.
+        'timeline' => '<x-muni::timeline :items="['
+            .'[\'title\' => \'Ingresada\', \'time\' => \'10:04\', \'datetime\' => \'2026-09-08T10:04:00-03:00\', \'tone\' => \'info\', \'actor\' => \'Ventanilla Única\'],'
+            .'[\'title\' => \'Derivada a Obras\', \'time\' => \'11:20\', \'tone\' => \'ok\', \'description\' => \'Con el certificado de dominio adjunto.\'],'
+            .'[\'title\' => \'Observada por Obras\', \'time\' => \'15:47\', \'tone\' => \'warn\', \'actor\' => \'C. Bugueño\','
+            .' \'detail\' => \'Domicilio: Calle Uno 100 → Calle Dos 200\'],'
+            .'[\'title\' => \'Rechazada por falta de antecedentes\', \'time\' => \'09:12\', \'tone\' => \'danger\'],'
+            .'[\'title\' => \'En revisión del director\', \'time\' => \'12:30\', \'tone\' => \'accent\', \'current\' => true],'
+            .'[\'title\' => \'Anulada por duplicado\', \'time\' => \'12:45\', \'tone\' => \'muted\'],'
+            .']" />',
         'breadcrumb' => '<x-muni::breadcrumb :items="[[\'label\' => \'Inicio\', \'url\' => \'#\'], [\'label\' => \'Patentes\']]" />',
         // Con `url` los números son enlaces de verdad. Sin él salen como texto, y la
         // reja mediría un componente que nadie usa así en producción.
@@ -61,6 +75,35 @@ function ejemplosDeVitrina(): array
         'sortable-table' => '<x-muni::sortable-table searchable caption="Patentes morosas"'
             .' :columns="[[\'key\' => \'rut\', \'label\' => \'RUT\'], [\'key\' => \'monto\', \'label\' => \'Monto\']]"'
             .' :rows="[[\'rut\' => \'12.345.678-9\', \'monto\' => \'520.000\', \'_tone\' => \'danger\'], [\'rut\' => \'9.876.543-2\', \'monto\' => \'80.000\']]" />',
+        // Los dos que siguen van AL FINAL a propósito. El reparto par/impar de la
+        // rejilla decide qué tarjeta cae sobre --muni-surface-3, y en la posición
+        // par está `input`, que es donde el mensaje de error falló contraste.
+        // Meterlos en medio correría ese reparto y dejaría de medirse justo el
+        // caso por el que se puso la regla. Al final, además, cae uno en cada
+        // superficie: diff-campos sobre la superficie normal y hoja sobre la 3.
+        //
+        // Los tres estados juntos —y el cuarto, «sin cambios»— porque cada uno
+        // pinta su propio par fg/bg en la etiqueta y en el <ins>/<del>: con una
+        // sola fila se mediría un tono de cuatro. Los valores son strings ya
+        // redactados, que es lo único que el componente acepta.
+        'diff-campos' => '<x-muni::diff-campos caption="Cambios en la solicitud 4821" :changes="['
+            .'[\'field\' => \'telefono\', \'label\' => \'Teléfono\', \'after\' => \'+56 9 8765 4321\', \'mono\' => true],'
+            .'[\'field\' => \'domicilio\', \'label\' => \'Domicilio\', \'before\' => \'Calle Uno 100\', \'after\' => \'Calle Dos 200\'],'
+            .'[\'field\' => \'correo\', \'label\' => \'Correo\', \'before\' => \'antiguo@ejemplo.cl\'],'
+            .'[\'field\' => \'rut\', \'label\' => \'RUT\', \'before\' => \'12.345.678-9\', \'after\' => \'12.345.678-9\', \'mono\' => true],'
+            .']">Registro conservado 5 años. La exportación queda en la bitácora.</x-muni::diff-campos>',
+        // Con folio, leyenda de verificación y las tres ranuras: sin ellas la
+        // mitad del componente —el pie, los recuadros de datos y la firma— no
+        // llega al DOM y la reja no mide nada de eso.
+        'hoja' => '<x-muni::hoja id="vitrina-hoja" unit="Dirección de Tránsito"'
+            .' type="Acta de fiscalización" folio="A-2026-4821" date="8 de septiembre de 2026"'
+            .' verification="Verifica el folio en la Oficina de Partes, Manuel Rodríguez 545.">'
+            .'<x-slot:emisor><strong>Fiscalizador</strong><br>Juan Pérez · Inspección Municipal</x-slot:emisor>'
+            .'<x-slot:titular><strong>Titular</strong><br>Ana Soto · Patente comercial 1.204</x-slot:titular>'
+            .'<p>Se constata el funcionamiento del local fuera del horario autorizado '
+            .'en el decreto alcaldicio 118/2026. Se levanta acta y se cita al Juzgado de Policía Local.</p>'
+            .'<x-slot:firma><span>Firma del fiscalizador</span></x-slot:firma>'
+            .'</x-muni::hoja>',
     ];
 }
 

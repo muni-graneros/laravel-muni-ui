@@ -62,7 +62,9 @@
     .slot{padding:11px;border:1px solid var(--muni-border);border-radius:var(--muni-radius-sm);text-align:center;cursor:pointer;transition:.15s;font-size:13px}
     .slot:hover{border-color:var(--muni-accent-strong)}
     .slot.on{background:var(--muni-accent);color:var(--muni-on-accent);border-color:var(--muni-accent)}
-    .slot .d{font-size:11px;opacity:.7;display:block}
+    .slot .d{font-size:11px;color:var(--muni-muted);display:block}
+    .slot.on .d{color:var(--muni-on-accent)}
+    .slot.on b::after{content:" \2713"}
 
     .kv{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--muni-border);font-size:13.5px}
     .kv span{color:var(--muni-muted)}.kv b{font-weight:600}
@@ -98,9 +100,9 @@
         <!-- PASO 1 -->
         <div x-show="step===0" x-cloak x-transition:enter="fade" x-transition:enter-start="fade-0" x-transition:enter-end="fade-1">
             <h2>Tus datos</h2><p class="sub">Ingresa tu RUT y autocompletamos lo que el municipio ya sabe de ti.</p>
-            <div class="fg"><label class="lbl">RUT</label><input class="field" x-model="d.rut" @blur="autofill()" placeholder="12.345.678-5"><div class="hint" x-show="filled" style="color:var(--muni-ok-fg)">✓ Datos traídos del maestro de personas</div></div>
-            <div class="row"><div class="fg"><label class="lbl">Nombres</label><input class="field" x-model="d.nombres"></div><div class="fg"><label class="lbl">Apellidos</label><input class="field" x-model="d.apellidos"></div></div>
-            <div class="row"><div class="fg"><label class="lbl">Correo</label><input class="field" x-model="d.email" placeholder="tu@correo.cl"></div><div class="fg"><label class="lbl">Teléfono</label><input class="field" x-model="d.fono" placeholder="+56 9 …"></div></div>
+            <div class="fg"><label class="lbl" for="wz-rut">RUT</label><input id="wz-rut" class="field" x-model="d.rut" @blur="autofill()" placeholder="12.345.678-5"><div class="hint" x-show="filled" style="color:var(--muni-ok-fg)">✓ Datos traídos del maestro de personas</div></div>
+            <div class="row"><div class="fg"><label class="lbl" for="wz-nombres">Nombres</label><input id="wz-nombres" class="field" x-model="d.nombres"></div><div class="fg"><label class="lbl" for="wz-apellidos">Apellidos</label><input id="wz-apellidos" class="field" x-model="d.apellidos"></div></div>
+            <div class="row"><div class="fg"><label class="lbl" for="wz-correo">Correo</label><input id="wz-correo" class="field" x-model="d.email" placeholder="tu@correo.cl"></div><div class="fg"><label class="lbl" for="wz-telefono">Teléfono</label><input id="wz-telefono" class="field" x-model="d.fono" placeholder="+56 9 …"></div></div>
         </div>
 
         <!-- PASO 2 -->
@@ -125,10 +127,10 @@
         <!-- PASO 3 -->
         <div x-show="step===2" x-cloak x-transition:enter="fade" x-transition:enter-start="fade-0" x-transition:enter-end="fade-1">
             <h2>Agenda tu examen</h2><p class="sub">Un cupo por franja, sin sobrecupo. Elige el día y la hora que te acomode.</p>
-            <label class="lbl">Franjas disponibles · Semana del 21 de julio</label>
-            <div class="slots">
+            <div class="lbl" id="wz-franjas">Franjas disponibles · Semana del 21 de julio</div>
+            <div class="slots" role="group" aria-labelledby="wz-franjas">
                 <template x-for="s in slots" :key="s.id">
-                    <div class="slot" :class="d.slot===s.id&&'on'" @click="d.slot=s.id"><b x-text="s.h"></b><span class="d" x-text="s.dia"></span></div>
+                    <div class="slot" role="button" tabindex="0" :aria-pressed="d.slot===s.id" :class="d.slot===s.id&&'on'" @click="d.slot=s.id" @keydown.enter.prevent="d.slot=s.id" @keydown.space.prevent="d.slot=s.id"><b x-text="s.h"></b><span class="d" x-text="s.dia"></span></div>
                 </template>
             </div>
         </div>

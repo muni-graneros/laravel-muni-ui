@@ -33,13 +33,13 @@
 
     /* profile header */
     .phead{display:flex;align-items:center;gap:18px;padding:24px;background:var(--muni-surface);border:1px solid var(--muni-border);border-radius:var(--muni-radius-lg);box-shadow:var(--muni-shadow);margin-bottom:22px;flex-wrap:wrap}
-    .bigav{position:relative;width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,var(--muni-accent-soft),var(--muni-surface-3));color:var(--muni-accent);display:grid;place-items:center;font-size:30px;font-weight:800;flex-shrink:0}
+    .bigav{position:relative;width:76px;height:76px;border-radius:50%;background:var(--muni-accent-soft);color:var(--muni-accent);display:grid;place-items:center;font-size:30px;font-weight:800;flex-shrink:0}
     .bigav .cam{position:absolute;right:-2px;bottom:-2px;width:26px;height:26px;border-radius:50%;background:var(--muni-accent);color:var(--muni-on-accent);display:grid;place-items:center;font-size:12px;border:2px solid var(--muni-surface);cursor:pointer}
     .phead__i h2{font-size:18px;font-weight:700}
     .phead__i .m{color:var(--muni-muted);font-size:13px;margin-top:2px}
     .chips{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
     .chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--muni-font-mono);font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px}
-    .chip.ok{color:var(--muni-ok-fg);background:var(--muni-ok-bg)}.chip.role{color:var(--muni-info-fg);background:color-mix(in srgb,var(--muni-info-fg) 12%,transparent)}
+    .chip.ok{color:var(--muni-ok-fg);background:var(--muni-ok-bg)}.chip.role{color:var(--muni-info-fg);background:var(--muni-info-bg)}
 
     /* tabs */
     .tabs{display:flex;gap:2px;border-bottom:1px solid var(--muni-border);margin-bottom:24px;overflow-x:auto}
@@ -113,10 +113,10 @@
         <div class="card">
             <div class="card__h"><h3>Datos personales</h3><p>Estos datos se sincronizan con el maestro de personas del municipio.</p></div>
             <div class="card__b">
-                <div class="row"><div class="fg"><label class="lbl">Nombres</label><input class="field" value="Juan Pablo"></div><div class="fg"><label class="lbl">Apellidos</label><input class="field" value="Soto Álvarez"></div></div>
-                <div class="row"><div class="fg"><label class="lbl">RUN</label><input class="field" value="12.345.678-5" disabled></div><div class="fg"><label class="lbl">Fecha de nacimiento</label><input class="field" value="1990-04-12"></div></div>
-                <div class="row"><div class="fg"><label class="lbl">Correo</label><input class="field" value="vecino@graneros.cl"></div><div class="fg"><label class="lbl">Teléfono</label><input class="field" value="+56 9 8765 4321"></div></div>
-                <div class="fg" style="margin:0"><label class="lbl">Dirección</label><input class="field" value="Av. Bernardo O'Higgins 1234, Graneros"></div>
+                <div class="row"><div class="fg"><label class="lbl" for="cfg-nombres">Nombres</label><input id="cfg-nombres" class="field" value="Juan Pablo"></div><div class="fg"><label class="lbl" for="cfg-apellidos">Apellidos</label><input id="cfg-apellidos" class="field" value="Soto Álvarez"></div></div>
+                <div class="row"><div class="fg"><label class="lbl" for="cfg-run">RUN</label><input id="cfg-run" class="field" value="12.345.678-5" disabled></div><div class="fg"><label class="lbl" for="cfg-fecha-de-nacimiento">Fecha de nacimiento</label><input id="cfg-fecha-de-nacimiento" class="field" value="1990-04-12"></div></div>
+                <div class="row"><div class="fg"><label class="lbl" for="cfg-correo">Correo</label><input id="cfg-correo" class="field" value="vecino@graneros.cl"></div><div class="fg"><label class="lbl" for="cfg-telefono">Teléfono</label><input id="cfg-telefono" class="field" value="+56 9 8765 4321"></div></div>
+                <div class="fg" style="margin:0"><label class="lbl" for="cfg-direccion">Dirección</label><input id="cfg-direccion" class="field" value="Av. Bernardo O'Higgins 1234, Graneros"></div>
             </div>
             <div class="card__f"><button class="btn btn-g">Cancelar</button><button class="btn btn-p" @click="save('Perfil guardado')">Guardar cambios</button></div>
         </div>
@@ -127,8 +127,8 @@
         <div class="card">
             <div class="card__h"><h3>Contraseña</h3><p>Se recomienda cambiarla cada 6 meses.</p></div>
             <div class="card__b">
-                <div class="fg"><label class="lbl">Contraseña actual</label><input class="field" type="password" placeholder="••••••••"></div>
-                <div class="row"><div class="fg"><label class="lbl">Nueva contraseña</label><input class="field" type="password"></div><div class="fg"><label class="lbl">Confirmar</label><input class="field" type="password"></div></div>
+                <div class="fg"><label class="lbl" for="cfg-contrasena-actual">Contraseña actual</label><input id="cfg-contrasena-actual" class="field" type="password" placeholder="••••••••"></div>
+                <div class="row"><div class="fg"><label class="lbl" for="cfg-nueva-contrasena">Nueva contraseña</label><input id="cfg-nueva-contrasena" class="field" type="password"></div><div class="fg"><label class="lbl" for="cfg-confirmar">Confirmar</label><input id="cfg-confirmar" class="field" type="password"></div></div>
             </div>
             <div class="card__f"><button class="btn btn-p" @click="save('Contraseña actualizada')">Actualizar contraseña</button></div>
         </div>

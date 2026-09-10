@@ -51,6 +51,17 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
   nativo. Todas las claves son opcionales dentro de `$item`.
 - `topbar` gana la clase `muni-topbar`, para que se pueda ocultar al imprimir sin depender de
   su atributo `style` en línea.
+- `<x-muni::combobox>`: buscar y elegir en una lista larga, para formularios **fuera de
+  Filament**. No retira `nombre-accesible-select.js`: el titular ARCOP lo pinta Filament con
+  `Select::searchable()`, y retirar ese parche exige una clase `Field`, que es otra ficha.
+- `<x-muni::popover>`: panel flotante sobre el atributo **nativo** `popover`. El top-layer
+  resuelve el recorte dentro de una tabla, el light-dismiss y el retorno de foco sin JS, y por
+  eso sobrevive al remorfeo de Livewire, que el `modal` actual no puede.
+- `<x-muni::checkbox-group>`: grupo de casillas como un solo campo, con el error atado al
+  `<fieldset>` y no repetido en cada casilla. Ninguna viene premarcada: bajo la Ley 21.719 el
+  consentimiento pre-marcado no es consentimiento válido.
+- `npm run a11y:vitrina` mide los componentes reales; `npm run registro` regenera
+  `registry.json` con `scripts/gen-registry.py`, que antes vivía fuera del repo.
 
 ### Corregido
 - **`file-dropzone` tumbaba el Alpine de la página entera** si la etiqueta traía un apóstrofo: el
@@ -77,6 +88,21 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
   con opacidad —que arrastra el contraste— y la página actual solo se marcaba con color.
 - Las demos mostraban el ámbar de aviso corregido en agosto con su valor viejo (3,11:1), el gris de
   ayuda a 3,19:1 y 2,59:1, y ninguna declaraba `<html lang>`.
+- **La hoja imprimía «Página 0 de 0»**: `counter(page)` solo resuelve dentro de una caja de
+  margen de `@page`. Degradaba a un dato falso, no a un hueco. Verificado con `page.pdf()` en
+  Chromium 151 y Firefox 153.
+- **La burbuja de `tooltip` salía como una tira vertical con las palabras partidas** (25×367 px
+  en vez de 165×26): `position-area` convierte la región elegida en el bloque contenedor. La
+  causa de fondo era un comentario que afirmaba que Firefox no soportaba anchor positioning —
+  Firefox 153 sí lo soporta, así que los dos motores entraban por la rama rota.
+- **La píldora de estado de `diff-campos` se sobreimprimía con la columna vecina**: en un
+  teléfono de 390 px estaba rota siempre.
+- **El menú del panel no abría**: el burger de `dashboard-shell` llevaba `@click` sin ningún
+  `x-data` antecesor, y la lateral cerrada seguía recibiendo el foco con `Tab`.
+- **La flecha de orden de `sortable-table` medía ~1,4:1** (`opacity:.3`), y el separador de
+  `gob-bar` 2,89:1. Los dos van `aria-hidden`, y hasta ahora la reja no medía los subárboles
+  decorativos.
+- Las 14 demos pasan la reja: eran 17 combinaciones en rojo, con 9 campos sin etiqueta asociada.
 - **El borde de los controles de formulario fallaba 1.4.11 en los dos temas**: 1,28:1 y 1,61:1 en
   claro, 1,43:1 y 1,90:1 en oscuro, contra el 3:1 que exige la norma para identificar un
   componente. En un campo el borde es lo único que dice dónde empieza. Token nuevo

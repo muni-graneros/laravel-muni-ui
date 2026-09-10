@@ -746,6 +746,82 @@
       "example": "<x-muni::chart-donut />"
     },
     {
+      "name": "checkbox-group",
+      "tag": "<x-muni::checkbox-group>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/checkbox-group.blade.php",
+      "description": "Un grupo de casillas NO es la suma de sus casillas:",
+      "props": [
+        {
+          "name": "name",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "legend",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "options",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "selected",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "hint",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "error",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "required",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-danger-bg",
+        "--muni-danger-fg",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-hint",
+        "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-text"
+      ],
+      "example": "<x-muni::checkbox-group :name=\"$name\" :legend=\"$legend\"></x-muni::checkbox-group>"
+    },
+    {
       "name": "checkbox",
       "tag": "<x-muni::checkbox>",
       "type": "registry:blade-component",
@@ -1111,17 +1187,31 @@
       "alpine": {
         "required": true,
         "directives": [
-          "x-muni"
+          "x-cloak",
+          "x-data",
+          "x-init",
+          "x-muni",
+          "x-show",
+          "x-teleport",
+          "x-trap"
         ],
-        "plugins": []
+        "plugins": [
+          "focus"
+        ]
       },
       "tokens": [
+        "--muni-accent",
         "--muni-bg",
         "--muni-border",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
         "--muni-font-sans",
         "--muni-muted",
         "--muni-radius-sm",
+        "--muni-ring",
         "--muni-surface",
+        "--muni-surface-2",
         "--muni-text",
         "--muni-topbar-h"
       ],
@@ -1926,8 +2016,10 @@
         }
       ],
       "alpine": {
-        "required": false,
-        "directives": [],
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
         "plugins": []
       },
       "tokens": [
@@ -3337,6 +3429,18 @@
           "type": "string",
           "default": "240px",
           "required": false
+        },
+        {
+          "name": "breakpoint",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Navegación principal",
+          "required": false
         }
       ],
       "slots": [
@@ -3349,14 +3453,19 @@
         "required": true,
         "directives": [
           "x-data",
-          "x-muni"
+          "x-muni",
+          "x-trap"
         ],
-        "plugins": []
+        "plugins": [
+          "focus"
+        ]
       },
       "tokens": [
+        "--muni-accent",
         "--muni-border",
         "--muni-dur",
         "--muni-ease",
+        "--muni-focus",
         "--muni-shadow-lg",
         "--muni-surface"
       ],

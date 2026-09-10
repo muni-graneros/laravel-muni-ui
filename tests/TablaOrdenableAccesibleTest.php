@@ -221,3 +221,24 @@ it('el id del buscador es estable entre renders y respeta el del consumidor', fu
     preg_match('/<label for="([^"]+)"/', $render('id="patentes-morosas"'), $c);
     expect($c[1] ?? '')->toStartWith('patentes-morosas', 'El id del consumidor no manda sobre el generado.');
 });
+
+it('el indicador de orden no se apaga con opacity: es el que dice que la columna se ordena', function () {
+    $fuente = fuenteDeLaVista('sortable-table');
+
+    // `opacity:.3` daba ~1,4:1 contra su fondo. Un indicador de interfaz necesita
+    // 3:1 (WCAG 1.4.11) y la reja no lo cazaba porque va `aria-hidden` y, hasta
+    // que se arregló, los subárboles decorativos no se medían.
+    expect((bool) preg_match('/muni-st__arrow[^;]*opacity/', $fuente))->toBeFalse(
+        'La flecha de orden vuelve a apagarse con opacity: es el único indicador visual de que '.
+        'la columna se puede ordenar y así no llega al 3:1 que pide 1.4.11.'
+    );
+
+    expect(str_contains($fuente, 'muni-st__arrow--on'))->toBeTrue(
+        'El estado activo del orden no tiene marca propia.'
+    );
+
+    expect((bool) preg_match('/muni-st__arrow--on[^}]*font-weight\s*:\s*700/', $fuente))->toBeTrue(
+        'El estado activo se distingue solo por color: necesita también la negrita, porque el '.
+        'color nunca es el único portador de información.'
+    );
+});

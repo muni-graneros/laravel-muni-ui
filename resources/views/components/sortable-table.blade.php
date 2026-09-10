@@ -327,7 +327,7 @@
                             <template x-if="c.sortable!==false">
                                 <button type="button" class="muni-st__sort" @click="sort(c.key)">
                                     <span x-text="c.label"></span>
-                                    <span class="muni-st__arrow" aria-hidden="true" :style="sortKey===c.key ? 'opacity:1' : 'opacity:.3'" x-text="sortKey===c.key ? (sortDir===1?'↑':'↓') : '↕'"></span>
+                                    <span class="muni-st__arrow" aria-hidden="true" :class="sortKey===c.key && 'muni-st__arrow--on'" x-text="sortKey===c.key ? (sortDir===1?'↑':'↓') : '↕'"></span>
                                 </button>
                             </template>
                             <template x-if="c.sortable===false">
@@ -381,7 +381,14 @@
         .muni-st__sort:hover { color:var(--muni-text); }
         /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
         .muni-st__sort:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:2px; }
-        .muni-st__arrow { font-family:var(--muni-font-mono); font-size:11px; }
+        /* Nada de opacity acá. La flecha llevaba `opacity:.3`, o sea ~1,4:1 contra
+           su fondo: es el indicador que dice que la columna se puede ordenar y no
+           llegaba ni al 3:1 que pide 1.4.11 para un componente de interfaz. Va con
+           el color del texto tenue, que ya está medido en los dos temas, y el
+           estado activo suma NEGRITA además del acento: el color nunca es el único
+           portador. El `aria-sort` del th sigue siendo lo que se anuncia. */
+        .muni-st__arrow { font-family:var(--muni-font-mono); font-size:11px; color:var(--muni-muted); }
+        .muni-st__arrow--on { color:var(--muni-accent); font-weight:700; }
         .muni-st td { padding:9px 12px; border-bottom:1px solid var(--muni-border); white-space:nowrap; color:var(--muni-text); }
         .muni-st tbody tr { transition:background var(--muni-dur) var(--muni-ease); }
         .muni-st tbody tr:hover { background:var(--muni-surface-2); }

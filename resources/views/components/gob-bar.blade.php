@@ -31,7 +31,7 @@
         .muni-gob-bar__in { display:flex; align-items:center; gap:10px; max-width:1180px; margin:0 auto; padding:7px clamp(16px,3vw,26px); flex-wrap:wrap; }
         .muni-gob-bar__brand { display:inline-flex; align-items:center; gap:9px; text-decoration:none; color:inherit; }
         .muni-gob-bar__name { font-size:12.5px; font-weight:700; letter-spacing:-.01em; }
-        .muni-gob-bar__sep { opacity:.4; font-size:12.5px; }
+        .muni-gob-bar__sep { opacity:.55; font-size:12.5px; }  /* .4 daba 2,89:1: por debajo incluso del 3:1 de objeto gráfico. .55 mide 4,13:1 y sigue leyéndose como puntuación tenue. */
         .muni-gob-bar__sys { font-size:12.5px; font-weight:500; opacity:.85; }
         .muni-gob-bar__spacer { flex:1; }
         .muni-gob-bar__back { font-size:11.5px; font-weight:600; color:#e8f1f2; text-decoration:none; opacity:.8; transition:opacity var(--muni-dur) var(--muni-ease); white-space:nowrap; }

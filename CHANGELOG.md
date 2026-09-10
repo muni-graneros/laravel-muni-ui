@@ -69,7 +69,10 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
   `--muni-field-border`, declarado también en el tema del panel.
 
 ### Hay que republicar
-**Sí, esta vez.** El token `--muni-field-border` se declara también en
+**Sí, esta vez.** Los pasos completos están en [`docs/UPGRADE-0.18.0.md`](docs/UPGRADE-0.18.0.md),
+que además lista lo que cambia de aspecto sin que el sistema host haga nada.
+
+El token `--muni-field-border` se declara también en
 `muni-ui-filament.css`, porque `muni-ui.css` no se carga dentro de un panel. Todo sistema con
 `MuniPanel` tiene que correr `vendor:publish --tag=muni-ui-filament --force` o el borde de sus
 campos se quedará sin color dentro del panel, sin ningún error visible.

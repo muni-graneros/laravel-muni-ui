@@ -104,6 +104,23 @@ function ejemplosDeVitrina(): array
             .'en el decreto alcaldicio 118/2026. Se levanta acta y se cita al Juzgado de Policía Local.</p>'
             .'<x-slot:firma><span>Firma del fiscalizador</span></x-slot:firma>'
             .'</x-muni::hoja>',
+        // De los tres que siguen, la reja solo alcanza la parte VISIBLE en reposo:
+        // el panel del popover, la burbuja del tooltip y la lista del combobox
+        // nacen cerrados, y el script salta todo nodo de alto 0. Aun así se miden
+        // acá el disparador, el campo, la etiqueta y la ayuda, que es donde vive
+        // el texto que el funcionario lee sin abrir nada. Lo cerrado sigue siendo
+        // agujero conocido de la reja, igual que el <details> de timeline.
+        'combobox' => '<x-muni::combobox name="vitrina_titular" label="Titular de la solicitud"'
+            .' selectedLabel="Ana Soto Miranda" value="4821"'
+            .' hint="Escribe el RUT o el nombre; se muestran hasta 20 resultados."'
+            .' :options="[[\'value\' => \'4821\', \'label\' => \'Ana Soto Miranda\', \'hint\' => \'12.345.678-9\']]" />',
+        'popover' => '<x-muni::popover label="Filtros de la bandeja">'
+            .'<form method="get"><p>Estado y fecha del requerimiento.</p></form>'
+            .'</x-muni::popover>',
+        'tooltip' => '<x-muni::tooltip text="Anular el giro de la patente" id="vitrina-tt">'
+            .'<button type="button" class="muni-btn" aria-label="Anular el giro de la patente"'
+            .' aria-describedby="vitrina-tt">Anular</button>'
+            .'</x-muni::tooltip>',
     ];
 }
 

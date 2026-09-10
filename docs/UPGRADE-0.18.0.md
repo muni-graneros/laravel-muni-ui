@@ -23,9 +23,12 @@ inyecta en los paneles únicamente `public/vendor/muni-ui/filament.css`: `muni-u
 carga ahí (el porqué está en `DESIGN.md` §7). Ese archivo es una copia publicada, así que
 subir la dependencia no lo actualiza solo.
 
-En esta versión ese archivo ganó el token `--muni-field-border`. Si no republicas, el borde
-de los campos dentro del panel se queda sin color y **no hay ningún error visible**: la
-pantalla se ve casi igual y el defecto de contraste sigue ahí.
+En esta versión ese archivo ganó dos cosas: el token `--muni-field-border` y las reglas de
+`@media print`. Si no republicas:
+
+- el borde de los campos dentro del panel se queda sin color y **no hay ningún error
+  visible** — la pantalla se ve casi igual y el defecto de contraste sigue ahí;
+- lo que imprimas desde el panel sale con la barra lateral, la topbar y el cromo encima.
 
 Para saber si te toca:
 
@@ -54,6 +57,7 @@ referencia o pruebas de regresión visual, van a diferir.
 | `--muni-hint` en tema claro | `#6b7280` | `#656c79` | No llegaba a 4.5:1: medía 4,16:1 sobre `--muni-surface-3` y 4,47:1 sobre `--muni-bg`, que son justo las superficies donde vive el texto de ayuda de un campo |
 | Borde de `input`, `select`, `switch`, `textarea` | heredado, 1,28:1 a 1,90:1 | token nuevo `--muni-field-border`, ≥3:1 | WCAG 1.4.11: en un campo el borde es lo único que dice dónde empieza |
 | Mensaje de error de campo y de `file-dropzone` | sobre la superficie del anfitrión | fondo propio `--muni-danger-bg` | Medía 4,17:1 en oscuro según dónde se pusiera el componente |
+| `timeline` con `tone` | solo el color del punto | el color **más** una etiqueta visible (`Conforme`, `Rechazado`, …) | WCAG 1.4.1: seis puntos de colores distintos son seis puntos iguales para quien no distingue verde de rojo. Se sobreescribe por ítem con `toneLabel` |
 | Extremos inertes de `pagination` | `<a>` activable con `opacity` | `<span>` inerte, sin opacidad | Un enlace apagado seguía siendo enfocable y activable, y la opacidad arrastra el contraste del texto |
 
 Si tu sistema redefine `--muni-hint` por su cuenta, revisa que tu valor llegue a 4.5:1 —
@@ -67,7 +71,7 @@ aria-disabled="true">`, fuera del orden de tabulación.
 
 ## 3. Componentes nuevos
 
-Ocho, todos aditivos. No tienes que adoptarlos para actualizar.
+Diez, todos aditivos. No tienes que adoptarlos para actualizar.
 
 | Componente | Para qué |
 |---|---|
@@ -79,6 +83,8 @@ Ocho, todos aditivos. No tienes que adoptarlos para actualizar.
 | `<x-muni::rut-input>` | RUT chileno con formato y validación de dígito verificador |
 | `<x-muni::date-input>` | Fecha en formato chileno sobre `<input type="date">` nativo |
 | `<x-muni::table-header>` | La franja entre el título y la tabla: contador que distingue el filtrado del total, y ranuras de búsqueda, filtros y acciones |
+| `<x-muni::hoja>` | La hoja carta que sale por impresora o PDF: membrete, folio, firma y pie con numeración. El cuerpo queda libre a propósito — el paquete **no** trae plantillas de certificado, acta ni oficio |
+| `<x-muni::diff-campos>` | Tabla antes/después por campo. Agregado, modificado y suprimido se leen en texto, no en el color |
 
 El catálogo completo y legible por máquina está en `registry.json`; cómo se arma una
 pantalla con ellos, en `SKILL.md`.

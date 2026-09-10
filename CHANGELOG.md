@@ -37,6 +37,19 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 - `data-table` gana cabecera y primera columna fijas, alto máximo y densidad, todo opt-in.
 - Props nuevas, todas aditivas: `tabs` gana `id`, `label` y `activation`; `sortable-table` gana
   `caption`; `segmented` gana `label`; `file-dropzone` gana `maxMb`.
+- **El paquete aprende a imprimir.** `<x-muni::hoja>` es la hoja carta con membrete, folio,
+  bloques de emisor y titular, firma y pie con numeración y leyenda de verificación; el cuerpo
+  queda LIBRE a propósito, porque la estructura de un certificado, un acta o un oficio la fijan
+  la Ley 19.880 y el municipio, no el sistema de diseño. Con ella llegan las reglas base de
+  `@media print` a las dos hojas de estilo y las de tabla al `@once` de `data-table`.
+- `<x-muni::diff-campos>`: la tabla antes/después por campo, con agregado, modificado y
+  suprimido legibles en texto. Es la única pieza de la bitácora de auditoría que corresponde a
+  este paquete; la pantalla completa se implementa en `laravel-arcop-panel`.
+- `timeline` deja de comunicar el estado solo con el color del punto, y gana `toneLabel`,
+  `actor`, `current` (`aria-current="step"`), `datetime` ISO y `detail` en un `<details>`
+  nativo. Todas las claves son opcionales dentro de `$item`.
+- `topbar` gana la clase `muni-topbar`, para que se pueda ocultar al imprimir sin depender de
+  su atributo `style` en línea.
 
 ### Corregido
 - **`file-dropzone` tumbaba el Alpine de la página entera** si la etiqueta traía un apóstrofo: el
@@ -72,10 +85,12 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 **Sí, esta vez.** Los pasos completos están en [`docs/UPGRADE-0.18.0.md`](docs/UPGRADE-0.18.0.md),
 que además lista lo que cambia de aspecto sin que el sistema host haga nada.
 
-El token `--muni-field-border` se declara también en
-`muni-ui-filament.css`, porque `muni-ui.css` no se carga dentro de un panel. Todo sistema con
-`MuniPanel` tiene que correr `vendor:publish --tag=muni-ui-filament --force` o el borde de sus
-campos se quedará sin color dentro del panel, sin ningún error visible.
+El token `--muni-field-border` y las reglas de impresión se
+declaran también en `muni-ui-filament.css`, porque `muni-ui.css` no se carga dentro de un
+panel. Todo sistema con `MuniPanel` tiene que correr
+`vendor:publish --tag=muni-ui-filament --force` o el borde de sus campos se quedará sin color
+dentro del panel —sin ningún error visible— y lo que imprima desde el panel saldrá con la barra
+lateral y la topbar encima.
 
 El resto de los cambios son componentes Blade, que viajan dentro del paquete y no necesitan
 republicación.

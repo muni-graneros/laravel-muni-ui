@@ -1244,6 +1244,97 @@
       "example": "<x-muni::date-input label=\"Fecha\" />"
     },
     {
+      "name": "diff-campos",
+      "tag": "<x-muni::diff-campos>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/diff-campos.blade.php",
+      "description": "Tabla antes/después por campo:",
+      "props": [
+        {
+          "name": "changes",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "caption",
+          "type": "string",
+          "default": "Cambios por campo",
+          "required": false
+        },
+        {
+          "name": "empty",
+          "type": "string",
+          "default": "Sin cambios registrados.",
+          "required": false
+        },
+        {
+          "name": "fieldHeading",
+          "type": "string",
+          "default": "Campo",
+          "required": false
+        },
+        {
+          "name": "stateHeading",
+          "type": "string",
+          "default": "Estado",
+          "required": false
+        },
+        {
+          "name": "beforeHeading",
+          "type": "string",
+          "default": "Antes",
+          "required": false
+        },
+        {
+          "name": "afterHeading",
+          "type": "string",
+          "default": "Después",
+          "required": false
+        },
+        {
+          "name": "nilLabel",
+          "type": "string",
+          "default": "sin valor",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-border",
+        "--muni-border-2",
+        "--muni-danger-bg",
+        "--muni-danger-border",
+        "--muni-danger-fg",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-info-bg",
+        "--muni-info-border",
+        "--muni-info-fg",
+        "--muni-muted",
+        "--muni-ok-bg",
+        "--muni-ok-border",
+        "--muni-ok-fg",
+        "--muni-radius",
+        "--muni-radius-sm",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-surface-3",
+        "--muni-text"
+      ],
+      "example": "<x-muni::diff-campos caption=\"Cambios por campo\"></x-muni::diff-campos>"
+    },
+    {
       "name": "drawer",
       "tag": "<x-muni::drawer>",
       "type": "registry:blade-component",
@@ -2001,6 +2092,155 @@
         "--muni-gob-petroleo"
       ],
       "example": "<x-muni::gob-stripe height=\"5px\" />"
+    },
+    {
+      "name": "hoja",
+      "tag": "<x-muni::hoja>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/hoja.blade.php",
+      "description": "HOJA TAMAÑO CARTA lista para imprimir o exportar a PDF desde el navegador",
+      "props": [
+        {
+          "name": "id",
+          "type": "string",
+          "default": "muni-hoja",
+          "required": false
+        },
+        {
+          "name": "organization",
+          "type": "string",
+          "default": "Municipalidad de Graneros",
+          "required": false
+        },
+        {
+          "name": "unit",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "type",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "folio",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "folioLabel",
+          "type": "string",
+          "default": "Folio",
+          "required": false
+        },
+        {
+          "name": "date",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "verification",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "crest",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        },
+        {
+          "name": "crestSrc",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "printable",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        },
+        {
+          "name": "printLabel",
+          "type": "string",
+          "default": "Imprimir",
+          "required": false
+        },
+        {
+          "name": "level",
+          "type": "int",
+          "default": "2",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "emisor",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "titular",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "firma",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "actions",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "folio",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "type",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "verification",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-accent-strong",
+        "--muni-border",
+        "--muni-border-2",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-on-accent",
+        "--muni-radius",
+        "--muni-radius-sm",
+        "--muni-shadow",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::hoja id=\"muni-hoja\" organization=\"Municipalidad de Graneros\"></x-muni::hoja>"
     },
     {
       "name": "input",
@@ -3551,7 +3791,7 @@
       "tag": "<x-muni::timeline>",
       "type": "registry:blade-component",
       "file": "resources/views/components/timeline.blade.php",
-      "description": "Componente timeline del sistema de diseño municipal",
+      "description": "Línea de tiempo = bitácora auditable",
       "props": [
         {
           "name": "items",
@@ -3568,9 +3808,13 @@
       },
       "tokens": [
         "--muni-accent",
+        "--muni-accent-strong",
         "--muni-border",
         "--muni-border-2",
         "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
         "--muni-font-mono",
         "--muni-font-sans",
         "--muni-glow",
@@ -3578,7 +3822,10 @@
         "--muni-info-fg",
         "--muni-muted",
         "--muni-ok-fg",
+        "--muni-radius-sm",
         "--muni-surface",
+        "--muni-surface-2",
+        "--muni-surface-3",
         "--muni-text",
         "--muni-warn-fg"
       ],

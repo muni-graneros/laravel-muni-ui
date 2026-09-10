@@ -10,7 +10,7 @@ pantalla.
 
 **Este documento se poda a medida que se cierra trabajo.** Las seis fichas de la primera tanda ya
 salieron del cuerpo, las siete de la segunda y tres de la tercera también. Están resumidas en la
-sección 0 con su commit. **Quedan 35 pendientes.** Si una ficha sigue acá, sigue sin hacerse.
+sección 0 con su commit. **Quedan 34 pendientes.** Si una ficha sigue acá, sigue sin hacerse.
 
 ## Antes de leer: dos advertencias sobre este documento
 
@@ -53,6 +53,7 @@ acá con su commit para no volver a proponerlas y para poder auditar qué cerró
 | `pagination` | `5881996` | Los extremos inertes dejan de ser enlaces, el apagado sale de un token y la página actual lleva aria-current. |
 | `timeline` | `09cbf98` | El estado del hito deja de vivir solo en el color: etiqueta visible, más actor, aria-current=step, datetime ISO y el detalle en <details> nativo. |
 | `diff-campos` (era parte de `bitacora-auditoria`) | `4d52ab2` | La tabla antes/después por campo, con agregado/modificado/suprimido legibles en texto. La pantalla completa sale del paquete: va en laravel-arcop-panel. |
+| `hoja` (era `doc-imprimible`) | `b12f1db` | El paquete aprende a imprimir: hoja carta con membrete, folio, firma y pie numerado, más las reglas base de @media print en las dos hojas de estilo. Sin plantillas de certificado, acta ni oficio: esas las fija la Ley 19.880 y el municipio. |
 
 Todas llevan prueba que falla si el defecto vuelve, y la suite pasó de 48 a 100 pruebas.
 
@@ -536,25 +537,6 @@ ecosistema ya tiene nueve.
 | `pantalla-resultado` | — | El cierre de un flujo: «Su solicitud fue recibida. Folio 2026-04871», con un solo camino de sa… | Fin del ingreso de cualquier solicitud (licencias, patentes, discapacidad, atención al vecino)… | bajo |
 | `plantilla-pantalla` | — | El punto de partida idéntico para toda pantalla nueva: shell + enlace de salto al contenido + … | Toda pantalla nueva de los seis sistemas; es la pieza que garantiza el Decreto N°1/2015 desde … | bajo (un archivo y una sección de… |
 
-### `doc-imprimible`
-
-**componente nuevo** · prioridad 2 · esfuerzo medio (una hoja muni-print.css + un print-shell + una demo con tres plantillas)
-*Absorbe los candidatos propuestos por separado: `hoja-impresion`, `armazon-impresion`.*
-
-**Qué resuelve.** La hoja tamaño carta que sale por impresora o PDF: membrete institucional con escudo, folio, bloques de datos del emisor y del titular, cuerpo o tabla de ítems, bloque de firma y pie con numeración de páginas y leyenda de verificación; todo el cromo de pantalla (barra lateral, topbar, toasts, botones) desaparece en impresión. Tres plantillas: certificado, acta y oficio.
-**Qué pasa hoy sin él.** `grep -rn -i "media print"` sobre todo el repo (sin vendor/) devuelve CERO coincidencias: ni en resources/css/, ni en los 53 componentes, ni en las 14 demos. No hay @page, ni thead{display:table-header-group} para repetir cabeceras entre páginas, ni break-inside:avoid, ni forzado del tema claro. Hoy imprimir en modo oscuro da una hoja inservible y la banda izquierda de .muni-row--danger desaparece porque los navegadores no imprimen fondos.
-**Lo más parecido que ya existe.** Nada. Lo más cercano: demo/solicitud.html (ficha de trámite en pantalla) y el paso 4 de demo/wizard.html, ninguno con estilos de impresión.
-**Referencia que lo hace mejor.** refs/ColorlibHQ_AdminLTE/src/html/pages/pages/invoice.astro — Es la ÚNICA composición imprimible de las 122 catalogadas. Trae membrete, bloques origen/destino, tabla de ítems, totales alineados y los botones ocultos en impresión.
-**Patrón.** ninguno: es composición
-**Teclas obligatorias.** Tab alcanza «Imprimir» y «Descargar PDF»; Enter/Espacio dispara window.print(); Ctrl/Cmd+P funciona igual sin tocar la página; Al cerrar el diálogo del navegador el foco vuelve al botón que lo abrió; Dentro del documento no hay nada más focusable: es texto
-**Alpine.** core, y mínimo: onclick="window.print()" inline lo bloquea una CSP estricta; va como <button x-data @click="window.print()"> o listener con nonce
-**Riesgo.** medio. (a) Los navegadores no imprimen fondos: badges y la banda --danger necesitan borde y texto además de color (el color nunca es el único portador, también en papel). (b) Hay que forzar la paleta clara dentro de @media print sin pisar la pantalla. (c) Un certificado de discapacidad lleva datos de salud (categoría sensible, Ley 21.719): pie con folio y verificador y nada más; la emisión queda en la bitácora.
-**Dónde se usa.** Certificado de inscripción en el Registro de Discapacidad; acta de fiscalización de patentes comerciales y de ferias libres; oficio/decreto de Tránsito; comprobante de ingreso con folio. Se imprime todos los días.
-
-> **Objeción del juez.** Incluso corregido: un documento con folio y leyenda de verificación normalmente no se emite con `window.print()` sino server-side (DomPDF/Gotenberg). El navegador no garantiza márgenes, imprime su propio encabezado con URL y fecha encima del membrete municipal, y cualquiera puede editar el DOM antes de imprimir — un certificado alterado sale con el escudo de Graneros igual. Si el municipio necesita un documento con validez, el HTML imprimible es el camino frágil y este componente puede convertirse en la excusa para no hacer el PDF server-side. Se sostiene igual porque el 90% del uso diario (acta de fiscalización, orden de trabajo, comprobante de ingreso) es papel de trabajo interno donde el PDF firmado es sobreingeniería, pero el alcance debe decir explícitamente dónde termina.
->
-> **Corrección exigida.** Partirlo en dos y quedarse solo con la primera mitad. (1) `muni-print.css` + un `<x-muni::hoja>` delgado: membrete con escudo, folio, pie con paginación y verificador, y slot de cuerpo LIBRE. (2) Fuera del paquete las tres plantillas certificado/acta/oficio: la estructura de un oficio o decreto la fija la Ley 19.880 (VISTOS/CONSIDERANDO/RESUELVO, distribución, timbre) y la fija el municipio, no el design system; seis sistemas heredando una plantilla inventada es un problema legal, no un ahorro. Borrar del uso municipal el «Certificado de inscripción en el Registro de Discapacidad»: ese registro lo emite el Registro Civil sobre la calificación de COMPIN, la municipalidad no tiene competencia — a lo sumo emite comprobante de ingreso, y ofrecer la plantilla invita a fabricar el documento y a estampar datos de salud (Ley 21.719) en papel. Añadir al alcance: prohibido `print-color-adjust: exact` (el usuario puede desactivar gráficos de fondo y el tóner lo paga el municipio) y la banda `--danger` se sustituye por borde sólido + texto; las reglas de `muni-num` y `muni-row--danger` van DENTRO del `@once` de `data-table.blade.php`, no en la hoja suelta, o el `@once` ya emitido gana. Esfuerzo: la hoja CSS es BAJO, no medio; lo que falta declarar es la verificación, que exige print preview real en Chrome y Firefox porque difieren en `thead{display:table-header-group}` y `break-inside`, y no se comprueba con un screenshot normal.
-
 ### `ficha-persona`
 
 **componente nuevo** · prioridad 2 · esfuerzo medio
@@ -768,7 +750,7 @@ La tabla es donde el funcionario pasa el día. Van juntas porque la cabecera, la
 
 El paquete no tiene una sola regla de impresión y el municipio emite certificados, actas y oficios todos los días. La bitácora va en la misma tanda porque la Ley 21.719 pide trazabilidad de accesos y porque comparte con la línea de tiempo la forma de presentar sucesos fechados.
 
-- `doc-imprimible`
+- ~~`doc-imprimible`~~ — hecho a medias a propósito en `b12f1db`: va la hoja, no las plantillas
 - ~~`bitacora-auditoria`~~ — la pantalla sale del paquete a `laravel-arcop-panel`; de las tres piezas que dejó, `sortable-table` se cerró en `c769aed` y `diff-campos` en `4d52ab2`
 - ~~`timeline`~~ — hecho en `09cbf98`
 

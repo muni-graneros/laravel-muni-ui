@@ -264,3 +264,116 @@
 @media (prefers-reduced-motion: reduce) {
     :root { --muni-dur: 0ms; }
 }
+
+/* ── IMPRESIÓN ───────────────────────────────────────────────────────────────
+   Lo que sale por la impresora o por «Guardar como PDF» del navegador. Antes de
+   este bloque el repo no tenía una sola regla de impresión: en modo oscuro salía
+   una hoja negra, y en cualquier modo el cromo de pantalla se dibujaba encima
+   del documento.
+
+   ESTÁ DUPLICADO en `muni-ui-filament.css` a propósito, y no es un descuido: es
+   DESIGN §7. `MuniPanel` inyecta en un panel Filament SOLO `filament.css`; esta
+   hoja la compila el Vite del sistema anfitrión para sus vistas públicas. Una
+   regla de impresión que viviera únicamente acá no existiría dentro del panel, y
+   no habría un solo error en consola que lo delatara.
+
+   PROHIBIDO `print-color-adjust: exact`. No garantiza nada —el usuario puede
+   desactivar los gráficos de fondo en el propio diálogo de impresión— y donde sí
+   se respeta, el tóner lo paga el municipio. La consecuencia se asume de frente:
+   los fondos de estado pasan a blanco y el estado queda en el BORDE y en el
+   TEXTO, que son lo que el navegador sí imprime. El color nunca es el único
+   portador de información, tampoco en papel.
+
+   Dos tokens NO se tocan a propósito: `--muni-field-border`, porque el borde de
+   un campo es un rectángulo que en papel se lee igual, y `--muni-focus`, porque
+   en papel no hay foco. */
+
+@page {
+    /* Los márgenes por defecto difieren entre Chrome y Firefox y dejan el
+       membrete pegado al borde de la hoja. */
+    margin: 16mm 18mm;
+}
+
+@media print {
+    /* PALETA CLARA FORZADA. Las declaraciones van DENTRO del media query: escritas
+       fuera pisarían la pantalla del funcionario, que es justo lo que no se quiere.
+       Los activadores explícitos de oscuro se enumeran uno por uno porque ganan por
+       cascada sobre `:root` (DESIGN §3): Filament pone `.dark` en el <html> y las
+       PWA del ecosistema usan `[data-theme="dark"]`. */
+    :root,
+    [data-muni-theme="dark"],
+    [data-theme="dark"],
+    .dark {
+        --muni-bg: #ffffff;
+        --muni-surface: #ffffff;
+        --muni-surface-2: #ffffff;
+        --muni-surface-3: #ffffff;
+        --muni-panel: #ffffff;
+        --muni-text: #000000;
+        --muni-muted: #3a3f4b;
+        /* Se deriva del atenuado en vez de repetir un hex: la pista y el
+           atenuado se leen sobre el mismo papel blanco. */
+        --muni-hint: var(--muni-muted);
+        --muni-border: #767676;
+        --muni-border-2: #3a3f4b;
+        --muni-accent: #0f766e;
+        --muni-accent-strong: #115e59;
+        --muni-accent-soft: #ffffff;
+        --muni-on-accent: #000000;
+        /* Los fondos de estado pasan a blanco (no se imprimen igual) y el tono
+           se conserva en el texto y en el borde, que sí salen. */
+        --muni-ok-fg: #0f5c44;
+        --muni-ok-bg: #ffffff;
+        --muni-ok-border: #0f5c44;
+        --muni-warn-fg: #8a5a00;
+        --muni-warn-bg: #ffffff;
+        --muni-warn-border: #8a5a00;
+        --muni-danger-fg: #b03030;
+        --muni-danger-bg: #ffffff;
+        --muni-danger-border: #b03030;
+        --muni-info-fg: #1f5fb0;
+        --muni-info-bg: #ffffff;
+        --muni-info-border: #1f5fb0;
+        --muni-shadow: none;
+        --muni-shadow-md: none;
+        --muni-shadow-lg: none;
+        --muni-ring: none;
+        --muni-glow: none;
+    }
+
+    /* El papel es blanco aunque el host pinte el fondo en su propio layout. */
+    html,
+    body {
+        background: #ffffff !important;
+        color: var(--muni-text) !important;
+    }
+
+    /* CROMO DE PANTALLA: nada de esto es el documento. Va con `!important`
+       porque varios de estos nodos traen su `display` en el atributo `style`, y
+       un estilo en línea le gana a cualquier hoja que no fuerce.
+       `[data-muni-imprimir]` es la salida para el caso en que lo que hay que
+       imprimir esté dentro de un diálogo abierto. */
+    .muni-skip-link,
+    .muni-sb,
+    .muni-ds__top,
+    .muni-ds__burger,
+    .muni-toast,
+    .muni-no-print,
+    [data-muni-no-print],
+    [role="dialog"][aria-modal="true"]:not([data-muni-imprimir]) {
+        display: none !important;
+    }
+
+    /* La barra superior pública (`<x-muni::topbar>`) no tiene clase propia: se
+       la reconoce por el `position:sticky` que emite en línea. */
+    .muni-topbar,
+    header[style*="position:sticky"] {
+        display: none !important;
+    }
+
+    /* Los márgenes de la hoja ya los pone `@page`: el relleno del armazón
+       sumaría una segunda banda en blanco. */
+    .muni-ds__main {
+        padding: 0 !important;
+    }
+}

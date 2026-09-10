@@ -13,6 +13,7 @@
 
 <header
     {{ $attributes->merge([
+        'class' => 'muni-topbar',
         'style' => 'position:sticky;top:0;z-index:100;height:var(--muni-topbar-h);'
             .'display:flex;align-items:center;gap:12px;padding:0 16px;'
             .'background:var(--muni-surface);border-bottom:1px solid var(--muni-border);',

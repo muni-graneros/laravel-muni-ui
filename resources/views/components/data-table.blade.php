@@ -108,11 +108,33 @@
 
         /* Lo que se imprime es un acta: el marco no puede recortar la nómina y la
            cabecera se repite en cada hoja, que es lo que se quiere en un documento
-           municipal. */
+           municipal.
+
+           TODAS las reglas de impresión de la tabla viven acá y no en la hoja
+           imprimible. El bloque de estilos de un componente se emite UNA sola vez,
+           y en una hoja con nómina la tabla va antes que el pie: el de data-table
+           ya está emitido y gana, así que una copia en la hoja no se aplicaría
+           nunca. */
         @media print {
             .muni-dt__scroll { overflow:visible !important; border-radius:0; }
             .muni-dt thead { display:table-header-group; }
             [data-muni-row] { break-inside:avoid; }
+
+            /* En pantalla las celdas van `nowrap` y lo que no cabe se alcanza
+               desplazando el marco. En papel no hay desplazamiento: un domicilio
+               largo se saldría de la hoja. Se deja envolver todo MENOS las cifras
+               y los RUT, que partidos a la mitad se leen mal. */
+            .muni-dt td { white-space:normal; }
+            .muni-num { white-space:nowrap; }
+
+            /* La franja de la fila con problema es una `box-shadow` interior, y
+               los navegadores no imprimen fondos: en papel desaparecía y la fila
+               morosa quedaba igual que las demás. Se sustituye por un borde
+               SÓLIDO, que sí se imprime, más una marca de texto, porque el color
+               tampoco puede ser el único portador sobre papel (WCAG 2.2 AA 1.4.1)
+               y una impresora en blanco y negro lo deja en gris. */
+            [data-muni-row].muni-row--danger td:first-child { box-shadow:none; border-left:3px solid var(--muni-danger-fg); padding-left:9px; }
+            [data-muni-row].muni-row--danger td:first-child::before { content:"(*) "; font-family:var(--muni-font-mono); font-weight:700; }
         }
     </style>
 @endonce

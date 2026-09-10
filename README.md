@@ -231,6 +231,7 @@ quedaban sin valor.
 | `<x-muni::auth-shell>` | `theme`, `title`, `system`, `subtitle`, `logo`; slots `aside`, `head` — layout login/registro |
 | `<x-muni::dashboard-shell>` | `theme`, `system`, `subtitle`, `status`, `user`; slots `sidebar`, `topbar` — layout de panel |
 | `<x-muni::error-page>` | `code`, `title`, `message`, `home`, `theme` — 403/404/500/503 |
+| `<x-muni::hoja>` | `organization`, `unit`, `type`, `folio`, `date`, `verification`, `crest`, `printable`, `level`; ranuras `emisor`, `titular`, `firma`, `actions` y cuerpo libre — la hoja carta que sale por impresora |
 
 Casi todos respetan `prefers-reduced-motion` y tienen `:focus-visible`. **Casi, no todos:**
 `docs/GAP-ANALYSIS.md` lista los que no, medidos uno por uno. El indicador de foco real es un

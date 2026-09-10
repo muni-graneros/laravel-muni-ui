@@ -10,7 +10,7 @@ pantalla.
 
 **Este documento se poda a medida que se cierra trabajo.** Las seis fichas de la primera tanda ya
 salieron del cuerpo, las siete de la segunda y tres de la tercera también. Están resumidas en la
-sección 0 con su commit. **Quedan 37 pendientes.** Si una ficha sigue acá, sigue sin hacerse.
+sección 0 con su commit. **Quedan 35 pendientes.** Si una ficha sigue acá, sigue sin hacerse.
 
 ## Antes de leer: dos advertencias sobre este documento
 
@@ -51,6 +51,8 @@ acá con su commit para no volver a proponerlas y para poder auditar qué cerró
 | `empty-state` | `18bf15e` | Separa «no hay datos» de «el filtro no encontró nada», que para el funcionario son problemas opuestos. |
 | `data-table` | `5881996` | La región desplazable se alcanza con teclado, las celdas saben su encabezado, y cabecera y primera columna fijas como opt-in. |
 | `pagination` | `5881996` | Los extremos inertes dejan de ser enlaces, el apagado sale de un token y la página actual lleva aria-current. |
+| `timeline` | `09cbf98` | El estado del hito deja de vivir solo en el color: etiqueta visible, más actor, aria-current=step, datetime ISO y el detalle en <details> nativo. |
+| `diff-campos` (era parte de `bitacora-auditoria`) | `4d52ab2` | La tabla antes/después por campo, con agregado/modificado/suprimido legibles en texto. La pantalla completa sale del paquete: va en laravel-arcop-panel. |
 
 Todas llevan prueba que falla si el defecto vuelve, y la suite pasó de 48 a 100 pruebas.
 
@@ -306,24 +308,6 @@ ecosistema ya tiene nueve.
 >
 > **Corrección exigida.** 1) Cambiar la base técnica: construirlo sobre el atributo NATIVO `popover` + `popovertarget`, no sobre una reimplementación de Radix/Pines. El top-layer nativo elimina el riesgo (1) —no se recorta dentro de una tabla con overflow ni hace falta `x-teleport`, lo que además evita que Livewire huerfane el panel al remorfear, problema que sí tiene el `modal` actual— y da light-dismiss, Esc y retorno de foco al invocador sin JS, que es el riesgo (2). 2) Descartar el truco de Pines de medir en invisible: con el panel ya en el top-layer se mide después de mostrarlo. El anclaje es un `getBoundingClientRect()` del disparador más un shim de ~20 líneas, y `@supports (anchor-name: --x)` lo sustituye por CSS Anchor Positioning puro donde exista (Chrome/Safari sí, Firefox no; nunca como única vía). 3) Corregir las referencias: `mejor_referencia` debe ser la especificación HTML del Popover API + el APG de disclosure; shadcn y Pines quedan solo como contrato de slots. 4) Poner `aria-expanded` EXPLÍCITO en el disparador: el mapeo implícito de `popovertarget` no es parejo entre navegadores. 5) Resetear el UA stylesheet de `[popover]` (`position:fixed; inset:0; margin:auto; border:solid; padding:.25em`) y no pelear `x-show` contra `showPopover()` — el estado lo lleva uno solo de los dos. 6) Añadir dos riesgos que faltan: en tablet y móvil el panel no se «corre a la izquierda», cambia a ancho completo anclado abajo por breakpoint; y como estos sistemas imprimen mucho, un popover abierto no debe salir en `@media print`. 7) Alcance: el slot por defecto debe poder ser un `<form method="get">` completo, para no perder los filtros en la URL. 8) El esfuerzo «medio» solo es honesto con esta arquitectura; con la que propone el candidato (teleport + listeners de scroll/resize + foco manual + flip) es alto.
 
-### `timeline`
-
-**ampliación** · prioridad 2 · esfuerzo bajo
-
-**Qué resuelve.** El historial de un expediente y el registro de accesos: quien, cuando, y que cambio de que a que.
-**Qué pasa hoy sin él.** El <time> no lleva atributo datetime, asi que la fecha no es legible por maquina; no hay campo para el actor (quien hizo la actuacion) ni donde poner el cambio antes/despues, que es lo que pide una bitacora de auditoria. Hoy la bitacora se muestra como tabla plana de cuatro columnas (fecha, usuario, accion, detalle), que se lee peor y no distingue visualmente una actuacion de otra.
-**Lo más parecido que ya existe.** timeline, que esta bien de base (<ol>/<li> real, tokens en ambos temas, ninguna coincidencia de color literal) pero sin actor, sin datetime y sin diff; data-table no da jerarquia temporal.
-**Referencia que lo hace mejor.** themesberg_flowbite-svelte/src/lib/timeline/ (unica familia que marca el hito actual con aria-current="step" y oculta los marcadores decorativos con aria-hidden); la forma del bloque, con etiqueta de fecha que agrupa, cabecera, cuerpo y pie de acciones, esta mejor en refs/ColorlibHQ_AdminLTE/src/html/pages/UI/timeline.astro. — Porque agrupa por fecha, que es como se consulta una bitacora («que paso el 14 de agosto»), y porque es la unica que marca el hito vigente de forma programatica en lugar de solo pintarlo.
-**Patrón.** ninguno: es contenido. disclosure si el detalle del cambio se colapsa, y para eso basta <details>/<summary> nativo, sin JS.
-**Teclas obligatorias.** ninguno si es solo lectura; Enter y Space si el detalle se colapsa con <details>
-**Alpine.** no
-**Riesgo.** Los hosts hoy pasan time ya formateado en es-CL («14 ago 2026, 09:12»); agregar datetime exige una prop nueva opcional con la fecha ISO o se rompen las llamadas existentes. Y el contenido de la bitacora es dato sensible: si se muestran valores antes/despues de campos personales aplica minimizacion de la Ley 21.719, el componente no debe invitar a volcar el registro completo en pantalla.
-**Dónde se usa.** La bitacora del expediente de una patente comercial (ingreso, observacion, resolucion) y el registro de accesos que Juridica exige para la Ley 21.719.
-
-> **Objeción del juez.** El componente tiene CERO consumidores en los cinco sistemas: `grep -rln "x-muni::timeline" /home/cesar/Dev` no devuelve nada. Agregarle props no hace que nadie lo adopte — atencionvecino y discapacidad ya tienen su versión funcionando y no la van a reescribir porque el paquete gane una clave `actor`. El valor solo se materializa migrando esos dos consumidores, y eso ya no es «esfuerzo bajo». Objeción secundaria: vender `datetime` como accesibilidad es falso, ningún lector de pantalla anuncia ese atributo; vale por trazabilidad y orden de exportación, y es la parte más barata del candidato, no la que justifica el trabajo.
->
-> **Corrección exigida.** 1) Cambiar el eje: no es «agregar datetime», es «hito auditable». Orden de valor: (a) etiqueta textual del tono junto al punto — hoy el color es el único portador, es la única falla WCAG del componente; (b) `actor`; (c) `aria-current="step"` en el hito vigente; (d) `datetime` ISO al final. 2) Corregir el `por_que_falta`: hoy NO es una tabla plana de cuatro columnas — son dos timelines caseras (`atencionvecino/.../requerimientos/show.blade.php:615-643` y `discapacidad-graneros/.../livewire/discapacidad/historial.blade.php`); el argumento correcto es la duplicación con colores literales sin contraparte oscura. 3) Corregir el riesgo declarado: NO rompe llamadas existentes, porque son claves opcionales del array `$item` y además hay cero consumidores. El riesgo que sí queda en pie es el de la Ley 21.719 en el diff. 4) Para ese diff: `<details>/<summary>` nativo, colapsado por defecto, recibiendo strings ya redactados por el host — nunca una prop que acepte el registro o el modelo completo, para que el componente no invite a volcar campos sensibles (diagnósticos en discapacidad, psicotécnicos en licencias). 5) Sacar del alcance la agrupación por fecha de AdminLTE: exige lógica de agrupación en el host y sube el esfuerzo sin resolver ninguna de las cuatro carencias. 6) Esfuerzo: mantener «bajo» para el componente (media jornada, Blade puro, sin Alpine, compatible con Livewire 3 y 4), pero declarar aparte la migración de los dos consumidores, que es media y es la que determina si esto sirve de algo.
-
 ### `campo-clave`
 
 **componente nuevo** · prioridad 3 · esfuerzo bajo
@@ -551,24 +535,6 @@ ecosistema ya tiene nueve.
 | `pantalla-bloqueo` | — | Bloquear la sesión por inactividad sin cerrarla: se ve quién está conectado y se pide su contr… | Mesón de Atención al Vecino, ventanilla de Licencias y sala de la central de cámaras de seguri… | bajo |
 | `pantalla-resultado` | — | El cierre de un flujo: «Su solicitud fue recibida. Folio 2026-04871», con un solo camino de sa… | Fin del ingreso de cualquier solicitud (licencias, patentes, discapacidad, atención al vecino)… | bajo |
 | `plantilla-pantalla` | — | El punto de partida idéntico para toda pantalla nueva: shell + enlace de salto al contenido + … | Toda pantalla nueva de los seis sistemas; es la pieza que garantiza el Decreto N°1/2015 desde … | bajo (un archivo y una sección de… |
-
-### `bitacora-auditoria`
-
-**componente nuevo** · prioridad 2 · esfuerzo medio-alto
-
-**Qué resuelve.** Quién vio o modificó qué ficha, cuándo, desde qué IP y con qué resultado; filtrable por actor, por persona afectada, por acción y por rango de fechas, con detalle antes/después por campo y exportación registrada.
-**Qué pasa hoy sin él.** El paquete tiene `timeline` (presentacional; su <time> no lleva atributo datetime, no es legible por máquina) y `sortable-table`, cuyo orden es inalcanzable por teclado: el <th> dispara @click sin tabindex, sin role="button" y sin @keydown (WCAG 2.1.1). No existe composición de trazabilidad, y la Ley 21.719 exige demostrar los accesos, no solo los cambios.
-**Lo más parecido que ya existe.** demo/solicitud.html tiene el historial .tl del trámite: la versión pública y feliz, cinco hitos, sin actor, sin IP, sin filtro, sin paginación.
-**Referencia que lo hace mejor.** refs/creativetimofficial_material-tailwind/docs-content/html/timeline/activities-timeline.tsx (el hilo) + refs/shadcn-ui_ui/apps/v4/app/(app)/examples/tasks/components/data-table-toolbar.tsx (facetas con contador y limpiar) — La línea de tiempo de Material Tailwind es la única del corpus que ata acción + autor + marca temporal como unidad, y el catálogo la vincula explícitamente a lo que la Ley 21.719 exige demostrar; la barra de shadcn es la mejor para acotar un volumen grande sin salir de la pantalla, que es el problema de una bitácora de un año.
-**Patrón.** ninguno como pantalla; las facetas usan Menu/Listbox y el rango usa Tabs, ya cubiertos por `dropdown` y `tabs`
-**Teclas obligatorias.** Tab entra a la barra de filtros; Cada faceta: Enter abre, ↑/↓ recorre, Espacio marca, Esc cierra devolviendo el foco al disparador; Tab llega a «Limpiar filtros» y luego a la tabla; Cada cabecera ordenable es un <button> real con aria-sort; Enter ordena y aria-live anuncia «ordenado por fecha, descendente, 240 registros»; Tab recorre la paginación con aria-current="page"; El detalle antes/después abre en drawer con foco atrapado, Esc cierra y devuelve el foco a la fila
-**Alpine.** core; nada nuevo
-**Riesgo.** alto, pero en privacidad, no en técnica: es la pantalla que más PII concentra. Exige permiso propio (no derivado del rol de administrador ni de un Gate::before), RUT afectado pseudonimizado por omisión y revelado con una acción que a su vez se registre, imposibilidad de borrar filas desde la interfaz, exportación con marca de agua y registrada, y plazo de retención declarado en la propia pantalla.
-**Dónde se usa.** Registro de accesos a la ficha de una persona con discapacidad (dato de salud), al maestro de personas y a las grabaciones de seguridad ciudadana. Es la evidencia que Jurídica necesita para el RAT y para responder una solicitud ARCOP.
-
-> **Objeción del juez.** Su valor está casi todo en el backend y casi nada en la UI: lo que decide si la bitácora sirve es qué eventos se registran, con qué permiso propio, con qué retención y si los accesos de solo lectura se graban. Un municipio chico que instale la pantalla sin el modelo de eventos detrás obtiene una vitrina vacía y, peor, falsa confianza de cumplimiento: Jurídica dirá «tenemos bitácora» cuando no se está registrando la lectura, que es justo lo que la 21.719 obliga a demostrar. A eso se suma que la referencia elegida es contraproducente — sortable-table embebe todas las filas como JSON en el HTML ($rowsJson), de modo que la pantalla que más PII concentra volcaría la bitácora completa al DOM y a la caché del navegador. Y el esfuerzo declarado «medio-alto» es deshonesto para lo que promete: pseudonimización reversible auditada, exportación con marca de agua registrada y permiso no derivado de Gate::before son semanas de backend, no un Blade.
->
-> **Corrección exigida.** Partirlo en tres y sacar la pantalla de este repo. (1) Bug bloqueante, ya, en muni-ui: convertir la cabecera ordenable de sortable-table en un <button type="button"> real dentro del th, con aria-sort en el th (ascending/descending/none), y anuncio por aria-live del resultado del orden; es prioridad 1 por sí mismo y no depende de este candidato. (2) Arreglo menor en muni-ui: timeline debe aceptar un ISO-8601 por ítem y emitirlo como <time datetime="...">, con el texto legible aparte. (3) Componente nuevo, y solo este: <x-muni::diff-campos> (o registro-cambio), la tabla antes/después por campo con marcado semántico de agregado, modificado y suprimido sin depender del color, que hoy no existe y se reutiliza igual en la bitácora, en el historial de una licencia y en la resolución de una rectificación ARCOP. La pantalla completa se renombra a bitacora-accesos y se implementa en laravel-arcop-panel componiendo lo que ya está: filter-bar (form GET, que además deja los filtros en la URL para las descargas), data-table con data-muni-row y .muni-num para RUT y fechas, pagination con aria-current, y drawer con x-trap.inert.noscroll para el detalle. Prohibido usar sortable-table aquí: el filtrado y el orden van en el servidor, nunca serializando filas al DOM.
 
 ### `doc-imprimible`
 
@@ -803,8 +769,8 @@ La tabla es donde el funcionario pasa el día. Van juntas porque la cabecera, la
 El paquete no tiene una sola regla de impresión y el municipio emite certificados, actas y oficios todos los días. La bitácora va en la misma tanda porque la Ley 21.719 pide trazabilidad de accesos y porque comparte con la línea de tiempo la forma de presentar sucesos fechados.
 
 - `doc-imprimible`
-- `bitacora-auditoria`
-- `timeline`
+- ~~`bitacora-auditoria`~~ — la pantalla sale del paquete a `laravel-arcop-panel`; de las tres piezas que dejó, `sortable-table` se cerró en `c769aed` y `diff-campos` en `4d52ab2`
+- ~~`timeline`~~ — hecho en `09cbf98`
 
 ### Tanda 5 — buscar dentro de listas largas
 

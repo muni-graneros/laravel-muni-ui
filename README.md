@@ -221,7 +221,7 @@ quedaban sin valor.
 | `<x-muni::nav-item>` | `href`, `icon`, `active`, `badge` |
 | `<x-muni::nav-section>` | `title` |
 | `<x-muni::breadcrumb>` | `items` (array de `['label','url'?]`) |
-| `<x-muni::tooltip>` | `text`, `placement` (top/bottom/left/right) (Alpine) |
+| `<x-muni::tooltip>` | `text`, `placement`, `describe`/`as` (Alpine) — la burbuja va `aria-hidden` por defecto: el nombre del botón va en su `aria-label`, no acá |
 | `<x-muni::avatar>` | `name` (iniciales), `src`, `size`, `tone` |
 | `<x-muni::progress>` | `value`, `max`, `tone`, `label`, `showValue` |
 | `<x-muni::skeleton>` | `width`, `height`, `rounded` (shimmer) |

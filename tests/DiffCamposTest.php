@@ -72,6 +72,115 @@ function diffCamposCss(): string
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $bloques[1] ?? []));
 }
 
+/**
+ * Todos los bloques de declaraciones que el CSS del componente escribe para
+ * `$selector`, en el orden en que salen. Devuelve solo el interior de las llaves.
+ */
+function diffCamposReglas(string $selector): array
+{
+    $css = diffCamposCss();
+    $bloques = [];
+
+    foreach (explode($selector, $css) as $i => $trozo) {
+        if ($i === 0) {
+            continue;
+        }
+
+        $abre = mb_strpos($trozo, '{');
+        $cierra = mb_strpos($trozo, '}');
+
+        /* Solo cuenta si la llave abre ANTES de que termine el selector: si entre
+           medio hay una coma o un espacio con otra clase, es otro selector. */
+        if ($abre === false || $cierra === false || trim(mb_substr($trozo, 0, $abre)) !== '') {
+            continue;
+        }
+
+        $bloques[] = mb_substr($trozo, $abre + 1, $cierra - $abre - 1);
+    }
+
+    return $bloques;
+}
+
+/**
+ * El cuerpo del primer bloque `@`-regla que empieza con `$apertura`, resuelto
+ * contando llaves: `@supports` y `@container` anidan, y una expresión regular
+ * corta en la primera `}` que encuentra, que es la interior.
+ */
+function diffCamposBloqueAnidado(string $apertura): string
+{
+    $css = diffCamposCss();
+    $inicio = mb_strpos($css, $apertura);
+
+    if ($inicio === false) {
+        return '';
+    }
+
+    $abre = mb_strpos($css, '{', $inicio);
+
+    if ($abre === false) {
+        return '';
+    }
+
+    $nivel = 0;
+    $largo = mb_strlen($css);
+
+    for ($i = $abre; $i < $largo; $i++) {
+        $c = mb_substr($css, $i, 1);
+
+        if ($c === '{') {
+            $nivel++;
+        } elseif ($c === '}') {
+            $nivel--;
+
+            if ($nivel === 0) {
+                return mb_substr($css, $abre + 1, $i - $abre - 1);
+            }
+        }
+    }
+
+    return '';
+}
+
+/**
+ * El CSS del componente con la at-regla que empieza en `$apertura` recortada
+ * ENTERA, prólogo incluido. Sirve para preguntar «¿queda algo de esto fuera?»
+ * sin que el propio `@supports (container-type: …)` cuente como una fuga.
+ */
+function diffCamposCssSinBloque(string $apertura): string
+{
+    $css = diffCamposCss();
+    $inicio = mb_strpos($css, $apertura);
+
+    if ($inicio === false) {
+        return $css;
+    }
+
+    $abre = mb_strpos($css, '{', $inicio);
+
+    if ($abre === false) {
+        return $css;
+    }
+
+    $nivel = 0;
+    $largo = mb_strlen($css);
+
+    for ($i = $abre; $i < $largo; $i++) {
+        $c = mb_substr($css, $i, 1);
+
+        if ($c === '{') {
+            $nivel++;
+        } elseif ($c === '}') {
+            $nivel--;
+
+            if ($nivel === 0) {
+                return mb_substr($css, 0, $inicio).mb_substr($css, $i + 1);
+            }
+        }
+    }
+
+    return $css;
+}
+
 /** La primera fila `<tr>` del HTML que contiene `$aguja`. */
 function diffCamposFila(string $html, string $aguja): string
 {
@@ -94,6 +203,14 @@ function diffCamposTresEstados(): array
         ['field' => 'domicilio', 'label' => 'Domicilio', 'before' => 'Calle Uno 100', 'after' => 'Calle Dos 200'],
         ['field' => 'correo', 'label' => 'Correo', 'before' => 'ana@ejemplo.cl'],
     ];
+}
+
+/** Los CUATRO estados a la vez: es como los rinde la vitrina y como se ven en pantalla. */
+function diffCamposCuatroEstados(): array
+{
+    return array_merge(diffCamposTresEstados(), [
+        ['field' => 'rut', 'label' => 'RUT', 'before' => '12.345.678-9', 'after' => '12.345.678-9', 'mono' => true],
+    ]);
 }
 
 it('deriva agregado, modificado y suprimido cuando el host no manda el estado', function () {
@@ -311,6 +428,157 @@ it('no usa Alpine, ni uniqid, ni directivas exclusivas de un major de Livewire',
         expect(str_contains($fuente, $prohibido))->toBeFalse(
             "El componente usa «{$prohibido}». Es contenido de solo lectura y debe funcionar igual en ".
             'Livewire 3 (personas-graneros) y en Livewire 4.'
+        );
+    }
+});
+
+/*
+|--------------------------------------------------------------------------
+| D3 — LA PÍLDORA DE ESTADO NO PUEDE SALIRSE DE SU COLUMNA
+|--------------------------------------------------------------------------
+|
+| Medido en Chromium 151 y Firefox 153, en claro y en oscuro: la píldora medía
+| 82-94 px y su columna 62-80, así que se dibujaba 14-46 px DENTRO de la celda
+| «Antes» y las dos palabras quedaban una encima de la otra. La reja de
+| accesibilidad no lo vio nunca —166 textos medidos, 0 fallos—: mide contraste y
+| reglas de axe, no geometría.
+|
+| La causa eran dos decisiones que se contradicen: la columna en PORCENTAJE (18 %
+| / 24 %), que encoge con el contenedor, y la píldora en `white-space:nowrap`,
+| que no encoge con nada. Desde PHP se puede fijar exactamente eso —que la
+| columna se dimensione al contenido y que la píldora no pueda exceder su celda—;
+| lo que no se puede medir acá es el píxel, y por eso el informe
+| `docs/VERIFICACION-NAVEGADOR.md` lleva la medición en los dos motores.
+*/
+
+it('la columna de estado se dimensiona al contenido, en píxeles, y no a un porcentaje', function () {
+    $reglas = diffCamposReglas('.muni-dc__c-estado');
+
+    expect($reglas !== [])->toBeTrue('No hay ni una regla de ancho para la columna de estado.');
+
+    foreach ($reglas as $i => $regla) {
+        expect(str_contains($regla, '%'))->toBeFalse(
+            "El bloque #{$i} de `.muni-dc__c-estado` vuelve a usar un porcentaje. Un porcentaje ata el ".
+            'ancho de la columna al del contenedor mientras la píldora mide siempre lo mismo: eso es D3, '.
+            'y se rompe igual en un teléfono de 390 px que en una tarjeta estrecha de escritorio.'
+        );
+        expect((bool) preg_match('/width\s*:\s*\d+(\.\d+)?px/', $regla))->toBeTrue(
+            "El bloque #{$i} de `.muni-dc__c-estado` tiene que fijar el ancho en px medidos sobre la ".
+            'píldora más ancha («Sin cambios»), no en una unidad que dependa del contenedor.'
+        );
+    }
+});
+
+it('la píldora de estado no puede exceder su celda pase lo que pase', function () {
+    $reglas = diffCamposReglas('.muni-dc__tag');
+
+    expect($reglas !== [])->toBeTrue('Desapareció la regla de la píldora de estado.');
+
+    $todas = implode(' ', $reglas);
+    $planas = preg_replace('/\s+/', '', $todas);
+
+    expect(str_contains((string) $planas, 'white-space:nowrap'))->toBeFalse(
+        'La píldora volvió a `white-space:nowrap`. Una caja que no envuelve dentro de una columna que sí '.
+        'encoge se dibuja encima de la celda vecina: es exactamente el defecto D3.'
+    );
+    expect(str_contains((string) $planas, 'max-width:100%'))->toBeTrue(
+        'Sin `max-width:100%` la píldora puede volver a salirse de su celda con una fuente más ancha, '.
+        'con zoom de solo texto o con una traducción más larga. Es el respaldo, no el adorno.'
+    );
+    expect(str_contains((string) $planas, 'white-space:normal'))->toBeTrue(
+        'La píldora tiene que poder ENVOLVER cuando no cabe: envolver es legible, sobreimprimir no.'
+    );
+});
+
+it('el ancho en píxeles de la columna no depende del modelo de caja del anfitrión', function () {
+    $reglas = diffCamposReglas('.muni-dc thead th');
+
+    expect($reglas !== [])->toBeTrue('Desapareció la regla de las cabeceras de columna.');
+
+    $planas = preg_replace('/\s+/', '', implode(' ', $reglas));
+
+    expect(str_contains((string) $planas, 'box-sizing:border-box'))->toBeTrue(
+        'Sin `box-sizing:border-box`, un `width` sobre la cabecera es el ancho del CONTENIDO y el relleno '.
+        'se suma encima: la misma regla da 122 px de columna en un anfitrión con el reset de Tailwind y '.
+        '146 px en uno sin él. Con el ancho medido en píxeles, esos 24 px deciden si la píldora cabe.'
+    );
+});
+
+it('el CSS moderno va dentro de @supports y nunca como única vía', function () {
+    $css = diffCamposCss();
+
+    if (! str_contains($css, '@container') && ! str_contains($css, 'container-type')) {
+        expect(true)->toBeTrue('El componente no usa consultas de contenedor: nada que exigir.');
+
+        return;
+    }
+
+    $soporta = diffCamposBloqueAnidado('@supports (container-type: inline-size)');
+
+    expect($soporta !== '')->toBeTrue(
+        'Hay consultas de contenedor fuera de un bloque `@supports (container-type: inline-size)` '.
+        '(DESIGN §10: el CSS moderno es mejora progresiva, no la única vía).'
+    );
+    $fuera = diffCamposCssSinBloque('@supports (container-type: inline-size)');
+
+    expect(str_contains($fuera, '@container'))->toBeFalse('Quedó al menos una `@container` fuera del `@supports`.');
+    expect(str_contains($fuera, 'container-type'))->toBeFalse('Quedó al menos un `container-type` fuera del `@supports`.');
+
+    // La contención en línea NO puede vivir en el nodo que recibe los atributos del
+    // anfitrión: si alguien pone el marco como ítem de un flex, un marco contenido
+    // mide cero y la tabla desaparece.
+    expect(str_contains($soporta, '.muni-dc__cq'))->toBeTrue('El contenedor de consulta tiene que ser el envoltorio interior.');
+    expect((bool) preg_match('/\.muni-dc__marco[^{]*\{[^}]*container-type/', $css))->toBeFalse(
+        '`container-type` quedó sobre `.muni-dc__marco`, que es el nodo con los atributos del anfitrión.'
+    );
+
+    // Y el camino de viewport, que es el que funciona en todas partes, tiene que
+    // seguir dimensionando la columna por su cuenta.
+    $viewport = diffCamposBloqueAnidado('@media (max-width: 640px)');
+
+    expect(str_contains($viewport, '.muni-dc__c-estado'))->toBeTrue(
+        'La consulta de viewport dejó de dimensionar la columna de estado: donde no haya consultas de '.
+        'contenedor, la tabla se queda sin el camino compacto.'
+    );
+});
+
+it('el envoltorio de consulta existe y no se come la semántica de la tabla', function () {
+    $html = diffCamposHtml(':changes="$cambios"', ['cambios' => diffCamposCuatroEstados()]);
+
+    expect(str_contains($html, 'muni-dc__cq'))->toBeTrue('Falta el envoltorio interior del contenedor de consulta.');
+
+    // Lo que NO puede haber cambiado: sigue siendo una <table> con <caption>,
+    // <thead>, <th scope="col"> y el campo como <th scope="row">. Reorganizar la
+    // tabla en bloques apilados habría costado justo esto.
+    foreach (['<table', '<caption', '<thead', '<tbody', 'scope="col"', 'scope="row"'] as $pieza) {
+        expect(str_contains($html, $pieza))->toBeTrue(
+            "Desapareció «{$pieza}»: la tabla dejó de ser una tabla y el lector de pantalla pierde la ".
+            'relación campo-valor (WCAG 2.2 AA 1.3.1).'
+        );
+    }
+
+    expect((bool) preg_match('/display\s*:\s*block/i', $html))->toBeFalse(
+        'Alguien apiló la tabla con `display:block` en línea: eso borra el rol de tabla en el árbol de '.
+        'accesibilidad, que es justo lo que este componente cuida.'
+    );
+});
+
+it('los cuatro estados se leen como PALABRA completa aunque se borre el color y el glifo', function () {
+    $html = diffCamposHtml(':changes="$cambios"', ['cambios' => diffCamposCuatroEstados()]);
+
+    // El glifo es refuerzo, nunca portador: va oculto al lector de pantalla.
+    expect(str_contains($html, 'class="muni-dc__glifo" aria-hidden="true"'))->toBeTrue(
+        'El glifo tiene que seguir oculto al lector (aria-hidden): es decorativo.'
+    );
+
+    // Se borra todo el color Y todo el glifo. Lo que sobreviva es el portador real.
+    $pelado = (string) preg_replace('/<span[^>]*aria-hidden="true"[^>]*>.*?<\/span>/su', '', $html);
+    $pelado = (string) preg_replace('/\s(class|style)="[^"]*"/i', '', $pelado);
+
+    foreach (['Agregado', 'Modificado', 'Suprimido', 'Sin cambios'] as $palabra) {
+        expect(str_contains($pelado, $palabra))->toBeTrue(
+            "«{$palabra}» no sobrevive a que se quiten el color y el glifo. Abreviar el estado a +, − o ± ".
+            'no es una salida: el glifo ya existe como refuerzo y va en aria-hidden, nunca como portador.'
         );
     }
 });

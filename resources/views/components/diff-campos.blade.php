@@ -149,6 +149,14 @@
 @endphp
 
 <div {{ $attributes->merge(['class' => 'muni-dc__marco']) }}>
+    {{-- El envoltorio interior existe SOLO para ser el contenedor de consulta del
+         bloque de estilos: la tabla vive tanto a ancho completo como dentro de una
+         tarjeta de 306 px, y una consulta de viewport no distingue esos dos casos.
+         Va acá dentro y no en `.muni-dc__marco` a propósito: `container-type`
+         implica contención de tamaño en línea, y el marco es el nodo que recibe los
+         atributos del anfitrión —si alguien lo pone como ítem de un flex, un marco
+         contenido mediría cero. Este div nunca se dimensiona por su contenido. --}}
+    <div class="muni-dc__cq">
     <table class="muni-dc">
         <caption class="muni-dc__caption">{{ $muniDcCaption }}</caption>
         <thead>
@@ -212,6 +220,7 @@
     @if (trim($slot) !== '')
         <p class="muni-dc__nota">{{ $slot }}</p>
     @endif
+    </div>
 </div>
 
 @once
@@ -234,10 +243,28 @@
 
         .muni-dc__caption { caption-side:top; text-align:left; padding:10px 12px; font-size:12.5px; font-weight:700; line-height:1.3; color:var(--muni-text); background:var(--muni-surface-2); border-bottom:1px solid var(--muni-border); }
 
-        .muni-dc thead th { text-align:left; padding:7px 12px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--muni-muted); background:var(--muni-surface-2); border-bottom:1px solid var(--muni-border); }
+        /* `box-sizing:border-box` acá no es cosmético: sin él, un `width` sobre una
+           celda de cabecera es el ancho del CONTENIDO y el relleno se suma encima,
+           así que la misma regla da 122 px de columna en un anfitrión con el reset
+           de Tailwind y 146 px en uno sin él. Con el ancho de la columna de estado
+           en píxeles medidos, esos 24 px de diferencia deciden si la píldora cabe:
+           se fija el modelo de caja y el número deja de depender del host. */
+        .muni-dc thead th { box-sizing:border-box; text-align:left; padding:7px 12px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--muni-muted); background:var(--muni-surface-2); border-bottom:1px solid var(--muni-border); }
         .muni-dc__c-campo { width:24%; }
-        .muni-dc__c-estado { width:18%; }
-        .muni-dc__c-valor { width:29%; }
+        /* La columna de estado se dimensiona AL CONTENIDO, en px, y no en
+           porcentaje. Medido con getBoundingClientRect en Chromium 151 y Firefox
+           153, en claro y en oscuro, la píldora más ancha —«= Sin cambios»— mide
+           93,8 px; con los 24 px de relleno de la celda hacen falta 117,8, y se
+           redondea a 122 (caja de borde) para dejar holgura de fuente al anfitrión
+           que redefina --muni-font-sans. Un porcentaje ataba el ancho al del contenedor —18 %
+           son 80 px en una tarjeta de 440 px y 60 px en una de 306— mientras la
+           píldora medía siempre lo mismo: de ahí salía el desborde de 14 a 46 px
+           sobre la columna «Antes». */
+        .muni-dc__c-estado { width:122px; }
+        /* Las dos columnas de valor se reparten lo que sobra, sea cual sea el
+           ancho de la tabla. Con `auto` no hay que cuadrar porcentajes a mano
+           cada vez que cambia el ancho de otra columna. */
+        .muni-dc__c-valor { width:auto; }
 
         /* Se gana en especificidad a `[data-muni-row] td` de data-table a
            propósito: aquel fija `white-space:nowrap`, y acá el valor TIENE que
@@ -251,7 +278,15 @@
            unidades alineen entre «antes» y «después». Opt-in por ítem. */
         .muni-dc .muni-num { font-family:var(--muni-font-mono); font-variant-numeric:tabular-nums; }
 
-        .muni-dc__tag { display:inline-flex; align-items:center; gap:4px; padding:1px 8px; border-radius:999px; border:1px solid var(--muni-border-2); font-size:11px; font-weight:700; line-height:1.6; white-space:nowrap; }
+        /* Dos garantias, y la segunda es la que importa: `max-width:100%` impide
+           que la píldora salga de su celda pase lo que pase —fuente del anfitrión
+           más ancha, zoom de solo texto, una traducción más larga—, y
+           `white-space:normal` hace que en ese caso ENVUELVA en vez de dibujarse
+           encima de la celda vecina. Antes decía `nowrap`, y una caja que no
+           encoge dentro de una columna que sí lo hace es exactamente el defecto
+           D3. El corte natural es el espacio: `overflow-wrap:anywhere`, heredado
+           de la celda, sólo parte una palabra cuando esa palabra sola no cabe. */
+        .muni-dc__tag { display:inline-flex; align-items:center; gap:4px; max-width:100%; padding:1px 8px; border-radius:999px; border:1px solid var(--muni-border-2); font-size:11px; font-weight:700; line-height:1.6; white-space:normal; }
         .muni-dc__glifo { font-family:var(--muni-font-mono); font-weight:700; }
         /* Los cuatro estados salen de tokens que tienen rama clara y rama oscura,
            así que la contraparte del modo oscuro viene con el token (DESIGN §4).
@@ -276,12 +311,38 @@
         .muni-dc__vacio { text-align:center; padding:26px 12px; color:var(--muni-muted); }
         .muni-dc__nota { margin:0; padding:8px 12px; border-top:1px solid var(--muni-border); font-family:var(--muni-font-sans); font-size:11.5px; line-height:1.45; color:var(--muni-muted); background:var(--muni-surface-2); }
 
+        {{-- Las reglas compactas están DOS veces a propósito, y no es duplicación
+             que limpiar: la de viewport es el camino base y funciona en todos
+             lados; la de contenedor, más abajo, es la que acierta cuando la tabla
+             vive en una tarjeta estrecha de una pantalla ancha —el caso que la
+             consulta de viewport no puede ver y que dejaba la columna de estado en
+             60 px dentro de un escritorio de 1440. Si algún día se editan los
+             valores, se editan los dos bloques. --}}
         @media (max-width: 640px) {
             .muni-dc { font-size:12px; }
             .muni-dc thead th, .muni-dc tbody th, .muni-dc tbody td { padding:6px 8px; }
             .muni-dc__c-campo { width:26%; }
-            .muni-dc__c-estado { width:24%; }
-            .muni-dc__c-valor { width:25%; }
+            /* Relleno de celda 16 px en vez de 24 y píldora compacta (88,8 px
+               medidos), así que la columna baja de 122 a 108 y los 14 px que se
+               liberan se van a las dos columnas de valor, que es donde se lee. */
+            .muni-dc__c-estado { width:108px; }
+            .muni-dc__tag { gap:3px; padding:1px 6px; }
+        }
+
+        /* Mejora progresiva (DESIGN §10): donde haya consultas de contenedor, lo
+           compacto se decide por el ancho de la TABLA y no por el de la ventana.
+           Va después del bloque de viewport para ganarle por orden, con la misma
+           especificidad. Donde no exista, queda el camino de arriba entero. */
+        @supports (container-type: inline-size) {
+            .muni-dc__cq { container-type:inline-size; container-name:muni-dc; }
+
+            @container muni-dc (max-width: 640px) {
+                .muni-dc { font-size:12px; }
+                .muni-dc thead th, .muni-dc tbody th, .muni-dc tbody td { padding:6px 8px; }
+                .muni-dc__c-campo { width:26%; }
+                .muni-dc__c-estado { width:108px; }
+                .muni-dc__tag { gap:3px; padding:1px 6px; }
+            }
         }
 
         /* En papel el fondo no se imprime: sin esto el <ins> y el <del> quedarían

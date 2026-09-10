@@ -47,7 +47,14 @@
     .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;font-weight:700;font-size:14px;padding:12px 20px;border-radius:var(--muni-radius-sm);border:1px solid transparent;cursor:pointer;transition:.15s}
     .btn-p{background:var(--muni-accent);color:var(--muni-on-accent)}.btn-p:hover{background:var(--muni-accent-strong)}
     .btn-g{background:var(--muni-surface);color:var(--muni-text);border-color:var(--muni-border)}.btn-g:hover{background:var(--muni-surface-2)}
-    .btn:disabled{opacity:.45;cursor:not-allowed}
+    /* El estado inactivo NO se expresa apagando el botón entero: `opacity:.45` bajaba
+       también la etiqueta —«Continuar» medía 2,34:1 en claro y 2,64:1 en oscuro, y
+       «← Atrás» 2,48:1—, y para llegar a 4,5:1 haría falta una opacidad tan alta que
+       el botón ya no se leería como inactivo. Se expresa con tokens: superficie
+       apagada + `--muni-muted` (5,81:1 en claro, 4,84:1 en oscuro sobre surface-2).
+       El estado no viaja solo por el color: lo anuncia el atributo `disabled` al
+       lector de pantalla y lo muestra `cursor:not-allowed` al puntero. */
+    .btn:disabled,.btn:disabled:hover{background:var(--muni-surface-2);color:var(--muni-muted);border-color:var(--muni-border);cursor:not-allowed;box-shadow:none}
     .rowbtw{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;font-size:12.5px}
     a{color:var(--muni-accent);text-decoration:none;font-weight:600}
     .divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--muni-hint);font-size:12px}

@@ -15,7 +15,30 @@ pantalla vuelve a dejarlas pasar.
 Umbrales (WCAG 2.2 AA, obligatorio en sistemas del Estado por el Decreto N°1/2015):
   · texto normal          4.5:1
   · texto grande          3.0:1   (>= 24px, o >= 18.66px en negrita)
+  · texto decorativo      3.0:1   (dentro de aria-hidden="true"; ver abajo)
   · axe-core              falla ante cualquier violación «serious» o «critical»
+
+Texto decorativo (aria-hidden="true") — por qué NO se salta del todo
+--------------------------------------------------------------------
+Un «/» entre dos enlaces de la barra institucional no es información: es puntuación.
+WCAG 1.4.3 exime el texto «incidental» (decoración y componentes inactivos) y axe-core
+salta los subárboles con aria-hidden="true", porque no existen en el árbol de
+accesibilidad. Esta reja hacía lo contrario: le exigía 4,5:1 a ese «/» y lo daba por
+defecto en las cinco demos que llevan la barra.
+
+Pero saltarlo del todo abre una puerta: cualquiera esconde un defecto real detrás de un
+aria-hidden y la reja deja de verlo. No es hipotético — el indicador de orden de
+`sortable-table` (resources/views/components) lleva aria-hidden="true" con opacity:.3,
+o sea ~1,4:1, y un salto ciego lo volvería invisible para siempre.
+
+Por eso no se salta: se RECLASIFICA.
+  · se sigue midiendo, y por debajo de 3:1 FALLA igual. Está dibujado en pantalla, lo
+    vea o no un lector: le aplica 1.4.11 como objeto gráfico.
+  · entre 3:1 y el umbral de texto se informa aparte, con su medición, en la sección
+    «Textos decorativos». No cuenta para el veredicto, pero queda escrito en cada
+    corrida: la puerta existe, pero tiene una luz encendida encima.
+Y esconder contenido INTERACTIVO detrás de un aria-hidden lo sigue cazando axe con
+`aria-hidden-focus`, que en esta reja es «serious» y falla.
 """
 from __future__ import annotations
 
@@ -99,8 +122,45 @@ MEDIR_CONTRASTE = r"""
     return partes.join(' > ');
   };
 
-  const fallas = [], indecidibles = [];
+  const fallas = [], indecidibles = [], decorativos = [];
   let medidos = 0;
+
+  // Un texto dentro de aria-hidden="true" no llega al árbol de accesibilidad: no es
+  // información, es dibujo. Se le exige 3:1 (1.4.11, objeto gráfico visible) en vez
+  // del umbral de texto, y lo que quede entre 3:1 y ese umbral se informa aparte en
+  // vez de desaparecer. El porqué y el riesgo están en el docstring del archivo.
+  const registrar = (ruta, texto, px, peso, colorCss, fondo, r, decorativo) => {
+    const grande = px >= 24 || (px >= 18.66 && peso >= 700);
+    const barraTexto = grande ? 3.0 : 4.5;
+    const minimo = decorativo ? 3.0 : barraTexto;
+    const item = {
+      ruta,
+      texto: texto.slice(0, 60),
+      ratio: Math.round(r * 100) / 100,
+      minimo,
+      px: Math.round(px * 10) / 10,
+      peso,
+      color: colorCss,
+      fondo: `rgb(${Math.round(fondo.r)}, ${Math.round(fondo.g)}, ${Math.round(fondo.b)})`,
+      decorativo,
+    };
+    if (r + 0.005 < minimo) { fallas.push(item); return; }
+    if (decorativo && r + 0.005 < barraTexto) { item.barraTexto = barraTexto; decorativos.push(item); }
+  };
+
+  // El contenido de ::before y ::after no está en el DOM, así que ni este script
+  // ni axe lo veían. Ahí vivía un «✓» a 3,73:1 en dos landings. Se mide aparte,
+  // leyendo el pseudo-elemento y atribuyéndoselo al elemento que lo genera.
+  const pseudos = [];
+  for (const el of document.querySelectorAll('*')) {
+    for (const cual of ['::before', '::after']) {
+      const ps = getComputedStyle(el, cual);
+      const contenido = (ps.content || '').replace(/^["']|["']$/g, '').trim();
+      if (!contenido || contenido === 'none' || contenido === 'normal') continue;
+      if (ps.visibility === 'hidden' || ps.display === 'none') continue;
+      pseudos.push({ el, cual, texto: contenido, estilo: ps });
+    }
+  }
 
   for (const el of document.querySelectorAll('*')) {
     // Solo elementos con texto propio visible.
@@ -136,28 +196,75 @@ MEDIR_CONTRASTE = r"""
     }
     for (let i = capas.length - 2; i >= 0; i--) fondo = sobre(capas[i], fondo);
 
-    const efectivo = frente.a < 1 ? sobre(frente, fondo) : frente;
-    const px = parseFloat(cs.fontSize);
-    const peso = parseInt(cs.fontWeight, 10) || 400;
-    const grande = px >= 24 || (px >= 18.66 && peso >= 700);
-    const minimo = grande ? 3.0 : 4.5;
-    const r = ratio(efectivo, fondo);
-    medidos++;
-    if (r + 0.005 < minimo) {
-      fallas.push({
-        ruta: rutaDe(el),
-        texto: propio.slice(0, 60),
-        ratio: Math.round(r * 100) / 100,
-        minimo,
-        px: Math.round(px * 10) / 10,
-        peso,
-        color: cs.color,
-        fondo: `rgb(${Math.round(fondo.r)}, ${Math.round(fondo.g)}, ${Math.round(fondo.b)})`,
-      });
+    // La opacidad de un ANCESTRO también apaga el texto, y hasta ahora no se
+    // miraba: se leía solo la del propio elemento. Así pasaron un opacity:.5 en
+    // el estado pendiente de la línea de tiempo (2,03:1 real) y un opacity:.6 en
+    // el pie institucional de cinco demos. `opacity` no se hereda como valor
+    // pero sí se acumula al componer, así que se multiplica en toda la cadena.
+    let opacidadHeredada = 1;
+    for (let n = el; n; n = n.parentElement) {
+      const o = parseFloat(getComputedStyle(n).opacity);
+      if (!isNaN(o)) opacidadHeredada *= o;
     }
+    if (opacidadHeredada === 0) continue;
+
+    const frenteConOpacidad = opacidadHeredada < 1
+      ? { r: frente.r, g: frente.g, b: frente.b, a: frente.a * opacidadHeredada }
+      : frente;
+    const efectivo = frenteConOpacidad.a < 1 ? sobre(frenteConOpacidad, fondo) : frenteConOpacidad;
+    medidos++;
+    registrar(
+      rutaDe(el), propio, parseFloat(cs.fontSize), parseInt(cs.fontWeight, 10) || 400,
+      cs.color, fondo, ratio(efectivo, fondo), !!el.closest('[aria-hidden="true"]'),
+    );
   }
+
+  // Segunda pasada: los ::before/::after recogidos arriba. El fondo se compone
+  // igual desde el elemento que los genera —el pseudo vive dentro de su caja—,
+  // y arrastran la misma opacidad heredada.
+  for (const { el, cual, texto, estilo } of pseudos) {
+    const frente = aRGB(estilo.color);
+    if (!frente || frente.a === 0) continue;
+    const caja = el.getBoundingClientRect();
+    if (caja.width < 1 || caja.height < 1) continue;
+
+    let fondo = null, capas = [], degradado = false;
+    for (let n = el; n; n = n.parentElement) {
+      const st = getComputedStyle(n);
+      if (st.backgroundImage && st.backgroundImage !== 'none') { degradado = true; break; }
+      const c = aRGB(st.backgroundColor);
+      if (!c || c.a === 0) continue;
+      capas.push(c);
+      if (c.a === 1) { fondo = c; break; }
+    }
+    if (degradado) {
+      indecidibles.push({ ruta: rutaDe(el) + cual, texto: texto.slice(0, 60), motivo: 'fondo con imagen o degradado' });
+      continue;
+    }
+    if (!fondo) fondo = { r: 255, g: 255, b: 255, a: 1 };
+    for (let i = capas.length - 2; i >= 0; i--) fondo = sobre(capas[i], fondo);
+
+    let op = 1;
+    for (let n = el; n; n = n.parentElement) {
+      const o = parseFloat(getComputedStyle(n).opacity);
+      if (!isNaN(o)) op *= o;
+    }
+    const opPseudo = parseFloat(estilo.opacity);
+    if (!isNaN(opPseudo)) op *= opPseudo;
+    if (op === 0) continue;
+
+    const conOp = op < 1 ? { r: frente.r, g: frente.g, b: frente.b, a: frente.a * op } : frente;
+    const efectivo = conOp.a < 1 ? sobre(conOp, fondo) : conOp;
+    medidos++;
+    registrar(
+      rutaDe(el) + cual, texto, parseFloat(estilo.fontSize), parseInt(estilo.fontWeight, 10) || 400,
+      estilo.color, fondo, ratio(efectivo, fondo), !!el.closest('[aria-hidden="true"]'),
+    );
+  }
+
   fallas.sort((a, b) => a.ratio - b.ratio);
-  return { medidos, fallas, indecidibles };
+  decorativos.sort((a, b) => a.ratio - b.ratio);
+  return { medidos, fallas, indecidibles, decorativos };
 }
 """
 
@@ -239,6 +346,7 @@ def revisar(pagina: Path, temas: list[str], axe_src: str, ctx) -> list[dict]:
             "medidos": contraste["medidos"],
             "contraste": contraste["fallas"],
             "indecidibles": contraste["indecidibles"],
+            "decorativos": contraste["decorativos"],
             "axe_graves": graves,
             "axe_otros": [v for v in axe if v["impact"] not in ("serious", "critical")],
         })
@@ -341,6 +449,26 @@ def main() -> int:
             for v in r["axe_graves"]:
                 print(f"   axe [{v['impact']}] {v['id']}: {v['help']} ({v['n']} nodo(s)) · {v['ejemplo'][:70]}")
             print()
+
+    # Textos decorativos: pasan el 3:1 de objeto gráfico pero no llegarían al umbral
+    # de texto. No fallan —están fuera del árbol de accesibilidad— pero se listan en
+    # cada corrida para que nadie use aria-hidden como escondite silencioso.
+    decorativos: dict[tuple, dict] = {}
+    for r in filas:
+        for d in r.get("decorativos", []):
+            clave = (d["ruta"], d["texto"], d["ratio"])
+            entrada = decorativos.setdefault(clave, {**d, "paginas": set()})
+            entrada["paginas"].add((r["pagina"], r["tema"]))
+    if decorativos:
+        print("\nTextos decorativos (aria-hidden=\"true\"): medidos con el 3:1 de objeto")
+        print("gráfico (WCAG 1.4.11), no con el umbral de texto. No cuentan para el veredicto.\n")
+        for d in sorted(decorativos.values(), key=lambda d: d["ratio"]):
+            paginas = sorted({p for p, _ in d["paginas"]})
+            print(f"   {d['ratio']:5.2f}:1 (mín. decorativo {d['minimo']}, texto sería {d['barraTexto']}) · "
+                  f"{d['px']}px/{d['peso']} · {d['color']} sobre {d['fondo']}\n"
+                  f"      {d['ruta']}\n      «{d['texto']}»\n"
+                  f"      en {len(paginas)} página(s): {', '.join(paginas)}")
+        print()
 
     indecidibles = sum(len(r["indecidibles"]) for r in filas)
     if indecidibles:

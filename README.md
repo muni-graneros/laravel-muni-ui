@@ -228,6 +228,7 @@ quedaban sin valor.
 | `<x-muni::empty-state>` | `title`, `description`, `icon`; slot `actions` |
 | `<x-muni::timeline>` | `items` — claves `title`, `time`, `description`, `tone`, `toneLabel`, `actor`, `current`, `datetime`, `detail`; hito auditable, sin Alpine |
 | `<x-muni::command-palette>` | `items`, `placeholder`, `hotkey` — ⌘K/Ctrl+K (Alpine) |
+| `<x-muni::combobox>` | `name` (obligatoria), `options`, `value`, `selectedLabel`, `search`, `model`, `searchModel`, `hint`, `error` — buscar y elegir en una lista larga; el valor vive en un input oculto, no en Alpine |
 | `<x-muni::auth-shell>` | `theme`, `title`, `system`, `subtitle`, `logo`; slots `aside`, `head` — layout login/registro |
 | `<x-muni::dashboard-shell>` | `theme`, `system`, `subtitle`, `status`, `user`; slots `sidebar`, `topbar` — layout de panel |
 | `<x-muni::error-page>` | `code`, `title`, `message`, `home`, `theme` — 403/404/500/503 |

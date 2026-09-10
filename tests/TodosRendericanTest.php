@@ -25,6 +25,7 @@ function propsObligatorias(): array
     return [
         'app-shell' => ':system="\'Licencias\'"',
         'topbar' => ':system="\'Licencias\'"',
+        'combobox' => 'name="titular_id"',
         'page-header' => 'title="Patentes morosas"',
         'kpi' => ':value="42" label="Solicitudes"',
         'stat' => ':value="42" label="Solicitudes"',

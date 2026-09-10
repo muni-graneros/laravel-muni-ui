@@ -226,6 +226,7 @@ quedaban sin valor.
 | `<x-muni::progress>` | `value`, `max`, `tone`, `label`, `showValue` |
 | `<x-muni::skeleton>` | `width`, `height`, `rounded` (shimmer) |
 | `<x-muni::empty-state>` | `title`, `description`, `icon`; slot `actions` |
+| `<x-muni::timeline>` | `items` — claves `title`, `time`, `description`, `tone`, `toneLabel`, `actor`, `current`, `datetime`, `detail`; hito auditable, sin Alpine |
 | `<x-muni::command-palette>` | `items`, `placeholder`, `hotkey` — ⌘K/Ctrl+K (Alpine) |
 | `<x-muni::auth-shell>` | `theme`, `title`, `system`, `subtitle`, `logo`; slots `aside`, `head` — layout login/registro |
 | `<x-muni::dashboard-shell>` | `theme`, `system`, `subtitle`, `status`, `user`; slots `sidebar`, `topbar` — layout de panel |

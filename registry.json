@@ -78,7 +78,7 @@
       "tag": "<x-muni::alert>",
       "type": "registry:blade-component",
       "file": "resources/views/components/alert.blade.php",
-      "description": "Componente alert del sistema de diseño municipal",
+      "description": "EL CUERPO VA CON EL `fg` DEL TONO, NO CON --muni-muted",
       "props": [
         {
           "name": "tone",
@@ -1712,6 +1712,12 @@
           "type": "string",
           "default": "220px",
           "required": false
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Abrir menú",
+          "required": false
         }
       ],
       "slots": [
@@ -1727,8 +1733,10 @@
       "alpine": {
         "required": true,
         "directives": [
+          "x-bind",
           "x-cloak",
           "x-data",
+          "x-effect",
           "x-muni",
           "x-show",
           "x-transition"
@@ -1736,12 +1744,17 @@
         "plugins": []
       },
       "tokens": [
+        "--muni-accent",
         "--muni-border",
         "--muni-dur",
         "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
         "--muni-radius",
+        "--muni-radius-sm",
         "--muni-shadow-lg",
-        "--muni-surface"
+        "--muni-surface",
+        "--muni-text"
       ],
       "example": "<x-muni::dropdown align=\"end\" width=\"220px\"></x-muni::dropdown>"
     },
@@ -2539,11 +2552,11 @@
       "tokens": [
         "--muni-accent",
         "--muni-danger-bg",
-        "--muni-danger-border",
         "--muni-danger-fg",
         "--muni-dur",
         "--muni-ease",
         "--muni-field-border",
+        "--muni-field-border-error",
         "--muni-focus",
         "--muni-font-sans",
         "--muni-hint",
@@ -3266,6 +3279,7 @@
         "--muni-border",
         "--muni-danger-border",
         "--muni-danger-fg",
+        "--muni-field-border-error",
         "--muni-font-mono",
         "--muni-font-sans"
       ],
@@ -3401,11 +3415,11 @@
       "tokens": [
         "--muni-accent",
         "--muni-danger-bg",
-        "--muni-danger-border",
         "--muni-danger-fg",
         "--muni-dur",
         "--muni-ease",
         "--muni-field-border",
+        "--muni-field-border-error",
         "--muni-focus",
         "--muni-font-sans",
         "--muni-hint",
@@ -4106,11 +4120,11 @@
       "tokens": [
         "--muni-accent",
         "--muni-danger-bg",
-        "--muni-danger-border",
         "--muni-danger-fg",
         "--muni-dur",
         "--muni-ease",
         "--muni-field-border",
+        "--muni-field-border-error",
         "--muni-focus",
         "--muni-font-mono",
         "--muni-font-sans",

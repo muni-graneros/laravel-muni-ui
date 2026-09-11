@@ -39,7 +39,14 @@ function ejemplosDeVitrina(): array
         'kpi' => '<x-muni::kpi :value="3412" label="Morosas" tone="danger" hint="al 6 de septiembre" />',
         'badge' => '<x-muni::badge tone="danger">Vencida</x-muni::badge> <x-muni::badge tone="ok">Al día</x-muni::badge> <x-muni::badge tone="warn">Por vencer</x-muni::badge>',
         'button' => '<x-muni::button>Guardar</x-muni::button> <x-muni::button variant="ghost">Cancelar</x-muni::button>',
-        'alert' => '<x-muni::alert tone="warn" title="217 patentes por vencer">Vencen dentro de 30 días.</x-muni::alert>',
+        // LOS CINCO TONOS, no solo warn. Cada uno pinta su propio par fg/bg, así que
+        // con una sola alerta se medía un tono de cinco: los otros cuatro estuvieron
+        // entre 4,15 y 4,41 sobre su fondo hasta que se midieron a mano.
+        'alert' => '<x-muni::alert tone="ok" title="Solicitud aprobada">Queda en la bitácora.</x-muni::alert>'
+            .'<x-muni::alert tone="warn" title="217 patentes por vencer">Vencen dentro de 30 días.</x-muni::alert>'
+            .'<x-muni::alert tone="danger" title="Giro rechazado">Revisa el RUT del titular.</x-muni::alert>'
+            .'<x-muni::alert tone="info" title="Sistema en mantención">El sábado 12, de 08:00 a 12:00.</x-muni::alert>'
+            .'<x-muni::alert title="Tono no declarado">Cae en info, y también se mide.</x-muni::alert>',
         'input' => '<x-muni::input label="RUT del titular" name="rut" hint="Formato 12.345.678-9" error="El dígito verificador no corresponde." />',
         'select' => '<x-muni::select label="Tipo de trámite" name="tramite" :options="[\'a\' => \'Licencia clase B\', \'b\' => \'Renovación\']" hint="Elige el trámite" />',
         'textarea' => '<x-muni::textarea label="Descripción del requerimiento" name="detalle" hint="Cuenta qué pasó" :maxlength="500" />',
@@ -124,6 +131,13 @@ function ejemplosDeVitrina(): array
         'popover' => '<x-muni::popover label="Filtros de la bandeja">'
             .'<form method="get"><p>Estado y fecha del requerimiento.</p></form>'
             .'</x-muni::popover>',
+        // dropdown tenía aria-expanded sobre un <div> sin rol —axe critical— y nadie
+        // lo veía porque no estaba acá. Van las dos formas del slot: la que el
+        // componente envuelve en un <button> propio y la que trae su control.
+        'dropdown' => '<x-muni::dropdown label="Acciones del giro">'
+            .'<x-muni::dropdown-item href="#">Ver expediente</x-muni::dropdown-item>'
+            .'<x-muni::dropdown-item href="#">Imprimir orden</x-muni::dropdown-item>'
+            .'</x-muni::dropdown>',
         'tooltip' => '<x-muni::tooltip text="Anular el giro de la patente" id="vitrina-tt">'
             .'<button type="button" class="muni-btn" aria-label="Anular el giro de la patente"'
             .' aria-describedby="vitrina-tt">Anular</button>'

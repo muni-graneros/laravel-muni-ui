@@ -25,8 +25,24 @@
     <span aria-hidden="true" style="flex-shrink:0;width:16px;height:16px;margin-top:1px;color:{{ $t['fg'] }};">
         {!! $icon ?? '<svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 4a1 1 0 011 1v4a1 1 0 11-2 0V7a1 1 0 011-1zm0 8a1 1 0 100 2 1 1 0 000-2z"/></svg>' !!}
     </span>
+    {{-- EL CUERPO VA CON EL `fg` DEL TONO, NO CON --muni-muted.
+
+         --muni-muted está calibrado contra las SUPERFICIES del tema
+         (surface / bg / surface-3), no contra los fondos de estado. Medido
+         sobre ellos daba 4,15 a 4,53:1 según el tono, la hoja y el tema: por
+         debajo del 4,5:1 que 1.4.3 exige para texto normal. El par
+         `{tono}-fg` sobre `{tono}-bg` sí está medido, en las dos hojas y en
+         los dos temas, y es el que ya usaba el título. Se reutiliza ese en vez
+         de inventar un token nuevo.
+
+         El tono NO queda comunicado solo por ese color: lo dicen también el
+         icono, el borde izquierdo de 3px y el `role` del recuadro.
+
+         Las clases son el punto de anclaje de la prueba que mide el contraste
+         de los cinco tonos: no llevan reglas propias porque el color depende
+         del tono y tiene que viajar en línea. --}}
     <div style="min-width:0;">
-        @if ($title)<div style="font-weight:700;color:{{ $t['fg'] }};margin-bottom:2px;">{{ $title }}</div>@endif
-        <div style="color:var(--muni-muted);">{{ $slot }}</div>
+        @if ($title)<div class="muni-alert__titulo" style="font-weight:700;color:{{ $t['fg'] }};margin-bottom:2px;">{{ $title }}</div>@endif
+        <div class="muni-alert__cuerpo" style="color:{{ $t['fg'] }};">{{ $slot }}</div>
     </div>
 </div>

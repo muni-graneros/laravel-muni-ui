@@ -176,7 +176,7 @@ quedaban sin valor.
 
 | Componente | Props principales |
 |-----------|-------------------|
-| `<x-muni::dropdown>` | `align` (start/end), `width`; slot `trigger` + ítems `<x-muni::dropdown-item>` |
+| `<x-muni::dropdown>` | `align` (start/end), `width`, `label`; ítems `<x-muni::dropdown-item>`. La ranura `trigger` es el **contenido** del botón, no el botón: si le pasas un `<button>` o un `<a>` propio, el componente no lo envuelve y le estampa el ARIA encima |
 | `<x-muni::dropdown-item>` | `href`, `icon`, `tone` (default/danger) |
 | `<x-muni::modal>` | `title`, `maxWidth`; slots `trigger`, `footer` |
 | `<x-muni::tabs>` | `tabs` (array de labels), `default`, `id`, `label`, `activation` (auto\|manual); paneles `<x-muni::tab-panel :index>` |

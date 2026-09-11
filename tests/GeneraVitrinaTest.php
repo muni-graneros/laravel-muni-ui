@@ -15,6 +15,12 @@ use Illuminate\Support\Facades\Blade;
  * La salida va a `build/vitrina/`, que está ignorada por git. No es un artefacto
  * que se publique: es el sujeto de la medición.
  *
+ * La vitrina CARGA ALPINE 3 y abre a mano los estados que nacen cerrados. Sin eso no
+ * emitía un solo <script>: nada interactivo hidrataba, `sortable-table` no llegaba
+ * siquiera a tener cabecera ni filas —viven dentro de <template x-for>— y la reja
+ * medía 165 textos. Con Alpine e hidratación mide 181. De dónde sale Alpine y qué se
+ * abre está en `fuenteDeAlpine()` y `abridorDeVitrina()`, acá abajo.
+ *
  *     ./vendor/bin/pest --filter=GeneraVitrina
  *     npm run a11y -- build/vitrina/claro.html build/vitrina/oscuro.html
  */
@@ -49,8 +55,9 @@ function ejemplosDeVitrina(): array
         // un par de colores que medir por tono. Un ítem con `current`, otro con
         // `actor` y otro con `detail`: el <summary> es una parada de tabulación
         // nueva, y sin un ítem que lo emita la reja no mide ni su foco ni su
-        // contraste. El <details> arranca colapsado, así que lo de adentro no se
-        // mide acá: es lo mismo que ve el funcionario al abrir la pantalla.
+        // contraste. El <details> nace colapsado, pero el abridor de la vitrina lo
+        // abre antes de medir: el texto del cambio («Domicilio: … → …») es lo que
+        // el funcionario lee cuando despliega, y hasta ahora no se medía nunca.
         'timeline' => '<x-muni::timeline :items="['
             .'[\'title\' => \'Ingresada\', \'time\' => \'10:04\', \'datetime\' => \'2026-09-08T10:04:00-03:00\', \'tone\' => \'info\', \'actor\' => \'Ventanilla Única\'],'
             .'[\'title\' => \'Derivada a Obras\', \'time\' => \'11:20\', \'tone\' => \'ok\', \'description\' => \'Con el certificado de dominio adjunto.\'],'
@@ -104,12 +111,12 @@ function ejemplosDeVitrina(): array
             .'en el decreto alcaldicio 118/2026. Se levanta acta y se cita al Juzgado de Policía Local.</p>'
             .'<x-slot:firma><span>Firma del fiscalizador</span></x-slot:firma>'
             .'</x-muni::hoja>',
-        // De los tres que siguen, la reja solo alcanza la parte VISIBLE en reposo:
-        // el panel del popover, la burbuja del tooltip y la lista del combobox
-        // nacen cerrados, y el script salta todo nodo de alto 0. Aun así se miden
-        // acá el disparador, el campo, la etiqueta y la ayuda, que es donde vive
-        // el texto que el funcionario lee sin abrir nada. Lo cerrado sigue siendo
-        // agujero conocido de la reja, igual que el <details> de timeline.
+        // Los tres nacen cerrados, y el medidor salta todo nodo de alto 0: hasta que
+        // la vitrina cargó Alpine, de estos solo se medía el disparador, el campo,
+        // la etiqueta y la ayuda. Ahora el abridor (ver `abridorDeVitrina`) abre la
+        // lista del combobox —con la primera opción resaltada—, la burbuja del
+        // tooltip y el panel del popover ANTES de que la reja mida, y si alguno se
+        // queda de alto 0 la reja FALLA en vez de dar verde midiendo de menos.
         'combobox' => '<x-muni::combobox name="vitrina_titular" label="Titular de la solicitud"'
             .' selectedLabel="Ana Soto Miranda" value="4821"'
             .' hint="Escribe el RUT o el nombre; se muestran hasta 20 resultados."'
@@ -124,7 +131,172 @@ function ejemplosDeVitrina(): array
     ];
 }
 
-function armaVitrina(string $tema): string
+/**
+ * El código de Alpine 3 que se hornea en la vitrina, o null si no hay copia en disco.
+ *
+ * Por qué hace falta: los componentes del paquete dan por sentado que Alpine viaja
+ * dentro del bundle de Livewire, así que el paquete no publica ninguno. Sin él la
+ * vitrina no emite un solo <script>: la lista del combobox, la burbuja del tooltip,
+ * el panel del popover y —esto es lo peor— TODA la cabecera y el cuerpo de
+ * `sortable-table`, que viven dentro de <template x-for>, nunca llegan al DOM. La
+ * reja medía lo que el funcionario ve antes de tocar nada, y solo eso.
+ *
+ * De dónde sale, en el mismo orden que `scripts/a11y-check.py` resuelve axe-core:
+ *   1. $MUNI_ALPINE_JS      (una ruta explícita, como el `--axe` de la reja)
+ *   2. node_modules/        (`npm install`; alpinejs es dependencia de desarrollo)
+ *   3. scripts/.cache/      (copia cacheada, ignorada por git como la de axe)
+ *
+ * Nunca de un CDN: la reja corre sin red y una vitrina que dependa de internet deja
+ * de ser un candado en cuanto se cae la conexión. Si no hay copia, la vitrina se
+ * genera igual pero SIN hidratar y se dice en voz alta: es preferible a un fallo de
+ * la suite en una máquina que no corrió `npm install`. Quien pierde de verdad es la
+ * reja, y por eso `a11y-check.py` marca FALLA si la página pedía Alpine y no llegó.
+ */
+function fuenteDeAlpine(): ?string
+{
+    $candidatos = [];
+
+    if ($ruta = getenv('MUNI_ALPINE_JS')) {
+        $candidatos[] = $ruta;
+    }
+
+    $candidatos[] = __DIR__.'/../node_modules/alpinejs/dist/cdn.min.js';
+
+    foreach (glob(__DIR__.'/../scripts/.cache/alpine-*.min.js') ?: [] as $cacheada) {
+        $candidatos[] = $cacheada;
+    }
+
+    foreach ($candidatos as $candidato) {
+        if (is_file($candidato)) {
+            return (string) file_get_contents($candidato);
+        }
+    }
+
+    return null;
+}
+
+/**
+ * El abridor: hidrata no basta, hay que ABRIR.
+ *
+ * Todo lo interactivo del paquete nace cerrado, y el medidor de contraste salta
+ * cualquier nodo de alto 0. Con Alpine y sin esto se ganaría `sortable-table`
+ * entero y nada más. Así que después de `alpine:initialized` se abre a mano lo que
+ * el funcionario abre con el ratón, y se deja abierto mientras la reja mide.
+ *
+ * Se abre por la API pública del componente (`Alpine.$data(...)` y los métodos que
+ * el propio Blade declara), no manoseando clases ni estilos: si mañana el
+ * componente cambia de manera de abrirse, esto se rompe en vez de mentir.
+ *
+ * Además deja constancia en `window.__vitrinaEstado` de qué quedó abierto y con qué
+ * alto, y solo entonces marca `data-vitrina-lista="1"` en el <html>. Ese es el
+ * apretón de manos que `a11y-check.py` espera antes de medir: sin él la reja
+ * mediría a mitad de la hidratación y el resultado dependería del reloj.
+ */
+function abridorDeVitrina(): string
+{
+    return <<<'JS'
+    (() => {
+        const estado = { alpine: null, xdata: 0, abiertos: [], fallos: [] };
+
+        const anota = (nombre, el) => {
+            const alto = el ? Math.round(el.getBoundingClientRect().height) : 0;
+            if (alto > 0) { estado.abiertos.push(nombre + ' ' + alto + 'px'); }
+            else { estado.fallos.push(nombre + ': quedó en 0px, no se está midiendo'); }
+        };
+
+        const conCuidado = (nombre, fn) => {
+            try { fn(); } catch (error) { estado.fallos.push(nombre + ': ' + error.message); }
+        };
+
+        const abre = () => {
+            estado.alpine = (window.Alpine && window.Alpine.version) || null;
+            estado.xdata = document.querySelectorAll('[x-data]').length;
+
+            /* La lista del combobox, y con la primera opción resaltada: el fondo del
+               resaltado y el aria-activedescendant son estado propio, y nunca se han
+               medido porque solo existen con la lista abierta. */
+            conCuidado('combobox', () => {
+                const combo = document.querySelector('.muni-combo');
+                if (! combo) { return; }
+                const datos = window.Alpine.$data(combo);
+                datos.abrir();
+                datos.activo = 0;
+            });
+
+            /* La burbuja del tooltip: la que salía como una tira vertical de 25x367
+               con las palabras partidas letra a letra. */
+            conCuidado('tooltip', () => {
+                const tt = document.querySelector('.muni-tt');
+                if (tt) { window.Alpine.$data(tt).abrir(); }
+            });
+
+            /* El popover lleva el estado en el atributo NATIVO, no en Alpine: se abre
+               como lo abre el navegador y Alpine sincroniza el aria-expanded solo. */
+            conCuidado('popover', () => {
+                const panel = document.querySelector('.muni-pop__panel');
+                if (panel && typeof panel.showPopover === 'function') { panel.showPopover(); }
+            });
+
+            /* El <details> del timeline: HTML puro, ni siquiera necesita Alpine, y aun
+               así nunca se había medido por nacer colapsado. */
+            conCuidado('timeline', () => {
+                document.querySelectorAll('details.muni-tl__detail').forEach((d) => { d.open = true; });
+            });
+
+            /* La cabecera ordenable con una columna YA ordenada. Este estado no se ha
+               medido NUNCA: ninguna columna arranca ordenada, así que la flecha
+               encendida, el aria-sort y el anuncio del cambio de orden no existían. */
+            conCuidado('sortable-table', () => {
+                const tabla = document.querySelector('table.muni-st');
+                const raiz = tabla && tabla.closest('[x-data]');
+                if (raiz) { window.Alpine.$data(raiz).sort('monto'); }
+            });
+        };
+
+        const mide = () => {
+            anota('combobox/lista', document.querySelector('.muni-combo__lista'));
+            anota('combobox/opción activa', document.querySelector('.muni-combo__opcion'));
+            anota('tooltip/burbuja', document.querySelector('.muni-tt__bubble'));
+            anota('popover/panel', document.querySelector('.muni-pop__panel'));
+            anota('timeline/detalle', document.querySelector('details.muni-tl__detail[open] .muni-tl__diff'));
+            anota('sortable-table/columna ordenada', document.querySelector('table.muni-st th[aria-sort="ascending"]'));
+            anota('sortable-table/cuerpo', document.querySelector('table.muni-st tbody tr'));
+
+            window.__vitrinaEstado = estado;
+            document.documentElement.setAttribute('data-vitrina-lista', '1');
+        };
+
+        const arranca = () => {
+            abre();
+            /* Un respiro antes de medir: las transiciones de x-show arrancan en
+               opacity:0 y el medidor de contraste salta lo que tiene opacidad 0.
+               Con prefers-reduced-motion la duración es 0ms, pero la reja también
+               se corre a mano en un navegador sin esa preferencia. */
+            setTimeout(mide, 250);
+        };
+
+        /* OJO con esperar solo el evento: el build de CDN de Alpine llama a start()
+           en un microtask del PROPIO <script>, así que `alpine:initialized` ya se
+           disparó cuando corre esta línea y un listener a secas no se entera nunca.
+           Medido: la vitrina se quedaba sin marcar `data-vitrina-lista` para siempre.
+           Se espera primero a que el documento termine de parsearse —Alpine tiene
+           MutationObserver, así que hidrata lo que llegue después— y ahí se decide:
+           si Alpine ya arrancó, se abre de una; si no, se engancha el evento. */
+        const cuandoAlpine = () => {
+            if (window.Alpine && window.Alpine.version) { arranca(); }
+            else { document.addEventListener('alpine:initialized', arranca, { once: true }); }
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', cuandoAlpine, { once: true });
+        } else {
+            cuandoAlpine();
+        }
+    })();
+    JS;
+}
+
+function armaVitrina(string $tema, ?string $alpine): string
 {
     $css = file_get_contents(__DIR__.'/../resources/css/muni-ui.css');
     $piezas = '';
@@ -137,7 +309,12 @@ function armaVitrina(string $tema): string
 
     // El contenedor fija el tema y las superficies con los MISMOS tokens que usan
     // los componentes: medir sobre un fondo inventado no diría nada.
-    return '<!doctype html><html lang="es" data-muni-theme="'.$tema.'"'.($tema === 'dark' ? ' class="dark"' : '').'>'
+    // `data-vitrina-espera-alpine` es el contrato con la reja, y se declara SIEMPRE
+    // —haya copia de Alpine o no—: si la página lo declara y nunca aparece
+    // `data-vitrina-lista`, `a11y-check.py` FALLA. Ponerlo solo cuando Alpine existe
+    // dejaría el peor caso en silencio: sin Alpine la reja volvería a dar verde
+    // midiendo 165 textos en vez de 181 y nadie se enteraría de que mide menos.
+    return '<!doctype html><html lang="es" data-muni-theme="'.$tema.'"'.($tema === 'dark' ? ' class="dark"' : '').' data-vitrina-espera-alpine="1">'
         .'<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
         .'<title>Vitrina de laravel-muni-ui — tema '.($tema === 'dark' ? 'oscuro' : 'claro').'</title>'
         .'<style>'.$css.'
@@ -153,6 +330,9 @@ function armaVitrina(string $tema): string
         </style></head><body>'
         .'<header class="v-cab"><h1>Vitrina de componentes — tema '.($tema === 'dark' ? 'oscuro' : 'claro').'</h1></header>'
         .'<main id="muni-contenido" tabindex="-1"><div class="v-grid">'.$piezas.'</div></main>'
+        // Alpine va INCRUSTADO, no enlazado: la vitrina se abre por file:// y tiene
+        // que seguir midiéndose igual si se copia el .html a otra parte.
+        .($alpine !== null ? '<script>'.$alpine.'</script><script>'.abridorDeVitrina().'</script>' : '')
         .'</body></html>';
 }
 
@@ -163,11 +343,37 @@ it('genera la vitrina con los componentes reales, en los dos temas', function ()
         mkdir($destino, 0o775, true);
     }
 
+    $alpine = fuenteDeAlpine();
+
+    if ($alpine === null) {
+        // Sin Alpine la vitrina se genera igual, pero mide la mitad. No se falla la
+        // suite —una máquina sin `npm install` no tiene por qué quedarse sin correr
+        // las pruebas— y se avisa donde se ve: la reja lo convierte en FALLA.
+        fwrite(STDERR, "\nAVISO: no hay copia de Alpine 3 en disco, la vitrina sale SIN hidratar.\n"
+            ."       Todo lo que abre (combobox, tooltip, popover, sortable-table) queda sin medir.\n"
+            ."       Solución: `npm install` en el repo, o copiar cdn.min.js de alpinejs a\n"
+            ."       scripts/.cache/alpine-<version>.min.js, o apuntar \$MUNI_ALPINE_JS a un archivo.\n\n");
+    }
+
     foreach (['light' => 'claro', 'dark' => 'oscuro'] as $tema => $archivo) {
-        $html = armaVitrina($tema);
+        $html = armaVitrina($tema, $alpine);
 
         expect($html)->toContain('x-muni::stat')
             ->and(strlen($html))->toBeGreaterThan(20000, 'La vitrina salió sospechosamente corta.');
+
+        expect($html)->toContain('data-vitrina-espera-alpine="1"');
+
+        if ($alpine !== null) {
+            // Que el <script> esté no basta: si el abridor deja de abrir algo, la
+            // vitrina vuelve a medir solo lo visible en reposo sin que nadie se entere.
+            expect($html)->toContain('alpine:initialized')
+                ->and($html)->toContain('data-vitrina-lista')
+                ->and($html)->toContain("querySelector('.muni-combo')")
+                ->and($html)->toContain("querySelector('.muni-tt')")
+                ->and($html)->toContain("querySelector('.muni-pop__panel')")
+                ->and($html)->toContain('details.muni-tl__detail')
+                ->and($html)->toContain("querySelector('table.muni-st')");
+        }
 
         file_put_contents("{$destino}/{$archivo}.html", $html);
     }

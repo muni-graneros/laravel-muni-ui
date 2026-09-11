@@ -309,6 +309,66 @@ def axe_js(ruta_dada: str | None) -> str:
     return destino.read_text(encoding="utf-8")
 
 
+def hidratacion_rota(r: dict) -> str | None:
+    """Devuelve por qué la hidratación no sirve, o None si sirvió.
+
+    Son dos maneras de volver al agujero, y las dos fallan. La primera es obvia: no
+    hay Alpine, o nunca terminó. La segunda es la traicionera: Alpine corrió, la
+    página se marcó lista, pero algo que tenía que quedar ABIERTO quedó de alto 0.
+    Ahí la reja mide de nuevo solo lo visible en reposo y da verde, que es
+    exactamente lo que pasaba antes de hidratar la vitrina.
+    """
+    h = r.get("hidratacion")
+    if not h:
+        return None
+    if not h.get("lista"):
+        return ("SIN HIDRATAR: la página declaró que esperaba Alpine y nunca marcó "
+                "data-vitrina-lista. Se midió solo lo visible en reposo, que es el "
+                f"agujero que la vitrina hidratada vino a tapar. {h.get('motivo', '')}")
+    if h.get("fallos"):
+        return "ABRIÓ A MEDIAS, eso no se mide: " + " · ".join(h["fallos"])
+    return None
+
+
+def falla(r: dict) -> bool:
+    return bool(r["contraste"]) or bool(r["axe_graves"]) or hidratacion_rota(r) is not None
+
+
+def esperar_hidratacion(page) -> dict | None:
+    """Espera a que la página termine de hidratar y de ABRIR lo que tenga que abrir.
+
+    Solo aplica a las páginas que lo declaran (`data-vitrina-espera-alpine`): la
+    vitrina, que hornea Alpine 3 y abre a mano la lista del combobox, la burbuja del
+    tooltip, el panel del popover, el <details> del timeline y la cabecera ordenable
+    de sortable-table. Las demos de `demo/` son HTML plano y no declaran nada.
+
+    Por qué es una espera y no un `wait_for_timeout` más largo: medir a mitad de la
+    hidratación da un resultado distinto en cada corrida —y el que sale verde es el
+    que mide menos—. Si la página dijo que esperaba Alpine y el apretón de manos no
+    llega, eso FALLA: la reja volvió a medir solo lo visible en reposo, que es
+    justamente el agujero que la vitrina hidratada vino a tapar.
+    """
+    if not page.evaluate("() => document.documentElement.hasAttribute('data-vitrina-espera-alpine')"):
+        return None
+
+    try:
+        page.wait_for_function(
+            "() => document.documentElement.getAttribute('data-vitrina-lista') === '1'",
+            timeout=10000,
+        )
+    except Exception as e:
+        return {"lista": False, "motivo": str(e).splitlines()[0], "abiertos": [], "fallos": []}
+
+    estado = page.evaluate("() => window.__vitrinaEstado || null") or {}
+    return {
+        "lista": True,
+        "alpine": estado.get("alpine"),
+        "xdata": estado.get("xdata", 0),
+        "abiertos": estado.get("abiertos", []),
+        "fallos": estado.get("fallos", []),
+    }
+
+
 def revisar(pagina: Path, temas: list[str], axe_src: str, ctx) -> list[dict]:
     resultados = []
     for tema in temas:
@@ -317,6 +377,7 @@ def revisar(pagina: Path, temas: list[str], axe_src: str, ctx) -> list[dict]:
             page.emulate_media(color_scheme="dark" if tema == "dark" else "light")
             page.goto(pagina.resolve().as_uri(), wait_until="load")
             page.wait_for_timeout(350)  # que Alpine hidrate y el CSS aplique
+            hidratacion = esperar_hidratacion(page)
             propios = page.evaluate(APLICAR_TEMA, tema)
             page.wait_for_timeout(150)
 
@@ -342,6 +403,7 @@ def revisar(pagina: Path, temas: list[str], axe_src: str, ctx) -> list[dict]:
         resultados.append({
             "pagina": str(pagina.relative_to(RAIZ)),
             "tema": tema,
+            "hidratacion": hidratacion,
             "temas_propios": propios,
             "medidos": contraste["medidos"],
             "contraste": contraste["fallas"],
@@ -416,7 +478,7 @@ def main() -> int:
             for pagina in paginas:
                 for r in revisar(pagina, temas, axe_src, ctx):
                     filas.append(r)
-                    marca = "FALLA" if (r["contraste"] or r["axe_graves"]) else "ok"
+                    marca = "FALLA" if falla(r) else "ok"
                     peor = f"{r['contraste'][0]['ratio']:.2f}" if r["contraste"] else "—"
                     print(f"  [{marca:5s}] {r['pagina']:34s} {r['tema']:5s} "
                           f"texto={r['medidos']:4d} contraste↓={len(r['contraste']):3d} "
@@ -430,16 +492,33 @@ def main() -> int:
     print("-" * 100)
     for r in filas:
         peor = f"{r['contraste'][0]['ratio']:.2f}" if r["contraste"] else "—"
-        ok = not r["contraste"] and not r["axe_graves"]
+        ok = not falla(r)
         print(f"{r['pagina']:34s} {r['tema']:6s} {r['medidos']:7d} {len(r['contraste']):12d} "
               f"{peor:>7s} {len(r['axe_graves']):10d} {'pasa' if ok else 'FALLA':>10s}")
     print("=" * 100)
 
-    fallidas = [r for r in filas if r["contraste"] or r["axe_graves"]]
+    hidratadas = [r for r in filas if r.get("hidratacion")]
+    if hidratadas:
+        print("\nHidratación (páginas que declaran que esperan Alpine)\n")
+        for r in hidratadas:
+            h = r["hidratacion"]
+            if not h["lista"]:
+                print(f"   {r['pagina']:34s} {r['tema']:6s} SIN HIDRATAR · {h.get('motivo', '')}")
+                continue
+            print(f"   {r['pagina']:34s} {r['tema']:6s} Alpine {h.get('alpine') or '?'} · "
+                  f"{h.get('xdata', 0)} nodos [x-data] · abiertos: {', '.join(h['abiertos']) or 'ninguno'}")
+            for f in h["fallos"]:
+                print(f"      no abrió: {f}")
+        print()
+
+    fallidas = [r for r in filas if falla(r)]
     if fallidas:
         print("\nDetalle de lo que falla\n")
         for r in fallidas:
             print(f"── {r['pagina']} · tema {r['tema']}")
+            roto = hidratacion_rota(r)
+            if roto:
+                print(f"   {roto}")
             for f in r["contraste"][:12]:
                 print(f"   contraste {f['ratio']:5.2f}:1 (mínimo {f['minimo']}) · {f['px']}px/{f['peso']} · "
                       f"{f['color']} sobre {f['fondo']}\n"

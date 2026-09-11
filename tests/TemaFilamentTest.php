@@ -208,3 +208,100 @@ it('la animación de entrada no arranca invisible (LCP)', function () {
         'El keyframe mg-fall arranca en opacity:0: el elemento LCP tarda hasta 0,81s en pintarse.'
     );
 });
+
+/*
+ * TRES REGLAS QUE FILAMENT 5.7 DEJÓ SIN EFECTO Y UNA TRANSICIÓN QUE RETRASA EL FOCO.
+ *
+ * El tema se escribió contra un marcado anterior y nadie lo notó porque una
+ * regla que no alcanza a nada no da ningún error: la pestaña activa en oscuro
+ * salía con `primary-400` de Filament (4,33:1 en rrhh-graneros), la barra
+ * superior en `zinc-900` (seguridad-graneros) y el anillo de foco de la barra
+ * lateral tardaba 160 ms en aparecer, así que axe y CDP lo medían a mitad.
+ *
+ * Por eso estas pruebas no confían en el selector: leen el marcado REAL de
+ * Filament desde `vendor/` y comprueban que el tema apunta a lo que Filament
+ * pinta hoy. Si Filament vuelve a mover la clase, cae la primera aserción y
+ * dice dónde mirar.
+ */
+
+/** El CSS del tema sin comentarios, para que un selector citado en prosa no cuente. */
+function temaSinComentarios(): string
+{
+    return (string) preg_replace('#/\*.*?\*/#s', '', temaFilament());
+}
+
+/** Una vista de Filament tal como está instalada en `vendor/`. */
+function vistaDeFilament(string $ruta): string
+{
+    return file_get_contents(__DIR__.'/../vendor/filament/'.$ruta);
+}
+
+it('la pestaña activa se colorea en el span que Filament pinta, no en el ítem', function () {
+    $item = vistaDeFilament('support/resources/views/components/tabs/item.blade.php');
+
+    expect(str_contains($item, 'class="fi-tabs-item-label"'))->toBeTrue(
+        'Filament ya no envuelve la etiqueta de la pestaña en `span.fi-tabs-item-label`: revisar el selector del tema.'
+    );
+
+    $css = temaSinComentarios();
+
+    foreach (['' => 'claro', '.dark ' => 'oscuro'] as $prefijo => $modo) {
+        $selector = '/(^|[\s,])'.preg_quote($prefijo, '/').'\.fi-tabs-item\.fi-active\s+\.fi-tabs-item-label[^{]*\{[^}]*color\s*:/';
+
+        expect(preg_match($selector, $css))->toBe(1,
+            "El tema no colorea `.fi-tabs-item.fi-active .fi-tabs-item-label` en {$modo}. Filament 5.7 pinta ".
+            'el `span` interior con `primary-700`/`primary-400`, así que una regla sobre el ítem no cambia nada.'
+        );
+    }
+
+    expect(preg_match('/(^|[\s,])(\.dark\s+)?\.fi-tabs-item\.fi-active\s*\{[^}]*color\s*:/', $css))->toBe(0,
+        'Volvió una regla de color sobre `.fi-tabs-item.fi-active` a secas: Filament la pisa en el span interior.'
+    );
+});
+
+it('la barra superior se pinta en nav.fi-topbar, que es la propia barra en Filament 5.7', function () {
+    $topbar = vistaDeFilament('filament/resources/views/livewire/topbar.blade.php');
+
+    expect(preg_match('/<nav\s[^>]*class="fi-topbar"/', $topbar))->toBe(1,
+        'Filament ya no pone `fi-topbar` en el `<nav>` de la barra: revisar el selector del tema.'
+    );
+
+    $css = temaSinComentarios();
+
+    expect(str_contains($css, '.fi-topbar > nav'))->toBeFalse(
+        '`.fi-topbar > nav` no alcanza a nada en Filament 5.7: la barra ES `nav.fi-topbar`, y sin la regla '.
+        'oscura queda en el `gray-900` de Filament sobre un panel que no es gris.'
+    );
+
+    foreach (['' => 'claro', '.dark ' => 'oscuro'] as $prefijo => $modo) {
+        $selector = '/(^|[\s,])'.preg_quote($prefijo, '/').'\.fi-topbar\s*\{[^}]*background\s*:/';
+
+        expect(preg_match($selector, $css))->toBe(1, "El tema no pinta el fondo de `.fi-topbar` en {$modo}.");
+    }
+});
+
+it('ninguna regla del tema anima «all» ni arrastra el contorno o la sombra', function () {
+    $css = temaSinComentarios();
+
+    preg_match_all('/([^{}]+)\{([^}]*)\}/', $css, $reglas, PREG_SET_ORDER);
+
+    $culpables = [];
+
+    foreach ($reglas as [, $selector, $cuerpo]) {
+        if (! preg_match('/(^|[;{\s])transition\s*:\s*([^;]+)/', $cuerpo, $m)) {
+            continue;
+        }
+
+        $valor = strtolower($m[2]);
+
+        if (preg_match('/\ball\b|outline|box-shadow/', $valor)) {
+            $culpables[] = trim((string) preg_replace('/\s+/', ' ', $selector)).' → '.trim($valor);
+        }
+    }
+
+    expect($culpables)->toBe([],
+        'Estas reglas transicionan `all`, `outline` o `box-shadow`: el anillo de foco tarda lo que dure la '.
+        'transición en aparecer, y axe y CDP lo miden a mitad de camino. Anima solo lo que cambia de '.
+        'verdad (background-color, color): '.implode(' | ', $culpables)
+    );
+});

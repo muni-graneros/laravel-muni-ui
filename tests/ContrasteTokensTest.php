@@ -137,3 +137,50 @@ it('el tema del panel también declara el token, porque muni-ui.css no se carga 
         'El puente del tema Filament tiene que declarar --muni-field-border en claro Y en .dark.'
     );
 });
+
+/*
+ * `--muni-muted` en el OSCURO DEL PANEL: 4,33:1 sobre el fondo del aviso `warn`.
+ *
+ * El token se había calibrado contra las superficies del panel (6,5:1 sobre
+ * `--muni-surface`) y nunca contra los cuatro fondos de estado, que son más
+ * claros porque mezclan un 18% del tono institucional. Medido con axe en
+ * scaffold-laravel-filament-pwa sobre `<x-muni::alert tone="warn">` en oscuro:
+ * #94a3b8 sobre #383e2a = 4,33:1; ok 4,41; info 4,37. Tres sistemas lo
+ * parcheaban en su `panel.css` con `html.dark { --muni-muted: #a3b1c4 }`.
+ *
+ * Los fondos de estado se resuelven desde el `color-mix()` REAL de la hoja, no
+ * desde un hex copiado a mano: si alguien sube el 18% a 25%, el fondo aclara,
+ * el ratio baja y el candado cae acá.
+ */
+it('--muni-muted en el oscuro del panel llega a 4,5:1 sobre los cuatro fondos de estado y las superficies', function () {
+    $hoja = cssMuniUiFilament();
+    $oscuro = bloqueTrasAncla($hoja, 'En oscuro mandan los tonos institucionales');
+
+    $muted = tokenColor($oscuro, $hoja, 'muted');
+    $texto = tokenColor($oscuro, $hoja, 'text');
+
+    expect($muted)->not->toBeNull('El bloque .dark del tema no declara --muni-muted.');
+    expect($texto)->not->toBeNull('El bloque .dark del tema no declara --muni-text.');
+
+    $fallos = [];
+
+    foreach (['ok-bg', 'warn-bg', 'info-bg', 'danger-bg', 'surface', 'surface-2', 'surface-3', 'bg'] as $nombre) {
+        $fondo = tokenColor($oscuro, $hoja, $nombre);
+
+        expect($fondo)->not->toBeNull("No se pudo resolver --muni-{$nombre} en el bloque .dark del tema.");
+
+        $ratio = ratioContraste($muted, $fondo);
+
+        if ($ratio < 4.5) {
+            $fallos[] = sprintf('--muni-muted (%s) sobre --muni-%s (%s) = %.2f:1', $muted, $nombre, $fondo, $ratio);
+        }
+    }
+
+    expect($fallos)->toBe([], "Texto secundario bajo 4,5:1 en el oscuro del panel:\n  ".implode("\n  ", $fallos));
+
+    // Sigue siendo texto SECUNDARIO: si lo aclaran hasta igualar al principal,
+    // la jerarquía visual desaparece aunque el contraste pase.
+    expect(luminanciaRelativa($muted))->toBeLessThan(luminanciaRelativa($texto),
+        "--muni-muted ({$muted}) quedó tan claro o más que --muni-text ({$texto}): ya no es secundario."
+    );
+});

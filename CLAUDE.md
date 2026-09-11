@@ -10,6 +10,16 @@ un sistema se agrega **aquí**, no en el repo host. Los hosts consumen; no redef
 Este paquete no tiene bundle propio: Motion One y el resto del JS se instalan y exponen
 en el `resources/js/app.js` de cada aplicación host.
 
+## Sesiones en paralelo (Claude Code / Gemini Antigravity / terminal manual)
+
+Varias sesiones de Claude Code y Gemini Antigravity trabajan sobre las mismas
+copias de trabajo de `~/Dev`, esta incluida. Antes de tocar nada:
+`/home/cesar/Dev/scripts/sesion estado .`. Al empezar: `sesion tomar . "qué vas a
+hacer"`. Al terminar: `sesion soltar .`. No bloquea — es un aviso — pero si el
+marcador es ajeno, mirá `git log --oneline -5` y `git status` antes de cualquier
+`reset`/checkout, y commiteá siempre con `git commit --only -- <rutas>` (el índice
+es compartido). Detalle y motivo en `~/Dev/CLAUDE.md`.
+
 ## Diseño, interactividad y animación
 
 **Las convenciones completas viven en la skill global `blade-livewire-design`

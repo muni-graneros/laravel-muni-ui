@@ -296,16 +296,52 @@ function abridorDeVitrina(): string
     JS;
 }
 
-function armaVitrina(string $tema, ?string $alpine): string
+/**
+ * Las tarjetas, ya renderizadas por Blade, envueltas por quien llame.
+ *
+ * El envoltorio cambia según el contexto (tarjeta suelta o `section.fi-section`
+ * del panel) pero el ORDEN y el conjunto no: las dos vitrinas miden exactamente
+ * las mismas piezas, que es lo único que hace comparable una paleta con la otra.
+ */
+function piezasDeVitrina(callable $envoltorio): string
 {
-    $css = file_get_contents(__DIR__.'/../resources/css/muni-ui.css');
     $piezas = '';
 
     foreach (ejemplosDeVitrina() as $nombre => $blade) {
-        $html = Blade::render($blade);
-        $piezas .= '<section class="v-pieza"><h2 class="v-nombre">&lt;x-muni::'.$nombre.'&gt;</h2>'
-            .'<div class="v-cuerpo">'.$html.'</div></section>';
+        $piezas .= $envoltorio($nombre, Blade::render($blade));
     }
+
+    return $piezas;
+}
+
+/**
+ * El <head> común: charset, viewport y el título. La hoja la pone cada contexto.
+ */
+function cabezaDeVitrina(string $titulo): string
+{
+    return '<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+        .'<title>'.$titulo.'</title>';
+}
+
+/**
+ * El <script> de Alpine + el abridor, o nada si no hay copia en disco.
+ * Va INCRUSTADO, no enlazado: la vitrina se abre por file:// y tiene que seguir
+ * midiéndose igual si se copia el .html a otra parte.
+ */
+function colaDeVitrina(?string $alpine): string
+{
+    return $alpine !== null
+        ? '<script>'.$alpine.'</script><script>'.abridorDeVitrina().'</script>'
+        : '';
+}
+
+function armaVitrina(string $tema, ?string $alpine): string
+{
+    $css = file_get_contents(__DIR__.'/../resources/css/muni-ui.css');
+
+    $piezas = piezasDeVitrina(fn (string $nombre, string $html) => '<section class="v-pieza">'
+        .'<h2 class="v-nombre">&lt;x-muni::'.$nombre.'&gt;</h2>'
+        .'<div class="v-cuerpo">'.$html.'</div></section>');
 
     // El contenedor fija el tema y las superficies con los MISMOS tokens que usan
     // los componentes: medir sobre un fondo inventado no diría nada.
@@ -314,9 +350,10 @@ function armaVitrina(string $tema, ?string $alpine): string
     // `data-vitrina-lista`, `a11y-check.py` FALLA. Ponerlo solo cuando Alpine existe
     // dejaría el peor caso en silencio: sin Alpine la reja volvería a dar verde
     // midiendo 165 textos en vez de 181 y nadie se enteraría de que mide menos.
-    return '<!doctype html><html lang="es" data-muni-theme="'.$tema.'"'.($tema === 'dark' ? ' class="dark"' : '').' data-vitrina-espera-alpine="1">'
-        .'<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-        .'<title>Vitrina de laravel-muni-ui — tema '.($tema === 'dark' ? 'oscuro' : 'claro').'</title>'
+    // `data-vitrina-hoja` dice QUÉ paleta se cargó: la reja lo lee y lo imprime en
+    // la tabla, para que no haya que adivinarlo por el nombre del archivo.
+    return '<!doctype html><html lang="es" data-muni-theme="'.$tema.'"'.($tema === 'dark' ? ' class="dark"' : '').' data-vitrina-espera-alpine="1" data-vitrina-hoja="muni-ui.css">'
+        .cabezaDeVitrina('Vitrina de laravel-muni-ui — tema '.($tema === 'dark' ? 'oscuro' : 'claro'))
         .'<style>'.$css.'
             body { margin:0; background:var(--muni-bg); color:var(--muni-text); font-family:var(--muni-font-sans); }
             .v-cab { padding:24px; border-bottom:1px solid var(--muni-border); }
@@ -330,13 +367,111 @@ function armaVitrina(string $tema, ?string $alpine): string
         </style></head><body>'
         .'<header class="v-cab"><h1>Vitrina de componentes — tema '.($tema === 'dark' ? 'oscuro' : 'claro').'</h1></header>'
         .'<main id="muni-contenido" tabindex="-1"><div class="v-grid">'.$piezas.'</div></main>'
-        // Alpine va INCRUSTADO, no enlazado: la vitrina se abre por file:// y tiene
-        // que seguir midiéndose igual si se copia el .html a otra parte.
-        .($alpine !== null ? '<script>'.$alpine.'</script><script>'.abridorDeVitrina().'</script>' : '')
+        .colaDeVitrina($alpine)
         .'</body></html>';
 }
 
-it('genera la vitrina con los componentes reales, en los dos temas', function () {
+/**
+ * La MISMA vitrina, pero en el contexto del panel: la otra paleta y el otro DOM.
+ *
+ * Por qué existe (DESIGN §7): `MuniPanel` inyecta `muni-ui-filament.css` y
+ * `muni-ui.css` NO se carga dentro de un panel. Son dos identidades a propósito
+ * —petróleo, lima y celeste contra teal y ámbar—, y en la rama oscura 30 de los
+ * 32 tokens comparables valen distinto. Hasta ahora la reja medía UNA sola de las
+ * dos: todo lo que el repo afirmaba sobre contraste valía para las aplicaciones
+ * sueltas y no decía absolutamente nada de los nueve sistemas municipales, que
+ * corren sobre paneles Filament. La verificación manual del panel
+ * (`docs/VERIFICACION-NAVEGADOR.md` §8) encontró ahí cuatro defectos que solo
+ * existen en esa paleta, incluido D13, donde la reja aprobaba `.muni-tl__tone` y
+ * axe lo reprobaba EN LA MISMA CORRIDA porque cada uno medía contra otra hoja.
+ *
+ * El banco es el de esa verificación (§8.1), reproducido aquí:
+ *   · se carga ÚNICAMENTE `muni-ui-filament.css`, nunca `muni-ui.css`;
+ *   · el DOM es el del panel — `body.fi-body`, `aside.fi-sidebar`,
+ *     `div.fi-topbar`, `div.fi-main-ctn > main.fi-main`, y cada componente
+ *     dentro de un `section.fi-section` con su `h2.fi-section-header-heading`;
+ *   · del armazón se reponen SOLO dos cosas que pone Filament y no el paquete:
+ *     la geometría (anchos y relleno) y `color:var(--muni-text)` en el <body>
+ *     —Filament emite ahí `text-gray-950 dark:text-white`—, para no medir texto
+ *     negro sobre fondo oscuro, que sería un defecto del banco. Ni un color más.
+ *
+ * Dos diferencias declaradas respecto del banco de §8.1, y el porqué de cada una:
+ *   · las tarjetas son las 31 de `ejemplosDeVitrina()`, no las 25 del banco: la
+ *     tarea es medir LAS MISMAS piezas en las dos paletas. Consecuencia: lo que
+ *     el banco tenía y esto no (`dropdown`, `modal`, `drawer`, `accordion`,
+ *     `command-palette`) sigue sin cubrirse por la reja — D10 y D15 no los caza.
+ *   · se conserva el reparto par/impar sobre `--muni-surface-3` de la vitrina
+ *     base. El banco dejaba `.v-cuerpo` vacío y por eso D16 quedó como «par de
+ *     riesgo sin instancia observada»; con el reparto, la instancia existe y se
+ *     mide, que es exactamente lo que D16 decía que pasaría en un anfitrión que
+ *     pintara una tarjeta con `surface-3` dentro del panel.
+ *
+ * El <header class="fi-header"> con su <h1> es DOM real del panel —la propia hoja
+ * lo estiliza en `.fi-main > .fi-header` y `.fi-header-heading`— y se incluye para
+ * que las dos vitrinas tengan la misma estructura de encabezados y la comparación
+ * axe-contra-axe no se ensucie con un `page-has-heading-one` de más.
+ */
+function armaVitrinaPanel(string $tema, ?string $alpine): string
+{
+    $css = file_get_contents(__DIR__.'/../resources/css/muni-ui-filament.css');
+    $oscuro = $tema === 'dark';
+
+    $piezas = piezasDeVitrina(fn (string $nombre, string $html) => '<section class="fi-section" data-pieza="'.$nombre.'">'
+        .'<h2 class="fi-section-header-heading">&lt;x-muni::'.$nombre.'&gt;</h2>'
+        .'<div class="v-cuerpo">'.$html.'</div></section>');
+
+    return '<!doctype html><html lang="es" data-muni-theme="'.$tema.'"'.($oscuro ? ' class="dark"' : '').' data-vitrina-espera-alpine="1" data-vitrina-hoja="muni-ui-filament.css">'
+        .cabezaDeVitrina('Vitrina de laravel-muni-ui en panel Filament — tema '.($oscuro ? 'oscuro' : 'claro'))
+        .'<style>'.$css.'</style>'
+        // Segunda hoja, a propósito separada de la del paquete: es el armazón del
+        // banco, y tiene que verse de un vistazo que no aporta ni un color.
+        .'<style>
+            body { margin:0; font-family:system-ui, sans-serif; color:var(--muni-text); }
+            .fi-main-ctn { margin-inline-start:180px; }
+            .fi-main { padding:24px; max-width:none; }
+            .fi-sidebar { position:fixed; inset-block:0; inset-inline-start:0; width:180px; padding:12px; z-index:30; }
+            .fi-topbar { position:sticky; top:0; z-index:20; }
+            .fi-topbar > nav { padding:12px 24px; }
+            .v-grid { display:grid; gap:20px; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); }
+            .fi-section { padding:16px; }
+            .fi-section-header-heading { font-size:12px; margin:0 0 12px; font-family:var(--muni-font-mono); }
+            /* Mismo reparto que la vitrina base: una de cada dos tarjetas mide
+               sobre --muni-surface-3. Ver el comentario de arriba. */
+            .v-grid > .fi-section:nth-child(even) .v-cuerpo { background:var(--muni-surface-3); padding:12px; border-radius:var(--muni-radius); }
+        </style></head>'
+        .'<body class="fi-body">'
+        // Los dos `aria-label` son del banco, no del paquete: sin ellos los tres
+        // <nav> de la página (barra lateral, barra superior y el `breadcrumb` del
+        // propio componente) quedan indistinguibles y axe levanta un
+        // `landmark-unique` que es culpa del armazón. Filament rotula los suyos.
+        .'<aside class="fi-sidebar"><nav class="fi-sidebar-nav" aria-label="Menú del panel"><div class="fi-sidebar-item">'
+        .'<a class="fi-sidebar-item-btn" href="#"><span class="fi-sidebar-item-label">Bandeja</span></a>'
+        .'</div></nav></aside>'
+        .'<div class="fi-topbar"><nav aria-label="Barra superior"><span>Barra superior del panel</span></nav></div>'
+        .'<div class="fi-main-ctn"><main class="fi-main" id="muni-contenido" tabindex="-1">'
+        .'<header class="fi-header"><h1 class="fi-header-heading">Vitrina de componentes en el panel — tema '.($oscuro ? 'oscuro' : 'claro').'</h1></header>'
+        .'<div class="v-grid">'.$piezas.'</div></main></div>'
+        .colaDeVitrina($alpine)
+        .'</body></html>';
+}
+
+/**
+ * Las cuatro páginas de la vitrina: archivo => cómo se arma.
+ *
+ * Cuatro y no dos porque son DOS paletas × DOS temas. La reja las mide todas por
+ * omisión (`scripts/a11y-check.py` sin argumentos glob-ea `build/vitrina/*.html`).
+ */
+function paginasDeVitrina(): array
+{
+    return [
+        'claro' => ['light', 'armaVitrina'],
+        'oscuro' => ['dark', 'armaVitrina'],
+        'panel-claro' => ['light', 'armaVitrinaPanel'],
+        'panel-oscuro' => ['dark', 'armaVitrinaPanel'],
+    ];
+}
+
+it('genera la vitrina con los componentes reales, en las dos paletas y los dos temas', function () {
     $destino = __DIR__.'/../build/vitrina';
 
     if (! is_dir($destino)) {
@@ -355,13 +490,36 @@ it('genera la vitrina con los componentes reales, en los dos temas', function ()
             ."       scripts/.cache/alpine-<version>.min.js, o apuntar \$MUNI_ALPINE_JS a un archivo.\n\n");
     }
 
-    foreach (['light' => 'claro', 'dark' => 'oscuro'] as $tema => $archivo) {
-        $html = armaVitrina($tema, $alpine);
+    foreach (paginasDeVitrina() as $archivo => [$tema, $constructor]) {
+        $html = $constructor($tema, $alpine);
+        $panel = str_starts_with($archivo, 'panel-');
 
         expect($html)->toContain('x-muni::stat')
             ->and(strlen($html))->toBeGreaterThan(20000, 'La vitrina salió sospechosamente corta.');
 
         expect($html)->toContain('data-vitrina-espera-alpine="1"');
+
+        if ($panel) {
+            // La condición que DESIGN §7 describe: SOLO la hoja del panel. Si un día
+            // alguien mete `muni-ui.css` aquí «para que se vea bien», la página deja
+            // de medir la paleta del panel y esto se pone rojo.
+            expect($html)->toContain('data-vitrina-hoja="muni-ui-filament.css"')
+                ->and($html)->toContain('Sala de Gobierno')
+                ->and($html)->not->toContain('Sistema de diseño del ecosistema municipal de Graneros');
+
+            // Y el DOM del panel, la cadena entera: sin ella los selectores de la
+            // hoja (`.fi-body`, `.dark .fi-section`, …) no enganchan y se mediría
+            // la paleta correcta sobre fondos que el panel nunca pinta.
+            expect($html)->toContain('<body class="fi-body">')
+                ->and($html)->toContain('<div class="fi-main-ctn">')
+                ->and($html)->toContain('<main class="fi-main"')
+                ->and($html)->toContain('<section class="fi-section"')
+                ->and($html)->toContain('class="fi-sidebar"')
+                ->and($html)->toContain('class="fi-topbar"');
+        } else {
+            expect($html)->toContain('data-vitrina-hoja="muni-ui.css"')
+                ->and($html)->toContain('Sistema de diseño del ecosistema municipal de Graneros');
+        }
 
         if ($alpine !== null) {
             // Que el <script> esté no basta: si el abridor deja de abrir algo, la
@@ -378,6 +536,22 @@ it('genera la vitrina con los componentes reales, en los dos temas', function ()
         file_put_contents("{$destino}/{$archivo}.html", $html);
     }
 
-    expect(file_exists($destino.'/claro.html'))->toBeTrue()
-        ->and(file_exists($destino.'/oscuro.html'))->toBeTrue();
+    foreach (array_keys(paginasDeVitrina()) as $archivo) {
+        expect(file_exists($destino."/{$archivo}.html"))->toBeTrue();
+    }
+});
+
+it('mide las mismas piezas en las dos paletas', function () {
+    // El valor de la variante del panel es la COMPARACIÓN: si un día las dos
+    // vitrinas dejan de renderizar el mismo conjunto, una diferencia de contraste
+    // entre paletas deja de ser atribuible a la paleta.
+    $base = armaVitrina('dark', null);
+    $panel = armaVitrinaPanel('dark', null);
+
+    foreach (array_keys(ejemplosDeVitrina()) as $nombre) {
+        expect($base)->toContain('&lt;x-muni::'.$nombre.'&gt;')
+            ->and($panel)->toContain('&lt;x-muni::'.$nombre.'&gt;');
+    }
+
+    expect(substr_count($panel, 'class="fi-section"'))->toBe(count(ejemplosDeVitrina()));
 });

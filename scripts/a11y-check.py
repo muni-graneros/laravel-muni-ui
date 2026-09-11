@@ -2,7 +2,7 @@
 """Reja de accesibilidad del paquete: abre cada demo en claro y en oscuro, mide el
 contraste real del texto y corre axe-core. Devuelve 1 si algo falla.
 
-    python3 scripts/a11y-check.py              # todas las demos, ambos temas
+    python3 scripts/a11y-check.py              # la vitrina (4 páginas) + demo/, ambos temas
     python3 scripts/a11y-check.py demo/app.html
     python3 scripts/a11y-check.py --json informe.json
     python3 scripts/a11y-check.py --tema oscuro
@@ -11,6 +11,17 @@ Por qué existe: en este paquete los defectos de contraste no se ven, se miden. 
 etiqueta de los KPI estuvo en 1,22:1 y la pestaña activa en 1,52:1, y en una captura
 las dos se veían «tenues», no ausentes. Cualquier revisión que dependa de mirar la
 pantalla vuelve a dejarlas pasar.
+
+Las DOS paletas, no una
+-----------------------
+El paquete tiene dos hojas con dos identidades a propósito: `muni-ui.css`, que cargan
+las aplicaciones sueltas, y `muni-ui-filament.css`, que `MuniPanel` inyecta en los
+paneles —y dentro de un panel `muni-ui.css` NO se carga (DESIGN §7)—. En la rama
+oscura, 30 de los 32 tokens comparables valen DISTINTO. Por eso la vitrina son cuatro
+páginas —`{claro,oscuro}.html` y `panel-{claro,oscuro}.html`— y las cuatro se miden por
+omisión: medir solo la primera paleta no decía nada de los nueve sistemas municipales,
+que corren sobre paneles Filament. La columna «Paleta» de la tabla dice cuál es cuál,
+leída del atributo `data-vitrina-hoja` que estampa cada página.
 
 Umbrales (WCAG 2.2 AA, obligatorio en sistemas del Estado por el Decreto N°1/2015):
   · texto normal          4.5:1
@@ -144,8 +155,16 @@ MEDIR_CONTRASTE = r"""
       fondo: `rgb(${Math.round(fondo.r)}, ${Math.round(fondo.g)}, ${Math.round(fondo.b)})`,
       decorativo,
     };
-    if (r + 0.005 < minimo) { fallas.push(item); return; }
-    if (decorativo && r + 0.005 < barraTexto) { item.barraTexto = barraTexto; decorativos.push(item); }
+    // MISMA POLÍTICA DE REDONDEO QUE axe-core, y no por gusto: axe hace
+    // `Math.floor(100*ratio)/100` antes de comparar. Acá había una tolerancia de
+    // +0,005 que abría una ventana de cinco milésimas bajo el umbral donde esta
+    // reja aprobaba y axe reprobaba EL MISMO NÚMERO, en la misma corrida. Pasó de
+    // verdad con `.muni-tl__tone` en 4,495465: la reja decía 4,50 y axe 4,49.
+    // Una reja más permisiva que la herramienta con la que se contrasta no sirve
+    // de reja, y con `--sin-axe` el defecto pasaba en silencio.
+    const truncado = Math.floor(r * 100) / 100;
+    if (truncado < minimo) { fallas.push(item); return; }
+    if (decorativo && truncado < barraTexto) { item.barraTexto = barraTexto; decorativos.push(item); }
   };
 
   // El contenido de ::before y ::after no está en el DOM, así que ni este script
@@ -330,6 +349,18 @@ def hidratacion_rota(r: dict) -> str | None:
     return None
 
 
+def hoja_de(r: dict) -> str:
+    """Qué paleta se midió en esta fila, para que la tabla diga cuál es cuál.
+
+    Son dos hojas con dos identidades a propósito —`muni-ui.css` para las
+    aplicaciones sueltas, `muni-ui-filament.css` para lo que corre dentro de un
+    panel, que es donde viven los nueve sistemas municipales— y en la rama oscura
+    30 de los 32 tokens comparables tienen valor DISTINTO. Una fila sin esta
+    columna obliga a adivinar la paleta por el nombre del archivo.
+    """
+    return r.get("hoja") or "—"
+
+
 def falla(r: dict) -> bool:
     return bool(r["contraste"]) or bool(r["axe_graves"]) or hidratacion_rota(r) is not None
 
@@ -378,6 +409,14 @@ def revisar(pagina: Path, temas: list[str], axe_src: str, ctx) -> list[dict]:
             page.goto(pagina.resolve().as_uri(), wait_until="load")
             page.wait_for_timeout(350)  # que Alpine hidrate y el CSS aplique
             hidratacion = esperar_hidratacion(page)
+            # Qué paleta declara la página. La vitrina lo estampa en el <html>
+            # (`muni-ui.css` o `muni-ui-filament.css`) y la reja lo imprime en la
+            # tabla: son DOS identidades distintas —en oscuro, 30 de 32 tokens
+            # comparables valen distinto— y un resultado que no diga cuál se midió
+            # no dice nada. Las demos de `demo/` no declaran nada.
+            hoja = page.evaluate(
+                "() => document.documentElement.getAttribute('data-vitrina-hoja')"
+            )
             propios = page.evaluate(APLICAR_TEMA, tema)
             page.wait_for_timeout(150)
 
@@ -403,6 +442,7 @@ def revisar(pagina: Path, temas: list[str], axe_src: str, ctx) -> list[dict]:
         resultados.append({
             "pagina": str(pagina.relative_to(RAIZ)),
             "tema": tema,
+            "hoja": hoja,
             "hidratacion": hidratacion,
             "temas_propios": propios,
             "medidos": contraste["medidos"],
@@ -420,7 +460,7 @@ def main() -> int:
     ap.add_argument(
         "paginas",
         nargs="*",
-        help="archivos HTML; por defecto la vitrina de componentes y todas las de demo/",
+        help="archivos HTML; por defecto las 4 páginas de la vitrina (2 paletas × 2 temas) y todas las de demo/",
     )
     ap.add_argument("--tema", choices=["claro", "oscuro", "ambos"], default="ambos")
     ap.add_argument("--axe", help="ruta a axe.min.js (si no, node_modules o caché)")
@@ -442,9 +482,11 @@ def main() -> int:
             "por la distribución (PEP 668) y rechaza `pip install`.\n"
         )
 
-    # La vitrina va PRIMERO y va por defecto. Se construyó justamente porque medir
-    # solo demo/*.html mide maquetas escritas a mano, no los componentes que se
-    # publican; dejarla fuera del conjunto por omisión anulaba su razón de existir.
+    # La vitrina va PRIMERO y va por defecto, sus CUATRO páginas. Se construyó
+    # justamente porque medir solo demo/*.html mide maquetas escritas a mano, no los
+    # componentes que se publican; dejarla fuera del conjunto por omisión anulaba su
+    # razón de existir. Y son cuatro y no dos porque son dos paletas distintas: el
+    # glob las toma todas, así que añadir una variante no obliga a tocar esto.
     # La genera `vendor/bin/pest --filter=GeneraVitrina`, y no está versionada, así
     # que si falta se avisa en vez de fallar: la reja sigue sirviendo sin ella.
     vitrina = sorted((RAIZ / "build/vitrina").glob("*.html"))
@@ -480,22 +522,23 @@ def main() -> int:
                     filas.append(r)
                     marca = "FALLA" if falla(r) else "ok"
                     peor = f"{r['contraste'][0]['ratio']:.2f}" if r["contraste"] else "—"
-                    print(f"  [{marca:5s}] {r['pagina']:34s} {r['tema']:5s} "
+                    print(f"  [{marca:5s}] {r['pagina']:34s} {r['tema']:5s} {hoja_de(r):20s} "
                           f"texto={r['medidos']:4d} contraste↓={len(r['contraste']):3d} "
                           f"peor={peor:6s} axe grave={len(r['axe_graves']):2d}")
         finally:
             ctx.close()
             navegador.close()
 
-    print("\n" + "=" * 100)
-    print(f"{'Demo':34s} {'Tema':6s} {'Textos':>7s} {'Bajo umbral':>12s} {'Peor':>7s} {'axe grave':>10s} {'Veredicto':>10s}")
-    print("-" * 100)
+    print("\n" + "=" * 121)
+    print(f"{'Página':34s} {'Tema':6s} {'Paleta (hoja cargada)':21s} {'Textos':>7s} {'Bajo umbral':>12s} "
+          f"{'Peor':>7s} {'axe grave':>10s} {'Veredicto':>10s}")
+    print("-" * 121)
     for r in filas:
         peor = f"{r['contraste'][0]['ratio']:.2f}" if r["contraste"] else "—"
         ok = not falla(r)
-        print(f"{r['pagina']:34s} {r['tema']:6s} {r['medidos']:7d} {len(r['contraste']):12d} "
+        print(f"{r['pagina']:34s} {r['tema']:6s} {hoja_de(r):21s} {r['medidos']:7d} {len(r['contraste']):12d} "
               f"{peor:>7s} {len(r['axe_graves']):10d} {'pasa' if ok else 'FALLA':>10s}")
-    print("=" * 100)
+    print("=" * 121)
 
     hidratadas = [r for r in filas if r.get("hidratacion")]
     if hidratadas:

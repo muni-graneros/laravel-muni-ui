@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "a11y": "python3 scripts/a11y-check.py",
-    "a11y:vitrina": "vendor/bin/pest --filter=GeneraVitrina && python3 scripts/a11y-check.py build/vitrina/claro.html build/vitrina/oscuro.html",
+    "a11y:vitrina": "vendor/bin/pest --filter=GeneraVitrina && python3 scripts/a11y-check.py build/vitrina/claro.html build/vitrina/oscuro.html build/vitrina/panel-claro.html build/vitrina/panel-oscuro.html",
     "a11y:demos": "python3 scripts/a11y-check.py demo/*.html",
     "a11y:claro": "python3 scripts/a11y-check.py --tema claro",
     "a11y:oscuro": "python3 scripts/a11y-check.py --tema oscuro",

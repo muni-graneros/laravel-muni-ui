@@ -26,7 +26,7 @@
        rinden 9:1 y son los correctos.
        ──────────────────────────────────────────────────────────────────── */
     --muni-text:        var(--mg-tinta);
-    --muni-muted:       #5c6f6d;
+    --muni-muted:       #5a6d6b;  /* 4,4955 sobre --muni-surface-3 (papel-2): 11 nodos de 5 componentes bajo umbral. Ahora 4,63. */
     --muni-hint:        #5f6e6c;
 
     --muni-bg:          #f8f5ec;
@@ -105,7 +105,7 @@
 .dark {
     --muni-text:        #eaf5f3;
     --muni-muted:       #94a3b8;
-    --muni-hint:        #7e8ea0;
+    --muni-hint:        #8191a3;  /* 4,4627 sobre --muni-surface-3 oscuro: la ayuda de input, textarea y rut-input. Ahora 4,64. */
 
     --muni-bg:          #081418;
     --muni-surface:     #0f2025;

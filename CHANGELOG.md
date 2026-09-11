@@ -78,6 +78,23 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
   `#6b7280` a `#656c79`. La prueba que ya existía cubría ese mismo token **solo en oscuro**.
 - El mismo fondo propio se extendió al mensaje de error de `input`, `select` y `switch`.
 - `dropdown` lanzaba `Undefined variable $trigger` si se usaba sin ese slot.
+- **`--muni-muted` en el oscuro del panel medía 4,33:1 sobre el fondo de un aviso `warn`**
+  (4,41 en `ok`, 4,37 en `info`): estaba calibrado contra las superficies del panel y nunca
+  contra los cuatro fondos de estado, que aclaran al mezclar un 18% del tono. Pasa de `#94a3b8`
+  a `#a3b1c4`: 5,10:1 en el peor caso y sigue por debajo de `--muni-text`. Tres sistemas lo
+  parcheaban en su `panel.css`; ya pueden quitar el parche.
+- **La pestaña activa del panel no cambiaba de color**: el tema coloreaba `.fi-tabs-item.fi-active`,
+  pero Filament 5.7 pinta el `span.fi-tabs-item-label` interior (y el ícono) con
+  `primary-700`/`primary-400`, así que en oscuro quedaba en el primario de Filament: 4,33:1 en
+  rrhh-graneros. La regla apunta ahora al `span` y al ícono, en claro y en oscuro. La prueba lee
+  el marcado real de Filament desde `vendor/` para que un cambio de clase vuelva a caer acá.
+- **La barra superior seguía en el gris de Filament**: `.fi-topbar > nav` no alcanza a nada en
+  Filament 5.7, donde la barra ES `nav.fi-topbar`. Ni el cristal cálido del claro ni el fondo
+  oscuro se aplicaban (seguridad-graneros la medía en `zinc-900`).
+- **El anillo de foco de la barra lateral tardaba 160 ms en aparecer**: `.fi-sidebar-item-btn`
+  transicionaba `all`, que arrastra `outline-color` y `box-shadow`, y axe/CDP lo medían a mitad
+  de camino. Ahora transiciona solo `background-color` y `color`; una prueba prohíbe `all`,
+  `outline` y `box-shadow` en cualquier `transition` del tema.
 - Cayó el último `uniqid()` del paquete: los siete componentes que generaban ids así ahora los
   derivan del `name`.
 - **El orden numérico de `sortable-table` estaba mal con formato chileno**: `1.240.000` se
@@ -118,6 +135,11 @@ panel. Todo sistema con `MuniPanel` tiene que correr
 `vendor:publish --tag=muni-ui-filament --force` o el borde de sus campos se quedará sin color
 dentro del panel —sin ningún error visible— y lo que imprima desde el panel saldrá con la barra
 lateral y la topbar encima.
+
+Los cuatro arreglos del tema del panel (`--muni-muted` oscuro, pestaña activa, barra superior y
+transición de la barra lateral) viajan en esa misma hoja: sin republicar no llegan. Al republicar,
+scaffold-laravel-filament-pwa, rrhh-graneros y seguridad-graneros pueden retirar los parches
+locales equivalentes (`panel.css`, `theme.blade.php` y `theme.css`).
 
 El resto de los cambios son componentes Blade, que viajan dentro del paquete y no necesitan
 republicación.

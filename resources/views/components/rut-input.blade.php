@@ -109,7 +109,7 @@
      * en línea lo pisa: una clase perdería siempre. Se arma acá para no emitir
      * el atributo dos veces en la misma etiqueta.
      */
-    $muniRutStyle = trim(($muniRutDvError ? 'border-color:var(--muni-danger-border);' : '')
+    $muniRutStyle = trim(($muniRutDvError ? 'border-color:var(--muni-field-border-error);' : '')
         .(string) $attributes->get('style'));
 
     /*

@@ -338,3 +338,40 @@ it('las props públicas no cambiaron de nombre', function () {
     expect(str_contains($switch, 'Recibe avisos'))->toBeTrue('switch: la prop `description` dejó de funcionar.');
     expect((bool) preg_match('/<input\b[^>]*\bchecked\b/', $switch))->toBeTrue('switch: la prop `checked` dejó de funcionar.');
 });
+
+it('el borde del campo en error se ve MÁS que el de un campo normal, y en los dos CSS', function () {
+    // Medido en el banco del panel: el borde de error daba 2,10:1 en claro y 1,53:1
+    // en oscuro, o sea por debajo del 3:1 de 1.4.11 y MENOS visible que un campo
+    // normal. El error es justo el estado que tiene que saltar a la vista.
+    foreach (['input', 'select', 'textarea', 'rut-input'] as $componente) {
+        $fuente = fuenteDeLaVista($componente);
+
+        expect(str_contains($fuente, '--muni-field-border-error'))->toBeTrue(
+            "«{$componente}» no usa el token del borde de error: si vuelve a --muni-danger-border, ".
+            'el campo equivocado se marca con un borde más tenue que el de un campo correcto.'
+        );
+    }
+
+    // El token viaja en las DOS hojas: dentro de un panel Filament solo se carga
+    // la del tema, y un var() sin declarar cae al respaldo sin dar ningún error.
+    foreach (['muni-ui.css', 'muni-ui-filament.css'] as $hoja) {
+        $css = file_get_contents(__DIR__.'/../resources/css/'.$hoja);
+
+        expect(str_contains($css, '--muni-field-border-error'))->toBeTrue(
+            "«{$hoja}» no declara --muni-field-border-error. Dentro de un panel el borde de un ".
+            'campo con error se quedaría sin color y no habría ningún error visible.'
+        );
+    }
+});
+
+it('el tema del panel esconde lo que Alpine no ha montado', function () {
+    $css = file_get_contents(__DIR__.'/../resources/css/muni-ui-filament.css');
+
+    // Diez componentes del paquete usan [x-cloak]. La regla que lo hace invisible
+    // vivía solo en muni-ui.css, que dentro de un panel NO se carga: en el primer
+    // pintado se veían el menú del dropdown abierto y los dos tab-panel a la vez.
+    expect((bool) preg_match('/\[x-cloak\][^{]*\{[^}]*display\s*:\s*none/', $css))->toBeTrue(
+        'El tema del panel no declara [x-cloak]: diez componentes muestran su contenido en '.
+        'crudo hasta que Alpine monta, y Filament tampoco aporta esa regla.'
+    );
+});

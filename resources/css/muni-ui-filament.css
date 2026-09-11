@@ -40,6 +40,7 @@
        (1,4:1 sobre el papel). Ver DESIGN §7: el token se declara acá TAMBIÉN
        porque muni-ui.css no se carga dentro de un panel Filament. */
     --muni-field-border: #90815b;
+    --muni-field-border-error: var(--muni-danger-fg);
 
     --muni-accent:        var(--mg-petroleo);
     --muni-accent-strong: var(--mg-petroleo-d);
@@ -114,6 +115,7 @@
     --muni-border:      #1c343a;
     --muni-border-2:    #2a4a52;
     --muni-field-border: #467c89;
+    --muni-field-border-error: var(--muni-danger-fg);
 
     --muni-accent:        var(--mg-celeste);
     --muni-accent-strong: var(--mg-lima-br);
@@ -273,6 +275,14 @@
 .fi-simple-main { border:1px solid var(--mg-borde) !important; border-radius:20px !important; box-shadow:0 34px 80px -38px rgba(13,58,68,.55) !important; }
 
 /* ══ MODO OSCURO (el panel ya oscuro) ══════════════════════════════════════ */
+/* Alpine esconde con `[x-cloak]` lo que aún no montó, pero la regla que lo hace
+   invisible vive en `muni-ui.css`, que DENTRO DE UN PANEL NO SE CARGA. Sin ella,
+   diez componentes del paquete muestran su contenido en crudo durante el primer
+   pintado: el menú del dropdown desplegado, el panel del accordion abierto y
+   —lo peor— los dos tab-panel a la vez. Medido en Chromium, Firefox y WebKit.
+   Filament tampoco la aporta: cero apariciones en sus cuatro CSS de dist. */
+[x-cloak] { display:none !important; }
+
 .dark .fi-body, .dark .fi-main-ctn, .dark .fi-main { background-color:#081418 !important; }
 .dark .fi-section, .dark .fi-wi, .dark .fi-wi-stats-overview-stat { background:#0f2025 !important; border-color:#1c343a !important; }
 .dark .fi-topbar > nav { background:#0d1c20 !important; border-color:#1c343a; }
@@ -464,9 +474,23 @@
     }
 
     /* El papel es blanco aunque el panel pinte el suyo. */
+    /* OJO CON LA ESPECIFICIDAD, que acá decide si el documento sale legible.
+       `body` puntúa 0,0,1; `.dark .fi-body` de este mismo archivo puntúa 0,2,0, y
+       ambas llevan `!important`, así que gana la segunda: en tema oscuro el papel
+       conservaba el fondo del panel con el texto forzado a negro encima. Medido:
+       65 de 386 textos bajo umbral, el peor en 1,12:1, y entre el 52 y el 56 % de
+       la hoja cubierta de tinta. Por eso se nombran aquí los mismos contenedores
+       del panel: para empatar la especificidad y ganar por orden. */
     html,
-    body{
+    body,
+    .dark .fi-body,
+    .dark .fi-main-ctn,
+    .dark .fi-main,
+    .dark .fi-section,
+    .dark .fi-wi,
+    .dark .fi-wi-stats-overview-stat{
         background:#ffffff !important;
+        background-color:#ffffff !important;
         color:var(--muni-text) !important;
     }
 

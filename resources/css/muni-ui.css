@@ -62,6 +62,7 @@
        donde 1.4.11 no aplica. Medido: 3,73:1 sobre --muni-surface y 3,22:1 sobre
        --muni-surface-3, que es el peor caso. */
     --muni-field-border: #7b849c;
+    --muni-field-border-error: var(--muni-danger-fg);
 
     --muni-accent: #0f766e;
     --muni-accent-strong: #115e59;
@@ -130,6 +131,7 @@
         --muni-border: #2a3347;
         --muni-border-2: #3a4560;
         --muni-field-border: #5f719d;
+    --muni-field-border-error: var(--muni-danger-fg);
         --muni-accent: #f59e0b;
         --muni-accent-strong: #d97706;
         --muni-accent-soft: #2d1d00;
@@ -178,6 +180,7 @@
     --muni-border: #2a3347;
     --muni-border-2: #3a4560;
     --muni-field-border: #5f719d;
+    --muni-field-border-error: var(--muni-danger-fg);
     --muni-accent: #f59e0b;
     --muni-accent-strong: #d97706;
     --muni-accent-soft: #2d1d00;
@@ -231,6 +234,7 @@
        donde 1.4.11 no aplica. Medido: 3,73:1 sobre --muni-surface y 3,22:1 sobre
        --muni-surface-3, que es el peor caso. */
     --muni-field-border: #7b849c;
+    --muni-field-border-error: var(--muni-danger-fg);
     --muni-accent: #0f766e;
     --muni-accent-strong: #115e59;
     --muni-accent-soft: #f0fdfa;

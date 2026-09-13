@@ -62,6 +62,14 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
   consentimiento pre-marcado no es consentimiento válido.
 - `npm run a11y:vitrina` mide los componentes reales; `npm run registro` regenera
   `registry.json` con `scripts/gen-registry.py`, que antes vivía fuera del repo.
+- **La reja mide dos pasadas nuevas**: impresión (`media=print`, con los gráficos de fondo
+  apagados) y contraste de no-texto (WCAG 1.4.11, 3:1) sobre el borde de los controles, en
+  estado normal y de error. Las dos ya habían dejado pasar defectos graves.
+- La vitrina mide además `modal`, `drawer`, `command-palette` y `sidebar` —los cuatro que
+  atrapan el foco—, con el plugin Focus de Alpine, y trae en error los controles que lo pintan
+  desde el servidor (`select`, `textarea`, `switch`), que nunca se habían medido.
+- `package-lock.json` se versiona: fija las versiones exactas de Alpine y Focus que la vitrina
+  incrusta.
 
 ### Corregido
 - **`file-dropzone` tumbaba el Alpine de la página entera** si la etiqueta traía un apóstrofo: el
@@ -120,6 +128,22 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
   `gob-bar` 2,89:1. Los dos van `aria-hidden`, y hasta ahora la reja no medía los subárboles
   decorativos.
 - Las 14 demos pasan la reja: eran 17 combinaciones en rojo, con 9 campos sin etiqueta asociada.
+- **Imprimir con el sistema operativo en modo oscuro dejaba el documento ilegible**: 177 textos a
+  1,23:1 sobre el papel, sin que nadie tocara nada. La regla de `prefers-color-scheme` puntúa
+  0,4,0 y la de impresión 0,1,0, así que ganaba la de pantalla. Pasa a
+  `@media screen and (prefers-color-scheme: dark)`: el navegador informa esa preferencia también
+  al imprimir, pero una hoja de papel no tiene modo oscuro.
+- **Dentro del panel pasaba lo mismo con el texto** (36 textos a 1,11:1): el tema oscuro escribía
+  colores literales en el elemento, y el bloque de impresión solo redefine tokens, así que un
+  literal no lo alcanza nunca. Ahora cada regla `.dark` lee el token correspondiente.
+- **`dropdown` declaraba `role="menu"` sin implementar el patrón**: cada ítem era una parada de
+  `Tab`, las flechas no hacían nada y `Escape` dejaba el foco perdido. Ahora flechas con vuelta,
+  `Home`/`End`, roving tabindex y retorno del foco al disparador.
+- **`rut-input` repintaba el borde con los tokens viejos a la primera tecla**, así que el campo
+  dejaba de verse justo al empezar a escribir. El borde de error de `checkbox` y `combobox`
+  también quedaba por debajo del de un campo correcto.
+- **Las 14 demos no tenían una sola regla de impresión** y sus bordes de campo medían 1,28 a
+  1,85:1. En papel se mueven colores de marca; está detallado en `docs/UPGRADE-0.18.0.md`.
 - **El borde de los controles de formulario fallaba 1.4.11 en los dos temas**: 1,28:1 y 1,61:1 en
   claro, 1,43:1 y 1,90:1 en oscuro, contra el 3:1 que exige la norma para identificar un
   componente. En un campo el borde es lo único que dice dónde empieza. Token nuevo

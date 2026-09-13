@@ -75,6 +75,14 @@ versionado 0.x) y hay que **republicar el tema del panel**, o nada de esto llega
   desde el servidor (`select`, `textarea`, `switch`), que nunca se habían medido.
 - `package-lock.json` se versiona: fija las versiones exactas de Alpine y Focus que la vitrina
   incrusta.
+- `<x-muni::nav-menu>` y `<x-muni::nav-grupo>`: el menú lateral se pinta desde un árbol, con la
+  regla de «activo» escrita una vez. **El paquete no consulta `Gate`, `Auth` ni `request()`**:
+  recibe el árbol ya filtrado y el permiso ya evaluado. Esconder un ítem del menú es cosmético y
+  nunca protege un endpoint.
+- **`data-muni-print-plain`** (opt-in del sistema anfitrión, apagado por defecto): dentro de un
+  panel en modo oscuro, el contenido propio de Filament salía a 1,00:1 en papel, porque sus 218
+  clases eligen un gris en vez de leer un token. Con el atributo puesto, el texto se aplana a
+  `--muni-text` al imprimir; el costo es que el texto de Filament pierde su color de estado.
 
 ### Corregido
 - **`file-dropzone` tumbaba el Alpine de la página entera** si la etiqueta traía un apóstrofo: el

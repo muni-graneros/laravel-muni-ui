@@ -481,6 +481,95 @@ it('la lateral expone navegación con nombre accesible sin dejar de ser <aside>'
 
 /*
 |--------------------------------------------------------------------------
+| 11 bis. Superpuesta es un diálogo modal; en columna, no
+|--------------------------------------------------------------------------
+|
+| `x-trap.inert` del plugin Focus NO pone el atributo `inert` alrededor: pone
+| `aria-hidden="true"`. Esconder así lo de al lado solo es legítimo mientras hay
+| un diálogo modal abierto; si la lateral se presenta como simple `navigation`,
+| lo que queda es contenido enfocable dentro de un subárbol declarado oculto, y
+| el usuario de lector de pantalla llega con Tab a cosas que se le dijo que no
+| existían. axe lo marca «serious» (`aria-hidden-focus`) y la reja lo daba en
+| rojo en las cuatro páginas `panel-sidebar-*`, donde el `.fi-sidebar` del banco
+| deja un enlace enfocable fuera de la lateral. En un panel real pasa lo mismo
+| con el hamburguesa del armazón, que también queda fuera.
+|
+| Se arregla diciendo la verdad, no tapando: bajo el punto de quiebre el panel
+| ES un diálogo modal —igual que `modal` y `drawer`, que ya pasan la reja—, y la
+| navegación no se pierde porque el landmark baja al contenedor interno, que es
+| el patrón corriente del menú móvil (diálogo por fuera, `navigation` por
+| dentro). En columna no hay diálogo, no hay trampa y el landmark vuelve arriba.
+*/
+
+it('la lateral superpuesta se declara diálogo modal y en columna sigue siendo navegación', function () {
+    $html = armazonHtml();
+    $aside = etiquetaDelArmazon($html, 'aside', 'muni-sb');
+
+    // Lo que llega al navegador antes de que Alpine monte —y lo que se queda en
+    // escritorio— es navegación pura: ni diálogo ni modal.
+    expect(str_contains($aside, 'role="navigation"'))->toBeTrue(
+        'La lateral dejó de nacer como navegación: en columna no hay ningún diálogo abierto.'
+    );
+    expect((bool) preg_match('/\saria-modal="/', $aside))->toBeFalse(
+        'La lateral nace con aria-modal: en columna es una columna del armazón, no un diálogo.'
+    );
+
+    expect((bool) preg_match('/(:|x-bind:)role="([^"]+)"/', $aside, $m))->toBeTrue(
+        'La lateral no cambia de rol al pasar a superpuesta: con `role="navigation"` el aria-hidden '.
+        'que estampa x-trap.inert alrededor no tiene diálogo que lo justifique (axe aria-hidden-focus).'
+    );
+    expect(str_contains($m[2], 'overlay'))->toBeTrue(
+        'El rol no depende del estado de matchMedia: el modo lo decide el punto de quiebre, no una clase.'
+    );
+    expect(str_contains($m[2], 'dialog') && str_contains($m[2], 'navigation'))->toBeTrue(
+        'El rol superpuesto no es `dialog` con vuelta a `navigation`: son los dos modos del componente.'
+    );
+
+    expect((bool) preg_match('/(:|x-bind:)aria-modal="([^"]+)"/', $aside, $mm))->toBeTrue(
+        'La lateral superpuesta no declara aria-modal: el lector sigue leyendo la página de atrás '.
+        'como si fuera alcanzable, que es justo lo que la trampa de foco impide.'
+    );
+    expect(str_contains($mm[2], 'overlay'))->toBeTrue(
+        'aria-modal no está atado al modo superpuesto: en escritorio anunciaría un diálogo que no existe.'
+    );
+});
+
+it('el diálogo superpuesto lleva la navegación dentro, con el mismo nombre', function () {
+    $html = armazonHtml();
+    $inner = etiquetaDelArmazon($html, 'div', 'muni-sb__inner');
+
+    expect($inner)->not->toBe('', 'Desapareció el contenedor interno de la lateral.');
+
+    expect((bool) preg_match('/(:|x-bind:)role="([^"]*navigation[^"]*)"/', $inner, $m))->toBeTrue(
+        'Con la lateral convertida en diálogo, la navegación principal se pierde como landmark: '.
+        'tiene que bajar al contenedor interno (diálogo por fuera, navigation por dentro).'
+    );
+    expect(str_contains($m[2], 'overlay'))->toBeTrue(
+        'El landmark interno no depende del modo: en columna el rol vive en la <aside> y acá sobraría anidado.'
+    );
+
+    expect((bool) preg_match('/(:|x-bind:)aria-label="([^"]+)"/', $inner))->toBeTrue(
+        'El landmark interno se queda sin nombre accesible: dos navegaciones sin nombre son indistinguibles.'
+    );
+    expect((bool) preg_match('/\srole="/', $inner))->toBeFalse(
+        'El contenedor interno nace con un rol fijo: en columna sería una navegación anidada dentro de otra.'
+    );
+    expect((bool) preg_match('/\saria-label="/', $inner))->toBeFalse(
+        'El contenedor interno nace con aria-label y sin rol: axe lo marca `aria-prohibited-attr` en un <div> genérico.'
+    );
+
+    // El nombre del diálogo y el de su navegación son el mismo, y lo manda el
+    // consumidor: si pone su aria-label, el de adentro no puede seguir diciendo
+    // «Navegación principal».
+    $propio = Blade::render('<x-muni::sidebar aria-label="Menú de Rentas" />');
+
+    expect(str_contains(etiquetaDelArmazon($propio, 'div', 'muni-sb__inner'), 'Menú de Rentas'))->toBeTrue(
+        'El landmark interno ignora el aria-label del consumidor y anuncia otro nombre que el diálogo.'
+    );
+});
+
+/*
+|--------------------------------------------------------------------------
 | 12. No se persiste nada
 |--------------------------------------------------------------------------
 */

@@ -34,6 +34,18 @@
     /* 0,02px por debajo: el panel superpuesto termina justo antes de que empiece
        la columna fija, sin la franja de un píxel donde valen las dos. */
     $bpMax = ($bpPx - 0.02).'px';
+
+    /* El nombre accesible, UNO SOLO para las dos capas: el diálogo superpuesto y
+       la navegación que lleva dentro. Manda el `aria-label` del consumidor —el
+       mismo que gana en la fusión de abajo— y si no lo hay, la prop `label`. */
+    $nombre = $attributes->get('aria-label') ?: $label;
+
+    /* El rol de la columna. Es `navigation`, pero si el consumidor trajo el
+       suyo en la bolsa, ese gana en la fusión de abajo y tiene que ganar
+       también cuando la lateral vuelve de superpuesta a columna: si no, la
+       atadura de Alpine le pisaría en silencio lo que el paquete le deja
+       elegir. */
+    $rolColumna = $attributes->get('role') ?: 'navigation';
 @endphp
 
 {{-- Barra lateral de navegación para dashboards.
@@ -63,6 +75,23 @@
      id}`. Por eso el hamburguesa del armazón puede decir la verdad en su
      `aria-expanded` sin compartir scope de Alpine, y por eso este componente
      sigue sirviendo suelto, fuera del armazón.
+
+     SUPERPUESTA ES UN DIÁLOGO MODAL, y decirlo es lo que arregla el defecto.
+     El modificador `.inert` de `x-trap` NO pone el atributo `inert` alrededor:
+     estampa `aria-hidden="true"` en todo lo que queda a los lados. Eso solo es
+     legítimo mientras hay un diálogo modal abierto; presentándose como simple
+     `navigation`, lo de al lado queda enfocable dentro de un subárbol declarado
+     oculto —el hamburguesa del armazón, sin ir más lejos, queda fuera de la
+     lateral— y un usuario de lector de pantalla llega con Tab a contenido que
+     se le dijo que no existía. axe lo marca «serious» (`aria-hidden-focus`).
+
+     Se resuelve diciendo la verdad y no tapando: bajo el punto de quiebre el
+     panel ES un diálogo modal —lo mismo que `modal` y `drawer`— y el landmark
+     de navegación baja al contenedor interno, que es el patrón corriente del
+     menú móvil: diálogo por fuera, `navigation` por dentro. En columna no hay
+     diálogo ni trampa, el rol vuelve a la `<aside>` y el de adentro se retira,
+     porque una navegación anidada dentro de otra no nombra nada nuevo. Los dos
+     cuelgan del MISMO `matchMedia` que todo lo demás, nunca de una clase CSS.
 
      SIGUE SIENDO `<aside>` A PROPÓSITO. El landmark que corresponde a la
      navegación principal es `navigation`, no `complementary`, pero cambiar el
@@ -128,6 +157,11 @@
     {{-- Atado al matchMedia, jamás a la clase CSS. --}}
     x-trap.inert.noscroll="overlay && open"
     :inert="overlay && ! open"
+    {{-- El rol que justifica ese aria-hidden de alrededor. El `role` estático de
+         la fusión es el de columna y es también el que vale sin JS; estas dos
+         ataduras solo lo cambian cuando el matchMedia dice que hay panel. --}}
+    :role="overlay ? 'dialog' : @js($rolColumna)"
+    :aria-modal="overlay ? 'true' : null"
     :class="open ? 'muni-sb--open' : ''"
     {{ $attributes->merge([
         'id' => 'muni-sidebar',
@@ -140,7 +174,15 @@
         'style' => "--sb-w:{$width};",
     ]) }}
 >
-    <div class="muni-sb__inner">
+    {{-- El landmark de navegación mientras la lateral es diálogo. Nace sin rol y
+         sin nombre a propósito: en columna el rol vive en la `<aside>` y un
+         `aria-label` suelto sobre un <div> sin rol es `aria-prohibited-attr`.
+         El nombre sale de `@js()`, así que un apóstrofo en el rótulo del
+         municipio no tumba la expresión de Alpine. --}}
+    <div class="muni-sb__inner"
+        :role="overlay ? 'navigation' : null"
+        :aria-label="overlay ? @js($nombre) : null"
+    >
         {{ $slot }}
     </div>
 </aside>

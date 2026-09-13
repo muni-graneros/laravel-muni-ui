@@ -136,6 +136,11 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 - **Dentro del panel pasaba lo mismo con el texto** (36 textos a 1,11:1): el tema oscuro escribía
   colores literales en el elemento, y el bloque de impresión solo redefine tokens, así que un
   literal no lo alcanza nunca. Ahora cada regla `.dark` lee el token correspondiente.
+- **La lateral superpuesta atrapaba el foco sin anunciarse como diálogo.** `x-trap.inert` pone
+  `aria-hidden` alrededor, no el atributo `inert`, así que el hamburguesa —que queda fuera de la
+  lateral— era un elemento enfocable dentro de algo declarado oculto, y axe lo marcaba `serious`.
+  Bajo el punto de quiebre la `<aside>` pasa a `role="dialog"` con `aria-modal`, y el landmark de
+  navegación baja al contenedor interno con el mismo nombre. En escritorio no cambia nada.
 - **`dropdown` declaraba `role="menu"` sin implementar el patrón**: cada ítem era una parada de
   `Tab`, las flechas no hacían nada y `Escape` dejaba el foco perdido. Ahora flechas con vuelta,
   `Home`/`End`, roving tabindex y retorno del foco al disparador.

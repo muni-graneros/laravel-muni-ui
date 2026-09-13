@@ -592,4 +592,82 @@
     :has(.muni-hoja){
         padding:0 !important;
     }
+
+    /* ── IMPRESIÓN PLANA: OPT-IN DEL SISTEMA ANFITRIÓN ───────────────────────
+       Todo lo de arriba redefine tokens `--muni-*`. El contenido propio de
+       Filament no los lee: elige un tono de su propia paleta. Medido con el CSS
+       real del panel de licencias, en oscuro y con `media=print`, el aviso
+       (`fi-callout`) salía así sobre el papel:
+
+         .fi-callout-heading      var(--color-white) → #ffffff → 1,00:1
+         .fi-callout-description  var(--gray-400)    → #9f9fa9 → 2,62:1
+         .fi-header-subheading    var(--gray-400)    → #9f9fa9 → 2,62:1
+
+       (Sobre el papel, porque los fondos NO se imprimen por omisión: el recuadro
+       oscuro del aviso desaparece y el texto blanco queda sobre la hoja.)
+
+       Son 218 clases de Filament con su gris horneado. Enumerarlas es una lista
+       que caduca con la próxima versión del panel — ya pasó con
+       `.dark .fi-header-heading`. La única regla que las alcanza a todas sin
+       nombrar ninguna es esta: forzar el color de TODO lo que cuelga de `.dark`.
+
+       QUÉ GANA quien la activa: el contenido del panel sale legible en papel
+       desde el modo oscuro, sin tocar el sistema anfitrión. Los tres de arriba
+       pasan a 21,00:1.
+
+       QUÉ PIERDE: el texto de Filament pierde su color de estado en papel. Un
+       aviso de error, una insignia de rechazo o un enlace se imprimen en negro,
+       como el resto. El estado sigue existiendo en el borde y en el texto —que
+       es lo que esta hoja imprime a propósito, ver arriba—, pero ya no en el
+       color de la letra. Por eso va apagado por omisión: imponérselo a los nueve
+       sistemas sería decidir por ellos.
+
+       LO QUE NO CUBRE: solo toca el color del texto, no el fondo. Filament pinta
+       el recuadro del aviso con su propio gris (`.fi-callout:where(.dark,.dark *)`
+       → #18181b) y ese fondo tampoco lee un token `--muni-*`. Por omisión da
+       igual —la impresora no imprime fondos—, pero si el funcionario enciende
+       «gráficos de fondo» en el diálogo, ese recuadro concreto sale negro con el
+       texto ya aplanado a negro encima: medido, 1,19:1. Sin el activador ese
+       mismo escenario ya salía roto por otro lado (título blanco sobre relleno
+       blanco, 1,00:1), así que el saldo con fondos es el mismo —2 de 14 elementos
+       bajo 4,5:1 en ambos casos— y sin fondos pasa de 6 bajo umbral a ninguno.
+       Cerrarlo del todo pediría aplanar también el fondo, que es otra decisión:
+       se llevaría por delante el cinturón institucional y el relleno del botón
+       primario. No se toma aquí.
+
+       CÓMO SE ACTIVA: el atributo booleano (sin valor) en el mismo elemento que
+       lleva `.dark`, o en un ancestro suyo. En un panel Filament es el <html>:
+
+           <html class="fi dark" data-muni-print-plain>
+
+       Filament no expone ningún hook para añadir atributos al <html>, así que el
+       anfitrión publica `filament-panels::components.layout.base` y lo edita.
+       NO con un script en línea desde un render hook: el panel va con CSP y
+       nonce, y un script sin nonce no se ejecuta ni avisa. Ver
+       `docs/UPGRADE-0.18.0.md`.
+
+       El nombre entra en la familia `print` de esta hoja (`data-muni-no-print`)
+       y es de raíz como `data-muni-theme`. NO se llama `data-muni-imprimir-…`
+       a propósito: `[data-muni-imprimir]` ya existe unas líneas más arriba y
+       significa otra cosa —una excepción por elemento, para imprimir desde
+       dentro de un diálogo—, y dos atributos con el mismo prefijo y sentidos
+       opuestos se confunden al leer el HTML.
+
+       Las dos formas del selector son necesarias: el panel pone `.dark` y el
+       activador en el MISMO <html>, y un elemento no es descendiente de sí
+       mismo; pero hay hosts que ponen `.dark` en el <body>.
+
+       El `!important` no es decorativo: las reglas de Filament vienen como
+       `.fi-callout .fi-callout-heading:where(.dark,.dark *)`, que puntúa 0,2,0,
+       lo mismo que esta. Sin `!important` gana la que va después, y el orden de
+       las dos hojas lo decide el anfitrión.
+
+       El color sale de `--muni-text`, que el bloque de tokens de arriba deja en
+       negro: si algún día ese reset cambia, este aplanado lo sigue. */
+    [data-muni-print-plain] .dark,
+    [data-muni-print-plain] .dark *,
+    .dark[data-muni-print-plain],
+    .dark[data-muni-print-plain] *{
+        color:var(--muni-text) !important;
+    }
 }

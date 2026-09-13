@@ -369,6 +369,125 @@ it('en el tema, toda regla .dark toma color, fondo y borde de un token que el pa
     }
 });
 
+/*
+| El tercer caso, que las dos invariantes de arriba NO cubren y no pueden cubrir:
+| el contenido propio de Filament. `.fi-callout .fi-callout-heading:where(.dark,
+| .dark *)` escribe `var(--color-white)` y la descripción `var(--gray-400)`
+| (#9f9fa9): tokens de Filament, no `--muni-*`. Redefinir la paleta municipal en
+| la raíz no los alcanza, y son 218 clases: enumerarlas es una lista que caduca
+| con cada versión del panel.
+|
+| Medido con el CSS real del panel de licencias, en oscuro y con `media=print`:
+| el título del aviso salía a 1,00:1 y la descripción a 2,62:1 sobre el papel.
+|
+| La única regla que los alcanza sin enumerar nada fuerza el color de TODO lo
+| que cuelga de `.dark`. Y eso cuesta: el texto de Filament pierde su color de
+| estado en papel. Por eso va detrás de un activador explícito del sistema
+| anfitrión y apagado por omisión — y por eso esta prueba vigila las dos mitades:
+| que la regla exista, y que NINGUNA versión suya quede sin activador.
+*/
+
+/** Reglas de impresión que fuerzan `color` sobre cualquier descendiente de `.dark`. */
+function imprAplanadoDeColor(string $css): array
+{
+    $encontradas = [];
+
+    foreach (imprReglas($css) as $regla) {
+        if (! imprEsDeImpresion($regla) || ! preg_match('/(?:^|[;{\s])color\s*:/', $regla['cuerpo'])) {
+            continue;
+        }
+
+        foreach (imprSelectores($regla['selector']) as $s) {
+            // El `*` final es lo que lo vuelve indiscriminado: alcanza al
+            // contenido de Filament sin nombrar una sola de sus clases.
+            if (preg_match('/\.dark\b[^,]*\*\s*$/', $s)) {
+                $encontradas[] = ['selector' => $s, 'cuerpo' => $regla['cuerpo']];
+            }
+        }
+    }
+
+    return $encontradas;
+}
+
+it('el aplanado de color en papel no existe sin el activador del sistema anfitrión', function () {
+    $activador = 'data-muni-print-plain';
+
+    $revisadas = 0;
+
+    foreach (imprHojas() as $hoja => $css) {
+        foreach (imprAplanadoDeColor($css) as $regla) {
+            $revisadas++;
+
+            // `toContain` con mensaje no existe en Pest: el segundo argumento es
+            // otra aguja que buscar, así que la prueba fallaba por el mensaje.
+            expect(str_contains($regla['selector'], "[{$activador}]"))->toBeTrue(sprintf(
+                '«%s»: `%s` fuerza el color de todo lo que cuelga de `.dark` al imprimir, sin el '.
+                'activador. Eso le quita el color de estado al texto de Filament en los nueve '.
+                'sistemas sin que ninguno lo haya pedido. La regla existe, pero solo detrás de '.
+                '`[%s]` en el <html> del panel.',
+                $hoja, $regla['selector'], $activador
+            ));
+        }
+    }
+
+    // Sin ninguna regla de aplanado la prueba pasaría sola, y se iría en silencio
+    // junto con lo que vigila.
+    expect($revisadas)->toBeGreaterThan(0,
+        'No hay ninguna regla de aplanado que revisar: el patrón dejó de mirar el archivo.'
+    );
+});
+
+it('con el activador, el aplanado alcanza a las clases de Filament y toma el token del papel', function () {
+    $activador = 'data-muni-print-plain';
+    $reglas = imprAplanadoDeColor(imprHojas()['muni-ui-filament.css']);
+
+    expect($reglas)->not->toBe([], sprintf(
+        '«muni-ui-filament.css»: no hay ninguna regla de impresión que fuerce el color bajo `.dark *`. '.
+        'Sin ella, `[%s]` no hace nada y el título de un aviso de Filament sigue saliendo a 1,00:1 '.
+        '(blanco sobre el papel), porque lee `--color-white` y no un token `--muni-*`.',
+        $activador
+    ));
+
+    // Las dos formas tienen que estar: el panel pone `.dark` y el activador en el
+    // MISMO <html>, así que `[activador] .dark *` sola no lo alcanzaría nunca.
+    $selectores = array_column($reglas, 'selector');
+
+    expect(array_filter($selectores, fn ($s) => str_starts_with($s, ".dark[{$activador}]")))->not->toBe([],
+        "Falta la forma `.dark[{$activador}] *`: el panel pone `.dark` y el activador en el mismo ".
+        '<html>, y un descendiente no es su propio ancestro.'
+    );
+
+    expect(array_filter($selectores, fn ($s) => str_starts_with($s, "[{$activador}] .dark")))->not->toBe([],
+        "Falta la forma `[{$activador}] .dark *`: hay hosts que ponen `.dark` en el <body> y el ".
+        'activador en el <html>.'
+    );
+
+    $papel = imprResetDelPapel(imprHojas()['muni-ui-filament.css']);
+
+    foreach ($reglas as $regla) {
+        preg_match_all('/(?:^|[;{\s])color\s*:\s*([^;}]+)/', $regla['cuerpo'], $m);
+
+        foreach ($m[1] as $valor) {
+            expect(str_contains($valor, '!important'))->toBeTrue(
+                "«{$regla['selector']}»: sin `!important` no le gana a `:where(.dark, .dark *)` de ".
+                'Filament, que puntúa 0,2,0 igual que esta regla.'
+            );
+
+            preg_match_all('/var\(\s*(--[\w-]+)/', $valor, $vars);
+
+            expect($vars[1])->not->toBe([], "«{$regla['selector']}»: el color sale de un token, no de un literal.");
+
+            foreach ($vars[1] as $var) {
+                expect(in_array($var, $papel['tokens'], true))->toBeTrue(sprintf(
+                    '«%s»: `%s` no se redefine en el bloque de impresión, así que en papel valdría el '.
+                    'tono del tema oscuro y el aplanado dejaría el documento peor que antes.',
+                    $regla['selector'], $var
+                ));
+            }
+        }
+    }
+});
+
 it('en papel, el texto sobre el acento se lee con y sin gráficos de fondo', function () {
     foreach (imprHojas() as $hoja => $css) {
         $papel = '';

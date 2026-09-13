@@ -104,7 +104,101 @@ Todas opcionales, todas con el comportamiento anterior como defecto.
 
 ---
 
-## 5. Defectos que se corrigieron y que quizá estés sufriendo hoy
+## 5. Impresión plana del panel en oscuro (opt-in, apagado por defecto)
+
+**Si no haces nada, nada cambia.** Esta sección es una decisión que te toca a ti, no al
+paquete.
+
+### El problema
+
+El bloque de `@media print` de `muni-ui-filament.css` redefine los tokens `--muni-*` para que
+el papel salga en claro aunque el panel esté en oscuro. Eso arregla todo lo que lee un token
+del paquete, pero **no alcanza al contenido propio de Filament**, que elige un tono de su
+propia paleta en vez de leer un token. Son 218 clases.
+
+Medido con el CSS real del panel de licencias, en oscuro y con `media=print`, sobre el papel:
+
+| Elemento | Color | Contraste |
+|---|---|---|
+| `.fi-callout-heading` | `var(--color-white)` → `#ffffff` | **1,00:1** |
+| `.fi-callout-description` | `var(--gray-400)` → `#9f9fa9` | **2,62:1** |
+| `.fi-header-subheading` | `var(--gray-400)` → `#9f9fa9` | **2,62:1** |
+
+Se mide sobre el papel porque **la impresora no imprime fondos por omisión**: el recuadro
+oscuro del aviso desaparece y queda el texto blanco sobre la hoja.
+
+### Cómo se activa
+
+Un atributo booleano en el **mismo elemento que lleva `.dark`, o en un ancestro suyo**. En un
+panel Filament ese elemento es siempre el `<html>`, y Filament no expone ningún hook para
+añadirle atributos: hay que publicar su plantilla y editarla.
+
+```bash
+php artisan vendor:publish --tag=filament-panels-views
+```
+
+En `resources/views/vendor/filament-panels/components/layout/base.blade.php`, sobre la
+etiqueta `<html>` que ya trae `@class([... 'dark' => ...])`:
+
+```html
+<html
+    lang="..."
+    dir="..."
+    data-muni-print-plain
+    @class(['fi', 'dark' => ...])
+>
+```
+
+**No lo pongas con un `<script>` en línea desde un render hook.** Los sistemas del ecosistema
+sirven el panel con CSP y nonce: un script sin nonce no se ejecuta y el activador no llega,
+sin un solo error visible en la página.
+
+Publicar las vistas de Filament te ata a revisarlas en cada upgrade del panel. Si prefieres
+no pagar eso, la alternativa es no activarlo y arreglar los documentos que imprimes para que
+salgan desde una vista propia (`<x-muni::hoja>`), que sí lee los tokens del paquete.
+
+### Qué ganas
+
+Todo el texto del panel pasa a `var(--muni-text)` al imprimir. En el banco de medición, los
+14 elementos medidos pasan de **6 por debajo de 4,5:1** (el peor, 1,00:1) a **ninguno**: los
+tres de la tabla quedan en 21,00:1.
+
+### Qué pierdes
+
+**El texto de Filament pierde su color de estado en papel.** Un aviso de error, una insignia
+de rechazo o un enlace se imprimen en negro, como el resto del documento. El estado sigue
+estando en el borde y en el texto —que es lo que esta hoja imprime a propósito—, pero ya no
+en el color de la letra.
+
+Si tus documentos impresos dependen del color para distinguir un estado, **no lo actives**:
+arregla primero el documento para que el estado se lea en palabras.
+
+### Lo que no cubre
+
+Solo toca el color del texto, no el fondo. Filament pinta el recuadro del aviso con su propio
+gris (`#18181b`) y ese fondo tampoco lee un token. Por omisión da igual, pero si el
+funcionario enciende «gráficos de fondo» en el diálogo de impresión, ese recuadro sale negro
+con el texto ya aplanado a negro encima (medido: 1,19:1). Sin el activador ese mismo escenario
+ya salía roto por el otro lado (título blanco sobre relleno blanco, 1,00:1), así que el saldo
+con fondos encendidos es el mismo —2 de 14 elementos bajo umbral en ambos casos— y sin fondos
+pasa de 6 a ninguno.
+
+Cerrarlo del todo pediría aplanar también el fondo, y eso se llevaría por delante el cinturón
+institucional y el relleno del botón primario. No se hizo.
+
+### El nombre
+
+`data-muni-print-plain` entra en la familia `print` que ya existe en esa hoja
+(`data-muni-no-print`) y es de raíz, como `data-muni-theme`. **No se llama
+`data-muni-imprimir-algo` a propósito:** `[data-muni-imprimir]` ya existe y significa otra
+cosa —una excepción por elemento, para poder imprimir desde dentro de un diálogo—, y dos
+atributos con el mismo prefijo y sentidos opuestos se confunden al leer el HTML.
+
+Acuérdate de republicar el CSS (§1) o el atributo no hará nada.
+
+---
+
+## 6. Defectos que se corrigieron y que quizá estés sufriendo hoy
 
 Vale la pena mirarlos porque varios se manifiestan en producción sin dar error:
 
@@ -123,7 +217,7 @@ Vale la pena mirarlos porque varios se manifiestan en producción sin dar error:
 
 ---
 
-## 6. Qué NO cambia
+## 7. Qué NO cambia
 
 - Los 9 invariantes institucionales `--muni-gob-*`.
 - La firma del sistema: `<tr data-muni-row>`, `.muni-row--danger`, `.muni-num`.
@@ -136,7 +230,7 @@ Vale la pena mirarlos porque varios se manifiestan en producción sin dar error:
 
 ---
 
-## 7. Cómo comprobar que quedó bien
+## 8. Cómo comprobar que quedó bien
 
 ```bash
 php artisan view:clear
@@ -155,7 +249,7 @@ demos en los dos temas.
 
 ---
 
-## 8. Deuda conocida que esta versión NO resuelve
+## 9. Deuda conocida que esta versión NO resuelve
 
 Se dice acá para que nadie la descubra en producción:
 

@@ -99,8 +99,7 @@ TEXTO_GRANDE = 3.0
 # suele estar en un ancestro, y hay que subir hasta encontrar uno opaco. Cuando el
 # fondo es un degradado o una imagen no se puede decidir por cálculo, así que se
 # informa aparte en vez de dar un falso aprobado.
-MEDIR_CONTRASTE = r"""
-() => {
+AYUDAS_JS = r"""
   const aRGB = (c) => {
     const m = c.match(/rgba?\(([^)]+)\)/);
     if (!m) return null;
@@ -131,6 +130,53 @@ MEDIR_CONTRASTE = r"""
       partes.unshift(s);
     }
     return partes.join(' > ');
+  };
+"""
+
+# DOS PASADAS CON EL MISMO CÓDIGO: pantalla e impresión.
+# `fondosApagados` no es un interruptor de conveniencia: es el caso REAL de una
+# impresora municipal. Al imprimir, los navegadores no pintan `background-color`
+# ni `background-image` salvo que el usuario marque «gráficos de fondo» en el
+# diálogo —viene desmarcado— así que TODO el texto queda sobre el blanco del
+# papel. Un texto claro sobre un chip de color, que en pantalla mide de sobra,
+# en papel queda blanco sobre blanco. Eso no lo ve ni esta reja midiendo en
+# pantalla ni axe, que no sabe de medios paginados.
+# La pasada con los fondos ACTIVADOS es la otra mitad: es la casilla marcada, y
+# es donde apareció D9 —el papel salía con el fondo oscuro del panel y el texto
+# forzado a negro encima, 65 de 386 textos bajo umbral, el peor en 1,12:1—.
+# El umbral no cambia en papel: 4,5:1 y 3:1 son los mismos (WCAG no exime la
+# impresión; el Decreto N°1/2015 tampoco).
+#
+# Lo que esta pasada NO modela, a propósito: Chromium, al imprimir SIN fondos,
+# oscurece por su cuenta el texto casi blanco (`Color::Dark()`). Medido sobre un
+# PDF real de `page.pdf(print_background=False)`: `rgb(226,232,244)` salió como
+# `rgb(148,152,160)`, ~3:1 sobre blanco. O sea que en Chromium la cifra «papel» de
+# un texto casi blanco es peor que la real, pero sigue bajo 4,5:1; y es un
+# paliativo de un motor, no algo que el paquete controle. Se mide el color que
+# declara el CSS, que es lo que decide en cualquier motor.
+MEDIR_CONTRASTE = r"""
+(opciones) => {
+""" + AYUDAS_JS + r"""
+  const fondosApagados = !!(opciones && opciones.fondosApagados);
+  const PAPEL = { r: 255, g: 255, b: 255, a: 1 };
+
+  // Fondo efectivo: subir hasta el primer ancestro con color opaco, componiendo
+  // las capas semitransparentes que haya en el camino. Con los fondos apagados
+  // no hay nada que subir: el fondo es la hoja.
+  const fondoEfectivo = (el) => {
+    if (fondosApagados) return { fondo: PAPEL, degradado: false };
+    let fondo = null; const capas = [];
+    for (let n = el; n; n = n.parentElement) {
+      const s = getComputedStyle(n);
+      if (s.backgroundImage && s.backgroundImage !== 'none') return { fondo: null, degradado: true };
+      const c = aRGB(s.backgroundColor);
+      if (!c || c.a === 0) continue;
+      capas.push(c);
+      if (c.a === 1) { fondo = c; break; }
+    }
+    if (!fondo) fondo = { r: 255, g: 255, b: 255, a: 1 };
+    for (let i = capas.length - 2; i >= 0; i--) fondo = sobre(capas[i], fondo);
+    return { fondo, degradado: false };
   };
 
   const fallas = [], indecidibles = [], decorativos = [];
@@ -197,23 +243,11 @@ MEDIR_CONTRASTE = r"""
     const frente = aRGB(cs.color);
     if (!frente || frente.a === 0) continue;
 
-    // Fondo efectivo: subir hasta el primer ancestro con color opaco, componiendo
-    // las capas semitransparentes que haya en el camino.
-    let fondo = null, capas = [], degradado = false;
-    for (let n = el; n; n = n.parentElement) {
-      const s = getComputedStyle(n);
-      if (s.backgroundImage && s.backgroundImage !== 'none') { degradado = true; break; }
-      const c = aRGB(s.backgroundColor);
-      if (!c || c.a === 0) continue;
-      capas.push(c);
-      if (c.a === 1) { fondo = c; break; }
-    }
-    if (!fondo && !degradado) fondo = { r: 255, g: 255, b: 255, a: 1 };
+    const { fondo, degradado } = fondoEfectivo(el);
     if (degradado) {
       indecidibles.push({ ruta: rutaDe(el), texto: propio.slice(0, 60), motivo: 'fondo con imagen o degradado' });
       continue;
     }
-    for (let i = capas.length - 2; i >= 0; i--) fondo = sobre(capas[i], fondo);
 
     // La opacidad de un ANCESTRO también apaga el texto, y hasta ahora no se
     // miraba: se leía solo la del propio elemento. Así pasaron un opacity:.5 en
@@ -247,21 +281,11 @@ MEDIR_CONTRASTE = r"""
     const caja = el.getBoundingClientRect();
     if (caja.width < 1 || caja.height < 1) continue;
 
-    let fondo = null, capas = [], degradado = false;
-    for (let n = el; n; n = n.parentElement) {
-      const st = getComputedStyle(n);
-      if (st.backgroundImage && st.backgroundImage !== 'none') { degradado = true; break; }
-      const c = aRGB(st.backgroundColor);
-      if (!c || c.a === 0) continue;
-      capas.push(c);
-      if (c.a === 1) { fondo = c; break; }
-    }
+    const { fondo, degradado } = fondoEfectivo(el);
     if (degradado) {
       indecidibles.push({ ruta: rutaDe(el) + cual, texto: texto.slice(0, 60), motivo: 'fondo con imagen o degradado' });
       continue;
     }
-    if (!fondo) fondo = { r: 255, g: 255, b: 255, a: 1 };
-    for (let i = capas.length - 2; i >= 0; i--) fondo = sobre(capas[i], fondo);
 
     let op = 1;
     for (let n = el; n; n = n.parentElement) {
@@ -284,6 +308,258 @@ MEDIR_CONTRASTE = r"""
   fallas.sort((a, b) => a.ratio - b.ratio);
   decorativos.sort((a, b) => a.ratio - b.ratio);
   return { medidos, fallas, indecidibles, decorativos };
+}
+"""
+
+# ── Contraste de NO-TEXTO (WCAG 1.4.11) ──────────────────────────────────────
+# Ni esta reja ni axe-core miden esto: axe solo compara texto contra su fondo.
+# 1.4.11 pide 3:1 para «la información visual necesaria para identificar un
+# componente de interfaz y sus estados». En un formulario, el borde es lo ÚNICO
+# que dice dónde empieza y dónde termina un campo, y el cambio de borde es lo
+# único que dice que el campo está en error.
+#
+# Por eso se mide el borde de `input`, `select`, `textarea`, la casilla visible
+# del `checkbox`/`switch` y el disparador del `combobox`, en DOS estados:
+#   · normal — el que hay en la página;
+#   · error  — el que ya viene marcado `aria-invalid="true"`, y además uno
+#     SONDEADO: se le pone `aria-invalid="true"` al control (y al <input> real
+#     que precede a la casilla visible, que es de donde cuelga la regla), se
+#     relee el borde y se deshace. No es inventar un estado: es ejecutar el que
+#     el propio CSS del componente declara, sin depender de que la vitrina
+#     tenga una instancia fallida de cada componente.
+#
+# Qué se compara: el borde contra sus DOS colores adyacentes —el relleno del
+# campo (interior) y la superficie sobre la que se apoya (exterior)—, y decide
+# el MEJOR de los dos: un borde que se despega de cualquiera de los dos lados
+# delimita el campo. Se informa el par completo para que la falla sea accionable.
+#
+# Qué NO es una falla: un borde de ancho 0, `style:none` o transparente. Ahí el
+# componente se identifica por otra cosa (relleno, subrayado, icono) y esta reja
+# no lo sabe: se lista aparte, sin veredicto, en vez de inventar un defecto.
+#
+# Defectos reales que pasaron por este hueco: el borde de un campo EN ERROR a
+# 2,10:1 en claro y 1,53:1 en oscuro —MENOS visible que el de un campo normal—,
+# y el borde de los controles antes de que existiera `--muni-field-border`.
+MEDIR_NO_TEXTO = r"""
+() => {
+""" + AYUDAS_JS + r"""
+  const MINIMO = 3.0;
+
+  // Orden a propósito: lo específico primero, porque el disparador del combobox
+  // y el buscador de la tabla TAMBIÉN son <input> y se medirían dos veces.
+  const CONTROLES = [
+    ['combobox', '.muni-combo__input, [role="combobox"]'],
+    ['checkbox', '.muni-checkbox'],
+    ['switch', '.muni-switch'],
+    ['input', 'input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=file]):not([type=submit]):not([type=button]):not([type=reset]):not([type=image])'],
+    ['select', 'select'],
+    ['textarea', 'textarea'],
+  ];
+
+  const fondoDetras = (el) => {
+    let fondo = null; const capas = [];
+    for (let n = el; n; n = n.parentElement) {
+      const s = getComputedStyle(n);
+      if (s.backgroundImage && s.backgroundImage !== 'none') return { fondo: null, degradado: true };
+      const c = aRGB(s.backgroundColor);
+      if (!c || c.a === 0) continue;
+      capas.push(c);
+      if (c.a === 1) { fondo = c; break; }
+    }
+    if (!fondo) fondo = { r: 255, g: 255, b: 255, a: 1 };
+    for (let i = capas.length - 2; i >= 0; i--) fondo = sobre(capas[i], fondo);
+    return { fondo, degradado: false };
+  };
+
+  const css = (n) => `rgb(${Math.round(n.r)}, ${Math.round(n.g)}, ${Math.round(n.b)})`;
+  const visible = (el) => {
+    const cs = getComputedStyle(el);
+    if (cs.visibility === 'hidden' || cs.display === 'none') return false;
+    let op = 1;
+    for (let n = el; n; n = n.parentElement) {
+      const o = parseFloat(getComputedStyle(n).opacity);
+      if (!isNaN(o)) op *= o;
+    }
+    if (op === 0) return false;
+    const c = el.getBoundingClientRect();
+    return c.width >= 1 && c.height >= 1;
+  };
+
+  // El peor lado PINTADO del borde. Si un lado se pinta y no se ve, ese trozo
+  // del contorno desaparece, así que manda el peor y no el promedio.
+  const medirBorde = (el, exterior) => {
+    const cs = getComputedStyle(el);
+    const propio = aRGB(cs.backgroundColor) || { r: 0, g: 0, b: 0, a: 0 };
+    const interior = propio.a === 0 ? exterior : (propio.a < 1 ? sobre(propio, exterior) : propio);
+    let peor = null;
+    let pintados = 0;
+    for (const lado of ['Top', 'Right', 'Bottom', 'Left']) {
+      const ancho = parseFloat(cs['border' + lado + 'Width']) || 0;
+      const estilo = cs['border' + lado + 'Style'];
+      const color = aRGB(cs['border' + lado + 'Color']);
+      if (ancho <= 0 || estilo === 'none' || estilo === 'hidden' || !color || color.a === 0) continue;
+      pintados++;
+      const contra = (fondo) => ratio(color.a < 1 ? sobre(color, fondo) : color, fondo);
+      const rInt = contra(interior), rExt = contra(exterior);
+      const r = Math.max(rInt, rExt);
+      if (!peor || r < peor.ratio) {
+        peor = {
+          lado: lado.toLowerCase(), ancho, estilo, ratio: r,
+          color: cs['border' + lado + 'Color'],
+          interior: css(interior), exterior: css(exterior),
+          contraInterior: Math.round(rInt * 100) / 100,
+          contraExterior: Math.round(rExt * 100) / 100,
+        };
+      }
+    }
+    return { peor, pintados, colores: ['Top', 'Right', 'Bottom', 'Left'].map((l) => cs['border' + l + 'Color']).join('|') };
+  };
+
+  const fallas = [], sinBorde = [], indecidibles = [], sinEstadoError = [];
+  const cobertura = {};
+  let medidos = 0;
+
+  const anotar = (el, control, estado, m) => {
+    medidos++;
+    cobertura[control] = cobertura[control] || { normal: 0, error: 0 };
+    cobertura[control][estado] = (cobertura[control][estado] || 0) + 1;
+    const item = {
+      ruta: rutaDe(el), control, estado, minimo: MINIMO,
+      ratio: Math.round(m.peor.ratio * 100) / 100,
+      lado: m.peor.lado, ancho: m.peor.ancho, estilo: m.peor.estilo,
+      color: m.peor.color, interior: m.peor.interior, exterior: m.peor.exterior,
+      contraInterior: m.peor.contraInterior, contraExterior: m.peor.contraExterior,
+    };
+    // MISMA POLÍTICA DE REDONDEO QUE arriba y que axe: truncar, no redondear.
+    if (Math.floor(m.peor.ratio * 100) / 100 < MINIMO) fallas.push(item);
+    return item;
+  };
+
+  const vistos = new Set();
+  for (const [control, selector] of CONTROLES) {
+    for (const el of document.querySelectorAll(selector)) {
+      if (vistos.has(el)) continue;
+      vistos.add(el);
+      if (!visible(el)) continue;
+
+      const { fondo: exterior, degradado } = fondoDetras(el.parentElement || el);
+      if (degradado) {
+        indecidibles.push({ ruta: rutaDe(el), control, motivo: 'el control se apoya en una imagen o degradado' });
+        continue;
+      }
+
+      const yaEnError = el.getAttribute('aria-invalid') === 'true'
+        || (el.previousElementSibling && el.previousElementSibling.getAttribute
+            && el.previousElementSibling.getAttribute('aria-invalid') === 'true');
+      const estado = yaEnError ? 'error' : 'normal';
+
+      const base = medirBorde(el, exterior);
+      if (!base.peor) {
+        sinBorde.push({
+          ruta: rutaDe(el), control, estado,
+          motivo: 'sin borde pintado (ancho 0, style:none o color transparente): '
+                + 'el componente se identifica por otra cosa y esta reja no la mide',
+        });
+        continue;
+      }
+      anotar(el, control, estado, base);
+      if (yaEnError) continue;
+
+      // Sonda del estado de error: se marca, se relee y se deshace.
+      const deshacer = [];
+      const marcar = (n) => {
+        if (!n || !n.setAttribute) return;
+        deshacer.push([n, n.getAttribute('aria-invalid')]);
+        n.setAttribute('aria-invalid', 'true');
+      };
+      marcar(el);
+      marcar(el.previousElementSibling);
+      const conError = medirBorde(el, exterior);
+      const cambio = conError.colores !== base.colores;
+      for (const [n, v] of deshacer) {
+        if (v === null) n.removeAttribute('aria-invalid'); else n.setAttribute('aria-invalid', v);
+      }
+
+      if (!cambio) {
+        sinEstadoError.push({
+          ruta: rutaDe(el), control,
+          motivo: 'aria-invalid no cambia el borde: o el componente pinta el error '
+                + 'desde el servidor (estilo en línea) o no lo señala con el borde',
+        });
+        continue;
+      }
+      if (!conError.peor) {
+        sinBorde.push({ ruta: rutaDe(el), control, estado: 'error', motivo: 'en error el borde deja de pintarse' });
+        continue;
+      }
+      const it = anotar(el, control, 'error', conError);
+      it.sondeado = true;
+      it.ratioNormal = Math.round(base.peor.ratio * 100) / 100;
+      // Lo que motivó medir esto: un estado de error que se ve MENOS que el
+      // estado normal invierte el significado del indicador.
+      if (conError.peor.ratio < base.peor.ratio) it.peorQueNormal = true;
+    }
+  }
+
+  fallas.sort((a, b) => a.ratio - b.ratio);
+  return { medidos, fallas, sinBorde, indecidibles, sinEstadoError, cobertura };
+}
+"""
+
+# ── Contador de páginas fuera de `@page` (D1) ────────────────────────────────
+# `counter(page)` y `counter(pages)` SOLO resuelven dentro de las cajas de margen
+# de `@page` (`@bottom-right { content: … }`). Pedidos desde un ::before/::after
+# del documento —fijo o en el flujo— no degradan a vacío: degradan a un dato
+# FALSO. Así salió «Página 0 de 0» en las 4 hojas de un acta en Chromium y
+# «Página de» en Firefox (docs/VERIFICACION-NAVEGADOR.md, D1). No es un problema
+# de contraste, así que ninguna medición de color lo ve: se busca el patrón.
+# Las cajas de margen de `@page` no están en el DOM, así que la forma CORRECTA de
+# numerar no aparece acá y no da falso positivo.
+MEDIR_CONTADOR = r"""
+() => {
+""" + AYUDAS_JS + r"""
+  const fallas = [];
+  for (const el of document.querySelectorAll('*')) {
+    for (const cual of ['::before', '::after']) {
+      const ps = getComputedStyle(el, cual);
+      const c = ps.content || '';
+      if (!/counter\(\s*pages?\s*[,)]/.test(c) && !/counters\(\s*pages?\s*,/.test(c)) continue;
+      if (ps.display === 'none' || ps.visibility === 'hidden') continue;
+      const s = getComputedStyle(el);
+      if (s.display === 'none' || s.visibility === 'hidden') continue;
+      fallas.push({ ruta: rutaDe(el) + cual, content: c.slice(0, 120) });
+    }
+  }
+  return fallas;
+}
+"""
+
+# ── Transiciones apagadas antes de medir ─────────────────────────────────────
+# `getComputedStyle` durante una transición CSS devuelve el valor a MITAD de
+# camino, y justo después de cambiar un atributo devuelve el de ANTES. La sonda
+# del estado de error de la pasada de no-texto pone `aria-invalid` y relee el
+# borde en el mismo tick: con `transition: border-color var(--muni-dur)` releía
+# el borde normal y concluía «aria-invalid no cambia el borde».
+#
+# No es hipotético, y pasaba justo en la paleta donde vivía D11: `muni-ui.css`
+# lleva `--muni-dur: 0ms` bajo `prefers-reduced-motion`, pero `muni-ui-filament.css`
+# deja 160ms. Medido en `panel-claro.html`, casilla del checkbox con
+# aria-invalid: con transición, `rgb(144,129,91)` antes y DESPUÉS (sonda ciega);
+# sin transición, `rgb(144,129,91)` → `rgb(224,163,173)`. La reja daba el
+# checkbox y el combobox del panel como «sin estado de error» en vez de medirlos.
+# El mismo riesgo corría para el cambio de tema (150 ms de espera contra 160 ms de
+# transición) y para el paso a `media=print`.
+#
+# Solo `transition`, no `animation`: una animación con `fill-mode: forwards`
+# (un fundido de entrada) volvería a su estado inicial —opacidad 0— al quitarla,
+# y la reja dejaría de medir lo que la página sí muestra. Apagar una transición
+# no cambia el valor final, solo lo adelanta.
+SIN_TRANSICIONES = r"""
+() => {
+  const s = document.createElement('style');
+  s.setAttribute('data-a11y-reja', 'sin-transiciones');
+  s.textContent = '*, *::before, *::after { transition: none !important; }';
+  document.head.appendChild(s);
 }
 """
 
@@ -362,7 +638,24 @@ def hoja_de(r: dict) -> str:
 
 
 def falla(r: dict) -> bool:
+    return (
+        bool(r["contraste"])
+        or bool(r["axe_graves"])
+        or hidratacion_rota(r) is not None
+        or bool(r.get("no_texto"))
+        or bool(r.get("impresion_papel"))
+        or bool(r.get("impresion_tinta"))
+        or bool(r.get("impresion_contador"))
+    )
+
+
+def falla_pantalla(r: dict) -> bool:
     return bool(r["contraste"]) or bool(r["axe_graves"]) or hidratacion_rota(r) is not None
+
+
+def falla_impresion(r: dict) -> bool:
+    return (bool(r.get("impresion_papel")) or bool(r.get("impresion_tinta"))
+            or bool(r.get("impresion_contador")))
 
 
 def esperar_hidratacion(page) -> dict | None:
@@ -417,10 +710,33 @@ def revisar(pagina: Path, temas: list[str], axe_src: str, ctx) -> list[dict]:
             hoja = page.evaluate(
                 "() => document.documentElement.getAttribute('data-vitrina-hoja')"
             )
+            # DESPUÉS de hidratar —la vitrina abre cosas con Alpine y no se le
+            # toca nada hasta que avisa— y ANTES de cambiar tema, sondear estados
+            # o pasar a impresión. El porqué, medido, en SIN_TRANSICIONES.
+            page.evaluate(SIN_TRANSICIONES)
             propios = page.evaluate(APLICAR_TEMA, tema)
             page.wait_for_timeout(150)
 
-            contraste = page.evaluate(MEDIR_CONTRASTE)
+            contraste = page.evaluate(MEDIR_CONTRASTE, {"fondosApagados": False})
+
+            # No-texto (1.4.11) ANTES de axe: la sonda del estado de error toca
+            # `aria-invalid` y lo deshace, y axe no debe ver la página a medias.
+            no_texto = page.evaluate(MEDIR_NO_TEXTO)
+
+            # ── Pasada de impresión ───────────────────────────────────────────
+            # El paquete imprime: `<x-muni::hoja>` es una hoja carta con membrete
+            # y folio, y el municipio emite actas y oficios todos los días. Bajo
+            # `media=print` el CSS cambia entero —fuerza paleta clara, apaga
+            # sombras, esconde el cromo—, así que lo medido en pantalla no dice
+            # nada del papel. Se mide DOS veces, que son los dos casos reales del
+            # diálogo de impresión (ver el comentario de MEDIR_CONTRASTE).
+            page.emulate_media(media="print")
+            page.wait_for_timeout(200)
+            impr_papel = page.evaluate(MEDIR_CONTRASTE, {"fondosApagados": True})
+            impr_tinta = page.evaluate(MEDIR_CONTRASTE, {"fondosApagados": False})
+            impr_contador = page.evaluate(MEDIR_CONTADOR)
+            page.emulate_media(media="screen")
+            page.wait_for_timeout(100)
 
             page.add_script_tag(content=axe_src)
             axe = page.evaluate(
@@ -438,9 +754,25 @@ def revisar(pagina: Path, temas: list[str], axe_src: str, ctx) -> list[dict]:
         finally:
             page.close()
 
+        # Lo que falla SOLO con los fondos impresos, separado de lo que ya falla
+        # en papel blanco. No es cosmético: con D9 reintroducido en una copia, el
+        # total «con fondos» pasaba de 38 a 39 y parecía ruido, porque los
+        # títulos claros que fallaban sobre blanco pasaban a leerse sobre el fondo
+        # oscuro y salían de la lista a la vez que entraban 37 textos negros sobre
+        # `#0f2025`. Contado aparte, el mismo caso pasa de 2 a 39.
+        en_papel = {(f["ruta"], f["texto"]) for f in impr_papel["fallas"]}
+        solo_con_fondos = [f for f in impr_tinta["fallas"] if (f["ruta"], f["texto"]) not in en_papel]
+
         graves = [v for v in axe if v["impact"] in ("serious", "critical")]
+        # Una página de FUERA del repo —una copia con un defecto reintroducido a
+        # mano, que es como se comprueba que la reja mide y no imprime ceros— no
+        # tiene ruta relativa a la raíz y reventaba acá con un ValueError.
+        try:
+            nombre = str(pagina.relative_to(RAIZ))
+        except ValueError:
+            nombre = str(pagina)
         resultados.append({
-            "pagina": str(pagina.relative_to(RAIZ)),
+            "pagina": nombre,
             "tema": tema,
             "hoja": hoja,
             "hidratacion": hidratacion,
@@ -449,6 +781,18 @@ def revisar(pagina: Path, temas: list[str], axe_src: str, ctx) -> list[dict]:
             "contraste": contraste["fallas"],
             "indecidibles": contraste["indecidibles"],
             "decorativos": contraste["decorativos"],
+            "impresion_medidos": impr_papel["medidos"],
+            "impresion_papel": impr_papel["fallas"],
+            "impresion_tinta": impr_tinta["fallas"],
+            "impresion_solo_con_fondos": solo_con_fondos,
+            "impresion_decorativos": impr_papel["decorativos"],
+            "impresion_contador": impr_contador,
+            "no_texto_medidos": no_texto["medidos"],
+            "no_texto": no_texto["fallas"],
+            "no_texto_sin_borde": no_texto["sinBorde"],
+            "no_texto_sin_error": no_texto["sinEstadoError"],
+            "no_texto_indecidibles": no_texto["indecidibles"],
+            "no_texto_cobertura": no_texto["cobertura"],
             "axe_graves": graves,
             "axe_otros": [v for v in axe if v["impact"] not in ("serious", "critical")],
         })
@@ -522,22 +866,65 @@ def main() -> int:
                     filas.append(r)
                     marca = "FALLA" if falla(r) else "ok"
                     peor = f"{r['contraste'][0]['ratio']:.2f}" if r["contraste"] else "—"
+                    impr = (len(r["impresion_papel"]) + len(r["impresion_solo_con_fondos"])
+                            + len(r["impresion_contador"]))
                     print(f"  [{marca:5s}] {r['pagina']:34s} {r['tema']:5s} {hoja_de(r):20s} "
-                          f"texto={r['medidos']:4d} contraste↓={len(r['contraste']):3d} "
-                          f"peor={peor:6s} axe grave={len(r['axe_graves']):2d}")
+                          f"texto={r['medidos']:4d} pantalla↓={len(r['contraste']):3d} "
+                          f"peor={peor:6s} impresión↓={impr:3d} 1.4.11↓={len(r['no_texto']):2d} "
+                          f"axe grave={len(r['axe_graves']):2d}")
         finally:
             ctx.close()
             navegador.close()
 
+    # TRES TABLAS Y NO UNA. Una falla de impresión y una de pantalla no se
+    # arreglan en el mismo sitio —la primera vive en el bloque `@media print`, la
+    # segunda en los tokens de la paleta— y el contraste de un borde no es el de
+    # un texto. Mezcladas en una sola columna «bajo umbral» obligan a abrir el
+    # detalle para saber de qué se está hablando.
     print("\n" + "=" * 121)
+    print("PANTALLA — contraste de texto (WCAG 1.4.3) y axe-core")
+    print("-" * 121)
     print(f"{'Página':34s} {'Tema':6s} {'Paleta (hoja cargada)':21s} {'Textos':>7s} {'Bajo umbral':>12s} "
           f"{'Peor':>7s} {'axe grave':>10s} {'Veredicto':>10s}")
     print("-" * 121)
     for r in filas:
         peor = f"{r['contraste'][0]['ratio']:.2f}" if r["contraste"] else "—"
-        ok = not falla(r)
+        ok = not falla_pantalla(r)
         print(f"{r['pagina']:34s} {r['tema']:6s} {hoja_de(r):21s} {r['medidos']:7d} {len(r['contraste']):12d} "
               f"{peor:>7s} {len(r['axe_graves']):10d} {'pasa' if ok else 'FALLA':>10s}")
+    print("=" * 121)
+
+    print("\n" + "=" * 121)
+    print("IMPRESIÓN (media=print) — el mismo umbral, otro CSS. «papel» = gráficos de fondo")
+    print("apagados, todo el texto sobre blanco (lo que hace una impresora por omisión); «+fondos» =")
+    print("lo que falla SOLO si se marca «gráficos de fondo» (ahí vivía D9); «contador» =")
+    print("counter(page)/counter(pages) fuera de @page, que imprime «Página 0 de 0» (D1).")
+    print("-" * 121)
+    print(f"{'Página':34s} {'Tema':6s} {'Paleta (hoja cargada)':21s} {'Textos':>7s} "
+          f"{'papel↓':>7s} {'peor':>7s} {'+fondos↓':>9s} {'peor':>7s} {'contador':>9s} {'Veredicto':>10s}")
+    print("-" * 121)
+    for r in filas:
+        pp, pt = r["impresion_papel"], r["impresion_solo_con_fondos"]
+        peor_p = f"{pp[0]['ratio']:.2f}" if pp else "—"
+        peor_t = f"{pt[0]['ratio']:.2f}" if pt else "—"
+        ok = not falla_impresion(r)
+        print(f"{r['pagina']:34s} {r['tema']:6s} {hoja_de(r):21s} {r['impresion_medidos']:7d} "
+              f"{len(pp):7d} {peor_p:>7s} {len(pt):9d} {peor_t:>7s} {len(r['impresion_contador']):9d} "
+              f"{'pasa' if ok else 'FALLA':>10s}")
+    print("=" * 121)
+
+    print("\n" + "=" * 121)
+    print("NO-TEXTO (WCAG 1.4.11, mínimo 3:1) — borde de los controles de formulario contra")
+    print("su fondo adyacente, en estado normal y en estado de error. axe no mide esto.")
+    print("-" * 121)
+    print(f"{'Página':34s} {'Tema':6s} {'Paleta (hoja cargada)':21s} {'Bordes':>7s} {'Bajo 3:1':>9s} "
+          f"{'Peor':>7s} {'Sin borde':>10s} {'Veredicto':>10s}")
+    print("-" * 121)
+    for r in filas:
+        nt = r["no_texto"]
+        peor = f"{nt[0]['ratio']:.2f}" if nt else "—"
+        print(f"{r['pagina']:34s} {r['tema']:6s} {hoja_de(r):21s} {r['no_texto_medidos']:7d} {len(nt):9d} "
+              f"{peor:>7s} {len(r['no_texto_sin_borde']):10d} {'pasa' if not nt else 'FALLA':>10s}")
     print("=" * 121)
 
     hidratadas = [r for r in filas if r.get("hidratacion")]
@@ -554,6 +941,14 @@ def main() -> int:
                 print(f"      no abrió: {f}")
         print()
 
+    def detalle_texto(fallas: list[dict], etiqueta: str, tope: int = 12) -> None:
+        for f in fallas[:tope]:
+            print(f"   [{etiqueta}] contraste {f['ratio']:5.2f}:1 (mínimo {f['minimo']}) · "
+                  f"{f['px']}px/{f['peso']} · {f['color']} sobre {f['fondo']}\n"
+                  f"      {f['ruta']}\n      «{f['texto']}»")
+        if len(fallas) > tope:
+            print(f"   … y {len(fallas) - tope} más en [{etiqueta}] (usa --json para verlas todas)")
+
     fallidas = [r for r in filas if falla(r)]
     if fallidas:
         print("\nDetalle de lo que falla\n")
@@ -562,15 +957,66 @@ def main() -> int:
             roto = hidratacion_rota(r)
             if roto:
                 print(f"   {roto}")
-            for f in r["contraste"][:12]:
-                print(f"   contraste {f['ratio']:5.2f}:1 (mínimo {f['minimo']}) · {f['px']}px/{f['peso']} · "
-                      f"{f['color']} sobre {f['fondo']}\n"
-                      f"      {f['ruta']}\n      «{f['texto']}»")
-            if len(r["contraste"]) > 12:
-                print(f"   … y {len(r['contraste']) - 12} más (usa --json para verlas todas)")
+            detalle_texto(r["contraste"], "pantalla")
+            # La pasada de impresión va ETIQUETADA: el mismo selector puede pasar
+            # en pantalla y fallar en papel, y son dos arreglos distintos.
+            detalle_texto(r["impresion_papel"], "impresión·papel")
+            # Con fondos, solo lo que NO salió ya en papel: el mismo selector dos
+            # veces en el detalle no dice nada nuevo (el total está en el JSON).
+            detalle_texto(r["impresion_solo_con_fondos"], "impresión·+fondos")
+            for c in r["impresion_contador"]:
+                print(f"   [impresión·contador] counter(page) fuera de @page: imprime un número FALSO "
+                      f"(«Página 0 de 0»)\n      {c['ruta']}\n      content: {c['content']}")
+            for f in r["no_texto"]:
+                extra = " · SONDEADO poniendo aria-invalid" if f.get("sondeado") else ""
+                if f.get("peorQueNormal"):
+                    extra += (f" · MÁS INVISIBLE QUE EL ESTADO NORMAL "
+                              f"({f['ratio']:.2f} en error contra {f['ratioNormal']:.2f} normal)")
+                print(f"   [1.4.11·{f['estado']}] borde {f['ratio']:5.2f}:1 (mínimo {f['minimo']}) · "
+                      f"{f['control']} · lado {f['lado']} {f['ancho']}px {f['estilo']}{extra}\n"
+                      f"      {f['color']} sobre interior {f['interior']} ({f['contraInterior']:.2f}:1) "
+                      f"y exterior {f['exterior']} ({f['contraExterior']:.2f}:1)\n"
+                      f"      {f['ruta']}")
             for v in r["axe_graves"]:
                 print(f"   axe [{v['impact']}] {v['id']}: {v['help']} ({v['n']} nodo(s)) · {v['ejemplo'][:70]}")
             print()
+
+    # Lo que la pasada de no-texto NO pudo juzgar. No son fallas y no cuentan
+    # para el veredicto, pero se escriben en cada corrida: un control sin borde
+    # se identifica por otra cosa que esta reja no mide, y un control cuyo
+    # `aria-invalid` no cambia nada pinta su error en otro lado (o no lo pinta).
+    sin_borde: dict[tuple, set] = {}
+    sin_error: dict[tuple, set] = {}
+    for r in filas:
+        for d in r.get("no_texto_sin_borde", []):
+            sin_borde.setdefault((d["control"], d["ruta"], d["motivo"]), set()).add(r["pagina"])
+        for d in r.get("no_texto_sin_error", []):
+            sin_error.setdefault((d["control"], d["ruta"], d["motivo"]), set()).add(r["pagina"])
+    if sin_borde or sin_error:
+        print("\nNo-texto: lo que quedó sin juzgar (no cuenta para el veredicto)\n")
+        for (control, ruta, motivo), pags in sorted(sin_borde.items()):
+            print(f"   sin borde   · {control} · {motivo}\n      {ruta}\n      en: {', '.join(sorted(pags))}")
+        for (control, ruta, motivo), pags in sorted(sin_error.items()):
+            print(f"   sin estado de error · {control} · {motivo}\n      {ruta}\n      en: {', '.join(sorted(pags))}")
+        print()
+
+    # Cobertura: qué controles y qué estados se midieron de verdad. La lección de
+    # `alert`, que la vitrina renderiza con un solo tono y por eso los otros tres
+    # nunca se midieron, vale igual acá: un estado que no aparece en la página no
+    # se mide, y eso tiene que verse sin abrir el JSON.
+    cobertura: dict[str, dict[str, int]] = {}
+    for r in filas:
+        for control, est in (r.get("no_texto_cobertura") or {}).items():
+            acc = cobertura.setdefault(control, {"normal": 0, "error": 0})
+            for k, v in est.items():
+                acc[k] = acc.get(k, 0) + v
+    if cobertura:
+        print("No-texto: cobertura por control (suma de las páginas × temas medidos)\n")
+        for control in sorted(cobertura):
+            c = cobertura[control]
+            aviso = "" if c.get("error") else "   ← el estado de ERROR no se midió en ningún lado"
+            print(f"   {control:10s} normal={c.get('normal', 0):3d}  error={c.get('error', 0):3d}{aviso}")
+        print()
 
     # Textos decorativos: pasan el 3:1 de objeto gráfico pero no llegarían al umbral
     # de texto. No fallan —están fuera del árbol de accesibilidad— pero se listan en

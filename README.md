@@ -221,6 +221,8 @@ quedaban sin valor.
 | `<x-muni::sidebar>` | `width`; slot con `<x-muni::nav-section>` + `<x-muni::nav-item>` (colapsa en móvil) |
 | `<x-muni::nav-item>` | `href`, `icon`, `active`, `badge` |
 | `<x-muni::nav-section>` | `title` |
+| `<x-muni::nav-menu>` | `items` (obligatoria), `actual`, `label` — pinta el menú desde un árbol. El anfitrión pasa el árbol **ya filtrado** y el permiso **ya evaluado**: el paquete no consulta `Gate` ni `request()` |
+| `<x-muni::nav-grupo>` | `titulo` (obligatoria), `abierto`, `icono` — sección plegable con `aria-expanded` real; el plegado va `inert` |
 | `<x-muni::breadcrumb>` | `items` (array de `['label','url'?]`) |
 | `<x-muni::tooltip>` | `text`, `placement`, `describe`/`as` (Alpine) — la burbuja va `aria-hidden` por defecto: el nombre del botón va en su `aria-label`, no acá |
 | `<x-muni::popover>` | `id`, `label`, `align`, `width`, `closeLabel`; ranuras `trigger` y contenido — panel flotante sobre el atributo nativo `popover`; el slot admite un `<form method="get">` entero |

@@ -134,6 +134,16 @@ function ejemplosDeVitrina(): array
         // dropdown tenía aria-expanded sobre un <div> sin rol —axe critical— y nadie
         // lo veía porque no estaba acá. Van las dos formas del slot: la que el
         // componente envuelve en un <button> propio y la que trae su control.
+        // El menú declarativo y su grupo plegable: sin esto la reja no mide ni el
+        // ítem activo ni el rótulo del grupo, que son texto nuevo.
+        'nav-menu' => '<x-muni::nav-menu actual="licencias.anular" :items="['
+            .'[\'etiqueta\' => \'Escritorio\', \'href\' => \'#\', \'clave\' => \'escritorio\'],'
+            .'[\'tipo\' => \'grupo\', \'etiqueta\' => \'Licencias\', \'clave\' => \'licencias\', \'items\' => ['
+            .'[\'etiqueta\' => \'Anular licencia\', \'href\' => \'#\', \'clave\' => \'licencias.anular\'],'
+            .'[\'etiqueta\' => \'Exámenes médicos\', \'href\' => \'#\', \'clave\' => \'licencias.examenes\'],'
+            .']],'
+            .'[\'etiqueta\' => \'Patentes morosas\', \'href\' => \'#\', \'clave\' => \'patentes\', \'badge\' => 12, \'badgeLabel\' => \'12 pendientes\'],'
+            .']" />',
         'dropdown' => '<x-muni::dropdown label="Acciones del giro">'
             .'<x-muni::dropdown-item href="#">Ver expediente</x-muni::dropdown-item>'
             .'<x-muni::dropdown-item href="#">Imprimir orden</x-muni::dropdown-item>'

@@ -2,7 +2,7 @@
   "$schema": "https://muni-graneros.github.io/laravel-muni-ui/registry.schema.json",
   "name": "laravel-muni-ui",
   "homepage": "https://github.com/muni-graneros/laravel-muni-ui",
-  "baseVersion": "0.17.1",
+  "baseVersion": "0.18.0",
   "namespace": "muni",
   "usage": "Los componentes se usan como <x-muni::NOMBRE>. No requieren registro manual: el service provider del paquete declara el namespace.",
   "rules": [
@@ -885,11 +885,11 @@
         "--muni-border",
         "--muni-border-2",
         "--muni-danger-bg",
-        "--muni-danger-border",
         "--muni-danger-fg",
         "--muni-dur",
         "--muni-ease",
         "--muni-field-border",
+        "--muni-field-border-error",
         "--muni-focus",
         "--muni-font-sans",
         "--muni-muted",
@@ -1029,11 +1029,11 @@
         "--muni-border",
         "--muni-combo-ancla",
         "--muni-danger-bg",
-        "--muni-danger-border",
         "--muni-danger-fg",
         "--muni-dur",
         "--muni-ease",
         "--muni-field-border",
+        "--muni-field-border-error",
         "--muni-focus",
         "--muni-font-mono",
         "--muni-font-sans",
@@ -1648,7 +1648,7 @@
       "tag": "<x-muni::dropdown-item>",
       "type": "registry:blade-component",
       "file": "resources/views/components/dropdown-item.blade.php",
-      "description": "Componente dropdown-item del sistema de diseño municipal",
+      "description": "ROVING TABINDEX:",
       "props": [
         {
           "name": "href",
@@ -1676,8 +1676,10 @@
         }
       ],
       "alpine": {
-        "required": false,
-        "directives": [],
+        "required": true,
+        "directives": [
+          "x-data"
+        ],
         "plugins": []
       },
       "tokens": [
@@ -1738,10 +1740,14 @@
           "x-data",
           "x-effect",
           "x-muni",
+          "x-ref",
           "x-show",
-          "x-transition"
+          "x-transition",
+          "x-trap"
         ],
-        "plugins": []
+        "plugins": [
+          "focus"
+        ]
       },
       "tokens": [
         "--muni-accent",
@@ -2692,6 +2698,59 @@
       "example": "<x-muni::modal maxWidth=\"480px\"></x-muni::modal>"
     },
     {
+      "name": "nav-grupo",
+      "tag": "<x-muni::nav-grupo>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/nav-grupo.blade.php",
+      "description": "Grupo plegable de ítems de menú",
+      "props": [
+        {
+          "name": "titulo",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "abierto",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "icono",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::nav-grupo :titulo=\"$titulo\"></x-muni::nav-grupo>"
+    },
+    {
       "name": "nav-item",
       "tag": "<x-muni::nav-item>",
       "type": "registry:blade-component",
@@ -2751,6 +2810,64 @@
         "--muni-text"
       ],
       "example": "<x-muni::nav-item href=\"#\"></x-muni::nav-item>"
+    },
+    {
+      "name": "nav-menu",
+      "tag": "<x-muni::nav-menu>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/nav-menu.blade.php",
+      "description": "El menú lateral completo, pintado desde un árbol de configuración",
+      "props": [
+        {
+          "name": "items",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "actual",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Navegación principal",
+          "required": false
+        },
+        {
+          "name": "nivel",
+          "type": "int",
+          "default": "0",
+          "required": false
+        },
+        {
+          "name": "prefijo",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-hint",
+        "--muni-muted",
+        "--muni-on-accent",
+        "--muni-surface-3"
+      ],
+      "example": "<x-muni::nav-menu :items=\"$items\" />"
     },
     {
       "name": "nav-section",
@@ -3276,9 +3393,8 @@
         "plugins": []
       },
       "tokens": [
-        "--muni-border",
-        "--muni-danger-border",
         "--muni-danger-fg",
+        "--muni-field-border",
         "--muni-field-border-error",
         "--muni-font-mono",
         "--muni-font-sans"

@@ -10,7 +10,7 @@ pantalla.
 
 **Este documento se poda a medida que se cierra trabajo.** Las seis fichas de la primera tanda ya
 salieron del cuerpo, las siete de la segunda y tres de la tercera también. Están resumidas en la
-sección 0 con su commit. **Quedan 30 pendientes.** Si una ficha sigue acá, sigue sin hacerse.
+sección 0 con su commit. **Quedan 28 pendientes.** Si una ficha sigue acá, sigue sin hacerse.
 
 ## Antes de leer: dos advertencias sobre este documento
 
@@ -53,6 +53,7 @@ acá con su commit para no volver a proponerlas y para poder auditar qué cerró
 | `pagination` | `5881996` | Los extremos inertes dejan de ser enlaces, el apagado sale de un token y la página actual lleva aria-current. |
 | `timeline` | `09cbf98` | El estado del hito deja de vivir solo en el color: etiqueta visible, más actor, aria-current=step, datetime ISO y el detalle en <details> nativo. |
 | `diff-campos` (era parte de `bitacora-auditoria`) | `4d52ab2` | La tabla antes/después por campo, con agregado/modificado/suprimido legibles en texto. La pantalla completa sale del paquete: va en laravel-arcop-panel. |
+| `nav-menu` + `nav-grupo` | `3e628ea` | El menú sale de un árbol con la regla de activo escrita una vez. El paquete no consulta permisos: los recibe ya evaluados, y esconder un ítem es cosmético, nunca autorización. |
 | `dashboard-shell` + `sidebar` | `eb446a0` | El menú móvil no abría —el burger tenía @click sin ningún x-data antecesor— y la lateral cerrada seguía recibiendo el foco. Reproducido en vivo: Tab aterrizaba en un enlace a x=-228px. |
 | `field` (prop muerta) | `d79d390` | Medido: cero consumidores pasan `name`. Se documenta como aceptada y sin efecto; emitir un `for` colgando habría convertido un contrato roto e inofensivo en una falla real de 4.1.2. |
 | `hoja` (era `doc-imprimible`) | `b12f1db` | El paquete aprende a imprimir: hoja carta con membrete, folio, firma y pie numerado, más las reglas base de @media print en las dos hojas de estilo. Sin plantillas de certificado, acta ni oficio: esas las fija la Ley 19.880 y el municipio. |
@@ -179,8 +180,6 @@ ecosistema ya tiene nueve.
 | `densidad` | 4 | Un modo compacto global que reduce alto de fila y de control para que quepan más registros, si… | La bandeja de solicitudes de Atención al Vecino y el listado de patentes morosas, donde el fun… | alto |
 | `gob-escudo` | 4 | Que el escudo municipal se lea en los dos temas sin el parche del recuadro blanco. | La cabecera de la central de cámaras en turno de noche; y el certificado de residencia que se … | bajo |
 | `kbd` | 5 | Mostrar en pantalla la tecla o la combinación de un atajo. | El pie de la paleta de comandos del panel de licencias y la ayuda de atajos del mesón de atenc… | bajo |
-| `nav-grupo` | — | Agrupar ítems del menú en una sección plegable que declara su estado y se abre sola cuando la … | El panel de Seguridad Ciudadana, donde Cámaras, Rondas y Denuncias cuelgan de «Operaciones» y … | bajo |
-| `nav-menu` | — | Pintar el menú lateral completo desde un árbol de configuración, filtrando por permiso y marca… | El menú del panel de Licencias, donde «Exámenes médicos» solo lo ve el rol Médico y «Anular li… | medio |
 | `tabs-ruta` | — | Solapas que llevan a rutas distintas, sin cargar todos los paneles ni perder el estado al nave… | La ficha del vecino en Atención al Vecino (Solicitudes · Documentos · Historial de contactos),… | bajo |
 
 ### `alert`
@@ -394,38 +393,6 @@ ecosistema ya tiene nueve.
 > **Objeción del juez.** Un rótulo desincronizado es peor que ningún rótulo, y un componente independiente no puede evitarlo. Si la vista escribe a mano `<x-muni::kbd>Ctrl K</x-muni::kbd>` y alguien pasa `hotkey="p"` a la paleta, el funcionario del mesón teclea un atajo que no existe y concluye que el sistema está malo. El propio candidato identifica que «el rótulo y el manejador tienen que salir de la misma fuente», pero eso es una responsabilidad de `command-palette` (que ya recibe `hotkey` como prop), no de un `<span>` sin lógica: crear el componente #55 da la ilusión de haber resuelto el problema sin tocar la causa.
 >
 > **Corrección exigida.** 1) Bajar el alcance: no crear un componente Blade nuevo. Definir `.muni-kbd` en el `@once <style>` de `command-palette.blade.php` —mismo patrón que `.muni-num` en `data-table.blade.php:40`— y reemplazar con ella el `style` en línea de la línea 45, que hoy duplica esos valores. 2) Mover la sincronía a donde vive el dato: que `command-palette` renderice el rótulo del atajo a partir de su propia prop `hotkey` en un `trigger` por defecto, para que rótulo y manejador salgan de la misma fuente. 3) Accesibilidad del símbolo: `<kbd>` no tiene rol ARIA implícito, así que nada de `aria-label` encima; el símbolo va con `aria-hidden="true"` y el texto («Command K», «Control K») como contenido visible o en un `sr-only`. 4) Sin relieve: sombra cero, borde 1px `var(--muni-border)`, como ya está — no copiar la variable de relieve de daisyUI; y si se quiere cubrir la impresión, la regla `@media print` corresponde a una hoja de impresión del paquete (hoy inexistente), no a este parche. 5) Coherencia de esfuerzo: `alpine: no` solo es cierto si se rotula una convención institucional fija. Detectar Mac vs Windows obliga a un `x-data` con `navigator.userAgentData?.platform ?? navigator.platform` y `x-text`, y entonces el esfuerzo declarado «bajo» sube a medio; decidirlo antes de estimar, no después. 6) Corregir `ya_existe_parcial`: `otp-input` y `segmented` no rotulan atajos; el único consumidor real es `command-palette`.
-
-### `nav-grupo`
-
-**componente nuevo** · **sin evaluar por un juez** · esfuerzo bajo
-
-**Qué resuelve.** Agrupar ítems del menú en una sección plegable que declara su estado y se abre sola cuando la página actual está dentro.
-**Qué pasa hoy sin él.** nav-section pinta un rótulo y nada más: no pliega. Con Licencias, Patentes, Discapacidad, Seguridad, Control de Acceso y Transparencia conviviendo en el mismo panel la lista no cabe en pantalla, y hoy se resuelve dejándola toda abierta con scroll, o partiendo el menú en varios layouts.
-**Lo más parecido que ya existe.** accordion es lo más cercano pero es de contenido (recibe items como array), no envuelve nav-item, y arrastra sus propios defectos: cabecera y panel sin id/aria-controls, panel sin role=region, chevron sin aria-hidden.
-**Referencia que lo hace mejor.** AdminLTE 4 — refs/ColorlibHQ_AdminLTE/src/ts/treeview.ts (estado) y Sneat Vuetify — themeselection_sneat-vuetify-vuejs-admin-template-free/typescript-version/src/@layouts/components/VerticalNavGroup.vue (animación) — AdminLTE es el único del lote que estampa aria-expanded y lo mantiene sincronizado, y su modo acordeón cierra los hermanos excluyendo correctamente el propio elemento y sus descendientes (el bug clásico). De Sneat se toma grid-template-rows: 0fr → 1fr, que anima sin medir alturas: la variante Next mide en JS y fuerza cuatro reflujos por apertura, inaceptable para el INP que exigimos.
-**Patrón.** disclosure
-**Teclas obligatorias.** Tab hasta el disparador; Enter; Space; el contenido plegado no recibe Tab
-**Alpine.** core
-**Riesgo.** El grupo tiene que abrirse EN SERVIDOR cuando contiene la ruta activa: si se deja a Alpine, en la primera pintura el ítem activo está oculto y con wire:navigate se ve el salto. grid-template-rows animado necesita overflow:hidden en el hijo o enfocar un enlace todavía oculto provoca scroll fantasma. La transición debe usar var(--muni-dur), no un literal, o repetimos el defecto de drawer y progress.
-**Dónde se usa.** El panel de Seguridad Ciudadana, donde Cámaras, Rondas y Denuncias cuelgan de «Operaciones» y el operador entra directo a la cámara sin ver el resto.
-
-> **Sin juez.** El evaluador de este candidato no alcanzó a correr. La ficha es la propuesta del analista, sin contraste.
-
-### `nav-menu`
-
-**componente nuevo** · **sin evaluar por un juez** · esfuerzo medio
-
-**Qué resuelve.** Pintar el menú lateral completo desde un árbol de configuración, filtrando por permiso y marcando el activo con una regla única y explícita.
-**Qué pasa hoy sin él.** Hoy cada sistema escribe a mano su lista de <x-muni::nav-item> en el layout, con @can(...) alrededor de cada uno y :active="request()->routeIs('licencias.*')" copiado ítem por ítem. Seis sistemas por ~15 ítems: la regla de «activo» se escribe casi cien veces y ya diverge (unos usan routeIs, otros request()->is(), otros la URL completa), así que el ítem marcado y las migas no siempre coinciden. El contador de pendientes se resuelve con una consulta suelta en el layout, una por ítem, en cada página.
-**Lo más parecido que ya existe.** nav-item y nav-section cubren el ítem y el rótulo, y nav-item lo hace bien (aria-current=page, :focus-visible con outline-offset:-2px, activo por color+peso+ARIA). No hay nada por encima: ni fuente de datos, ni filtro por permiso, ni <nav> con nombre accesible. Y nav-section pinta el rótulo como un <div> suelto, sin role=group ni aria-labelledby: la sección no existe para el lector.
-**Referencia que lo hace mejor.** CoreUI — refs/coreui_coreui-free-bootstrap-admin-template/src/pug/_partials/sidebar-nav.pug (modelo de datos con cuatro tipos de nodo) y Sneat — themeselection_sneat-bootstrap-html-laravel-admin-template-free/resources/views/layouts/sections/menu/verticalMenu.blade.php (resolución del activo en servidor) — Son las dos únicas del catálogo que resuelven el árbol entero EN EL SERVIDOR y llegan al navegador con el HTML ya decidido: sin JS que marque el activo, sin parpadeo y compatible con wire:navigate. Sneat además es Blade sobre Laravel, con el árbol compartido desde un service provider en boot(). Su capa accesible es inservible (cero aria-current, disparadores con javascript:void(0)), pero eso ya lo aporta nuestro nav-item.
-**Patrón.** ninguno: es navegación (landmark nav + lista); los grupos plegables son disclosure. NO es el patrón menu
-**Teclas obligatorias.** Tab entre enlaces; Enter; Enter/Space en el disparador del grupo; ninguna flecha (no es role=menu)
-**Alpine.** no (el activo se resuelve en PHP); core solo si se incluyen grupos plegables
-**Riesgo.** Poner el permiso en la vista tienta a usarlo como control de acceso: el filtro del menú es COSMÉTICO, la autorización sigue en la policy y el middleware de la ruta, y hay que decirlo en la doc o alguien va a «proteger» un endpoint escondiéndolo del menú. El contador debe recibirse ya calculado o cacheado en Redis, nunca resolverse dentro del componente, o se paga una consulta por ítem en cada página. El número del contador necesita texto accesible: hoy el lector anuncia «Solicitudes 12» sin decir qué son doce.
-**Dónde se usa.** El menú del panel de Licencias, donde «Exámenes médicos» solo lo ve el rol Médico y «Anular licencia» solo el Jefe de Tránsito, y el ítem «Solicitudes» lleva el contador de las que esperan en el mesón.
-
-> **Sin juez.** El evaluador de este candidato no alcanzó a correr. La ficha es la propuesta del analista, sin contraste.
 
 ### `tabs-ruta`
 

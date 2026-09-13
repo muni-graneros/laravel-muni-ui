@@ -142,6 +142,126 @@ function ejemplosDeVitrina(): array
             .'<button type="button" class="muni-btn" aria-label="Anular el giro de la patente"'
             .' aria-describedby="vitrina-tt">Anular</button>'
             .'</x-muni::tooltip>',
+        // `sidebar` EN MODO COLUMNA, y por eso sí puede ir acá: por encima de su
+        // punto de quiebre no atrapa el foco ni aísla nada —atraparlo dejaría al
+        // funcionario encerrado en el menú—, así que convive con las otras
+        // tarjetas sin taparlas ni volverlas `aria-hidden`. El modo SUPERPUESTO,
+        // que es el que sí atrapa, vive en su propia página (ver
+        // `ejemplosDeDialogo()`). Va al final para no correr el reparto par/impar
+        // de las tarjetas que ya estaban: quién cae sobre `--muni-surface-3`
+        // decide qué defecto se mide, y eso no se toca al agregar piezas.
+        'sidebar' => '<x-muni::sidebar id="vitrina-sidebar-columna" label="Navegación del sistema">'
+            .'<x-muni::nav-section title="Trámites">'
+            .'<x-muni::nav-item href="#" active badge="12">Bandeja de entrada</x-muni::nav-item>'
+            .'<x-muni::nav-item href="#" badge="3">Observadas</x-muni::nav-item>'
+            .'</x-muni::nav-section>'
+            .'<x-muni::nav-section title="Administración">'
+            .'<x-muni::nav-item href="#">Usuarios</x-muni::nav-item>'
+            .'</x-muni::nav-section>'
+            .'</x-muni::sidebar>',
+        // EL ESTADO DE ERROR de los tres controles que lo pintan desde el servidor.
+        // `select` y `textarea` ponen el borde de error con estilo EN LÍNEA, y
+        // `switch` ni siquiera cambia la pista: la pasada de no-texto de la reja
+        // sondea el error poniendo `aria-invalid` en el navegador, y en estos tres
+        // no se mueve nada. Sin una instancia que ya nazca en error, ese estado no
+        // se medía en ningún lado —la reja lo decía en su tabla de cobertura— y
+        // D11 (el borde en error menos visible que el normal) podía volver en
+        // cualquiera de los tres sin que nadie lo viera. Los de arriba se quedan
+        // en estado normal: cambiarlos a error borraría la medición del otro estado.
+        //
+        // Nombres de campo propios: con el mismo `name` que las instancias normales
+        // saldrían ids duplicados y axe levantaría un `duplicate-id` del banco.
+        // Van al final por lo mismo que `sidebar`: no correr el reparto par/impar.
+        // La clave lleva `#error` porque es una VARIANTE de la pieza, no otra
+        // pieza: el rótulo la muestra como `<x-muni::select> en error`.
+        'select#error' => '<x-muni::select label="Tipo de trámite" name="tramite_observado"'
+            .' :options="[\'a\' => \'Licencia clase B\', \'b\' => \'Renovación\']"'
+            .' hint="Elige el trámite" :error="\'Elige un trámite de la lista.\'" />',
+        'textarea#error' => '<x-muni::textarea label="Descripción del requerimiento" name="detalle_observado"'
+            .' hint="Cuenta qué pasó" :maxlength="500" :error="\'La descripción es obligatoria.\'" />',
+        'switch#error' => '<x-muni::switch label="Acepto recibir notificaciones" name="avisos_observado"'
+            .' description="Obligatorio para seguir el trámite en línea" :error="\'Debes aceptar para continuar.\'" />',
+    ];
+}
+
+/**
+ * El rótulo visible de una tarjeta: `<x-muni::select>`, o `<x-muni::select> en
+ * error` para la variante `select#error`. Ya escapado para ir dentro de un <h2>.
+ */
+function rotuloDePieza(string $nombre): string
+{
+    [$componente, $variante] = array_pad(explode('#', $nombre, 2), 2, null);
+
+    return '&lt;x-muni::'.$componente.'&gt;'.($variante !== null ? ' en '.$variante : '');
+}
+
+/**
+ * Los CUATRO que atrapan el foco, uno por página y por un motivo medido.
+ *
+ * `modal`, `drawer`, `command-palette` y `sidebar` (en su modo superpuesto) usan
+ * `x-trap.inert` del plugin Focus de Alpine. Ese modificador no es cosmético: al
+ * abrirse, el plugin recorre el árbol desde el diálogo hasta <body> y estampa
+ * `aria-hidden="true"` en TODO lo que quede a los lados. Consecuencias medidas
+ * sobre la propia reja, y por eso estos cuatro NO pueden compartir página con las
+ * tarjetas de `ejemplosDeVitrina()`:
+ *
+ *   · el medidor de contraste trata lo que cuelga de un `aria-hidden="true"` como
+ *     decorativo y le baja el umbral de 4,5:1 a 3:1 (es la política del docstring
+ *     de `scripts/a11y-check.py`). Abrir un modal sobre la vitrina entera
+ *     degradaría de golpe el umbral de todas las demás tarjetas: la reja seguiría
+ *     verde midiendo los mismos textos con la vara más blanda. Un retroceso en
+ *     silencio, que es justo lo que esta vitrina existe para no permitir.
+ *   · axe-core no entra en un subárbol `aria-hidden`: dejaría de revisar todo lo
+ *     demás de la página.
+ *   · y entre ellos se aíslan mutuamente —los tres se teletransportan a <body> y
+ *     son hermanos—, así que dos abiertos a la vez se tapan el uno al otro.
+ *
+ * Una página por diálogo, entonces. Cada una lleva el disparador real del
+ * componente (el `trigger`), que es superficie visible en producción, y el abridor
+ * la abre por la API pública y comprueba que la trampa AISLÓ de verdad: si el
+ * plugin Focus no llegó, `x-trap` es una directiva desconocida, Alpine la ignora
+ * sin decir nada y el diálogo se abre igual pero sin atrapar el foco. Sin esa
+ * comprobación la reja daría verde sobre un diálogo que no atrapa nada.
+ */
+function ejemplosDeDialogo(): array
+{
+    return [
+        'modal' => '<x-muni::modal id="vitrina-modal" title="Anular el giro 4821">'
+            .'<x-slot:trigger><x-muni::button>Anular giro</x-muni::button></x-slot:trigger>'
+            .'<p>El giro queda sin efecto y la anulación se registra en la bitácora '
+            .'con tu nombre y la hora. No se puede deshacer desde el panel.</p>'
+            .'<x-slot:footer><x-muni::button variant="ghost">Cancelar</x-muni::button>'
+            .'<x-muni::button>Anular el giro</x-muni::button></x-slot:footer>'
+            .'</x-muni::modal>',
+        'drawer' => '<x-muni::drawer id="vitrina-drawer" title="Solicitud 4821 — Ana Soto">'
+            .'<x-slot:trigger><x-muni::button variant="ghost">Ver detalle</x-muni::button></x-slot:trigger>'
+            .'<p>Ingresada el 8 de septiembre por Ventanilla Única. Derivada a la '
+            .'Dirección de Obras con el certificado de dominio adjunto.</p>'
+            .'<x-muni::badge tone="warn">Por vencer</x-muni::badge>'
+            .'<x-slot:footer><x-muni::button variant="ghost">Cerrar</x-muni::button>'
+            .'<x-muni::button>Derivar</x-muni::button></x-slot:footer>'
+            .'</x-muni::drawer>',
+        'command-palette' => '<x-muni::command-palette :items="['
+            .'[\'label\' => \'Bandeja de entrada\', \'url\' => \'#bandeja\', \'group\' => \'Trámites\'],'
+            .'[\'label\' => \'Patentes morosas\', \'url\' => \'#patentes\', \'group\' => \'Rentas\'],'
+            .'[\'label\' => \'Usuarios del sistema\', \'url\' => \'#usuarios\', \'group\' => \'Administración\'],'
+            .']">'
+            .'<x-slot:trigger><x-muni::button variant="ghost">Buscar (Ctrl+K)</x-muni::button></x-slot:trigger>'
+            .'</x-muni::command-palette>',
+        // La MISMA lateral de la vitrina, pero con el punto de quiebre por encima
+        // del ancho del navegador de la reja (1280): así entra en modo superpuesto
+        // —velo, trampa de foco, Escape y devolución del foco— que es el modo que
+        // nunca se había medido. Se fuerza por la prop pública `breakpoint`, no
+        // encogiendo la ventana: el ancho de la reja es suyo y no se toca desde acá.
+        'sidebar' => '<x-muni::sidebar id="vitrina-sidebar" breakpoint="2000" label="Navegación principal">'
+            .'<x-muni::nav-section title="Trámites">'
+            .'<x-muni::nav-item href="#" active badge="12">Bandeja de entrada</x-muni::nav-item>'
+            .'<x-muni::nav-item href="#" badge="3">Observadas</x-muni::nav-item>'
+            .'</x-muni::nav-section>'
+            .'<x-muni::nav-section title="Administración">'
+            .'<x-muni::nav-item href="#">Usuarios</x-muni::nav-item>'
+            .'</x-muni::nav-section>'
+            .'</x-muni::sidebar>',
     ];
 }
 
@@ -176,10 +296,58 @@ function fuenteDeAlpine(): ?string
 
     $candidatos[] = __DIR__.'/../node_modules/alpinejs/dist/cdn.min.js';
 
+    // El glob del núcleo NO puede tragarse la copia del plugin: los dos archivos
+    // viven en la misma caché y `alpine-*.min.js` casa también con
+    // `alpine-focus-3.17.2.min.js`. Cargar el plugin donde va el núcleo deja la
+    // página sin Alpine y con un «Alpine is not defined» que nadie lee.
     foreach (glob(__DIR__.'/../scripts/.cache/alpine-*.min.js') ?: [] as $cacheada) {
+        if (! str_contains(basename($cacheada), 'alpine-focus-')) {
+            $candidatos[] = $cacheada;
+        }
+    }
+
+    return primeraFuenteEnDisco($candidatos);
+}
+
+/**
+ * El plugin Focus (`@alpinejs/focus`) horneado, o null si no hay copia en disco.
+ *
+ * Por qué hace falta: `modal`, `drawer`, `command-palette` y `sidebar` usan
+ * `x-trap.inert.noscroll`, que es una directiva del PLUGIN, no del núcleo. Y acá
+ * está el detalle que obliga a comprobarlo en el navegador: si el plugin no está,
+ * Alpine no se queja —una directiva desconocida se ignora en silencio—, el
+ * diálogo se abre igual porque el `x-show` es del núcleo, y la reja mediría un
+ * diálogo que NO atrapa el foco dando verde. Por eso el abridor no se conforma
+ * con que el panel tenga alto: exige la prueba de que la trampa aisló el resto
+ * de la página (ver `abridorDeVitrina`).
+ *
+ * Se resuelve igual que el núcleo —$MUNI_ALPINE_FOCUS_JS, node_modules,
+ * scripts/.cache— y NUNCA de un CDN, por lo mismo: la reja corre sin red.
+ *
+ * Va SIEMPRE ANTES del núcleo. Es como lo pide Alpine: los plugins se registran
+ * sobre `window.Alpine` antes de que el núcleo llame a `start()`, y el build de
+ * CDN del núcleo arranca solo en un microtask de su propio <script>. Al revés, el
+ * plugin llegaría tarde y `x-trap` no existiría al hidratar.
+ */
+function fuenteDeFocus(): ?string
+{
+    $candidatos = [];
+
+    if ($ruta = getenv('MUNI_ALPINE_FOCUS_JS')) {
+        $candidatos[] = $ruta;
+    }
+
+    $candidatos[] = __DIR__.'/../node_modules/@alpinejs/focus/dist/cdn.min.js';
+
+    foreach (glob(__DIR__.'/../scripts/.cache/alpine-focus-*.min.js') ?: [] as $cacheada) {
         $candidatos[] = $cacheada;
     }
 
+    return primeraFuenteEnDisco($candidatos);
+}
+
+function primeraFuenteEnDisco(array $candidatos): ?string
+{
     foreach ($candidatos as $candidato) {
         if (is_file($candidato)) {
             return (string) file_get_contents($candidato);
@@ -210,21 +378,122 @@ function abridorDeVitrina(): string
 {
     return <<<'JS'
     (() => {
-        const estado = { alpine: null, xdata: 0, abiertos: [], fallos: [] };
+        const estado = { alpine: null, xdata: 0, dialogo: null, abiertos: [], fallos: [] };
 
+        /* Qué diálogo espera ESTA página, o null si es la vitrina general. Lo
+           declara el <html>, así que una página de diálogo que se quede sin su
+           componente no pasa de largo: abajo se exige que abra. */
+        const dialogo = document.documentElement.getAttribute('data-vitrina-dialogo');
+        estado.dialogo = dialogo;
+
+        /* No basta con «tiene alto»: la lateral cerrada mide 720px de alto y está
+           fuera de la pantalla por translateX(-100%), y un panel con
+           visibility:hidden u opacidad 0 tampoco lo mide el medidor de contraste.
+           Se exige lo mismo que exige la reja para contar un texto: visible, con
+           caja, y dentro del ancho de la ventana. */
         const anota = (nombre, el) => {
-            const alto = el ? Math.round(el.getBoundingClientRect().height) : 0;
-            if (alto > 0) { estado.abiertos.push(nombre + ' ' + alto + 'px'); }
-            else { estado.fallos.push(nombre + ': quedó en 0px, no se está midiendo'); }
+            if (! el) { estado.fallos.push(nombre + ': no existe en el DOM, no se está midiendo'); return; }
+            const cs = getComputedStyle(el);
+            const caja = el.getBoundingClientRect();
+            const alto = Math.round(caja.height);
+            if (cs.visibility === 'hidden' || cs.display === 'none' || parseFloat(cs.opacity) === 0) {
+                estado.fallos.push(nombre + ': está en el DOM pero oculto (' + cs.visibility + '/' + cs.display
+                    + '/opacidad ' + cs.opacity + '), no se está midiendo');
+                return;
+            }
+            if (caja.right <= 0 || caja.left >= window.innerWidth) {
+                estado.fallos.push(nombre + ': quedó fuera de la pantalla (izquierda ' + Math.round(caja.left)
+                    + 'px), no se está midiendo');
+                return;
+            }
+            if (alto <= 0) { estado.fallos.push(nombre + ': quedó en 0px, no se está midiendo'); return; }
+            estado.abiertos.push(nombre + ' ' + alto + 'px');
         };
 
         const conCuidado = (nombre, fn) => {
             try { fn(); } catch (error) { estado.fallos.push(nombre + ': ' + error.message); }
         };
 
+        /* La raíz Alpine de una tarjeta, por su nombre de pieza. Se abre por la API
+           pública del componente (`Alpine.$data(raiz)` y los métodos que declara su
+           propio Blade), nunca tocando clases ni estilos: si el componente cambia
+           de forma de abrirse, esto se rompe en vez de mentir. */
+        const raizDe = (pieza) => {
+            const el = document.querySelector('[data-pieza="' + pieza + '"] [x-data]');
+            if (! el) { throw new Error('no hay raíz [x-data] en la tarjeta'); }
+            return window.Alpine.$data(el);
+        };
+
+        /* Los cuatro que atrapan el foco: cómo se abre cada uno y qué tiene que
+           quedar midiéndose. Uno por página: ver `ejemplosDeDialogo()`. */
+        const DIALOGOS = {
+            'modal': {
+                abre: () => { raizDe('modal').open = true; },
+                mide: () => {
+                    anota('modal/panel', document.querySelector('#vitrina-modal'));
+                    anota('modal/título', document.querySelector('#vitrina-modal-title'));
+                    anota('modal/pie', document.querySelector('#vitrina-modal footer'));
+                },
+            },
+            'drawer': {
+                abre: () => { raizDe('drawer').open = true; },
+                mide: () => {
+                    anota('drawer/panel', document.querySelector('[role="dialog"][aria-labelledby="vitrina-drawer-title"]'));
+                    anota('drawer/título', document.querySelector('#vitrina-drawer-title'));
+                    anota('drawer/pie', document.querySelector('[role="dialog"][aria-labelledby="vitrina-drawer-title"] footer'));
+                },
+            },
+            'command-palette': {
+                /* `show()` es el método que el propio componente expone y el que
+                   llama su disparador y el atajo Ctrl+K. */
+                abre: () => { raizDe('command-palette').show(); },
+                mide: () => {
+                    anota('command-palette/panel', document.querySelector('[role="dialog"][aria-label="Paleta de comandos"]'));
+                    /* Las filas viven dentro de un <template x-for>: sin Alpine no
+                       llegan al DOM y sin abrir no se pintan. */
+                    anota('command-palette/resultado', document.querySelector('a[href="#bandeja"]'));
+                    anota('command-palette/grupo del resultado', document.querySelector('a[href="#patentes"] span:last-child'));
+                },
+            },
+            'sidebar': {
+                /* Por el evento `muni-sidebar`, que es el contrato que el propio
+                   componente documenta para el hamburguesa del armazón. */
+                abre: () => {
+                    const aside = document.querySelector('#vitrina-sidebar');
+                    if (! aside) { throw new Error('no está la lateral en la página'); }
+                    const datos = window.Alpine.$data(aside);
+                    if (! datos.overlay) { throw new Error('no entró en modo superpuesto: el punto de quiebre no se aplicó'); }
+                    window.dispatchEvent(new CustomEvent('muni-sidebar'));
+                },
+                mide: () => {
+                    anota('sidebar/panel superpuesto', document.querySelector('#vitrina-sidebar'));
+                    anota('sidebar/ítem activo', document.querySelector('#vitrina-sidebar [aria-current="page"]'));
+                    anota('sidebar/rótulo de sección', document.querySelector('#vitrina-sidebar .muni-sb__inner > div > div'));
+                },
+            },
+        };
+
+        /* Cuántos nodos hay aislados por una trampa de foco. `x-trap.inert` del
+           plugin Focus recorre el árbol desde el diálogo hasta <body> y estampa
+           `aria-hidden="true"` en todo lo que queda a los lados: ese recuento es
+           la PRUEBA observable de que el plugin llegó y de que la trampa se armó.
+           Sin plugin, `x-trap` es una directiva desconocida —Alpine las ignora sin
+           decir nada—, el diálogo se abre igual porque el x-show es del núcleo, y
+           la reja daría verde sobre un diálogo que no atrapa el foco. */
+        const aislados = () => document.querySelectorAll('[aria-hidden="true"]').length;
+        let aisladosAntes = 0;
+
         const abre = () => {
             estado.alpine = (window.Alpine && window.Alpine.version) || null;
             estado.xdata = document.querySelectorAll('[x-data]').length;
+            aisladosAntes = aislados();
+
+            if (dialogo) {
+                const caso = DIALOGOS[dialogo];
+                if (! caso) { estado.fallos.push('la página declara el diálogo «' + dialogo + '» y el abridor no sabe abrirlo'); return; }
+                conCuidado(dialogo, caso.abre);
+                return;
+            }
 
             /* La lista del combobox, y con la primera opción resaltada: el fondo del
                resaltado y el aria-activedescendant son estado propio, y nunca se han
@@ -268,19 +537,83 @@ function abridorDeVitrina(): string
         };
 
         const mide = () => {
-            anota('combobox/lista', document.querySelector('.muni-combo__lista'));
-            anota('combobox/opción activa', document.querySelector('.muni-combo__opcion'));
-            anota('tooltip/burbuja', document.querySelector('.muni-tt__bubble'));
-            anota('popover/panel', document.querySelector('.muni-pop__panel'));
-            anota('timeline/detalle', document.querySelector('details.muni-tl__detail[open] .muni-tl__diff'));
-            anota('sortable-table/columna ordenada', document.querySelector('table.muni-st th[aria-sort="ascending"]'));
-            anota('sortable-table/cuerpo', document.querySelector('table.muni-st tbody tr'));
+            if (dialogo) {
+                const caso = DIALOGOS[dialogo];
+                if (caso) { conCuidado(dialogo, caso.mide); }
+
+                /* La trampa TIENE que haber aislado algo. Si no, o falta el plugin
+                   Focus o el componente dejó de usar `x-trap.inert`: en los dos
+                   casos lo que se está midiendo es un diálogo que no atrapa el
+                   foco, y eso la reja lo tiene que poner en rojo, no medir de menos. */
+                const delta = aislados() - aisladosAntes;
+                if (delta > 0) { estado.abiertos.push('trampa de foco/nodos aislados por x-trap.inert ' + delta); }
+                else {
+                    estado.fallos.push('trampa de foco: al abrir el diálogo no se aisló ni un nodo '
+                        + '(`x-trap.inert` no corrió). Falta el plugin Focus de Alpine (@alpinejs/focus) '
+                        + 'o el componente dejó de atrapar el foco: el diálogo se abre, pero el foco se escapa.');
+                }
+            } else {
+                anota('combobox/lista', document.querySelector('.muni-combo__lista'));
+                anota('combobox/opción activa', document.querySelector('.muni-combo__opcion'));
+                anota('tooltip/burbuja', document.querySelector('.muni-tt__bubble'));
+                anota('popover/panel', document.querySelector('.muni-pop__panel'));
+                anota('timeline/detalle', document.querySelector('details.muni-tl__detail[open] .muni-tl__diff'));
+                anota('sortable-table/columna ordenada', document.querySelector('table.muni-st th[aria-sort="ascending"]'));
+                anota('sortable-table/cuerpo', document.querySelector('table.muni-st tbody tr'));
+                anota('sidebar/columna', document.querySelector('#vitrina-sidebar-columna'));
+                anota('sidebar/ítem activo', document.querySelector('#vitrina-sidebar-columna [aria-current="page"]'));
+
+                /* La lateral en modo columna NO puede atrapar el foco: atraparlo
+                   dejaría al funcionario encerrado en el menú, y de paso volvería
+                   `aria-hidden` a todas las demás tarjetas, que el medidor trata
+                   entonces como decorativas y mide con la vara de 3:1 en vez de
+                   4,5:1. Es decir: la reja seguiría verde midiendo más blando. */
+                conCuidado('sidebar/sin trampa en columna', () => {
+                    const aside = document.querySelector('#vitrina-sidebar-columna');
+                    if (! aside) { throw new Error('no está la lateral en la página'); }
+                    const datos = window.Alpine.$data(aside);
+                    if (datos.overlay) { throw new Error('quedó en modo superpuesto con la ventana a '
+                        + window.innerWidth + 'px: taparía las demás tarjetas'); }
+                    const tapadas = Array.from(document.querySelectorAll('[data-pieza]'))
+                        .filter((t) => t.closest('[aria-hidden="true"]'))
+                        .map((t) => t.getAttribute('data-pieza'));
+                    if (tapadas.length) { throw new Error('hay ' + tapadas.length + ' tarjetas dentro de un '
+                        + 'aria-hidden (' + tapadas.slice(0, 3).join(', ') + '…): se estarían midiendo como '
+                        + 'decorativas, con la vara de 3:1 en vez de 4,5:1'); }
+                });
+            }
 
             window.__vitrinaEstado = estado;
             document.documentElement.setAttribute('data-vitrina-lista', '1');
         };
 
+        /* ¿Llegó el plugin Focus? Se pregunta en TODAS las páginas, no solo en las
+           de diálogo: `dropdown`, que va en la vitrina general, también usa
+           `x-trap`, y sin el plugin esas cuatro páginas daban verde con un menú
+           que no atrapa el foco (medido: 8 de 40 combinaciones en «ok»). Y
+           «hidratado» quiere decir lo que corre en producción —el bundle de
+           Livewire trae núcleo Y plugin—, no medio entorno.
+           Se pregunta por la API pública: el plugin registra la mágica `$focus`
+           y `Alpine.evaluate` la resuelve. Una directiva desconocida no se puede
+           sondear —Alpine la ignora sin decir nada—, una mágica sí. */
+        const hayFocus = () => {
+            try {
+                const el = document.querySelector('[x-data]') || document.body;
+                const focus = window.Alpine.evaluate(el, '$focus');
+                return !! focus && typeof focus.focus === 'function';
+            } catch (error) { return false; }
+        };
+
         const arranca = () => {
+            if (! hayFocus()) {
+                /* Sin abrir nada y SIN marcar `data-vitrina-lista`: la reja espera
+                   el apretón de manos, no llega y pone la página en rojo como SIN
+                   HIDRATAR, que es exactamente lo que queda —lo visible en reposo—. */
+                estado.fallos.push('falta el plugin Focus de Alpine (@alpinejs/focus): x-trap no existe');
+                window.__vitrinaEstado = estado;
+                console.error('Vitrina: falta el plugin Focus de Alpine (@alpinejs/focus). No se abre nada y la página queda sin marcar como lista.');
+                return;
+            }
             abre();
             /* Un respiro antes de medir: las transiciones de x-show arrancan en
                opacity:0 y el medidor de contraste salta lo que tiene opacidad 0.
@@ -317,11 +650,18 @@ function abridorDeVitrina(): string
  * del panel) pero el ORDEN y el conjunto no: las dos vitrinas miden exactamente
  * las mismas piezas, que es lo único que hace comparable una paleta con la otra.
  */
-function piezasDeVitrina(callable $envoltorio): string
+function piezasDeVitrina(callable $envoltorio, ?string $dialogo = null): string
 {
+    // Una página de diálogo lleva UNA sola pieza, y a propósito: los cuatro que
+    // atrapan el foco vuelven `aria-hidden` todo lo que no es el diálogo, así que
+    // compartir página con las otras tarjetas las degradaría a decorativas.
+    $ejemplos = $dialogo === null
+        ? ejemplosDeVitrina()
+        : [$dialogo => ejemplosDeDialogo()[$dialogo]];
+
     $piezas = '';
 
-    foreach (ejemplosDeVitrina() as $nombre => $blade) {
+    foreach ($ejemplos as $nombre => $blade) {
         $piezas .= $envoltorio($nombre, Blade::render($blade));
     }
 
@@ -342,20 +682,41 @@ function cabezaDeVitrina(string $titulo): string
  * Va INCRUSTADO, no enlazado: la vitrina se abre por file:// y tiene que seguir
  * midiéndose igual si se copia el .html a otra parte.
  */
-function colaDeVitrina(?string $alpine): string
+function colaDeVitrina(?string $alpine, ?string $focus): string
 {
-    return $alpine !== null
-        ? '<script>'.$alpine.'</script><script>'.abridorDeVitrina().'</script>'
-        : '';
+    if ($alpine === null) {
+        return '';
+    }
+
+    // El plugin PRIMERO. Los plugins de Alpine se registran sobre `window.Alpine`
+    // antes de que el núcleo arranque, y el build de CDN del núcleo llama a
+    // `start()` en un microtask de su propio <script>: al revés, `x-trap` no
+    // existiría cuando la página hidrata. Cada <script> va rotulado para que el
+    // orden sea comprobable desde la prueba y desde el HTML generado.
+    $cola = $focus !== null ? '<script data-vitrina="alpine-focus">'.$focus.'</script>' : '';
+
+    return $cola
+        .'<script data-vitrina="alpine-core">'.$alpine.'</script>'
+        .'<script data-vitrina="abridor">'.abridorDeVitrina().'</script>';
 }
 
-function armaVitrina(string $tema, ?string $alpine): string
+/**
+ * El atributo que declara QUÉ diálogo espera la página, o cadena vacía.
+ * El abridor lo lee para saber qué abrir y qué exigir; sin él, la página es la
+ * vitrina general.
+ */
+function marcaDeDialogo(?string $dialogo): string
+{
+    return $dialogo === null ? '' : ' data-vitrina-dialogo="'.$dialogo.'"';
+}
+
+function armaVitrina(string $tema, ?string $alpine, ?string $focus = null, ?string $dialogo = null): string
 {
     $css = file_get_contents(__DIR__.'/../resources/css/muni-ui.css');
 
-    $piezas = piezasDeVitrina(fn (string $nombre, string $html) => '<section class="v-pieza">'
-        .'<h2 class="v-nombre">&lt;x-muni::'.$nombre.'&gt;</h2>'
-        .'<div class="v-cuerpo">'.$html.'</div></section>');
+    $piezas = piezasDeVitrina(fn (string $nombre, string $html) => '<section class="v-pieza" data-pieza="'.$nombre.'">'
+        .'<h2 class="v-nombre">'.rotuloDePieza($nombre).'</h2>'
+        .'<div class="v-cuerpo">'.$html.'</div></section>', $dialogo);
 
     // El contenedor fija el tema y las superficies con los MISMOS tokens que usan
     // los componentes: medir sobre un fondo inventado no diría nada.
@@ -366,8 +727,8 @@ function armaVitrina(string $tema, ?string $alpine): string
     // midiendo 165 textos en vez de 181 y nadie se enteraría de que mide menos.
     // `data-vitrina-hoja` dice QUÉ paleta se cargó: la reja lo lee y lo imprime en
     // la tabla, para que no haya que adivinarlo por el nombre del archivo.
-    return '<!doctype html><html lang="es" data-muni-theme="'.$tema.'"'.($tema === 'dark' ? ' class="dark"' : '').' data-vitrina-espera-alpine="1" data-vitrina-hoja="muni-ui.css">'
-        .cabezaDeVitrina('Vitrina de laravel-muni-ui — tema '.($tema === 'dark' ? 'oscuro' : 'claro'))
+    return '<!doctype html><html lang="es" data-muni-theme="'.$tema.'"'.($tema === 'dark' ? ' class="dark"' : '').' data-vitrina-espera-alpine="1" data-vitrina-hoja="muni-ui.css"'.marcaDeDialogo($dialogo).'>'
+        .cabezaDeVitrina('Vitrina de laravel-muni-ui — '.($dialogo !== null ? $dialogo.' abierto, ' : '').'tema '.($tema === 'dark' ? 'oscuro' : 'claro'))
         .'<style>'.$css.'
             body { margin:0; background:var(--muni-bg); color:var(--muni-text); font-family:var(--muni-font-sans); }
             .v-cab { padding:24px; border-bottom:1px solid var(--muni-border); }
@@ -379,9 +740,9 @@ function armaVitrina(string $tema, ?string $alpine): string
                mensaje de error fallaba el contraste antes de llevar fondo propio. */
             .v-pieza:nth-child(even) .v-cuerpo { background:var(--muni-surface-3); padding:12px; border-radius:var(--muni-radius); }
         </style></head><body>'
-        .'<header class="v-cab"><h1>Vitrina de componentes — tema '.($tema === 'dark' ? 'oscuro' : 'claro').'</h1></header>'
+        .'<header class="v-cab"><h1>Vitrina de componentes — '.($dialogo !== null ? '&lt;x-muni::'.$dialogo.'&gt; abierto, ' : '').'tema '.($tema === 'dark' ? 'oscuro' : 'claro').'</h1></header>'
         .'<main id="muni-contenido" tabindex="-1"><div class="v-grid">'.$piezas.'</div></main>'
-        .colaDeVitrina($alpine)
+        .colaDeVitrina($alpine, $focus)
         .'</body></html>';
 }
 
@@ -410,10 +771,11 @@ function armaVitrina(string $tema, ?string $alpine): string
  *     negro sobre fondo oscuro, que sería un defecto del banco. Ni un color más.
  *
  * Dos diferencias declaradas respecto del banco de §8.1, y el porqué de cada una:
- *   · las tarjetas son las 31 de `ejemplosDeVitrina()`, no las 25 del banco: la
- *     tarea es medir LAS MISMAS piezas en las dos paletas. Consecuencia: lo que
- *     el banco tenía y esto no (`dropdown`, `modal`, `drawer`, `accordion`,
- *     `command-palette`) sigue sin cubrirse por la reja — D10 y D15 no los caza.
+ *   · las tarjetas son TODAS las de `ejemplosDeVitrina()`, no las 25 del banco: la
+ *     tarea es medir LAS MISMAS piezas en las dos paletas. De lo que el banco
+ *     tenía, `dropdown` ya va en la vitrina y `modal`, `drawer` y
+ *     `command-palette` en su página propia (ver `ejemplosDeDialogo()`); sigue
+ *     fuera `accordion`.
  *   · se conserva el reparto par/impar sobre `--muni-surface-3` de la vitrina
  *     base. El banco dejaba `.v-cuerpo` vacío y por eso D16 quedó como «par de
  *     riesgo sin instancia observada»; con el reparto, la instancia existe y se
@@ -425,17 +787,17 @@ function armaVitrina(string $tema, ?string $alpine): string
  * que las dos vitrinas tengan la misma estructura de encabezados y la comparación
  * axe-contra-axe no se ensucie con un `page-has-heading-one` de más.
  */
-function armaVitrinaPanel(string $tema, ?string $alpine): string
+function armaVitrinaPanel(string $tema, ?string $alpine, ?string $focus = null, ?string $dialogo = null): string
 {
     $css = file_get_contents(__DIR__.'/../resources/css/muni-ui-filament.css');
     $oscuro = $tema === 'dark';
 
     $piezas = piezasDeVitrina(fn (string $nombre, string $html) => '<section class="fi-section" data-pieza="'.$nombre.'">'
-        .'<h2 class="fi-section-header-heading">&lt;x-muni::'.$nombre.'&gt;</h2>'
-        .'<div class="v-cuerpo">'.$html.'</div></section>');
+        .'<h2 class="fi-section-header-heading">'.rotuloDePieza($nombre).'</h2>'
+        .'<div class="v-cuerpo">'.$html.'</div></section>', $dialogo);
 
-    return '<!doctype html><html lang="es" data-muni-theme="'.$tema.'"'.($oscuro ? ' class="dark"' : '').' data-vitrina-espera-alpine="1" data-vitrina-hoja="muni-ui-filament.css">'
-        .cabezaDeVitrina('Vitrina de laravel-muni-ui en panel Filament — tema '.($oscuro ? 'oscuro' : 'claro'))
+    return '<!doctype html><html lang="es" data-muni-theme="'.$tema.'"'.($oscuro ? ' class="dark"' : '').' data-vitrina-espera-alpine="1" data-vitrina-hoja="muni-ui-filament.css"'.marcaDeDialogo($dialogo).'>'
+        .cabezaDeVitrina('Vitrina de laravel-muni-ui en panel Filament — '.($dialogo !== null ? $dialogo.' abierto, ' : '').'tema '.($oscuro ? 'oscuro' : 'claro'))
         .'<style>'.$css.'</style>'
         // Segunda hoja, a propósito separada de la del paquete: es el armazón del
         // banco, y tiene que verse de un vistazo que no aporta ni un color.
@@ -463,9 +825,9 @@ function armaVitrinaPanel(string $tema, ?string $alpine): string
         .'</div></nav></aside>'
         .'<div class="fi-topbar"><nav aria-label="Barra superior"><span>Barra superior del panel</span></nav></div>'
         .'<div class="fi-main-ctn"><main class="fi-main" id="muni-contenido" tabindex="-1">'
-        .'<header class="fi-header"><h1 class="fi-header-heading">Vitrina de componentes en el panel — tema '.($oscuro ? 'oscuro' : 'claro').'</h1></header>'
+        .'<header class="fi-header"><h1 class="fi-header-heading">Vitrina de componentes en el panel — '.($dialogo !== null ? '&lt;x-muni::'.$dialogo.'&gt; abierto, ' : '').'tema '.($oscuro ? 'oscuro' : 'claro').'</h1></header>'
         .'<div class="v-grid">'.$piezas.'</div></main></div>'
-        .colaDeVitrina($alpine)
+        .colaDeVitrina($alpine, $focus)
         .'</body></html>';
 }
 
@@ -477,12 +839,26 @@ function armaVitrinaPanel(string $tema, ?string $alpine): string
  */
 function paginasDeVitrina(): array
 {
-    return [
-        'claro' => ['light', 'armaVitrina'],
-        'oscuro' => ['dark', 'armaVitrina'],
-        'panel-claro' => ['light', 'armaVitrinaPanel'],
-        'panel-oscuro' => ['dark', 'armaVitrinaPanel'],
+    $paginas = [
+        'claro' => ['light', 'armaVitrina', null],
+        'oscuro' => ['dark', 'armaVitrina', null],
+        'panel-claro' => ['light', 'armaVitrinaPanel', null],
+        'panel-oscuro' => ['dark', 'armaVitrinaPanel', null],
     ];
+
+    // Y una página por diálogo, tambien en las dos paletas y los dos temas. No es
+    // manía de simetría: los nueve sistemas municipales corren dentro de paneles
+    // Filament, donde se carga `muni-ui-filament.css` y NO `muni-ui.css`, y en la
+    // rama oscura 30 de los 32 tokens comparables valen distinto. Medir el modal
+    // solo en la paleta suelta no diría nada del modal que ve el funcionario.
+    foreach (array_keys(ejemplosDeDialogo()) as $dialogo) {
+        $paginas[$dialogo.'-claro'] = ['light', 'armaVitrina', $dialogo];
+        $paginas[$dialogo.'-oscuro'] = ['dark', 'armaVitrina', $dialogo];
+        $paginas['panel-'.$dialogo.'-claro'] = ['light', 'armaVitrinaPanel', $dialogo];
+        $paginas['panel-'.$dialogo.'-oscuro'] = ['dark', 'armaVitrinaPanel', $dialogo];
+    }
+
+    return $paginas;
 }
 
 it('genera la vitrina con los componentes reales, en las dos paletas y los dos temas', function () {
@@ -493,6 +869,7 @@ it('genera la vitrina con los componentes reales, en las dos paletas y los dos t
     }
 
     $alpine = fuenteDeAlpine();
+    $focus = fuenteDeFocus();
 
     if ($alpine === null) {
         // Sin Alpine la vitrina se genera igual, pero mide la mitad. No se falla la
@@ -504,12 +881,36 @@ it('genera la vitrina con los componentes reales, en las dos paletas y los dos t
             ."       scripts/.cache/alpine-<version>.min.js, o apuntar \$MUNI_ALPINE_JS a un archivo.\n\n");
     }
 
-    foreach (paginasDeVitrina() as $archivo => [$tema, $constructor]) {
-        $html = $constructor($tema, $alpine);
+    if ($focus === null) {
+        // Mismo criterio que con el núcleo, y el mismo desenlace: las páginas se
+        // generan igual, el abridor comprueba en el navegador que falta el plugin,
+        // no abre nada ni marca la página lista, y la reja las pone en ROJO. Es lo
+        // que tiene que pasar: un diálogo que no atrapa el foco no es accesible.
+        fwrite(STDERR, "\nAVISO: no hay copia del plugin Focus de Alpine en disco.\n"
+            ."       modal, drawer, command-palette, sidebar y dropdown no atraparían el foco, así que\n"
+            ."       la vitrina no abre nada y la reja pone TODAS las páginas en rojo como SIN HIDRATAR.\n"
+            ."       Solución: `npm install` en el repo, o copiar cdn.min.js de @alpinejs/focus a\n"
+            ."       scripts/.cache/alpine-focus-<version>.min.js, o apuntar \$MUNI_ALPINE_FOCUS_JS a un archivo.\n\n");
+    }
+
+    foreach (paginasDeVitrina() as $archivo => [$tema, $constructor, $dialogo]) {
+        $html = $constructor($tema, $alpine, $focus, $dialogo);
         $panel = str_starts_with($archivo, 'panel-');
 
-        expect($html)->toContain('x-muni::stat')
-            ->and(strlen($html))->toBeGreaterThan(20000, 'La vitrina salió sospechosamente corta.');
+        if ($dialogo === null) {
+            expect($html)->toContain('x-muni::stat')
+                ->and(strlen($html))->toBeGreaterThan(20000, 'La vitrina salió sospechosamente corta.');
+        } else {
+            // Una página de diálogo lleva UNA pieza y nada más: si un día se cuela
+            // el resto de la vitrina, la trampa de foco la volvería `aria-hidden`
+            // entera y el medidor la mediría con la vara de 3:1. Por eso se
+            // comprueba las dos cosas: que está el diálogo y que NO está lo demás.
+            expect($html)->toContain('&lt;x-muni::'.$dialogo.'&gt;')
+                ->and($html)->toContain('data-vitrina-dialogo="'.$dialogo.'"')
+                ->and($html)->not->toContain('x-muni::stat')
+                ->and(substr_count($html, ' data-pieza="'))->toBe(1, 'La página del diálogo trae más de una tarjeta.')
+                ->and(strlen($html))->toBeGreaterThan(15000, 'La página del diálogo salió sospechosamente corta.');
+        }
 
         expect($html)->toContain('data-vitrina-espera-alpine="1"');
 
@@ -545,6 +946,29 @@ it('genera la vitrina con los componentes reales, en las dos paletas y los dos t
                 ->and($html)->toContain("querySelector('.muni-pop__panel')")
                 ->and($html)->toContain('details.muni-tl__detail')
                 ->and($html)->toContain("querySelector('table.muni-st')");
+
+            // Y que el abridor sepa abrir los cuatro que atrapan el foco, y que
+            // exija la prueba de la trampa. Sin esto se volvería a lo de antes:
+            // medir el diálogo cerrado, o abierto pero sin atrapar nada.
+            expect($html)->toContain("dispatchEvent(new CustomEvent('muni-sidebar'))")
+                ->and($html)->toContain('x-trap.inert');
+
+            // Y que en CUALQUIER página, sin el plugin Focus, no se abra nada ni se
+            // marque lista: `dropdown` vive en la vitrina general y también usa
+            // `x-trap`, así que la falta del plugin no puede quedar solo en las
+            // páginas de diálogo.
+            expect($html)->toContain("window.Alpine.evaluate(el, '\$focus')")
+                ->and($html)->toContain('if (! hayFocus())');
+        }
+
+        if ($alpine !== null && $focus !== null) {
+            // El plugin va ANTES del núcleo, que es como Alpine lo pide: los
+            // plugins se registran sobre `window.Alpine` antes de que el núcleo
+            // llame a start(), y el build de CDN arranca solo. Al revés `x-trap`
+            // no existiría al hidratar y los cuatro diálogos no atraparían nada.
+            expect($html)->toContain('data-vitrina="alpine-focus"')
+                ->and(strpos($html, 'data-vitrina="alpine-focus"'))
+                ->toBeLessThan(strpos($html, 'data-vitrina="alpine-core"'));
         }
 
         file_put_contents("{$destino}/{$archivo}.html", $html);
@@ -559,13 +983,40 @@ it('mide las mismas piezas en las dos paletas', function () {
     // El valor de la variante del panel es la COMPARACIÓN: si un día las dos
     // vitrinas dejan de renderizar el mismo conjunto, una diferencia de contraste
     // entre paletas deja de ser atribuible a la paleta.
-    $base = armaVitrina('dark', null);
-    $panel = armaVitrinaPanel('dark', null);
+    $base = armaVitrina('dark', null, null);
+    $panel = armaVitrinaPanel('dark', null, null);
 
     foreach (array_keys(ejemplosDeVitrina()) as $nombre) {
-        expect($base)->toContain('&lt;x-muni::'.$nombre.'&gt;')
-            ->and($panel)->toContain('&lt;x-muni::'.$nombre.'&gt;');
+        expect($base)->toContain('>'.rotuloDePieza($nombre).'</h2>')
+            ->and($panel)->toContain('>'.rotuloDePieza($nombre).'</h2>');
     }
 
     expect(substr_count($panel, 'class="fi-section"'))->toBe(count(ejemplosDeVitrina()));
+});
+
+it('trae en error cada control que pinta el error desde el servidor, en las dos paletas', function () {
+    // `select`, `textarea` y `switch` pintan el borde de error con estilo EN LÍNEA
+    // desde el servidor. La pasada de no-texto de la reja sondea el error poniendo
+    // `aria-invalid` en el navegador, y en estos tres no cambia nada: si la página
+    // no trae ya una instancia en error, ese estado no se mide nunca y D11 (el
+    // borde en error menos visible que el normal) puede volver sin que nadie lo vea.
+    // Se exige el control de verdad con `aria-invalid="true"`, no solo el mensaje.
+    $enError = [
+        'select' => '/<select\b[^>]*\baria-invalid="true"/',
+        'textarea' => '/<textarea\b[^>]*\baria-invalid="true"/',
+        // El <input> real del switch es invisible (0×0): la reja mide la pista
+        // `.muni-switch` que va justo después y lee el error de su hermano previo.
+        'switch' => '/<input\b[^>]*\baria-invalid="true"[^>]*>\s*<span class="muni-switch"/',
+    ];
+
+    foreach (['armaVitrina', 'armaVitrinaPanel'] as $constructor) {
+        foreach (['light', 'dark'] as $tema) {
+            $html = $constructor($tema, null, null);
+
+            foreach ($enError as $control => $patron) {
+                expect(preg_match($patron, $html))
+                    ->toBe(1, "{$constructor}/{$tema}: no hay ningún {$control} en error, y la reja no puede provocarlo.");
+            }
+        }
+    }
 });

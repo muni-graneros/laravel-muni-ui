@@ -343,8 +343,11 @@ it('el borde del campo en error se ve MÁS que el de un campo normal, y en los d
     // Medido en el banco del panel: el borde de error daba 2,10:1 en claro y 1,53:1
     // en oscuro, o sea por debajo del 3:1 de 1.4.11 y MENOS visible que un campo
     // normal. El error es justo el estado que tiene que saltar a la vista.
-    foreach (['input', 'select', 'textarea', 'rut-input'] as $componente) {
-        $fuente = fuenteDeLaVista($componente);
+    // `checkbox` y `combobox` se quedaron fuera del primer arreglo (23b2935) y la reja
+    // los midió después: 2,10:1 en el panel claro, 1,53:1 en el oscuro y 2,18:1 en el
+    // base oscuro, siempre por debajo del mismo campo SIN error.
+    foreach (['input', 'select', 'textarea', 'rut-input', 'checkbox', 'combobox'] as $componente) {
+        $fuente = codigoDe($componente);
 
         expect(str_contains($fuente, '--muni-field-border-error'))->toBeTrue(
             "«{$componente}» no usa el token del borde de error: si vuelve a --muni-danger-border, ".
@@ -362,6 +365,38 @@ it('el borde del campo en error se ve MÁS que el de un campo normal, y en los d
             'campo con error se quedaría sin color y no habría ningún error visible.'
         );
     }
+});
+
+it('ningún estado aria-invalid de un campo pinta su borde con el token de la alerta', function () {
+    // `--muni-danger-border` es el borde de una ALERTA, calibrado para rodear un fondo
+    // de estado, no para ser el único límite de un control: en el panel claro vale
+    // #e0a3ad. La prueba de arriba mira que el token correcto aparezca; esta mira que
+    // el incorrecto no siga ganando en la regla del estado de error.
+    $revisadas = 0;
+
+    foreach (glob(__DIR__.'/../resources/views/components/*.blade.php') ?: [] as $vista) {
+        $componente = basename($vista, '.blade.php');
+
+        preg_match_all('/([^{}]*\[aria-invalid="true"\][^{}]*)\{([^}]*)\}/', codigoDe($componente), $reglas, PREG_SET_ORDER);
+
+        foreach ($reglas as [, $selector, $cuerpo]) {
+            if (! preg_match('/border(-[a-z]+)*\s*:/', $cuerpo)) {
+                continue;
+            }
+
+            $revisadas++;
+
+            expect(str_contains($cuerpo, '--muni-danger-border'))->toBeFalse(
+                "«{$componente}» pinta el borde de «".trim($selector).'» con --muni-danger-border: '.
+                'el campo con error queda con un borde MÁS tenue que el de uno correcto. Va '.
+                '--muni-field-border-error.'
+            );
+        }
+    }
+
+    // checkbox y combobox marcan el error con un selector de atributo: si no se
+    // encuentra ninguna regla, la prueba no está mirando nada.
+    expect($revisadas)->toBeGreaterThanOrEqual(2);
 });
 
 it('el tema del panel esconde lo que Alpine no ha montado', function () {

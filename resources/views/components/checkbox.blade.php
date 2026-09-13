@@ -152,7 +152,7 @@
         .muni-checkbox-input:focus-visible + .muni-checkbox { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:2px; box-shadow:var(--muni-ring); }
         .muni-checkbox-input:disabled + .muni-checkbox { background:var(--muni-surface-2); border-color:var(--muni-border-2); }
         .muni-checkbox-input:disabled { cursor:not-allowed; }
-        .muni-checkbox-input[aria-invalid="true"] + .muni-checkbox { border-color:var(--muni-danger-border); }
+        .muni-checkbox-input[aria-invalid="true"] + .muni-checkbox { border-color:var(--muni-field-border-error); }
         /* Alinea la descripción y el error con el texto de la etiqueta: 24 del blanco
            de pulsación más los 8 del gap. */
         .muni-checkbox-aside { display:block; padding-left:32px; }

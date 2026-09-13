@@ -261,15 +261,17 @@
  *
  * `--mg-petroleo-d` (#0d3a44) sobre el fondo oscuro del panel (#081418) da
  * 1,52:1: la pestaña SELECCIONADA sería la menos legible de la fila, justo al
- * revés de lo que tiene que pasar. Se usa `--mg-lima-br`, el mismo acento que
- * este archivo ya emplea sobre fondo oscuro para el encabezado de tabla: 12,69:1.
+ * revés de lo que tiene que pasar. Se usa `--muni-accent-strong`, que en oscuro
+ * ES `--mg-lima-br`, el mismo acento que este archivo ya emplea sobre fondo oscuro
+ * para el encabezado de tabla: 12,69:1. Va por el token y no por `--mg-lima-br`
+ * para que el bloque de impresión lo alcance (ver «MODO OSCURO» más abajo).
  *
  * No se detectó en uso —el CAD de Seguridad Pública no tiene pestañas— sino
  * revisando el archivo entero después de encontrar el de las etiquetas de KPI.
  * Cualquier sistema del ecosistema que sí las use lo tiene activo.
  */
 .dark .fi-tabs-item.fi-active .fi-tabs-item-label,
-.dark .fi-tabs-item.fi-active > .fi-icon { color:var(--mg-lima-br) !important; }
+.dark .fi-tabs-item.fi-active > .fi-icon { color:var(--muni-accent-strong) !important; }
 
 /* ══ ENTRADA ESCALONADA ════════════════════════════════════════════════════ */
 @keyframes mg-fall{ from{transform:translateY(-14px)} to{transform:none} }
@@ -300,10 +302,27 @@
    Filament tampoco la aporta: cero apariciones en sus cuatro CSS de dist. */
 [x-cloak] { display:none !important; }
 
-.dark .fi-body, .dark .fi-main-ctn, .dark .fi-main { background-color:#081418 !important; }
-.dark .fi-section, .dark .fi-wi, .dark .fi-wi-stats-overview-stat { background:#0f2025 !important; border-color:#1c343a !important; }
-.dark .fi-topbar { background:#0d1c20 !important; border-color:#1c343a; --tw-ring-color:#1c343a; }
-.dark .fi-header-heading, .dark .fi-wi-stats-overview-stat-value { color:#eaf5f3 !important; }
+/* EL MODO OSCURO DEL TEMA LEE TOKENS, NO ESCRIBE COLORES.
+   Cada regla `.dark …` de este archivo toma su color, fondo y borde de un
+   `--muni-*` cuyo valor oscuro es EXACTAMENTE el literal que antes iba escrito
+   acá (#081418 = --muni-bg, #0f2025 = --muni-surface, #0d1c20 = --muni-surface-2,
+   #1c343a = --muni-border, #eaf5f3 = --muni-text, --mg-lima-br =
+   --muni-accent-strong). En pantalla no cambia un píxel.
+
+   Cambia en papel. El bloque de impresión redefine esos tokens en la raíz, con
+   el mismo selector y después que el bloque `.dark` de arriba, así que gana por
+   orden. Un literal, en cambio, vive en la hoja del elemento: ningún reset de la
+   raíz lo alcanza, y con `!important` y 0,2,0 tampoco un reset de `body`. Así
+   imprimían el título de página y el de cada tarjeta, #eaf5f3 sobre blanco a
+   1,11:1 (36 textos en la vitrina del panel), y así se imprimía el fondo de las
+   tablas en oscuro, que el arreglo de D9 no enumeraba.
+
+   La prueba `ImpresionGanaAlTemaTest` rechaza cualquier regla `.dark …` nueva que
+   escriba un color literal o lea una variable que la impresión no redefine. */
+.dark .fi-body, .dark .fi-main-ctn, .dark .fi-main { background-color:var(--muni-bg) !important; }
+.dark .fi-section, .dark .fi-wi, .dark .fi-wi-stats-overview-stat { background:var(--muni-surface) !important; border-color:var(--muni-border) !important; }
+.dark .fi-topbar { background:var(--muni-surface-2) !important; border-color:var(--muni-border); --tw-ring-color:var(--muni-border); }
+.dark .fi-header-heading, .dark .fi-wi-stats-overview-stat-value { color:var(--muni-text) !important; }
 /*
  * La ETIQUETA del KPI, que faltaba.
  *
@@ -316,19 +335,20 @@
  *
  * Va con `--mg-sb-mut`, el tono que este mismo paquete ya usa para texto
  * atenuado sobre fondo oscuro: 6,11:1 sobre la tarjeta, claramente legible y
- * subordinado al valor (15:1), que es la jerarquía que corresponde.
+ * subordinado al valor (15:1), que es la jerarquía que corresponde. En papel no
+ * hay fondo oscuro: el bloque de impresión lo redefine al atenuado de la hoja.
  *
  * Hace falta `!important` porque la regla clara de este archivo también lo
  * lleva; sin él ganaría la de arriba por orden.
  */
 .dark .fi-wi-stats-overview-stat-label { color:var(--mg-sb-mut) !important; }
-.dark .fi-ta-header-cell { background:#0f2025; color:var(--mg-lima-br); }
+.dark .fi-ta-header-cell { background:var(--muni-surface); color:var(--muni-accent-strong); }
 /* El título de cada tarjeta. Mismo motivo que los tres de abajo: arriba se
    pinta de petróleo oscuro y el bloque oscuro no lo enumeraba, así que sobre la
    tarjeta oscura quedaba en 1,36:1 —medido con getComputedStyle en el escritorio
    de web-graneros, el 2026-08-18—. Con el color que ya usa el título de página
    sube a 15:1. */
-.dark .fi-section-header-heading { color:#eaf5f3 !important; }
+.dark .fi-section-header-heading { color:var(--muni-text) !important; }
 
 /* Huecos del bloque oscuro de arriba, encontrados midiendo en el navegador el
    2026-08-17 (adopción de la Ley 21.719 en discapacidad). Los tres salen del
@@ -347,13 +367,13 @@
    3. El anillo de foco. `--mg-petroleo` al 18% se diseñó contra papel: medido
       sobre superficie oscura daba ~1,1:1 el halo y ~1,9:1 el borde, bajo el 3:1
       que WCAG 2.2 exige para indicadores no textuales (1.4.11 y 2.4.11). Con
-      `--mg-lima-br` el borde queda sobre 12:1. No es cosmético: los sistemas del
+      `--muni-accent-strong` (en oscuro, `--mg-lima-br`) el borde queda sobre 12:1. No es cosmético: los sistemas del
       Estado lo tienen obligado por el Decreto N°1/2015 SEGPRES. */
-.dark .fi-ta-ctn { background:#0f2025 !important; border-color:#1c343a; }
-.dark .fi-simple-layout { background:#081418 !important; }
+.dark .fi-ta-ctn { background:var(--muni-surface) !important; border-color:var(--muni-border); }
+.dark .fi-simple-layout { background:var(--muni-bg) !important; }
 .dark .fi-input-wrp:focus-within {
-    border-color:var(--mg-lima-br) !important;
-    box-shadow:0 0 0 3px color-mix(in srgb,var(--mg-lima-br) 35%,transparent) !important;
+    border-color:var(--muni-accent-strong) !important;
+    box-shadow:0 0 0 3px color-mix(in srgb,var(--muni-accent-strong) 35%,transparent) !important;
 }
 
 /* Tabs de relation managers: alineadas con el contenido, no centradas (Filament
@@ -409,12 +429,12 @@
    propiedades inline durante la subida; el resto es solo la piel de la
    tarjeta. */
 .filepond--root.has-video-preview .filepond--item-panel{position:absolute !important;inset:0 !important;width:auto !important;height:auto !important;transform:none !important;background:#f8fafc;border:1px solid #e2e8f0;border-radius:.75rem;box-shadow:0 1px 3px rgb(0 0 0 / .06)}
-.dark .filepond--root.has-video-preview .filepond--item-panel{background:#18181b;border-color:#27272a}
+.dark .filepond--root.has-video-preview .filepond--item-panel{background:var(--muni-surface-2);border-color:var(--muni-border)}
 .filepond--root.has-video-preview .filepond--file-info{position:relative !important;width:100% !important;max-width:100% !important;display:flex;justify-content:flex-start;gap:.5rem;align-items:center;margin:0 !important;transform:none !important;padding:0 2rem .35rem .25rem;border-bottom:1px solid #e2e8f0}
 .filepond--root.has-video-preview .filepond--file-info-main{color:#0f172a;font-weight:600;font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
 .filepond--root.has-video-preview .filepond--file-info-sub{color:#64748b;font-size:.72rem}
-.dark .filepond--root.has-video-preview .filepond--file-info-main{color:#f8fafc}
-.dark .filepond--root.has-video-preview .filepond--file-info-sub{color:#a1a1aa}
+.dark .filepond--root.has-video-preview .filepond--file-info-main{color:var(--muni-text)}
+.dark .filepond--root.has-video-preview .filepond--file-info-sub{color:var(--muni-muted)}
 .filepond--root.has-video-preview .filepond--media-preview-wrapper,.filepond--root.has-video-preview .filepond--media-preview{position:relative !important;width:auto !important;height:auto !important;overflow:visible !important;background:transparent;display:flex;justify-content:center}
 .filepond--root.has-video-preview .filepond--media-preview-wrapper:before{display:none !important}
 /* El video: altura fija define el tamaño de toda la tarjeta. `object-fit`
@@ -427,7 +447,7 @@
    clic, aunque se vean. */
 .filepond--root.has-video-preview .filepond--file-action-button{position:absolute !important;top:.5rem !important;right:.5rem !important;left:auto !important;bottom:auto !important;z-index:20 !important;pointer-events:auto !important;background:rgba(0,0,0,.55);color:#fff}
 .filepond--root.has-video-preview .filepond--open-icon,.filepond--root.has-video-preview .filepond--download-icon{position:relative !important;z-index:20 !important;pointer-events:auto !important;opacity:1 !important;color:#334155}
-.dark .filepond--root.has-video-preview .filepond--open-icon,.dark .filepond--root.has-video-preview .filepond--download-icon{color:#cbd5e1}
+.dark .filepond--root.has-video-preview .filepond--open-icon,.dark .filepond--root.has-video-preview .filepond--download-icon{color:var(--muni-muted)}
 
 /* ── IMPRESIÓN ───────────────────────────────────────────────────────────────
    Copia DELIBERADA de las reglas de impresión de `muni-ui.css` (DESIGN §7):
@@ -467,7 +487,11 @@
         --muni-hint:var(--muni-muted);
         --muni-border:#767676;
         --muni-border-2:#3a3f4b;
-        --muni-accent:#0f766e;
+        /* Texto sobre el papel Y relleno con `--muni-on-accent` negro encima: los
+           dos a 4,5:1. Con #0f766e el negro sobre el botón primario daba 3,84:1 al
+           imprimir con fondos. #11847b: 4,61:1 encima · 4,56:1 como texto. Ver el
+           comentario gemelo en `muni-ui.css`. */
+        --muni-accent:#11847b;
         --muni-accent-strong:#115e59;
         --muni-accent-soft:#ffffff;
         --muni-on-accent:#000000;
@@ -488,6 +512,12 @@
         --muni-shadow-lg:none;
         --muni-ring:none;
         --muni-glow:none;
+        /* Los dos tonos de texto «sobre superficie oscura» del tema. En papel no
+           hay superficie oscura: pasan a los de la hoja. Sin esto, la etiqueta
+           del KPI en oscuro (`--mg-sb-mut`, #7ea3a3) saldría a 2,9:1 sobre blanco.
+           La barra lateral, que es su otro uso, no se imprime. */
+        --mg-sb-txt:var(--muni-text);
+        --mg-sb-mut:var(--muni-muted);
     }
 
     /* El papel es blanco aunque el panel pinte el suyo. */
@@ -497,7 +527,10 @@
        conservaba el fondo del panel con el texto forzado a negro encima. Medido:
        65 de 386 textos bajo umbral, el peor en 1,12:1, y entre el 52 y el 56 % de
        la hoja cubierta de tinta. Por eso se nombran aquí los mismos contenedores
-       del panel: para empatar la especificidad y ganar por orden. */
+       del panel: para empatar la especificidad y ganar por orden.
+       Hoy esas reglas oscuras ya leen `--muni-bg` y `--muni-surface`, que el bloque
+       de arriba deja en blanco, así que el papel gana también sin esta lista. Se
+       conserva porque `html` y `body` la necesitan igual y porque cuesta cero. */
     html,
     body,
     .dark .fi-body,

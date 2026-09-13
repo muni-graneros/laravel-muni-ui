@@ -11,7 +11,8 @@
      · `data-muni-theme="dark"`  → nuestro, tema fijo (feria/disc).
      · `.dark`                    → Filament y la estrategia de clase de Tailwind.
      · `[data-theme="dark"]`      → convención de otras UI / PWA-SPA.
-     · `@media (prefers-color-scheme: dark)` → PWA/SPA que sigue el OS (fallback).
+     · `@media screen and (prefers-color-scheme: dark)` → PWA/SPA que sigue el OS
+       (fallback; solo en pantalla, ver la Regla 1).
    Jerarquía: light por defecto → dark por preferencia del OS → activadores
    explícitos de clase/atributo (ganan sobre el OS) → `data-muni-theme` explícito
    (override final, para congelar el tema de un sistema con identidad fija).
@@ -117,8 +118,15 @@
 /* ── Bloque de valores DARK (reutilizado por todos los activadores) ──────────── */
 /* Regla 1: preferencia del OS (PWA/SPA sin control explícito). El :not() permite
    que un sistema con tema fijo en light (feria/disc con data-muni-theme="light")
-   NO se oscurezca aunque el usuario tenga el OS en modo oscuro. */
-@media (prefers-color-scheme: dark) {
+   NO se oscurezca aunque el usuario tenga el OS en modo oscuro.
+
+   Va atada a `screen` porque el navegador SÍ reporta la preferencia del sistema
+   al imprimir, y este selector puntúa 0,4,0: le ganaba al `:root` del bloque de
+   impresión (0,1,0) aunque ese bloque viniera después. Medido con la reja: 177
+   textos a 1,23:1 sobre el papel, con solo tener el sistema en oscuro. Una hoja
+   no tiene modo oscuro; fuera de la pantalla esta regla no tiene que existir, y
+   así el papel gana por construcción en vez de por una carrera de selectores. */
+@media screen and (prefers-color-scheme: dark) {
     :root:not([data-muni-theme="light"]):not([data-theme="light"]):not(.light) {
         --muni-bg: #0b0f14;
         --muni-surface: #111620;
@@ -131,7 +139,7 @@
         --muni-border: #2a3347;
         --muni-border-2: #3a4560;
         --muni-field-border: #5f719d;
-    --muni-field-border-error: var(--muni-danger-fg);
+        --muni-field-border-error: var(--muni-danger-fg);
         --muni-accent: #f59e0b;
         --muni-accent-strong: #d97706;
         --muni-accent-soft: #2d1d00;
@@ -320,7 +328,17 @@
         --muni-hint: var(--muni-muted);
         --muni-border: #767676;
         --muni-border-2: #3a3f4b;
-        --muni-accent: #0f766e;
+        /* El acento hace dos trabajos en papel y los dos tienen que llegar a 4,5:1.
+           Es COLOR DE TEXTO sobre la hoja, y es RELLENO del botón primario, la
+           página actual o el día elegido, con `--muni-on-accent` encima. Ese texto
+           va en negro porque sin «gráficos de fondo» (lo que hace la impresora por
+           omisión) el relleno desaparece y el texto cae sobre el papel: en blanco
+           se volvería invisible. Con #0f766e el negro encima daba 3,84:1 en cuanto
+           alguien activaba los fondos. #11847b es el mismo verde azulado, un punto
+           más claro: negro encima 4,61:1 · como texto sobre blanco 4,56:1. La
+           ventana en que los dos usos pasan a la vez es estrecha (luminancia
+           relativa entre 0,176 y 0,183): no hay margen para moverlo. */
+        --muni-accent: #11847b;
         --muni-accent-strong: #115e59;
         --muni-accent-soft: #ffffff;
         --muni-on-accent: #000000;

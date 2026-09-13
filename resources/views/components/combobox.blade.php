@@ -396,7 +396,7 @@
         /* El outline es el indicador REAL: la box-shadow del anillo se computa
            transparente dentro de Filament y no queda nada (DESIGN §5). */
         .muni-combo__input:focus { outline: 3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset: 2px; border-color: var(--muni-accent); box-shadow: var(--muni-ring); }
-        .muni-combo__input[aria-invalid="true"] { border-color: var(--muni-danger-border); }
+        .muni-combo__input[aria-invalid="true"] { border-color: var(--muni-field-border-error); }
         .muni-combo__input:disabled { background: var(--muni-surface-2); color: var(--muni-muted); cursor: not-allowed; }
 
         .muni-combo__clear { position: absolute; right: 34px; min-width: 24px; min-height: 24px; display: inline-flex; align-items: center; justify-content: center; padding: 0; background: transparent; color: var(--muni-muted); border: 1px solid transparent; border-radius: var(--muni-radius-sm); cursor: pointer; transition: color var(--muni-dur) var(--muni-ease); }

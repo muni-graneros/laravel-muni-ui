@@ -196,8 +196,8 @@
         paint() {
             const el = this.$refs.field;
             if (el) el.style.borderColor = (this.message || this.serverError)
-                ? 'var(--muni-danger-border)'
-                : 'var(--muni-border)';
+                ? 'var(--muni-field-border-error)'
+                : 'var(--muni-field-border)';
         },
     }"
 >

@@ -410,3 +410,22 @@ it('el tema del panel esconde lo que Alpine no ha montado', function () {
         'crudo hasta que Alpine monta, y Filament tampoco aporta esa regla.'
     );
 });
+
+it('el RUT no vuelve a los bordes viejos cuando el JS lo repinta al teclear', function () {
+    // El servidor pintaba bien el borde, pero paint() lo reescribía en línea a la
+    // primera tecla con --muni-border (1,28:1) para el estado normal y
+    // --muni-danger-border (1,53:1 en el panel oscuro) para el error. La reja no lo
+    // veía porque prueba poniendo aria-invalid, no escribiendo en el campo.
+    $fuente = fuenteDeLaVista('rut-input');
+
+    expect(str_contains($fuente, "'var(--muni-danger-border)'"))->toBeFalse(
+        'paint() de rut-input vuelve a pintar el error con --muni-danger-border: el RUT inválido '.
+        'queda con un borde menos visible que uno correcto.'
+    );
+    expect(str_contains($fuente, "'var(--muni-border)'"))->toBeFalse(
+        'paint() de rut-input vuelve a pintar el estado normal con --muni-border (1,28:1): el campo '.
+        'deja de verse en cuanto el funcionario empieza a escribir.'
+    );
+    expect(str_contains($fuente, "'var(--muni-field-border-error)'"))->toBeTrue();
+    expect(str_contains($fuente, "'var(--muni-field-border)'"))->toBeTrue();
+});

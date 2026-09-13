@@ -61,8 +61,12 @@ la declaración completa y el elemento queda sin color.
 En orden de aplicación, tal como está escrita en `resources/css/muni-ui.css`:
 
 1. **`:root`** define el claro. Es el punto de partida.
-2. **`@media (prefers-color-scheme: dark)`** aplica el oscuro al elemento raíz, salvo que la raíz
-   lleve un activador explícito de claro.
+2. **`@media screen and (prefers-color-scheme: dark)`** aplica el oscuro al elemento raíz, salvo
+   que la raíz lleve un activador explícito de claro. **El `screen and` no es decorativo**: el
+   navegador informa la preferencia del sistema también al imprimir, y esta regla puntúa 0,4,0
+   contra el 0,1,0 del `:root` del bloque de impresión. Sin él, cualquier funcionario con el
+   sistema en oscuro imprimía un acta con 177 textos a 1,23:1 sin tocar nada. Una hoja de papel no
+   tiene modo oscuro. Lo vigila `tests/ImpresionGanaAlTemaTest.php`.
 3. **`[data-muni-theme="dark"]`, `[data-theme="dark"]`, `.dark`** activan el oscuro en cualquier
    elemento. Los tres existen para convivir con todo el ecosistema a la vez: Filament pone `.dark`,
    las PWA usan `data-theme`, y el paquete usa el suyo. No hay que elegir uno.

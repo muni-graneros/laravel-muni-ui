@@ -29,6 +29,10 @@ function propsObligatorias(): array
         'combobox' => 'name="titular_id"',
         'page-header' => 'title="Patentes morosas"',
         'kpi' => ':value="42" label="Solicitudes"',
+        // nav-menu recibe el árbol ya filtrado por el anfitrión y nav-grupo el
+        // rótulo del que salen sus ids: sin ellos no hay contrato que probar.
+        'nav-menu' => ':items="[[\'etiqueta\' => \'Inicio\', \'href\' => \'/\']]"',
+        'nav-grupo' => 'titulo="Operaciones"',
         'stat' => ':value="42" label="Solicitudes"',
         // tab-panel lee `active` del x-data de su padre: fuera de <x-muni::tabs>
         // renderiza igual, que es justo lo que hay que comprobar acá.

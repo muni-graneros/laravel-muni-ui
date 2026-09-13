@@ -10,7 +10,12 @@ las etiquetas de git, así que dicen *qué* cambió pero no siempre *qué había
 republicar*. Desde acá en adelante cada versión anota si el sistema que la adopta debe
 volver a publicar artefactos, porque subir el `composer.json` no aplica nada por sí solo.
 
-## [Sin publicar]
+## [0.18.0] — 2026-09-13
+
+**Antes de subirla, lee [`docs/UPGRADE-0.18.0.md`](docs/UPGRADE-0.18.0.md).** Dos cosas no son
+automáticas: hay que **editar el constraint** de `composer.json` (`^0.17` no cruza a `0.18` en
+versionado 0.x) y hay que **republicar el tema del panel**, o nada de esto llega a los paneles.
+
 
 ### Agregado
 - `docs/INVENTORY.md`: inventario de los 53 componentes con props, tokens, Alpine,

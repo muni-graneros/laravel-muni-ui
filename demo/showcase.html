@@ -7,6 +7,11 @@
     [data-muni-theme="light"] {
         --muni-bg:#f4f5f7; --muni-surface:#fff; --muni-surface-2:#f5f6f8; --muni-surface-3:#eceef2;
         --muni-text:#1a1d24; --muni-muted:#5a6070; --muni-hint:#656c79; --muni-border:#e2e4ea; --muni-border-2:#c8ccd6;
+        /* Borde de los controles de formulario: mismos valores que --muni-field-border en
+           resources/css/muni-ui.css (WCAG 1.4.11, 3:1). --muni-border medía 1,37:1 sobre
+           esta paleta. Medido contra el fondo real del campo (--muni-bg): 3,44:1 en claro
+           sobre #f4f5f7 y 4,07:1 en oscuro sobre #080b10. */
+        --muni-field-border:#7b849c;
         --muni-accent:#0f766e; --muni-accent-strong:#115e59; --muni-on-accent:#fff;
         --muni-ok-fg:#0f7a5a; --muni-ok-bg:#e2f5ee; --muni-danger-fg:#b03030; --muni-danger-bg:#fdeaea;
         --muni-warn-fg:#8a5a00; --muni-warn-bg:#fef3dc; --muni-info-fg:#1f5fb0; --muni-info-bg:#e6effb;
@@ -15,6 +20,7 @@
     [data-muni-theme="dark"] {
         --muni-bg:#080b10; --muni-surface:#0f141c; --muni-surface-2:#151b26; --muni-surface-3:#1c2432;
         --muni-text:#e6ecf7; --muni-muted:#7d8da8; --muni-hint:#7a8ba8; --muni-border:#212a3a; --muni-border-2:#2f3b52;
+        --muni-field-border:#5f719d;
         --muni-accent:#f5a623; --muni-accent-strong:#ffb845; --muni-on-accent:#0a0d12;
         --muni-ok-fg:#2fd968; --muni-ok-bg:#0c2a19; --muni-danger-fg:#ff5247; --muni-danger-bg:#2a0d0c;
         --muni-warn-fg:#f59e0b; --muni-warn-bg:#2a1e05; --muni-info-fg:#4d9bff; --muni-info-bg:#0b1a2e;
@@ -87,7 +93,7 @@
     .seg{ display:inline-flex; padding:3px; gap:2px; background:var(--muni-surface-2); border:1px solid var(--muni-border); border-radius:8px; }
     .seg span{ padding:6px 13px; font-size:12px; font-weight:600; color:var(--muni-muted); border-radius:6px; cursor:pointer; transition:.16s; }
     .seg span.on{ background:var(--muni-surface); color:var(--muni-text); box-shadow:0 1px 3px rgba(0,0,0,.2); }
-    .field{ flex:1; min-width:170px; padding:9px 12px; font-family:inherit; font-size:12.5px; background:var(--muni-bg); color:var(--muni-text); border:1px solid var(--muni-border); border-radius:8px; }
+    .field{ flex:1; min-width:170px; padding:9px 12px; font-family:inherit; font-size:12.5px; background:var(--muni-bg); color:var(--muni-text); border:1px solid var(--muni-field-border); border-radius:8px; }
     .field:focus{ outline:none; border-color:var(--muni-accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--muni-accent) 25%,transparent); }
     .cta{ font-family:inherit; font-size:12.5px; font-weight:600; padding:9px 15px; border:none; border-radius:8px; background:var(--muni-accent); color:var(--muni-on-accent); cursor:pointer; transition:.16s; }
     .cta:hover{ background:var(--muni-accent-strong); }
@@ -117,6 +123,39 @@
     .cell .t{ font-family:system-ui,sans-serif; font-size:12.5px; color:var(--muni-muted); margin-top:6px; line-height:1.45; }
 
     footer{ padding:36px 0 60px; border-top:1px solid var(--muni-border); color:var(--muni-hint); font-size:11.5px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+
+    /* ── IMPRESIÓN ─────────────────────────────────────────────────────────────
+       Mismo patrón que el bloque @media print de resources/css/muni-ui.css, sobre la
+       paleta propia de esta vitrina: clara forzada en los DOS temas (el <body> fija
+       data-muni-theme="dark" y se imprimía #e6ecf7 sobre la hoja, 1,19:1), cromo y
+       ambientación fuera y el estado en el borde y en el texto, que es lo que sale con
+       «gráficos de fondo» desmarcado (viene así). El ámbar #f5a623 y el verde #2fd968
+       del tema oscuro no se imprimen: en papel manda la paleta clara.
+       PROHIBIDO print-color-adjust: exact: no garantiza nada y el tóner lo paga el municipio. */
+    @media print {
+        /* Márgenes de hoja: los de Chrome y Firefox difieren y dejan el contenido pegado
+           al borde (mismo valor que resources/css/muni-ui.css). */
+        @page{margin:16mm 18mm}
+        :root, [data-muni-theme] {
+            --muni-bg:#fff; --muni-surface:#fff; --muni-surface-2:#fff; --muni-surface-3:#fff;
+            --muni-text:#000; --muni-muted:#3a3f4b; --muni-hint:#3a3f4b; --muni-border:#767676; --muni-border-2:#3a3f4b;
+            --muni-accent:#0f766e; --muni-accent-strong:#115e59; --muni-on-accent:#000;
+            --muni-ok-fg:#0f5c44; --muni-ok-bg:#fff; --muni-danger-fg:#b03030; --muni-danger-bg:#fff;
+            --muni-warn-fg:#8a5a00; --muni-warn-bg:#fff; --muni-info-fg:#1f5fb0; --muni-info-bg:#fff;
+            --muni-glow:none;
+        }
+        html, body { background:#fff !important; color:#000 !important; }
+        /* Cromo y ambientación: retícula, barrido, reloj y conmutador de tema. */
+        .bg, .scan, .toggle, .nav .pill { display:none !important; }
+        .console { box-shadow:none; }
+        .seg span.on { box-shadow:none; border:1px solid var(--muni-border); }
+        /* Relleno de acento → contorno. Sin fondos, la marca «μ» y «Descargar Excel»
+           quedaban blanco sobre blanco; borde y peso los mantienen legibles. */
+        .mark, .cta { background:transparent !important; color:#000 !important; border:2px solid currentColor !important; font-weight:700; }
+        .tag { border:1px solid currentColor; }
+        /* Las muestras de color son fondos: sin borde, la fila desaparece del papel. */
+        .sw { border-color:#767676; }
+    }
 </style>
 
 <div class="bg"></div>

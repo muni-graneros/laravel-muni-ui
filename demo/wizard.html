@@ -7,6 +7,9 @@
     :root{
         --muni-bg:#f5f6f8;--muni-surface:#fff;--muni-surface-2:#f5f6f8;--muni-surface-3:#eceef2;
         --muni-text:#1a1d24;--muni-muted:#5a6070;--muni-hint:#656c79;--muni-border:#e0e3ea;--muni-border-2:#c8ccd6;
+        /* Borde de los controles de formulario: mismos valores que --muni-field-border en
+           resources/css/muni-ui.css (WCAG 1.4.11, 3:1). --muni-border medía 1,28:1. */
+        --muni-field-border:#7b849c;
         --muni-accent:#0f766e;--muni-accent-strong:#115e59;--muni-accent-soft:#f0fdfa;--muni-on-accent:#fff;
         --muni-ok-fg:#0f7a5a;--muni-ok-bg:#e2f5ee;--muni-warn-fg:#8a5a00;--muni-danger-fg:#b03030;--muni-info-fg:#1f5fb0;
         --muni-radius:10px;--muni-radius-lg:14px;--muni-radius-sm:7px;
@@ -14,7 +17,7 @@
         --muni-ring:0 0 0 3px color-mix(in srgb,var(--muni-accent) 30%,transparent);--muni-ease:cubic-bezier(.22,1,.36,1);--muni-dur:160ms;
         --muni-font-sans:'DM Sans',system-ui,sans-serif;--muni-font-mono:'DM Mono',ui-monospace,monospace;--muni-glow:none;
     }
-    .dark{--muni-bg:#0b0f14;--muni-surface:#111620;--muni-surface-2:#181e2a;--muni-surface-3:#1c2333;--muni-text:#e2e8f4;--muni-muted:#7a8ba8;--muni-hint:#7a8ba8;--muni-border:#2a3347;--muni-border-2:#3a4560;--muni-accent:#f59e0b;--muni-accent-strong:#d97706;--muni-accent-soft:#2d1d00;--muni-on-accent:#0b0f14;--muni-ok-fg:#22c55e;--muni-ok-bg:#0d2d1a;--muni-warn-fg:#f59e0b;--muni-danger-fg:#ef4444;--muni-info-fg:#3b82f6;--muni-shadow:0 1px 2px rgba(0,0,0,.3),0 2px 8px rgba(0,0,0,.35);--muni-shadow-lg:0 16px 40px rgba(0,0,0,.55);--muni-ring:0 0 0 3px color-mix(in srgb,var(--muni-accent) 35%,transparent);--muni-font-sans:'IBM Plex Sans',system-ui,sans-serif;--muni-font-mono:'IBM Plex Mono',ui-monospace,monospace;--muni-glow:0 0 6px currentColor}
+    .dark{--muni-bg:#0b0f14;--muni-surface:#111620;--muni-surface-2:#181e2a;--muni-surface-3:#1c2333;--muni-text:#e2e8f4;--muni-muted:#7a8ba8;--muni-hint:#7a8ba8;--muni-border:#2a3347;--muni-border-2:#3a4560;--muni-field-border:#5f719d;--muni-accent:#f59e0b;--muni-accent-strong:#d97706;--muni-accent-soft:#2d1d00;--muni-on-accent:#0b0f14;--muni-ok-fg:#22c55e;--muni-ok-bg:#0d2d1a;--muni-warn-fg:#f59e0b;--muni-danger-fg:#ef4444;--muni-info-fg:#3b82f6;--muni-shadow:0 1px 2px rgba(0,0,0,.3),0 2px 8px rgba(0,0,0,.35);--muni-shadow-lg:0 16px 40px rgba(0,0,0,.55);--muni-ring:0 0 0 3px color-mix(in srgb,var(--muni-accent) 35%,transparent);--muni-font-sans:'IBM Plex Sans',system-ui,sans-serif;--muni-font-mono:'IBM Plex Mono',ui-monospace,monospace;--muni-glow:0 0 6px currentColor}
     @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
     [x-cloak]{display:none!important}
     *{box-sizing:border-box;margin:0;padding:0}
@@ -45,7 +48,7 @@
     .card h2{font-size:18px;font-weight:700;letter-spacing:-.01em}
     .card p.sub{color:var(--muni-muted);font-size:13.5px;margin-top:4px;margin-bottom:22px}
     .lbl{display:block;font-size:12.5px;font-weight:600;margin-bottom:6px}
-    .field{width:100%;padding:10px 12px;font-size:13.5px;color:var(--muni-text);background:var(--muni-surface);border:1px solid var(--muni-border);border-radius:var(--muni-radius-sm);font-family:var(--muni-font-sans);transition:.15s}
+    .field{width:100%;padding:10px 12px;font-size:13.5px;color:var(--muni-text);background:var(--muni-surface);border:1px solid var(--muni-field-border);border-radius:var(--muni-radius-sm);font-family:var(--muni-font-sans);transition:.15s}
     .field:focus{outline:none;border-color:var(--muni-accent);box-shadow:var(--muni-ring)}
     .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     @media(max-width:520px){.row{grid-template-columns:1fr}}
@@ -85,6 +88,35 @@
     .done-box{text-align:center;padding:20px 0}
     .done-ring{width:76px;height:76px;border-radius:50%;background:var(--muni-ok-bg);color:var(--muni-ok-fg);display:grid;place-items:center;font-size:38px;margin:0 auto 18px;box-shadow:var(--muni-glow)}
     .fade{transition:opacity .25s var(--muni-ease),transform .25s var(--muni-ease)}.fade-0{opacity:0;transform:translateY(8px)}.fade-1{opacity:1;transform:none}
+
+    /* ── IMPRESIÓN ─────────────────────────────────────────────────────────────
+       Mismo patrón que el bloque @media print de resources/css/muni-ui.css: paleta
+       clara forzada en los DOS temas (en oscuro se imprimía #e2e8f4 sobre la hoja,
+       1,23:1), cromo fuera y el estado en el borde y en el texto, que es lo que sale
+       con «gráficos de fondo» desmarcado (viene así).
+       PROHIBIDO print-color-adjust: exact: no garantiza nada y el tóner lo paga el municipio. */
+    @media print{
+        /* Márgenes de hoja: los de Chrome y Firefox difieren y dejan el contenido pegado
+           al borde (mismo valor que resources/css/muni-ui.css). */
+        @page{margin:16mm 18mm}
+        :root,.dark,[data-muni-theme]{
+            --muni-bg:#fff;--muni-surface:#fff;--muni-surface-2:#fff;--muni-surface-3:#fff;
+            --muni-text:#000;--muni-muted:#3a3f4b;--muni-hint:#3a3f4b;--muni-border:#767676;--muni-border-2:#3a3f4b;
+            --muni-accent:#0f766e;--muni-accent-strong:#115e59;--muni-accent-soft:#fff;--muni-on-accent:#000;
+            --muni-ok-fg:#0f5c44;--muni-ok-bg:#fff;--muni-warn-fg:#8a5a00;--muni-danger-fg:#b03030;--muni-info-fg:#1f5fb0;
+            --muni-shadow:none;--muni-shadow-lg:none;--muni-ring:none;--muni-glow:none;
+        }
+        html,body{background:#fff!important;color:#000!important}
+        .top{position:static}
+        .top .icnbtn{display:none!important}
+        /* Relleno de acento → contorno. Sin fondos, la marca «μ» y «Continuar» quedaban
+           blanco sobre blanco (1,00:1). El botón inactivo conserva su propio estilo. */
+        .mark,.btn-p:not(:disabled){background:transparent!important;color:#000!important;border:2px solid currentColor!important;font-weight:700}
+        .step.done .smark{background:transparent!important;color:var(--muni-accent)!important}
+        /* Horario elegido: además del «✓» que ya lleva, borde grueso en vez de relleno. */
+        .slot.on{background:transparent!important;color:#000!important;border:2px solid #000!important;font-weight:700}
+        .slot.on .d{color:var(--muni-muted)}
+    }
 </style>
 
 <body x-data="wiz()" :class="dark && 'dark'">

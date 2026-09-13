@@ -83,6 +83,35 @@
     .btn-g{background:var(--muni-surface);color:var(--muni-text);border-color:var(--muni-border)}.btn-g:hover{background:var(--muni-surface-2)}
     .next{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;background:var(--muni-info-bg);border:1px solid color-mix(in srgb,var(--muni-info-fg) 30%,transparent);border-radius:var(--muni-radius);font-size:13px;line-height:1.5}
     .next b{color:var(--muni-info-fg)}
+
+    /* ── IMPRESIÓN ─────────────────────────────────────────────────────────────
+       Mismo patrón que el bloque @media print de resources/css/muni-ui.css: paleta
+       clara forzada en los DOS temas (en oscuro se imprimía #e2e8f4 sobre la hoja,
+       1,23:1), cromo fuera y el estado en el borde y en el texto, que es lo que sale
+       con «gráficos de fondo» desmarcado (viene así). Es la página que un vecino sí
+       imprime —el estado de su trámite—, así que la marca de la barra se conserva.
+       PROHIBIDO print-color-adjust: exact: no garantiza nada y el tóner lo paga el municipio. */
+    @media print{
+        /* Márgenes de hoja: los de Chrome y Firefox difieren y dejan el contenido pegado
+           al borde (mismo valor que resources/css/muni-ui.css). */
+        @page{margin:16mm 18mm}
+        :root,.dark,[data-muni-theme]{
+            --muni-bg:#fff;--muni-surface:#fff;--muni-surface-2:#fff;--muni-surface-3:#fff;
+            --muni-text:#000;--muni-muted:#3a3f4b;--muni-hint:#3a3f4b;--muni-border:#767676;--muni-border-2:#3a3f4b;
+            --muni-accent:#0f766e;--muni-accent-strong:#115e59;--muni-accent-soft:#fff;--muni-on-accent:#000;
+            --muni-ok-fg:#0f5c44;--muni-ok-bg:#fff;--muni-danger-fg:#b03030;--muni-warn-fg:#8a5a00;--muni-warn-bg:#fff;
+            --muni-info-fg:#1f5fb0;--muni-info-bg:#fff;
+            --muni-shadow:none;--muni-shadow-lg:none;--muni-ring:none;--muni-glow:none;
+        }
+        html,body{background:#fff!important;color:#000!important}
+        .top{position:static}
+        .top .icnbtn{display:none!important}
+        /* Relleno de acento → contorno. Sin fondos, la marca «μ», «Subir documento» y el
+           «✓» de los pasos hechos quedaban blanco sobre blanco (1,00:1). */
+        .mark,.btn-p{background:transparent!important;color:#000!important;border:2px solid currentColor!important;font-weight:700}
+        .step.done .smark{background:transparent!important;color:var(--muni-accent)!important}
+        .badge{border:1px solid currentColor}
+    }
 </style>
 
 <body x-data="{dark:false}" :class="dark && 'dark'">

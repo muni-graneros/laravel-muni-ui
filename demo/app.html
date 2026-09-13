@@ -7,6 +7,9 @@
     :root{
         --muni-bg:#f5f6f8;--muni-surface:#fff;--muni-surface-2:#f5f6f8;--muni-surface-3:#eceef2;
         --muni-text:#1a1d24;--muni-muted:#5a6070;--muni-hint:#656c79;--muni-border:#e0e3ea;--muni-border-2:#c8ccd6;
+        /* Borde de los controles de formulario: mismos valores que --muni-field-border en
+           resources/css/muni-ui.css (WCAG 1.4.11, 3:1). --muni-border medía 1,28:1. */
+        --muni-field-border:#7b849c;
         --muni-accent:#0f766e;--muni-accent-strong:#115e59;--muni-accent-soft:#f0fdfa;--muni-on-accent:#fff;
         --muni-ok-fg:#0f7a5a;--muni-ok-bg:#e2f5ee;--muni-warn-fg:#8a5a00;--muni-warn-bg:#fef3dc;
         --muni-danger-fg:#b03030;--muni-danger-bg:#fdeaea;--muni-info-fg:#1f5fb0;
@@ -18,6 +21,7 @@
     .dark,[data-muni-theme=dark]{
         --muni-bg:#0b0f14;--muni-surface:#111620;--muni-surface-2:#181e2a;--muni-surface-3:#1c2333;
         --muni-text:#e2e8f4;--muni-muted:#7a8ba8;--muni-hint:#7a8ba8;--muni-border:#2a3347;--muni-border-2:#3a4560;
+        --muni-field-border:#5f719d;
         --muni-accent:#f59e0b;--muni-accent-strong:#d97706;--muni-accent-soft:#2d1d00;--muni-on-accent:#0b0f14;
         --muni-ok-fg:#22c55e;--muni-ok-bg:#0d2d1a;--muni-warn-fg:#f59e0b;--muni-warn-bg:#2d1d00;
         --muni-danger-fg:#ef4444;--muni-danger-bg:#2d0d0d;--muni-info-fg:#3b82f6;
@@ -85,7 +89,7 @@
     .seg{display:inline-flex;padding:3px;gap:2px;background:var(--muni-surface-2);border:1px solid var(--muni-border);border-radius:var(--muni-radius-sm)}
     .seg span{padding:6px 13px;font-size:12.5px;font-weight:600;color:var(--muni-muted);border-radius:6px;cursor:pointer;transition:.15s}
     .seg span.on{background:var(--muni-surface);color:var(--muni-text);box-shadow:var(--muni-shadow)}
-    .search{flex:1;min-width:180px;padding:9px 12px;font-size:13px;color:var(--muni-text);background:var(--muni-surface);border:1px solid var(--muni-border);border-radius:var(--muni-radius-sm);font-family:var(--muni-font-sans)}
+    .search{flex:1;min-width:180px;padding:9px 12px;font-size:13px;color:var(--muni-text);background:var(--muni-surface);border:1px solid var(--muni-field-border);border-radius:var(--muni-radius-sm);font-family:var(--muni-font-sans)}
     .search:focus{outline:none;border-color:var(--muni-accent);box-shadow:var(--muni-ring)}
 
     table{width:100%;border-collapse:collapse;font-size:12.5px}
@@ -147,6 +151,39 @@
     .fade{transition:opacity var(--muni-dur) var(--muni-ease)}.fade-0{opacity:0}.fade-1{opacity:1}
     .slide{transition:transform .28s var(--muni-ease)}.slide-0{transform:translateX(100%)}.slide-1{transform:translateX(0)}
     .pop{transition:opacity var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease)}.pop-0{opacity:0;transform:scale(.96) translateY(8px)}.pop-1{opacity:1;transform:scale(1) translateY(0)}
+
+    /* ── IMPRESIÓN ─────────────────────────────────────────────────────────────
+       Mismo patrón que el bloque @media print de resources/css/muni-ui.css: paleta
+       clara forzada en los DOS temas (en oscuro se imprimía #e2e8f4 sobre el papel,
+       1,23:1), cromo de pantalla fuera y el estado en el borde y en el texto, que es
+       lo que la impresora saca con «gráficos de fondo» desmarcado (viene así).
+       PROHIBIDO print-color-adjust: exact: no garantiza nada y el tóner lo paga el
+       municipio. Cada demo es HTML autocontenido, por eso el bloque vive en cada una. */
+    @media print{
+        /* Márgenes de hoja: los de Chrome y Firefox difieren y dejan el contenido pegado
+           al borde (mismo valor que resources/css/muni-ui.css). */
+        @page{margin:16mm 18mm}
+        :root,.dark,[data-muni-theme]{
+            --muni-bg:#fff;--muni-surface:#fff;--muni-surface-2:#fff;--muni-surface-3:#fff;
+            --muni-text:#000;--muni-muted:#3a3f4b;--muni-hint:#3a3f4b;--muni-border:#767676;--muni-border-2:#3a3f4b;
+            --muni-accent:#0f766e;--muni-accent-strong:#115e59;--muni-accent-soft:#fff;--muni-on-accent:#000;
+            --muni-ok-fg:#0f5c44;--muni-ok-bg:#fff;--muni-warn-fg:#8a5a00;--muni-warn-bg:#fff;
+            --muni-danger-fg:#b03030;--muni-danger-bg:#fff;--muni-info-fg:#1f5fb0;
+            --muni-shadow:none;--muni-shadow-md:none;--muni-shadow-lg:none;--muni-ring:none;--muni-glow:none;
+        }
+        html,body{background:#fff!important;color:#000!important}
+        body{display:block}
+        /* Cromo: navegación, barra superior, capas y avisos flotantes no son el documento. */
+        .sb,.col>.top,.toasts,.ov,.drawer,.modal,.palette{display:none!important}
+        .main{padding:0;max-width:none}
+        /* Relleno de acento → contorno. Sin fondos, «Descargar Excel» quedaba blanco sobre
+           blanco (1,00:1); con borde y peso sigue leyéndose como la acción principal. */
+        .btn-p{background:transparent!important;color:#000!important;border:2px solid currentColor!important;font-weight:700}
+        .btn-g{border-color:var(--muni-border)}
+        /* El gráfico de barras y la leyenda son fondos: sin borde desaparecían del papel. */
+        .card__b span.mono+div{border:1.5px solid var(--muni-accent);border-bottom:0}
+        .leg .sw{border:5px solid var(--muni-ok-fg)}.leg div+div .sw{border-color:var(--muni-danger-fg)}
+    }
 </style>
 
 <body x-data="panel()" x-init="init()" :class="dark && 'dark'" @keydown.window="if((e=$event).key==='k'&&(e.metaKey||e.ctrlKey)){e.preventDefault();openPal()}">
@@ -204,7 +241,7 @@
                         <template x-for="(b,i) in bars" :key="i">
                             <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%" :title="b.m+': '+b.v">
                                 <span class="mono" style="font-size:11px;color:var(--muni-muted);margin-bottom:5px" x-text="b.v"></span>
-                                <div style="width:100%;max-width:34px;border-radius:5px 5px 0 0;background:linear-gradient(180deg,var(--muni-accent),color-mix(in srgb,var(--muni-accent) 50%,transparent));transition:height .6s var(--muni-ease)" :style="`height:${b.v/maxBar*100}%`"></div>
+                                <div style="width:100%;max-width:34px;border-radius:5px 5px 0 0;background:linear-gradient(180deg,var(--muni-accent),color-mix(in srgb,var(--muni-accent) 50%,transparent));transition:height .6s var(--muni-ease)" :style="{ height: (b.v/maxBar*100) + '%' }"></div>
                             </div>
                         </template>
                     </div>

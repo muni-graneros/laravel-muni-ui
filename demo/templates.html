@@ -7,6 +7,9 @@
     :root{
         --muni-bg:#f5f6f8;--muni-surface:#fff;--muni-surface-2:#f5f6f8;--muni-surface-3:#eceef2;
         --muni-text:#1a1d24;--muni-muted:#5a6070;--muni-hint:#656c79;--muni-border:#e0e3ea;--muni-border-2:#c8ccd6;
+        /* Borde de los controles de formulario: mismos valores que --muni-field-border en
+           resources/css/muni-ui.css (WCAG 1.4.11, 3:1). --muni-border medía 1,28:1. */
+        --muni-field-border:#7b849c;
         --muni-accent:#0f766e;--muni-accent-strong:#115e59;--muni-accent-soft:#f0fdfa;--muni-on-accent:#fff;
         --muni-ok-fg:#0f7a5a;--muni-ok-bg:#e2f5ee;--muni-warn-fg:#8a5a00;--muni-warn-bg:#fef3dc;
         --muni-danger-fg:#b03030;--muni-danger-bg:#fdeaea;--muni-info-fg:#1f5fb0;--muni-info-bg:#e6effb;
@@ -18,6 +21,7 @@
     [data-muni-theme="dark"],.dark,[data-theme="dark"]{
         --muni-bg:#0b0f14;--muni-surface:#111620;--muni-surface-2:#181e2a;--muni-surface-3:#1c2333;
         --muni-text:#e2e8f4;--muni-muted:#7a8ba8;--muni-hint:#7a8ba8;--muni-border:#2a3347;--muni-border-2:#3a4560;
+        --muni-field-border:#5f719d;
         --muni-accent:#f59e0b;--muni-accent-strong:#d97706;--muni-accent-soft:#2d1d00;--muni-on-accent:#0b0f14;
         --muni-ok-fg:#22c55e;--muni-ok-bg:#0d2d1a;--muni-warn-fg:#f59e0b;--muni-warn-bg:#2d1d00;
         --muni-danger-fg:#ef4444;--muni-danger-bg:#2d0d0d;--muni-info-fg:#3b82f6;--muni-info-bg:#0d1a2d;
@@ -51,7 +55,7 @@
     .btn{display:inline-flex;align-items:center;gap:7px;font-family:var(--muni-font-sans);font-weight:600;font-size:13px;padding:9px 16px;border-radius:var(--muni-radius-sm);border:1px solid transparent;cursor:pointer;transition:.16s}
     .btn-p{background:var(--muni-accent);color:var(--muni-on-accent)}.btn-p:hover{background:var(--muni-accent-strong)}
     .btn-g{background:transparent;color:var(--muni-text);border-color:var(--muni-border)}.btn-g:hover{background:var(--muni-surface-2)}
-    .field{width:100%;padding:10px 12px;font-family:var(--muni-font-sans);font-size:13.5px;color:var(--muni-text);background:var(--muni-surface);border:1px solid var(--muni-border);border-radius:var(--muni-radius-sm)}
+    .field{width:100%;padding:10px 12px;font-family:var(--muni-font-sans);font-size:13.5px;color:var(--muni-text);background:var(--muni-surface);border:1px solid var(--muni-field-border);border-radius:var(--muni-radius-sm)}
     .field:focus{outline:none;border-color:var(--muni-accent);box-shadow:var(--muni-ring)}
     .lbl{display:block;font-size:12.5px;font-weight:600;margin-bottom:6px}
     .card{background:var(--muni-surface);border:1px solid var(--muni-border);border-radius:var(--muni-radius-lg);box-shadow:var(--muni-shadow)}
@@ -106,6 +110,33 @@
     .err{min-height:560px;display:grid;place-items:center;text-align:center;padding:24px;position:relative;overflow:hidden}
     .err .grid{position:absolute;inset:0;opacity:.6;background-image:linear-gradient(color-mix(in srgb,var(--muni-accent) 5%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--muni-accent) 5%,transparent) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse 60% 50% at 50% 45%,#000,transparent)}
     .err .code{font-family:var(--muni-font-mono);font-size:clamp(80px,18vw,130px);font-weight:700;line-height:1;letter-spacing:-.04em;color:var(--muni-accent);text-shadow:var(--muni-glow)}
+
+    /* ── IMPRESIÓN ─────────────────────────────────────────────────────────────
+       Mismo patrón que el bloque @media print de resources/css/muni-ui.css: paleta
+       clara forzada en los DOS temas (en oscuro se imprimía #e2e8f4 sobre la hoja,
+       1,23:1), cromo fuera y el estado en el borde y en el texto, que es lo que sale
+       con «gráficos de fondo» desmarcado (viene así).
+       PROHIBIDO print-color-adjust: exact: no garantiza nada y el tóner lo paga el municipio. */
+    @media print{
+        /* Márgenes de hoja: los de Chrome y Firefox difieren y dejan el contenido pegado
+           al borde (mismo valor que resources/css/muni-ui.css). */
+        @page{margin:16mm 18mm}
+        :root,.dark,[data-muni-theme],[data-theme]{
+            --muni-bg:#fff;--muni-surface:#fff;--muni-surface-2:#fff;--muni-surface-3:#fff;
+            --muni-text:#000;--muni-muted:#3a3f4b;--muni-hint:#3a3f4b;--muni-border:#767676;--muni-border-2:#3a3f4b;
+            --muni-accent:#0f766e;--muni-accent-strong:#115e59;--muni-accent-soft:#fff;--muni-on-accent:#000;
+            --muni-ok-fg:#0f5c44;--muni-ok-bg:#fff;--muni-warn-fg:#8a5a00;--muni-warn-bg:#fff;
+            --muni-danger-fg:#b03030;--muni-danger-bg:#fff;--muni-info-fg:#1f5fb0;--muni-info-bg:#fff;
+            --muni-shadow:none;--muni-shadow-md:none;--muni-shadow-lg:none;--muni-ring:none;--muni-glow:none;
+        }
+        html,body{background:#fff!important;color:#000!important}
+        /* Cromo: el selector de plantilla y de tema no es el documento; la retícula, tampoco. */
+        .switcher,.auth-aside::before,.err .grid{display:none!important}
+        /* Relleno de acento → contorno. Sin fondos, «Crear cuenta» y la marca «μ» quedaban
+           blanco sobre blanco (1,00:1); borde y peso los mantienen legibles como tales. */
+        .mark,.btn-p{background:transparent!important;color:#000!important;border:2px solid currentColor!important;font-weight:700}
+        .badge{border:1px solid currentColor}
+    }
 </style>
 
 <body x-data="gallery()" :data-muni-theme="theme">

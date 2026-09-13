@@ -85,6 +85,37 @@
     .toast.info { border-left-color:var(--muni-info-fg); } .toast.info .tdot { background:var(--muni-info-fg); color:var(--muni-info-fg); }
     .t-enter { transition:opacity var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease); }
     .t-0 { opacity:0; transform:translateY(8px) scale(.98); } .t-1 { opacity:1; transform:translateY(0) scale(1); }
+
+    /* ── IMPRESIÓN ─────────────────────────────────────────────────────────────
+       Mismo patrón que el bloque @media print de resources/css/muni-ui.css: paleta
+       clara forzada en los DOS temas (el <body> fija data-muni-theme="dark" y se
+       imprimía #e2e8f4 sobre la hoja, 1,23:1), cromo fuera y el estado en el borde y
+       en el texto, que es lo que sale con «gráficos de fondo» desmarcado.
+       PROHIBIDO print-color-adjust: exact: no garantiza nada y el tóner lo paga el municipio. */
+    @media print {
+        /* Márgenes de hoja: los de Chrome y Firefox difieren y dejan el contenido pegado
+           al borde (mismo valor que resources/css/muni-ui.css). */
+        @page{margin:16mm 18mm}
+        :root, [data-muni-theme] {
+            --muni-bg:#fff; --muni-surface:#fff; --muni-surface-2:#fff; --muni-surface-3:#fff;
+            --muni-text:#000; --muni-muted:#3a3f4b; --muni-hint:#3a3f4b; --muni-border:#767676; --muni-border-2:#3a3f4b;
+            --muni-accent:#0f766e; --muni-accent-strong:#115e59; --muni-on-accent:#000;
+            --muni-ok-fg:#0f5c44; --muni-ok-bg:#fff; --muni-ok-border:#0f5c44;
+            --muni-warn-fg:#8a5a00; --muni-warn-bg:#fff; --muni-warn-border:#8a5a00;
+            --muni-danger-fg:#b03030; --muni-danger-bg:#fff; --muni-danger-border:#b03030;
+            --muni-info-fg:#1f5fb0; --muni-info-bg:#fff; --muni-info-border:#1f5fb0;
+            --muni-shadow:none; --muni-shadow-md:none; --muni-shadow-lg:none; --muni-ring:none; --muni-glow:none;
+        }
+        html, body { background:#fff !important; color:#000 !important; }
+        /* Cromo: el conmutador de tema y las notificaciones flotantes no son el documento. */
+        .head > .btn, .toast { display:none !important; }
+        /* Relleno de acento → contorno: sin fondos la etiqueta quedaba sobre el blanco del
+           papel; borde y peso la mantienen como acción principal. */
+        .btn-primary { background:transparent !important; color:#000 !important; border:2px solid currentColor !important; font-weight:700; }
+        /* El subrayado de la pestaña activa es un fondo: pasa a borde para que la pestaña
+           activa no quede marcada solo por el color. */
+        .tab.on::after { background:none; height:0; border-top:2px solid var(--muni-accent); }
+    }
 </style>
 
 <body x-data="{ theme: 'dark' }" :data-muni-theme="theme">

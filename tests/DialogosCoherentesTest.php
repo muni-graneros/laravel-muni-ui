@@ -50,7 +50,10 @@ it('declara role="dialog" y aria-modal="true"', function (string $componente) {
 it('se cierra con Escape y deja inerte el fondo mientras está abierto', function (string $componente) {
     $html = renderDialogo($componente);
 
-    expect((bool) preg_match('/keydown\.escape\.window/', $html))->toBeTrue(
+    // Dónde se escucha Escape es decisión de cada uno (modal lo escucha en el
+    // propio elemento del diálogo, con tabindex="-1", para no cerrar también lo
+    // que tenga debajo; drawer sigue en window): lo que se exige es que se cierre.
+    expect((bool) preg_match('/keydown\.escape[.=]/', $html))->toBeTrue(
         "«{$componente}» no cierra con Escape: WCAG 2.2 2.1.2, quien navega con teclado queda encerrado."
     );
     expect(str_contains($html, 'x-trap.inert'))->toBeTrue(

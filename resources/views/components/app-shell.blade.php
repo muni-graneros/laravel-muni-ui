@@ -1,5 +1,5 @@
 @props([
-    'theme' => 'light',
+    'theme' => null,
     'title' => null,
     'system',
     'subtitle' => null,
@@ -7,11 +7,22 @@
     'maxWidth' => '1200px',
 ])
 
+{{-- `theme` sin valor = seguir al sistema operativo (el media query de muni-ui.css
+     decide). Antes el default era 'light' y se escribía siempre: apagaba la
+     preferencia del equipo. Un sistema con identidad fija pasa theme="light"; el
+     que persiste la elección del funcionario (<x-muni::selector-tema>) pasa lo que
+     leyó de la cookie.
+
+     La <meta name="color-scheme"> sigue al mismo prop: es lo que pinta en oscuro
+     los desplegables nativos, los input type=date y las barras de desplazamiento,
+     que los tokens no alcanzan. Sin valor deja elegir al equipo («light dark»);
+     con tema fijo, solo ese. --}}
 <!DOCTYPE html>
-<html lang="es" data-muni-theme="{{ $theme }}">
+<html lang="es" @if ($theme) data-muni-theme="{{ $theme }}" @endif>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="{{ $theme === 'dark' ? 'dark' : ($theme === 'light' ? 'light' : 'light dark') }}">
     {{-- La meta va FUERA del <title>: dentro es RCDATA, o sea texto, así que
          el marcado se vería en la pestaña y la <meta> no existiría como
          elemento (echo.js se quedaba sin clave y el tiempo real, apagado). --}}

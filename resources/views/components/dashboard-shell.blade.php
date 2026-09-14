@@ -1,5 +1,5 @@
 @props([
-    'theme' => 'light',
+    'theme' => null,
     'title' => null,
     'system' => 'Panel',
     'subtitle' => null,
@@ -7,11 +7,14 @@
     'user' => null,
 ])
 
+{{-- `theme` sin valor = seguir al sistema operativo; la <meta name="color-scheme">
+     sigue al mismo prop. Ver app-shell. --}}
 <!DOCTYPE html>
-<html lang="es" data-muni-theme="{{ $theme }}">
+<html lang="es" @if ($theme) data-muni-theme="{{ $theme }}" @endif>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="{{ $theme === 'dark' ? 'dark' : ($theme === 'light' ? 'light' : 'light dark') }}">
     {{-- La meta va FUERA del <title>: dentro es RCDATA, o sea texto, así que
          el marcado se vería en la pestaña y la <meta> no existiría como
          elemento (echo.js se quedaba sin clave y el tiempo real, apagado). --}}

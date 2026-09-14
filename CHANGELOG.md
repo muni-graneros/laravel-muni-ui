@@ -79,6 +79,20 @@ versionado 0.x) y hay que **republicar el tema del panel**, o nada de esto llega
   regla de «activo» escrita una vez. **El paquete no consulta `Gate`, `Auth` ni `request()`**:
   recibe el árbol ya filtrado y el permiso ya evaluado. Esconder un ítem del menú es cosmético y
   nunca protege un endpoint.
+- `<x-muni::spinner>` y `<x-muni::busy-region>`: decir que algo está en curso **en texto** y
+  decir cuándo terminó, con `aria-busy` y anuncio del recuento. Queda un paso manual con NVDA y
+  VoiceOver que no existe en esta máquina.
+- `<x-muni::selector-tema>`: claro, oscuro o seguir al sistema, con la elección persistida por
+  el anfitrión. **Los tres armazones dejan de forzar `light` por defecto**: `theme` sin valor ya
+  no escribe nada y manda el sistema operativo; un sistema con identidad fija pasa `light`.
+- `<x-muni::sesion-guardia>`: avisa antes de que caduque la sesión y deja prorrogarla; el tiempo
+  lo pasa el servidor.
+- `modal` gana la variante de confirmación (`role="alertdialog"`, sin cierre por clic fuera,
+  foco inicial en cancelar, cuerpo atado con `aria-describedby`). Todas las props nuevas
+  conservan el comportamiento de siempre por defecto.
+- `stat` ata la cifra a su rótulo (`role="group"` + `aria-labelledby`) y dice «subió»/«bajó» en
+  texto con `deltaDir`; `calendar` respeta el rango también por teclado; el rótulo del atajo de
+  `command-palette` nace de la misma prop `hotkey` que el manejador.
 - **`data-muni-print-plain`** (opt-in del sistema anfitrión, apagado por defecto): dentro de un
   panel en modo oscuro, el contenido propio de Filament salía a 1,00:1 en papel, porque sus 218
   clases eligen un gris en vez de leer un token. Con el atributo puesto, el texto se aplana a
@@ -157,6 +171,9 @@ versionado 0.x) y hay que **republicar el tema del panel**, o nada de esto llega
 - **`dropdown` declaraba `role="menu"` sin implementar el patrón**: cada ítem era una parada de
   `Tab`, las flechas no hacían nada y `Escape` dejaba el foco perdido. Ahora flechas con vuelta,
   `Home`/`End`, roving tabindex y retorno del foco al disparador.
+- **`alert` inventaba la región viva por el tono**: `danger` salía siempre con `role="alert"`,
+  así que una nota fija de instrucciones se anunciaba como aviso cada vez que se pintaba. El rol
+  lo declara ahora el consumidor cuando de verdad anuncia algo.
 - **`rut-input` repintaba el borde con los tokens viejos a la primera tecla**, así que el campo
   dejaba de verse justo al empezar a escribir. El borde de error de `checkbox` y `combobox`
   también quedaba por debajo del de un campo correcto.

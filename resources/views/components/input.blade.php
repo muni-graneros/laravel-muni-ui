@@ -58,6 +58,19 @@
     ]);
 
     $attributes = $attributes->except(['id', 'aria-describedby']);
+
+    /*
+     * `icon` se imprime SIN escapar (echo crudo, más abajo): es un SVG decorativo
+     * que el desarrollador escribe en su plantilla, como prop o como slot, con la
+     * misma confianza que el resto del marcado. JAMÁS recibe datos del vecino ni
+     * de ningún registro: si un dato tiene que decidir el dibujo, se elige el SVG
+     * en la plantilla y se pasa el resultado, nunca el dato. Es el criterio que
+     * cerró el mismo echo en alert.blade.php (ficha «alert» de docs/GAP-ANALYSIS.md,
+     * punto 2 del juez); aquí no hay catálogo de nombres que ofrecer, así que se
+     * documenta en vez de cerrarse. Va como comentario PHP y no de Blade a
+     * propósito: el primer comentario Blade del archivo es la descripción que
+     * `npm run registro` escribe en registry.json.
+     */
 @endphp
 
 <div style="display:flex;flex-direction:column;gap:6px;">

@@ -86,12 +86,14 @@ it('el badge de tono warn renderiza el color correcto', function () {
     expect($html)->toContain('Pendiente');
 });
 
-it('la alerta de tono danger usa role="alert" y las demás role="status"', function () {
+// El rol dejó de salir del tono: lo declara el consumidor (GAP-ANALYSIS «alert»,
+// corrección del juez). El contrato completo está en AlertaRolEIconoTest.
+it('la alerta no declara región viva sola: el role lo pone el consumidor', function () {
     $danger = Blade::render('<x-muni::alert tone="danger" title="Error">Algo falló</x-muni::alert>');
-    $info = Blade::render('<x-muni::alert tone="info">Aviso</x-muni::alert>');
+    $anunciada = Blade::render('<x-muni::alert tone="danger" role="alert">Algo falló</x-muni::alert>');
 
-    expect($danger)->toContain('role="alert"');
-    expect($info)->toContain('role="status"');
+    expect(str_contains($danger, 'role='))->toBeFalse();
+    expect(str_contains($anunciada, 'role="alert"'))->toBeTrue();
 });
 
 it('el kpi renderiza valor, etiqueta y el tono elegido', function () {

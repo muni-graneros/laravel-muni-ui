@@ -30,6 +30,14 @@
      * componente es de presentación.
      */
     'selectionName' => null,
+    /*
+     * Densidad de la fila: 'comoda' (la de siempre) o 'compacta'. Sin la prop, la
+     * tabla hereda lo que el anfitrión haya pintado en el <html> como
+     * `data-muni-densidad="compacta"` desde una cookie leída EN SERVIDOR — el
+     * paquete no gestiona cookies ni lee request(), y así no hay parpadeo.
+     * Pasarla a mano gana sobre esa herencia, en los dos sentidos.
+     */
+    'densidad' => null,
 ])
 
 @php
@@ -43,6 +51,27 @@
        refresco, además de ensuciar el diff. Se deriva de las columnas, que son lo que
        identifica a esta tabla, y el consumidor puede imponer el suyo con `id`. */
     $buscadorId = ($attributes->get('id') ?: 'muni-st-'.substr(sha1($colsJson ?: ''), 0, 8)).'-q';
+
+    /* «cómoda» con tilde es como se escribe en español y es lo que va a salir de un
+       select del anfitrión: se acepta igual que «comoda». Sin prop no se emite clase
+       alguna y manda lo que el anfitrión haya puesto en el documento. */
+    $densidadPedida = filled($densidad) ? trim((string) $densidad) : null;
+
+    $densidadFila = $densidadPedida === null
+        ? null
+        : strtr(mb_strtolower($densidadPedida), ['ó' => 'o', 'á' => 'a', 'é' => 'e', 'í' => 'i', 'ú' => 'u']);
+
+    /* Una errata («compacto», «densa») no puede caer a cómoda en silencio: la vista
+       se vería normal y nadie se enteraría de que la prop está mal escrita. */
+    if ($densidadFila !== null && ! in_array($densidadFila, ['comoda', 'compacta'], true)) {
+        throw new InvalidArgumentException(
+            "La densidad «{$densidadPedida}» no existe: solo «comoda» (la de siempre) o «compacta»."
+        );
+    }
+
+    $tableClass = 'muni-st'
+        .($densidadFila === 'compacta' ? ' muni-st--compact' : '')
+        .($densidadFila === 'comoda' ? ' muni-st--comoda' : '');
 
     $selectKey = '';
 
@@ -285,7 +314,7 @@
     @endif
 
     <div style="overflow-x:auto;border:1px solid var(--muni-border);border-radius:var(--muni-radius);background:var(--muni-surface);">
-        <table class="muni-st">
+        <table class="{{ $tableClass }}">
             @isset($caption)
                 <caption class="muni-sr">{{ $caption }}</caption>
             @endisset
@@ -355,8 +384,13 @@
                                 </label>
                             </td>
                         @endif
-                        <template x-for="c in cols" :key="c.key">
-                            <td :style="`text-align:${c.align||'left'};${c.mono?'font-family:var(--muni-font-mono);font-variant-numeric:tabular-nums;':''}`" x-text="row[c.key]"></td>
+                        {{-- `ci` no es decorativo: la primera celda de DATOS se marca por
+                             índice porque el hermano anterior de las celdas es el propio
+                             <template>, no la casilla, y `.muni-st__pick + td` no casa
+                             con nada. De esa clase cuelga el rojo del dato de la fila
+                             morosa (DESIGN §9). --}}
+                        <template x-for="(c,ci) in cols" :key="c.key">
+                            <td :class="ci===0 && 'muni-st__first'" :style="`text-align:${c.align||'left'};${c.mono?'font-family:var(--muni-font-mono);font-variant-numeric:tabular-nums;':''}`" x-text="row[c.key]"></td>
                         </template>
                     </tr>
                 </template>
@@ -374,10 +408,15 @@
            y `visibility:hidden` lo sacarían y la etiqueta dejaría de contar. */
         .muni-sr { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
         [x-cloak] { display:none !important; }
-        .muni-st { width:100%; border-collapse:collapse; font-family:var(--muni-font-sans); font-size:12.5px; }
-        .muni-st th { text-align:left; white-space:nowrap; padding:9px 12px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--muni-muted); background:var(--muni-surface-2); border-bottom:1px solid var(--muni-border); }
+        /* Las medidas de la fila viven en variables LOCALES del componente, con
+           prefijo propio. NO son tokens --muni-*: el espaciado del paquete no se
+           tokeniza (los otros 37 componentes no cambian), y un --muni-* que solo
+           existiera acá reventaría la guarda que exige que todo --muni-* leído por
+           un componente esté declarado en las dos hojas. */
+        .muni-st { --mst-cell-py:9px; --mst-cell-px:12px; --mst-head-py:9px; --mst-head-px:12px; width:100%; border-collapse:collapse; font-family:var(--muni-font-sans); font-size:12.5px; }
+        .muni-st th { text-align:left; white-space:nowrap; padding:var(--mst-head-py, 9px) var(--mst-head-px, 12px); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--muni-muted); background:var(--muni-surface-2); border-bottom:1px solid var(--muni-border); }
         .muni-st__sortable { user-select:none; }
-        .muni-st__sort { display:inline-flex; align-items:center; gap:5px; min-height:24px; padding:0 4px; margin:0 -4px; font:inherit; color:inherit; background:none; border:0; border-radius:var(--muni-radius-sm); cursor:pointer; transition:color var(--muni-dur) var(--muni-ease); }
+        .muni-st__sort { display:inline-flex; align-items:center; justify-content:center; gap:5px; min-height:24px; min-width:24px; padding:0 4px; margin:0 -4px; font:inherit; color:inherit; background:none; border:0; border-radius:var(--muni-radius-sm); cursor:pointer; transition:color var(--muni-dur) var(--muni-ease); }
         .muni-st__sort:hover { color:var(--muni-text); }
         /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
         .muni-st__sort:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:2px; }
@@ -389,16 +428,34 @@
            portador. El `aria-sort` del th sigue siendo lo que se anuncia. */
         .muni-st__arrow { font-family:var(--muni-font-mono); font-size:11px; color:var(--muni-muted); }
         .muni-st__arrow--on { color:var(--muni-accent); font-weight:700; }
-        .muni-st td { padding:9px 12px; border-bottom:1px solid var(--muni-border); white-space:nowrap; color:var(--muni-text); }
+        .muni-st td { padding:var(--mst-cell-py, 9px) var(--mst-cell-px, 12px); border-bottom:1px solid var(--muni-border); white-space:nowrap; color:var(--muni-text); }
+
+        /* UN solo lugar donde vive el compacto: la prop densidad="compacta" y la
+           herencia de [data-muni-densidad="compacta"], que el anfitrión pinta en la
+           raíz del documento, redefinen las MISMAS variables. Solo relleno: nunca
+           una `height` fija, que recortaría el texto en cuanto el usuario fuerza
+           line-height 1.5 (WCAG 2.2 AA 1.4.12 Text Spacing). */
+        .muni-st--compact,
+        [data-muni-densidad="compacta"] .muni-st { --mst-cell-py:4px; --mst-cell-px:8px; --mst-head-py:5px; --mst-head-px:8px; }
+        /* La tabla que pide «comoda» a mano gana sobre el modo compacto del
+           anfitrión: misma especificidad y va después. */
+        [data-muni-densidad="compacta"] .muni-st--comoda { --mst-cell-py:9px; --mst-cell-px:12px; --mst-head-py:9px; --mst-head-px:12px; }
         .muni-st tbody tr { transition:background var(--muni-dur) var(--muni-ease); }
         .muni-st tbody tr:hover { background:var(--muni-surface-2); }
         /* La banda vertical va en la primera celda porque es el borde izquierdo de la
            fila; el rojo y la negrita son del DATO. Con la columna de selección puesta,
            la primera celda es la casilla: pintarla dejaría el control en rojo y el dato
-           en negro. Por eso el color se declara aparte y salta la celda de selección. */
-        .muni-st__danger td:first-child { box-shadow:inset 3px 0 0 var(--muni-danger-fg); }
-        .muni-st__danger td:first-child:not(.muni-st__pick),
-        .muni-st__danger .muni-st__pick + td { color:var(--muni-danger-fg); font-weight:600; }
+           en negro. Por eso el color se declara aparte y salta la celda de selección.
+
+           OJO CON `:first-child`: las celdas salen de un <template x-for>, que el
+           navegador deja en el DOM como PRIMER HIJO del <tr>. Con `td:first-child`
+           la banda no casaba con ninguna celda y NO SE PINTABA (medido en Chromium
+           y en Firefox: box-shadow «none»), y `.muni-st__pick + td` fallaba por lo
+           mismo, porque el hermano siguiente de la casilla es el <template>.
+           `:first-of-type` sí salta el <template>; el rojo del dato cuelga de la
+           clase que la fila pone en su primera celda de datos. */
+        .muni-st__danger td:first-of-type { box-shadow:inset 3px 0 0 var(--muni-danger-fg); }
+        .muni-st__danger .muni-st__first { color:var(--muni-danger-fg); font-weight:600; }
         /* El borde de un CONTROL sale de --muni-field-border y no del token de separador:
            medido, --muni-border da 1,28:1 sobre la superficie y 1.4.11 pide 3:1. */
         .muni-st__search { width:100%; padding:9px 12px; font-family:var(--muni-font-sans); font-size:13px; color:var(--muni-text); background:var(--muni-surface); border:1px solid var(--muni-field-border); border-radius:var(--muni-radius-sm); }
@@ -423,6 +480,20 @@
            y una barra de acciones en papel no significan nada. */
         @media print {
             .muni-st__pick, .muni-st__bulk { display:none !important; }
+        }
+        /* PISO DE OBJETIVO: la fila encoge, el objetivo no. Los controles que viven
+           dentro de una celda acá son el botón de orden de la cabecera y el blanco de
+           la casilla, y los dos miden 24×24 con la fila compacta porque su tamaño no
+           sale del relleno de la celda. La regla de `td a`/`td button` va igual que en
+           data-table: hoy las celdas de datos son `x-text` y no admiten marcado, pero
+           el piso es el mismo contrato en las dos tablas de la ficha y así una celda
+           con acciones —el estado vacío, un slot futuro— nace ya con él.
+           Sin puntero fino —la tablet de terreno— todo sube a 44×44. */
+        .muni-st td a, .muni-st td button { display:inline-flex; align-items:center; justify-content:center; min-height:24px; min-width:24px; }
+        @media (pointer: coarse) {
+            .muni-st__sort { min-height:44px; min-width:44px; }
+            .muni-st td a, .muni-st td button { min-height:44px; min-width:44px; }
+            .muni-st__pick-hit { width:44px; height:44px; }
         }
         /* En alto contraste forzado el color de acento desaparece: la casilla se
            queda con el dibujo del sistema, que sigue siendo visible. */

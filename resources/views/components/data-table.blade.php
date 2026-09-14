@@ -18,13 +18,42 @@
     /* Alto máximo del marco (p. ej. `60vh`). También opt-in: sin él no hay recorte. */
     'maxHeight' => null,
     /* Densidad: 'normal' o 'compact'. Dos, no cinco: nueve sistemas que deben verse
-       igual no necesitan cinco densidades, necesitan un default bueno. */
+       igual no necesitan cinco densidades, necesitan un default bueno.
+       Se conserva porque ya está publicada y hay vistas que la usan; lo nuevo se
+       pide con `densidad`, que es la que además se hereda del anfitrión. */
     'density' => 'normal',
+    /*
+     * Densidad de la fila: 'comoda' (la de siempre) o 'compacta'. Sin la prop, la
+     * tabla hereda lo que el anfitrión haya pintado en el <html> como
+     * `data-muni-densidad="compacta"` desde una cookie leída EN SERVIDOR — el
+     * paquete no gestiona cookies ni lee request(), y así no hay parpadeo.
+     * Pasarla a mano gana sobre esa herencia, en los dos sentidos.
+     */
+    'densidad' => null,
 ])
 
 @php
     $stickyHeader = filter_var($stickyHeader, FILTER_VALIDATE_BOOLEAN);
     $stickyColumn = filter_var($stickyColumn, FILTER_VALIDATE_BOOLEAN);
+
+    /* La prop nueva manda; si no viene, la heredada `density="compact"` se traduce.
+       Sin ninguna de las dos no se emite clase alguna: la tabla queda a merced de
+       lo que el anfitrión haya puesto en el <html>, que es el caso normal. */
+    $densidadPedida = filled($densidad) ? trim((string) $densidad) : ($density === 'compact' ? 'compacta' : null);
+
+    /* «cómoda» con tilde es como se escribe en español y es lo que va a salir de
+       un select del anfitrión: se acepta igual que «comoda». */
+    $densidadFila = $densidadPedida === null
+        ? null
+        : strtr(mb_strtolower($densidadPedida), ['ó' => 'o', 'á' => 'a', 'é' => 'e', 'í' => 'i', 'ú' => 'u']);
+
+    /* Una errata («compacto», «densa») no puede caer a cómoda en silencio: la vista
+       se vería normal y nadie se enteraría de que la prop está mal escrita. */
+    if ($densidadFila !== null && ! in_array($densidadFila, ['comoda', 'compacta'], true)) {
+        throw new InvalidArgumentException(
+            "La densidad «{$densidadPedida}» no existe: solo «comoda» (la de siempre) o «compacta»."
+        );
+    }
 
     /* Sin nombre, un `role="region"` es una parada de tabulación anónima: el lector
        anuncia «región» y nada más. Si el consumidor no da ninguno, al menos dice
@@ -36,7 +65,9 @@
         .($stickyHeader ? ' muni-dt__scroll--head' : '')
         .($stickyColumn ? ' muni-dt__scroll--col' : '');
 
-    $tableClass = 'muni-dt'.($density === 'compact' ? ' muni-dt--compact' : '');
+    $tableClass = 'muni-dt'
+        .($densidadFila === 'compacta' ? ' muni-dt--compact' : '')
+        .($densidadFila === 'comoda' ? ' muni-dt--comoda' : '');
 @endphp
 
 {{-- Tabla densa de datos. El slot son las filas <tr>; usar la clase `muni-row--danger`
@@ -95,11 +126,38 @@
         /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
         .muni-dt__scroll:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:2px; }
 
-        .muni-dt { width:100%; border-collapse:collapse; font-family:var(--muni-font-sans); font-size:12.5px; }
-        .muni-dt th { text-align:left; white-space:nowrap; padding:9px 12px; font-family:var(--muni-font-sans); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--muni-muted); background:var(--muni-surface-2); border-bottom:1px solid var(--muni-border); }
-        .muni-data-body td, [data-muni-row] td { padding: 8px 12px; border-bottom: 1px solid var(--muni-border); white-space: nowrap; color: var(--muni-text); }
-        .muni-dt--compact th { padding:5px 8px; }
-        .muni-dt--compact .muni-data-body td, .muni-dt--compact [data-muni-row] td { padding:4px 8px; }
+        /* Las medidas de la fila viven en variables LOCALES del componente, con
+           prefijo propio. NO son tokens --muni-*: el espaciado del paquete no se
+           tokeniza (los otros 37 componentes no cambian), y un --muni-* que solo
+           existiera acá reventaría la guarda que exige que todo --muni-* leído por
+           un componente esté declarado en las dos hojas. Cada var() lleva su
+           respaldo por si la regla de la tabla no alcanzó a una fila suelta. */
+        .muni-dt { --mdt-cell-py:8px; --mdt-cell-px:12px; --mdt-head-py:9px; --mdt-head-px:12px; width:100%; border-collapse:collapse; font-family:var(--muni-font-sans); font-size:12.5px; }
+        .muni-dt th { text-align:left; white-space:nowrap; padding:var(--mdt-head-py, 9px) var(--mdt-head-px, 12px); font-family:var(--muni-font-sans); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--muni-muted); background:var(--muni-surface-2); border-bottom:1px solid var(--muni-border); }
+        .muni-data-body td, [data-muni-row] td { padding:var(--mdt-cell-py, 8px) var(--mdt-cell-px, 12px); border-bottom: 1px solid var(--muni-border); white-space: nowrap; color: var(--muni-text); }
+
+        /* UN solo lugar donde vive el compacto: la prop densidad="compacta" y la
+           herencia de [data-muni-densidad="compacta"], que el anfitrión pinta en la
+           raíz del documento, redefinen las MISMAS variables. Solo relleno: nunca
+           una `height` fija, que recortaría el texto en cuanto el usuario fuerza
+           line-height 1.5 (WCAG 2.2 AA 1.4.12 Text Spacing). */
+        .muni-dt--compact,
+        [data-muni-densidad="compacta"] .muni-dt { --mdt-cell-py:4px; --mdt-cell-px:8px; --mdt-head-py:5px; --mdt-head-px:8px; }
+        /* La tabla que pide «comoda» a mano gana sobre el modo compacto del
+           anfitrión: misma especificidad y va después. Una nómina de tres filas en
+           un panel compacto no tiene por qué encogerse. */
+        [data-muni-densidad="compacta"] .muni-dt--comoda { --mdt-cell-py:8px; --mdt-cell-px:12px; --mdt-head-py:9px; --mdt-head-px:12px; }
+
+        /* PISO DE OBJETIVO: la fila encoge, el objetivo no. Con el relleno en 4px,
+           dos botones contiguos en la columna de acciones quedarían bajo el mínimo
+           de 24×24 de 2.5.8; con este piso la celda de acciones crece y deja de
+           encoger, que es exactamente lo que AdminLTE no hace. */
+        .muni-dt td a, .muni-dt td button { display:inline-flex; align-items:center; justify-content:center; min-height:24px; min-width:24px; }
+        /* En la tablet de terreno no hay puntero fino: el objetivo sube a 44×44
+           aunque eso deshaga el compacto justo en esa columna. */
+        @media (pointer: coarse) {
+            .muni-dt td a, .muni-dt td button { min-height:44px; min-width:44px; }
+        }
         [data-muni-row]:hover { background: var(--muni-surface-2); }
         [data-muni-row].muni-row--danger { position: relative; }
         [data-muni-row].muni-row--danger td:first-child { box-shadow: inset 3px 0 0 var(--muni-danger-fg); }

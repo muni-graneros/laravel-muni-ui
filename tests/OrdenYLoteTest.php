@@ -477,7 +477,15 @@ it('la franja de morosidad cae sobre el dato y no sobre la casilla', function ()
     preg_match('#<style>(.*?)</style>#s', $componente, $style);
     $css = (string) preg_replace('#/\*.*?\*/#s', '', $style[1] ?? '');
 
-    preg_match('/\.muni-st__danger td:first-child\s*\{([^}]*)\}/', $css, $regla);
+    /* `td:first-child` NO sirve acá y por eso este candado cambió de selector
+       (ficha `densidad`): las celdas salen de un <template x-for>, que el
+       navegador deja en el DOM como PRIMER hijo del <tr>, así que
+       `.muni-st__danger td:first-child` no casaba con ninguna celda y la banda
+       —la firma del sistema, DESIGN §9— no se pintaba. El selector que sí cae en
+       la primera celda de la fila, que con la columna de selección puesta es la
+       casilla, es `:first-of-type`. Lo que se exige sigue siendo lo mismo: que la
+       banda esté y que el color del dato NO caiga sobre el control. */
+    preg_match('/\.muni-st__danger td:first-of-type\s*\{([^}]*)\}/', $css, $regla);
 
     expect($regla[1] ?? '')->not->toBeEmpty('Desapareció la franja de la fila con problema (DESIGN §9).');
 

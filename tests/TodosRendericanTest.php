@@ -37,6 +37,8 @@ function propsObligatorias(): array
         // tab-panel lee `active` del x-data de su padre: fuera de <x-muni::tabs>
         // renderiza igual, que es justo lo que hay que comprobar acá.
         'tab-panel' => ':index="0"',
+        'selector-tema' => 'action="/preferencias/tema"',
+        'sesion-guardia' => 'expira-en="2026-09-13T15:30:00-03:00"',
     ];
 }
 

@@ -78,7 +78,7 @@
       "tag": "<x-muni::alert>",
       "type": "registry:blade-component",
       "file": "resources/views/components/alert.blade.php",
-      "description": "EL CUERPO VA CON EL `fg` DEL TONO, NO CON --muni-muted",
+      "description": "Recuadro de aviso fijo en uno de cuatro tonos (ok, warn, danger, info), con título opcional y un glifo propio por tono",
       "props": [
         {
           "name": "tone",
@@ -97,6 +97,12 @@
           "type": "mixed",
           "default": "null",
           "required": false
+        },
+        {
+          "name": "role",
+          "type": "mixed",
+          "default": "null",
+          "required": false
         }
       ],
       "slots": [
@@ -106,10 +112,6 @@
         },
         {
           "name": "icon",
-          "description": "Slot con nombre opcional"
-        },
-        {
-          "name": "t",
           "description": "Slot con nombre opcional"
         }
       ],
@@ -126,7 +128,6 @@
         "--muni-info-bg",
         "--muni-info-border",
         "--muni-info-fg",
-        "--muni-muted",
         "--muni-ok-bg",
         "--muni-ok-border",
         "--muni-ok-fg",
@@ -182,12 +183,12 @@
       "tag": "<x-muni::app-shell>",
       "type": "registry:blade-component",
       "file": "resources/views/components/app-shell.blade.php",
-      "description": "La meta va FUERA del <title>:",
+      "description": "`theme` sin valor = seguir al sistema operativo (el media query de muni-ui.css decide)",
       "props": [
         {
           "name": "theme",
-          "type": "string",
-          "default": "light",
+          "type": "mixed",
+          "default": "null",
           "required": false
         },
         {
@@ -253,19 +254,19 @@
         "--muni-text",
         "--muni-topbar-h"
       ],
-      "example": "<x-muni::app-shell theme=\"light\"></x-muni::app-shell>"
+      "example": "<x-muni::app-shell></x-muni::app-shell>"
     },
     {
       "name": "auth-shell",
       "tag": "<x-muni::auth-shell>",
       "type": "registry:blade-component",
       "file": "resources/views/components/auth-shell.blade.php",
-      "description": "La meta va FUERA del <title>:",
+      "description": "`theme` sin valor = seguir al sistema operativo; la <meta name=\"color-scheme\"> sigue al mismo prop",
       "props": [
         {
           "name": "theme",
-          "type": "string",
-          "default": "light",
+          "type": "mixed",
+          "default": "null",
           "required": false
         },
         {
@@ -326,7 +327,7 @@
         "--muni-surface",
         "--muni-text"
       ],
-      "example": "<x-muni::auth-shell theme=\"light\" title=\"Ingresar\"></x-muni::auth-shell>"
+      "example": "<x-muni::auth-shell title=\"Ingresar\"></x-muni::auth-shell>"
     },
     {
       "name": "avatar",
@@ -457,6 +458,70 @@
       "example": "<x-muni::breadcrumb />"
     },
     {
+      "name": "busy-region",
+      "tag": "<x-muni::busy-region>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/busy-region.blade.php",
+      "description": "LA REGIÓN QUE DICE QUE ALGO ESTÁ EN CURSO, EN TEXTO, Y DICE CUÁNDO TERMINÓ",
+      "props": [
+        {
+          "name": "target",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "loading",
+          "type": "string",
+          "default": "Cargando…",
+          "required": false
+        },
+        {
+          "name": "status",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "delay",
+          "type": "string",
+          "default": "long",
+          "required": false
+        },
+        {
+          "name": "busy",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-filament",
+          "x-for",
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-field-border",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-shadow-md",
+        "--muni-surface",
+        "--muni-text"
+      ],
+      "example": "<x-muni::busy-region loading=\"Cargando…\"></x-muni::busy-region>"
+    },
+    {
       "name": "button",
       "tag": "<x-muni::button>",
       "type": "registry:blade-component",
@@ -532,7 +597,7 @@
       "tag": "<x-muni::calendar>",
       "type": "registry:blade-component",
       "file": "resources/views/components/calendar.blade.php",
-      "description": "Calendario de mes (Alpine 3)",
+      "description": "Calendario de mes (Alpine 3 core)",
       "props": [
         {
           "name": "name",
@@ -545,6 +610,12 @@
           "type": "mixed",
           "default": "null",
           "required": false
+        },
+        {
+          "name": "value",
+          "type": "mixed",
+          "default": "null",
+          "required": false
         }
       ],
       "slots": [],
@@ -554,12 +625,17 @@
           "x-data",
           "x-for",
           "x-if",
+          "x-model",
+          "x-modelable",
+          "x-muni",
+          "x-ref",
           "x-text"
         ],
         "plugins": []
       },
       "tokens": [
         "--muni-accent",
+        "--muni-accent-strong",
         "--muni-border",
         "--muni-dur",
         "--muni-ease",
@@ -1102,6 +1178,7 @@
       "tokens": [
         "--muni-accent",
         "--muni-border",
+        "--muni-border-2",
         "--muni-dur",
         "--muni-ease",
         "--muni-focus",
@@ -1111,6 +1188,7 @@
         "--muni-muted",
         "--muni-radius-lg",
         "--muni-radius-sm",
+        "--muni-ring",
         "--muni-shadow-lg",
         "--muni-surface",
         "--muni-surface-2",
@@ -1123,12 +1201,12 @@
       "tag": "<x-muni::dashboard-shell>",
       "type": "registry:blade-component",
       "file": "resources/views/components/dashboard-shell.blade.php",
-      "description": "La meta va FUERA del <title>:",
+      "description": "`theme` sin valor = seguir al sistema operativo; la <meta name=\"color-scheme\"> sigue al mismo prop",
       "props": [
         {
           "name": "theme",
-          "type": "string",
-          "default": "light",
+          "type": "mixed",
+          "default": "null",
           "required": false
         },
         {
@@ -1215,7 +1293,7 @@
         "--muni-text",
         "--muni-topbar-h"
       ],
-      "example": "<x-muni::dashboard-shell theme=\"light\"></x-muni::dashboard-shell>"
+      "example": "<x-muni::dashboard-shell></x-muni::dashboard-shell>"
     },
     {
       "name": "data-table",
@@ -2648,6 +2726,36 @@
           "type": "string",
           "default": "480px",
           "required": false
+        },
+        {
+          "name": "role",
+          "type": "string",
+          "default": "dialog",
+          "required": false
+        },
+        {
+          "name": "dismissable",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        },
+        {
+          "name": "describedby",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "initialFocus",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "cancelLabel",
+          "type": "string",
+          "default": "Cancelar",
+          "required": false
         }
       ],
       "slots": [
@@ -2669,6 +2777,10 @@
         "directives": [
           "x-cloak",
           "x-data",
+          "x-effect",
+          "x-init",
+          "x-muni",
+          "x-on",
           "x-show",
           "x-teleport",
           "x-transition",
@@ -2685,6 +2797,7 @@
         "--muni-ease",
         "--muni-focus",
         "--muni-font-sans",
+        "--muni-gob-petroleo-dark",
         "--muni-muted",
         "--muni-radius-lg",
         "--muni-radius-sm",
@@ -3548,6 +3661,182 @@
       "example": "<x-muni::select></x-muni::select>"
     },
     {
+      "name": "selector-tema",
+      "tag": "<x-muni::selector-tema>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/selector-tema.blade.php",
+      "description": "Selector de tema:",
+      "props": [
+        {
+          "name": "action",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "value",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "default": "muni-tema",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Tema",
+          "required": false
+        },
+        {
+          "name": "hint",
+          "type": "string",
+          "default": "Con «Sistema» se sigue la preferencia del equipo.",
+          "required": false
+        },
+        {
+          "name": "submitLabel",
+          "type": "string",
+          "default": "Guardar",
+          "required": false
+        },
+        {
+          "name": "enabled",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-muni",
+          "x-text"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border-2",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-shadow",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::selector-tema :action=\"$action\" />"
+    },
+    {
+      "name": "sesion-guardia",
+      "tag": "<x-muni::sesion-guardia>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/sesion-guardia.blade.php",
+      "description": "Guardia de sesión (Alpine 3 core + plugin Focus, que viaja en el bundle de Livewire)",
+      "props": [
+        {
+          "name": "expiraEn",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "renovarUrl",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "salirUrl",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "ingresarUrl",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "avisarA",
+          "type": "int",
+          "default": "300",
+          "required": false
+        },
+        {
+          "name": "dialogoA",
+          "type": "int",
+          "default": "60",
+          "required": false
+        },
+        {
+          "name": "ahora",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "duracion",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-cloak",
+          "x-data",
+          "x-ref",
+          "x-show",
+          "x-teleport",
+          "x-text",
+          "x-trap"
+        ],
+        "plugins": [
+          "focus"
+        ]
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-accent-strong",
+        "--muni-bg",
+        "--muni-border",
+        "--muni-border-2",
+        "--muni-danger-bg",
+        "--muni-danger-border",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-on-accent",
+        "--muni-radius",
+        "--muni-radius-lg",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-shadow-lg",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text",
+        "--muni-warn-fg"
+      ],
+      "example": "<x-muni::sesion-guardia :expiraEn=\"$expiraEn\" />"
+    },
+    {
       "name": "sidebar",
       "tag": "<x-muni::sidebar>",
       "type": "registry:blade-component",
@@ -3798,11 +4087,38 @@
       "example": "<x-muni::sortable-table />"
     },
     {
+      "name": "spinner",
+      "tag": "<x-muni::spinner>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/spinner.blade.php",
+      "description": "EL DIBUJO de una carga en curso",
+      "props": [
+        {
+          "name": "size",
+          "type": "string",
+          "default": "20px",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-dur"
+      ],
+      "example": "<x-muni::spinner size=\"20px\" />"
+    },
+    {
       "name": "stat",
       "tag": "<x-muni::stat>",
       "type": "registry:blade-component",
       "file": "resources/views/components/stat.blade.php",
-      "description": "Componente stat del sistema de diseño municipal",
+      "description": "`role=\"group\"` + `aria-labelledby` atan la cifra a su rótulo sin tocar el DOM (un <dl> con un solo par no aporta más y rompía la compatibilidad de los hosts que ya estilizan `.muni-stat`)",
       "props": [
         {
           "name": "value",

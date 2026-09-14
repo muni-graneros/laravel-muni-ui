@@ -191,6 +191,27 @@ function ejemplosDeVitrina(): array
             .' hint="Cuenta qué pasó" :maxlength="500" :error="\'La descripción es obligatoria.\'" />',
         'switch#error' => '<x-muni::switch label="Acepto recibir notificaciones" name="avisos_observado"'
             .' description="Obligatorio para seguir el trámite en línea" :error="\'Debes aceptar para continuar.\'" />',
+        // Entradas devueltas por los agentes del workflow de cierre del backlog.
+        'calendar' => '<x-muni::calendar name="fecha_cita" min="2026-09-05" value="2026-09-12" />',
+        'command-palette' => '<x-muni::command-palette :items="['
+            .'[\'label\' => \'Bandeja de entrada\', \'url\' => \'#bandeja\', \'group\' => \'Trámites\'],'
+            .'[\'label\' => \'Patentes morosas\', \'url\' => \'#patentes\', \'group\' => \'Rentas\'],'
+            .'[\'label\' => \'Usuarios del sistema\', \'url\' => \'#usuarios\', \'group\' => \'Administración\'],'
+            .']" />',
+        'modal#confirmacion' => '<x-muni::modal id="vitrina-confirmacion" title="¿Anular la solicitud 2024-118?" role="alertdialog" :dismissable="false" initial-focus="cancelar">'
+    .'<x-slot:trigger><x-muni::button variant="danger">Anular solicitud</x-muni::button></x-slot:trigger>'
+    .'<p>La solicitud de <b>Rosa Contreras</b> (folio 2024-118) quedará anulada y se avisará a Obras. '
+    .'No se puede deshacer desde el panel.</p>'
+    .'<x-slot:footer><x-muni::button variant="danger">Anular solicitud</x-muni::button></x-slot:footer>'
+    .'</x-muni::modal>',
+        'spinner' => '<p>Generar padrón <x-muni::spinner size="16px" /> <x-muni::spinner /> <x-muni::spinner size="32px" /></p>',
+        'busy-region' => '<x-muni::busy-region target="rut" loading="Buscando en el maestro de personas…" status="1 persona encontrada"><p>Ana Soto Miranda · 12.345.678-9</p></x-muni::busy-region> <x-muni::busy-region target="rut" loading="Buscando en el maestro de personas…" :busy="true"><p>Ana Soto Miranda · 12.345.678-9</p></x-muni::busy-region>',
+        'selector-tema' => '<x-muni::selector-tema action="/preferencias/tema" value="sistema" />',
+        // Fecha LEJANA a propósito: con una real, en cuanto pasara el velo opaco taparía la vitrina
+        // entera y la reja mediría solo el bloqueo. Acá se mide el estado de reposo (raíz teleportada,
+        // región viva vacía, diálogo oculto); los estados visibles los mide su propio banco
+        // (build/sesion-guardia/, tests/navegador/guardia-de-sesion.py) en los dos temas.
+        'sesion-guardia' => '<x-muni::sesion-guardia id="vitrina-sesion" expira-en="2030-01-01T12:00:00-03:00" renovar-url="#" salir-url="#" ingresar-url="#" duracion="7200" />',
     ];
 }
 

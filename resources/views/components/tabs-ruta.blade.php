@@ -139,6 +139,15 @@
      */
     $apuntado = $texto($attributes->get('aria-labelledby'));
 
+    if ($apuntado === '') {
+        /* Y se saca de la bolsa: un `aria-labelledby` vacío al lado del
+           `aria-label` no nombra nada por la norma, pero deja el nombre del
+           landmark a merced de cómo lo resuelva cada lector. Se reasigna
+           `$attributes` —y no otra variable— porque el derrame solo se compila
+           si la expresión empieza literalmente por `$attributes` (DESIGN §8). */
+        $attributes = $attributes->except('aria-labelledby');
+    }
+
     $porDefecto = $apuntado !== ''
         ? ['class' => 'muni-tabr']
         : ['class' => 'muni-tabr', 'aria-label' => $label];

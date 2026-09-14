@@ -542,7 +542,7 @@ it('la entrada de la vitrina renderiza la ficha del vecino con datos reales', fu
      */
     $ejemplo = '<x-muni::tabs-ruta label="Secciones del vecino" actual="vecino.documentos" :items="['
         .'[\'etiqueta\' => \'Solicitudes\', \'href\' => \'#solicitudes\', \'clave\' => \'vecino.solicitudes\', \'badge\' => 3, \'badgeLabel\' => \'solicitudes abiertas\'],'
-        .'[\'etiqueta\' => \'Documentos\', \'href\' => \'#documentos\', \'clave\' => \'vecino.documentos\'],'
+        .'[\'etiqueta\' => \'Documentos\', \'href\' => \'#documentos\', \'clave\' => \'vecino.documentos\', \'badge\' => 2, \'badgeLabel\' => \'documentos adjuntos\'],'
         .'[\'etiqueta\' => \'Historial de contactos\', \'href\' => \'#contactos\', \'clave\' => \'vecino.contactos\'],'
         .']" />';
 
@@ -551,6 +551,13 @@ it('la entrada de la vitrina renderiza la ficha del vecino con datos reales', fu
     expect(count(enlacesDeSolapa($html)))->toBe(3, 'La entrada de la vitrina no pinta las tres secciones.');
     expect(substr_count($html, 'aria-current="page"'))->toBe(1, 'La entrada de la vitrina no marca la sección actual.');
     expect(str_contains($html, '3 solicitudes abiertas'))->toBeTrue('La entrada de la vitrina pierde el contador.');
+    /* El contador va también en la solapa ACTIVA: es la única regla que invierte los
+       colores (fondo --muni-accent, texto --muni-on-accent) y sin eso la reja de la
+       vitrina no la mediría en ninguna de las cuatro paletas. */
+    expect(str_contains($html, '2 documentos adjuntos'))->toBeTrue(
+        'La entrada de la vitrina no lleva contador en la solapa activa: la regla que invierte '.
+        'los colores se queda sin medir.'
+    );
 });
 
 it('se renderiza SIN UNA SOLA PROP, que es como lo llama el candado de humo', function () {
@@ -605,6 +612,11 @@ it('el aria-labelledby NULO del anfitrión no deja el landmark sin nombre', func
     expect((bool) preg_match('/<nav\b[^>]*\baria-label="[^"]+"/i', $vacio))->toBeTrue(
         'Con aria-labelledby="" tampoco recupera su nombre por defecto: '.$vacio
     );
+    expect((bool) preg_match('/aria-labelledby="\s*"/i', $vacio))->toBeFalse(
+        'Deja puesto un aria-labelledby vacío al lado del aria-label: por la norma el vacío no '.
+        'nombra nada y gana el aria-label, pero no todos los lectores lo resuelven igual y el '.
+        'landmark queda a merced de la implementación. Se saca de la bolsa: '.$vacio
+    );
 });
 
 it('un objeto sin __toString dentro de una solapa se descarta en vez de tumbar la página', function () {
@@ -628,7 +640,10 @@ it('un objeto sin __toString dentro de una solapa se descarta en vez de tumbar l
     expect(count($enlaces))->toBe(2, 'Se esperaban solo las dos solapas sanas: '.$html);
     expect(str_contains($html, 'Historial de contactos'))->toBeTrue('Descartó la solapa sana por el badge inválido.');
     expect(str_contains($html, 'Domicilios'))->toBeTrue('Descartó la solapa sana por la clave inválida.');
-    expect(str_contains($html, 'muni-tabr__badge'))->toBeFalse('Pintó un contador que no es un texto.');
+    /* Se busca el ELEMENTO, no la clase: la clase también sale en el bloque de estilos. */
+    expect((bool) preg_match('/<span class="muni-tabr__badge"/', $html))->toBeFalse(
+        'Pintó un contador con un valor que no es texto.'
+    );
 });
 
 it('el rótulo parte las palabras largas en vez de desbordar la fila', function () {
@@ -687,7 +702,10 @@ it('genera el banco de navegador en build/solapas-de-ruta/', function () {
         '<h1 id="titulo-ficha">Ana Soto Rivera</h1>'
         .'<x-muni::tabs-ruta label="Secciones del vecino" actual="vecino.documentos" :items="['
         ."['etiqueta' => 'Solicitudes', 'href' => '#solicitudes', 'clave' => 'vecino.solicitudes', 'badge' => 3, 'badgeLabel' => 'solicitudes abiertas'],"
-        ."['etiqueta' => 'Documentos', 'href' => '#documentos', 'clave' => 'vecino.documentos'],"
+        /* El contador va también en la solapa ACTIVA: es la única regla del componente
+           que INVIERTE los colores (fondo --muni-accent sobre texto --muni-on-accent) y
+           sin una solapa activa con contador en el banco esa regla no la medía nadie. */
+        ."['etiqueta' => 'Documentos', 'href' => '#documentos', 'clave' => 'vecino.documentos', 'badge' => 2, 'badgeLabel' => 'documentos adjuntos'],"
         ."['etiqueta' => 'Historial de contactos', 'href' => '#contactos', 'clave' => 'vecino.contactos'],"
         ."['etiqueta' => 'Domicilios', 'href' => '#domicilios', 'clave' => 'vecino.domicilios'],"
         .']" />'

@@ -26,8 +26,11 @@ dentro del panel solo se carga `muni-ui-filament.css`, DESIGN §7):
   · con `prefers-reduced-motion: reduce` la transición computa 0 s, y sin la
     preferencia existe (si no, la comprobación sería vacía);
   · el área táctil de cada solapa llega a 24 px de alto (2.5.8);
-  · a 390 px de ancho las solapas envuelven y el documento NO se desplaza en
-    horizontal (1.4.10);
+  · a 390 px y a 320 px de ancho las solapas ENVUELVEN y el documento NO se
+    desplaza en horizontal (1.4.10), que es la razón por la que la fila usa
+    flex-wrap y no overflow-x como el tablist de `tabs`;
+  · el contador de la solapa ACTIVA —la única regla que invierte los colores—
+    existe en el banco y pasa su propio contraste;
   · el texto solo para lector del contador mide 1 px sin `display:none`.
 
 Devuelve 0 si todo pasa; 1 con la lista de fallos; 2 si el banco no está.
@@ -42,7 +45,10 @@ RAIZ = Path(__file__).resolve().parent.parent.parent
 BANCO_POR_DEFECTO = RAIZ / "build" / "solapas-de-ruta"
 MOVIMIENTOS = ("reduce", "no-preference")
 NAVEGADORES = ("chromium", "firefox")
-ANCHOS = (("escritorio", 1440, 900), ("telefono", 390, 780))
+# 320 px es el ancho que el comentario CSS del componente usa para justificar
+# haberse separado de `tabs` (envolver en vez de desplazarse en horizontal):
+# si no se mide ahí, la justificación no tiene red.
+ANCHOS = (("escritorio", 1440, 900), ("telefono", 390, 780), ("estrecho", 320, 780))
 
 SONDA = r"""
 () => {
@@ -221,6 +227,18 @@ def verificar_estado_sin_color(d: dict, donde: str, fallos: list[str]) -> None:
         if s["barra"]["content"] not in ("none", "normal", ""):
             fallos.append(f"{donde} «{s['texto']}»: una solapa inactiva dibuja la barra del activo.")
 
+    # La solapa activa es la ÚNICA que invierte los colores del contador (fondo
+    # --muni-accent, texto --muni-on-accent). Si el banco deja de traer contador
+    # en la activa, esa regla se queda sin medir y nadie se entera: se exige aquí
+    # para que `verificar_contraste` tenga siempre ese par que comparar.
+    if activa["badge"] is None:
+        fallos.append(
+            f"{donde}: la solapa activa no trae contador, así que la única regla que invierte "
+            "los colores (--muni-on-accent sobre --muni-accent) no la mide nadie."
+        )
+    elif a_rgb(activa["badge"]["fondo"]) is None or "rgba(0, 0, 0, 0)" in activa["badge"]["fondo"]:
+        fallos.append(f"{donde}: el contador de la solapa activa no pinta su fondo propio: {activa['badge']['fondo']!r}")
+
 
 def verificar_contraste(d: dict, donde: str, fallos: list[str]) -> float:
     peor = 99.0
@@ -340,8 +358,8 @@ def main(argv: list[str]) -> int:
 
                         if d["desbordaX"]:
                             fallos.append(f"{donde}: el documento se desplaza en horizontal (WCAG 1.4.10).")
-                        if ancho_nombre == "telefono" and d["filas"] < 2:
-                            fallos.append(f"{donde}: a 390px las cuatro solapas siguen en una sola fila.")
+                        if ancho <= 390 and d["filas"] < 2:
+                            fallos.append(f"{donde}: a {ancho}px las cuatro solapas siguen en una sola fila.")
 
                         teclado = verificar_teclado(pagina, donde, fallos)
 

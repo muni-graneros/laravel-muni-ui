@@ -490,7 +490,7 @@ it('el alcance es solo tabla: ningún otro componente lee la densidad', function
  * que el selector que lleva la banda sea uno que el marcado servido PUEDE casar.
  * La medición de verdad está en `tests/navegador/densidad-de-tabla.py`.
  */
-it('la banda de sortable-table no puede colgar de :first-child ni de `+ td`: el <tr> empieza por un <template', function () {
+it('la banda de sortable-table no puede colgar de :first-child ni de `+ td`: entre el <tr> y sus celdas hay un <template x-for>', function () {
     $html = tablaOrdenableDensaHtml();
 
     expect((bool) preg_match('/<tr\b[^>]*>\s*<template\b/', $html))->toBeTrue(
@@ -716,9 +716,17 @@ it('genera el banco de navegador en build/densidad-de-tabla/', function () {
         'podría medir. Falta node_modules/alpinejs (npm install).'
     );
 
+    /* El enlace de la celda va SIN estilar a propósito —es el peor caso del piso
+       de objetivo: un <a> pelado no trae ni min-height ni min-width propios, así
+       que lo que lo sostiene en 24x24 es la regla del componente y nada más—, pero
+       el banco le pone el color del texto: el azul por defecto del navegador da
+       1,93:1 sobre la superficie oscura y ensuciaría la medición de contraste con
+       un defecto que es del banco y no del componente. (En la vitrina la celda de
+       acciones lleva <x-muni::button>, que es lo que usan los sistemas.) */
     $armazon = 'body{margin:0;padding:16px;background:var(--muni-bg);color:var(--muni-text);font-family:var(--muni-font-sans)}'
         .'h2{font-size:12px;font-weight:700;margin:16px 0 6px;color:var(--muni-muted)}'
-        .'section:first-child h2{margin-top:0}';
+        .'section:first-child h2{margin-top:0}'
+        .'[data-caso] td a, [data-caso] td button{color:var(--muni-text);background:none;border:0;font:inherit;text-decoration:underline;cursor:pointer}';
 
     // Las cuatro páginas: los dos temas × con y sin el modo compacto del
     // anfitrión pintado en el <html>, que es la única vía de persistencia que el
@@ -784,4 +792,35 @@ it('en Chromium y Firefox: la fila encoge, el objetivo no baja de 24×24, la her
     // reproducible desde el repo y no desde un banco en /tmp.
     expect(count(array_filter($lineas, fn (string $l) => str_contains($l, 'filas por pantallada'))))->toBeGreaterThan(0,
         "El guion no reportó cuántas filas caben a 1366×768 en cada densidad:\n".implode("\n", $lineas));
+});
+
+/*
+ * La reja oficial de accesibilidad (`scripts/a11y-check.py`, la misma de
+ * `npm run a11y:vitrina`) sobre el banco: contraste real de todo el texto y
+ * axe-core, en los DOS temas. Se corre sobre una sola de las cuatro páginas
+ * porque el contenido es idéntico —lo que cambia entre ellas es el atributo del
+ * anfitrión y el tema del documento, y la reja fuerza los dos temas ella misma—,
+ * y una página son ya 543 textos medidos: las tres densidades, la fila morosa y
+ * la columna de selección.
+ *
+ * Hacía falta porque la reja nunca había medido estas dos tablas: `data-table` no
+ * está en `ejemplosDeVitrina()` (hay que agregarlo; la entrada va en el informe de
+ * la ficha) y la densidad compacta no existía cuando se midió `sortable-table`.
+ */
+it('la reja de accesibilidad pasa sobre el banco denso en los dos temas', function () {
+    if (pythonDeLaRejaDensa() === null) {
+        $this->markTestSkipped('Sin .venv-a11y (npm run a11y:instalar) no hay navegador: la reja se salta, no se da por hecha.');
+    }
+
+    $lineas = [];
+    $codigo = 0;
+
+    exec(
+        'cd '.escapeshellarg(dirname(__DIR__)).' && python3 '.escapeshellarg(__DIR__.'/../scripts/a11y-check.py').' '
+        .escapeshellarg(__DIR__.'/../build/densidad-de-tabla/claro.html').' 2>&1',
+        $lineas,
+        $codigo,
+    );
+
+    expect($codigo)->toBe(0, "La reja de accesibilidad falla sobre la tabla densa:\n".implode("\n", array_slice($lineas, -40)));
 });

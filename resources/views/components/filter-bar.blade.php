@@ -5,6 +5,17 @@
 
 {{-- Barra de filtros GET: los valores quedan en la URL para que las descargas
      (xlsx/csv) los arrastren. El slot son los campos (usar <x-muni::field>). --}}
+@php
+    /* El token va SOLO si el método no es GET, y la comparación es insensible a
+       mayúsculas porque `method="POST"` es igual de válido en HTML. En GET sería
+       peor que inútil: los filtros viven en la URL —esa es toda la gracia del
+       componente— y el token acabaría en la cadena de consulta que el funcionario
+       copia y pega en un correo. En POST, sin token, Laravel responde 419 y el
+       filtro no se aplica jamás: es el defecto que el juez mandó arreglar antes
+       que cualquier componente nuevo. */
+    $muniFbProtegido = strtolower(trim((string) $method)) !== 'get';
+@endphp
+
 <form
     method="{{ $method }}"
     @if ($action) action="{{ $action }}" @endif
@@ -14,6 +25,10 @@
             .'border:1px solid var(--muni-border);border-radius:var(--muni-radius);',
     ]) }}
 >
+    @if ($muniFbProtegido)
+        @csrf
+    @endif
+
     {{ $slot }}
 
     <div style="display:flex;gap:8px;margin-left:auto;">

@@ -168,7 +168,7 @@ it('es un formulario POST real con token CSRF y botón de envío: funciona sin J
         'El formulario no lleva el token CSRF: la ruta protegida responde 419 y la preferencia no se guarda.'
     );
     expect((bool) preg_match('/<button\b[^>]*\btype="submit"/', $html))->toBeTrue(
-        'No hay botón de envío: sin JS (o con la CSP bloqueando el onchange en línea de segmented) no hay forma de guardar.'
+        'No hay botón de envío: sin JS segmented no autoenvía, así que no hay forma de guardar.'
     );
 });
 
@@ -277,21 +277,21 @@ it('aplica el tema con data-muni-theme en la raíz y nunca toca la clase .dark d
     );
 });
 
-it('intercepta el cambio en fase de captura para que el onchange en línea de segmented no recargue', function () {
+it('intercepta el cambio en fase de captura para que el autoenvío de segmented no recargue', function () {
     /*
-     * `segmented` emite `onchange="this.form && this.form.submit()"` en cada
-     * radio: dentro de un <form>, elegir una opción recarga la página. Con
+     * `segmented` envía el formulario con `x-on:change` + requestSubmit() al
+     * elegir una opción: dentro de un <form>, eso recarga la página. Con
      * Alpine el cambio se aplica al instante y se guarda por fetch; para que
-     * el submit nativo no gane la carrera, el formulario escucha `change` en
-     * CAPTURA y detiene la propagación antes de que llegue al radio. Sin
-     * Alpine (o bloqueado) el onchange sigue ahí y el botón Guardar también.
+     * ese envío no gane la carrera, el formulario escucha `change` en CAPTURA
+     * y detiene la propagación antes de que llegue al radio. Sin Alpine no hay
+     * autoenvío y el botón Guardar sigue ahí.
      */
     $form = stEtiquetaForm(stHtml());
 
     expect($form)->not->toBe('', 'No se encontró la etiqueta <form> en el HTML.');
 
     expect((bool) preg_match('/\s(?:@|x-on:)change\.capture\.stop=/', $form))->toBeTrue(
-        'El formulario no escucha `change` en captura con `.stop`: el onchange en línea de segmented '.
+        'El formulario no escucha `change` en captura con `.stop`: el autoenvío de segmented '.
         'envía el formulario y cada flecha del teclado recarga la página (WCAG 2.2 AA 3.2.2).'
     );
 

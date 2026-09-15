@@ -32,11 +32,12 @@
      dice en texto visible con role="status". Sin JS es un formulario: botón Guardar,
      POST, recarga con el tema leído de la cookie.
 
-     `segmented` emite en cada radio un `onchange` en línea que envía el formulario.
-     Para que ese submit nativo no le gane al camino de Alpine —y cada flecha del
-     teclado recargue la página— el formulario escucha `change` en CAPTURA y detiene
-     la propagación antes de que llegue al radio. Sin Alpine el onchange sigue vivo
-     (donde la CSP lo permita) y el botón Guardar está siempre.
+     `segmented` envía el formulario al elegir (un `x-on:change` con requestSubmit()
+     en cada radio, que ya no se dispara con las flechas). Para que ese envío no le
+     gane al camino de Alpine, el formulario escucha `change` en CAPTURA y detiene
+     la propagación antes de que llegue al radio. Sin Alpine no hay autoenvío y el
+     botón Guardar está siempre; el «Aplicar» de respaldo de `segmented` no aparece,
+     porque este formulario ya trae su botón.
 
      DÓNDE NO VA. Nunca dentro de un panel Filament: el panel ya trae su conmutador
      con persistencia propia, que muni-ui respeta vía `.dark`; dos conmutadores son

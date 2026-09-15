@@ -39,7 +39,7 @@
                  @if(filled($title)) aria-labelledby="{{ $tituloId }}" @else aria-label="Panel lateral de detalle" @endif
                  x-transition:enter="muni-drawer" x-transition:enter-start="{{ $isRight ? 'muni-drawer-r0' : 'muni-drawer-l0' }}" x-transition:enter-end="muni-drawer-1"
                  x-transition:leave="muni-drawer" x-transition:leave-start="muni-drawer-1" x-transition:leave-end="{{ $isRight ? 'muni-drawer-r0' : 'muni-drawer-l0' }}"
-                 style="position:absolute;top:0;bottom:0;{{ $isRight ? 'right:0;' : 'left:0;' }}width:{{ $width }};max-width:92vw;display:flex;flex-direction:column;background:var(--muni-surface);border-{{ $isRight ? 'left' : 'right' }}:1px solid var(--muni-border);box-shadow:var(--muni-shadow-lg);">
+                 style="position:absolute;top:0;bottom:0;{{ $isRight ? 'right:0;' : 'left:0;' }}width:{{ $width }};max-width:92vw;display:flex;flex-direction:column;background:var(--muni-surface);border-{{ $isRight ? 'left' : 'right' }}:1px solid var(--muni-overlay-border, var(--muni-border));box-shadow:var(--muni-shadow-lg);">
                 <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--muni-border);">
                     <h2 id="{{ $tituloId }}" style="margin:0;font-family:var(--muni-font-sans);font-size:15px;font-weight:700;color:var(--muni-text);">{{ $title }}</h2>
                     <button type="button" @click="open=false" aria-label="Cerrar" class="muni-drawer__x">

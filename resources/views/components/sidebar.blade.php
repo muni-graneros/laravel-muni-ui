@@ -202,7 +202,12 @@
         @media (max-width: {{ $bpMax }}) {
             .muni-sb { position:fixed; inset:0 auto 0 0; z-index:150; transform:translateX(-100%); visibility:hidden;
                 transition:transform var(--muni-dur) var(--muni-ease), visibility 0s linear var(--muni-dur);
-                box-shadow:var(--muni-shadow-lg); }
+                box-shadow:var(--muni-shadow-lg);
+                /* Superpuesta FLOTA sobre el contenido, y suelta (sin el armazón)
+                   ni siquiera tiene velo: su límite es el de una superficie
+                   flotante, no el de un separador. En columna sigue en
+                   --muni-border. Con respaldo, para la hoja sin republicar. */
+                border-right-color:var(--muni-overlay-border, var(--muni-border)); }
             .muni-sb--open { transform:translateX(0); visibility:visible; transition:transform var(--muni-dur) var(--muni-ease), visibility 0s; }
         }
     </style>

@@ -19,13 +19,17 @@
             .'background:var(--muni-surface);border-bottom:1px solid var(--muni-border);',
     ]) }}
 >
-    {{-- Logo sobre lienzo blanco: patrón del ecosistema (el escudo municipal necesita
-         fondo claro para leerse igual en tema oscuro y claro). --}}
-    <div style="height:38px;display:flex;align-items:center;justify-content:center;padding:4px 10px;background:#fff;border-radius:var(--muni-radius-sm);flex-shrink:0;">
+    {{-- Placa del escudo: el PNG tiene el contorno en petróleo casi negro y sobre
+         la superficie oscura se pierde, así que va sobre placa clara. La placa es
+         un token con dos ramas (blanca en claro, gris apagado en oscuro) y no el
+         recuadro blanco fijo de antes, que encandilaba en una sala a oscuras. El
+         respaldo es otro token con dos ramas, para el sistema que todavía tiene
+         publicada la hoja anterior. --}}
+    <div style="height:38px;display:flex;align-items:center;justify-content:center;padding:4px 10px;background:var(--muni-logo-plate, var(--muni-surface));border-radius:var(--muni-radius-sm);flex-shrink:0;">
         @if ($logo)
             {{ $logo }}
         @else
-            <span style="font-family:var(--muni-font-mono);font-weight:700;font-size:13px;color:#0b0f14;letter-spacing:-.02em;">GRA</span>
+            <span style="font-family:var(--muni-font-mono);font-weight:700;font-size:13px;color:var(--muni-logo-plate-fg, var(--muni-text));letter-spacing:-.02em;">GRA</span>
         @endif
     </div>
 

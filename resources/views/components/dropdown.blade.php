@@ -245,7 +245,7 @@
         role="menu"
         {{ $attributes->merge([
             'style' => "position:absolute;top:calc(100% + 6px);{$origin}z-index:50;min-width:{$width};"
-                ."padding:5px;background:var(--muni-surface);border:1px solid var(--muni-border);"
+                ."padding:5px;background:var(--muni-surface);border:1px solid var(--muni-overlay-border, var(--muni-border));"
                 ."border-radius:var(--muni-radius);box-shadow:var(--muni-shadow-lg);"
                 ."transform-origin:top ".($align === 'start' ? 'left' : 'right').";",
         ]) }}

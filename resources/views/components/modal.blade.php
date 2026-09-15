@@ -187,7 +187,7 @@
                 {{ $attributes->merge([
                     'style' => "position:relative;width:100%;max-width:{$maxWidth};max-height:calc(100vh - 40px);"
                         ."display:flex;flex-direction:column;background:var(--muni-surface);color:var(--muni-text);"
-                        ."border:1px solid var(--muni-border);border-radius:var(--muni-radius-lg);"
+                        ."border:1px solid var(--muni-overlay-border, var(--muni-border));border-radius:var(--muni-radius-lg);"
                         ."box-shadow:var(--muni-shadow-lg);overflow:hidden;font-family:var(--muni-font-sans);",
                 ]) }}
             >

@@ -6,6 +6,8 @@
     'hint' => null,
     'icon' => null,
     'required' => false,
+    'requiredText' => 'obligatorio',
+    'requiredTextVisible' => false,
 ])
 
 @php
@@ -71,12 +73,35 @@
      * propósito: el primer comentario Blade del archivo es la descripción que
      * `npm run registro` escribe en registry.json.
      */
+
+    /*
+     * La palabra «obligatorio» va en TEXTO junto a la etiqueta, y no solo el
+     * asterisco. El asterisco es un glifo: un lector de pantalla lo lee
+     * «asterisco» —o no lo lee—, y quien no conoce la convención no sabe qué
+     * significa. Con la palabra al lado, el asterisco pasa a ser decoración y
+     * lleva aria-hidden; sin ella (`required-text=""`) vuelve a ser el único
+     * indicador y se deja audible, porque taparlo dejaría al campo sin ninguno.
+     *
+     * Se apaga con la CADENA VACÍA, no con `null`: la directiva de props aplica
+     * el valor por defecto con `??`, así que un null explícito vuelve al texto
+     * de fábrica. Es lo contrario de lo que hace un `:algo="null"` sobre un
+     * componente hijo, que sí gana (DESIGN §8).
+     *
+     * Oculta a la vista por defecto: el `required` nativo ya la anuncia y el
+     * formulario pone la leyenda general (técnica G184), así que repetirla
+     * visible en los treinta campos de un trámite es ruido. Con
+     * `required-text-visible` se ve, para el formulario corto donde la leyenda
+     * queda lejos.
+     */
+    $muniObl = trim((string) $requiredText);
+    $muniOblClase = $requiredTextVisible ? 'muni-obl' : 'muni-sr';
+    $muniOblTexto = $requiredTextVisible ? '('.$muniObl.')' : $muniObl;
 @endphp
 
 <div style="display:flex;flex-direction:column;gap:6px;">
     @if ($label)
         <label for="{{ $muniId }}" style="font-family:var(--muni-font-sans);font-size:12.5px;font-weight:600;color:var(--muni-text);">
-            {{ $label }}@if ($required)<span style="color:var(--muni-danger-fg);margin-left:2px;">*</span>@endif
+            {{ $label }}@if ($required)@if ($muniObl !== '')<span aria-hidden="true" style="color:var(--muni-danger-fg);margin-left:2px;">*</span><span class="{{ $muniOblClase }}"> {{ $muniOblTexto }}</span>@else<span style="color:var(--muni-danger-fg);margin-left:2px;">*</span>@endif@endif
         </label>
     @endif
 
@@ -123,6 +148,8 @@
 
 @once
     <style>
+        .muni-sr { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
+        .muni-obl { font-weight:400; font-size:.92em; color:var(--muni-muted); }
         .muni-input::placeholder { color: var(--muni-hint); }
         /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
         .muni-input:focus { outline: 3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset: 2px; border-color: var(--muni-accent); box-shadow: var(--muni-ring); }

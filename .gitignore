@@ -13,3 +13,7 @@ demo/vendor/
 a11y-informe.json
 .venv-a11y/
 /build/
+
+# Artefactos del sandbox de Claude Code: son dispositivos y archivos vacíos que el
+# harness monta dentro del repo, no configuración del proyecto. Se colaron en 95a1ee2.
+/.claude/

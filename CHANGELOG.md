@@ -79,6 +79,23 @@ versionado 0.x) y hay que **republicar el tema del panel**, o nada de esto llega
   regla de «activo» escrita una vez. **El paquete no consulta `Gate`, `Auth` ni `request()`**:
   recibe el árbol ya filtrado y el permiso ya evaluado. Esconder un ítem del menú es cosmético y
   nunca protege un endpoint.
+- **Diecisiete fichas más del backlog, cada una con revisión adversarial y verificación en
+  Chromium y Firefox** —bancos reproducibles en `tests/navegador/`—:
+  - `<x-muni::description-list>`/`description-item` (pares dato-valor con `dl`), `<x-muni::record-list>`
+    (los registros como fichas cuando la tabla no cabe), `<x-muni::input-password>` (ver lo que se
+    escribe, con botón real), `<x-muni::tabs-ruta>` (solapas que navegan en vez de cargar todos los
+    paneles).
+  - Pantallas completas: `pantalla-resultado` (cierre con folio), `pantalla-bloqueo` (bloqueo por
+    inactividad sin perder el trabajo), `formulario-tramite`, `ajustes-cuenta`, `agenda-horas`,
+    `asistente` (pasos con validación) y `plantilla-pantalla`.
+  - `<x-muni::bulk-bar>` para acciones en lote; densidad compacta en `data-table` y `sortable-table`.
+  - `<x-muni::pii>`: el dato personal oculto por omisión, revelado con un acto explícito que avisa al
+    anfitrión para la bitácora de accesos (Ley 21.719).
+  - Tokens `--muni-overlay-border`, `--muni-dur-slow` y `--muni-logo-plate` en las dos hojas.
+- **Vitrina de desarrollo** con `vendor/bin/testbench serve` en `/vitrina`, generada recorriendo el
+  directorio de componentes. Vive en `workbench/`: el paquete no registra rutas.
+- Candado `SinRastrosDeDepuracionTest`: falla ante escrituras a disco, volcados de variables y
+  marcadores de depuración en cualquier componente.
 - `<x-muni::spinner>` y `<x-muni::busy-region>`: decir que algo está en curso **en texto** y
   decir cuándo terminó, con `aria-busy` y anuncio del recuento. Queda un paso manual con NVDA y
   VoiceOver que no existe en esta máquina.
@@ -171,6 +188,12 @@ versionado 0.x) y hay que **republicar el tema del panel**, o nada de esto llega
 - **`dropdown` declaraba `role="menu"` sin implementar el patrón**: cada ítem era una parada de
   `Tab`, las flechas no hacían nada y `Escape` dejaba el foco perdido. Ahora flechas con vuelta,
   `Home`/`End`, roving tabindex y retorno del foco al disparador.
+- **`toast-host` autodestruía todo aviso a los 4,5 s** sin pausa al puntero ni al foco: un folio no
+  alcanzaba a leerse. Los errores ya no se autocierran y dos avisos seguidos se anuncian los dos.
+- **`breadcrumb` eran enlaces sueltos que solo se distinguían por color**; ahora es una lista con
+  `aria-current`. **`ring` no exponía el porcentaje** a tecnologías de apoyo. **`filter-bar` no
+  llevaba `@csrf`**: con `method="post"` daba 419. **La banda de peligro no se pintaba en
+  `sortable-table`**, porque el primer hijo de la fila es el `<template>` de Alpine.
 - **`alert` inventaba la región viva por el tono**: `danger` salía siempre con `role="alert"`,
   así que una nota fija de instrucciones se anunciaba como aviso cada vez que se pintaba. El rol
   lo declara ahora el consumidor cuando de verdad anuncia algo.

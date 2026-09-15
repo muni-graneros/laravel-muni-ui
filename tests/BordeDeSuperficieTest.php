@@ -13,8 +13,9 @@
 | Decisión: NO se oscurece `--muni-border` para todo el paquete, que endurecería
 | cada separador y cada tarjeta. Se crea `--muni-overlay-border`, que SOLO usan
 | las superficies que flotan sobre la página: popover, dropdown, modal, drawer,
-| paleta de comandos, avisos flotantes, el aviso de sesión y la lateral cuando se
-| superpone (solo bajo su punto de quiebre). Mismo precedente que
+| paleta de comandos, avisos flotantes, el aviso de sesión, la lista del combobox,
+| el panel de la pantalla de bloqueo y la lateral cuando se superpone (solo bajo
+| su punto de quiebre). Mismo precedente que
 | `--muni-field-border`: token propio, declarado en las dos hojas y medido.
 |
 | Se mide contra TODA superficie sobre la que el panel puede quedar flotando
@@ -24,7 +25,8 @@
 |
 | Los diálogos con velo (modal, drawer, paleta, lateral superpuesta y sesión) NO
 | tocan el fondo de la página: por fuera tocan el velo. Eso se mide aparte,
-| componiendo el velo que declara cada componente sobre cada superficie.
+| componiendo el velo que declara cada componente sobre cada superficie. Modal,
+| drawer y paleta leen el color del velo de `--muni-scrim`.
 */
 
 /** Superficies sobre las que puede flotar un panel. */
@@ -171,6 +173,10 @@ it('las superficies flotantes dibujan su límite con el token, con respaldo para
         'command-palette.blade.php',
         'toast-host.blade.php',
         'sesion-guardia.blade.php',
+        // Flotan con sombra y z-index propio: la lista del combobox sobre el
+        // formulario, y el panel de la pantalla de bloqueo sobre su capa.
+        'combobox.blade.php',
+        'pantalla-bloqueo.blade.php',
     ];
 
     $vistas = componentesBladeBds();
@@ -231,8 +237,8 @@ it('contra el velo, el límite del diálogo se sigue viendo en cada rama de las 
 
     $velos = [
         'modal.blade.php' => '/\.muni-modal__veil\s*\{[^}]*background:\s*([^;]+);\s*opacity:\s*([0-9.]+)/',
-        'drawer.blade.php' => '/inset:0;background:(rgba\([^)]*\))/',
-        'command-palette.blade.php' => '/inset:0;background:(rgba\([^)]*\))/',
+        'drawer.blade.php' => '/\.muni-drawer__velo\s*\{[^}]*background:\s*([^;]+);\s*opacity:\s*([0-9.]+)/',
+        'command-palette.blade.php' => '/\.muni-cmdk__velo\s*\{[^}]*background:\s*([^;]+);\s*opacity:\s*([0-9.]+)/',
         'dashboard-shell.blade.php' => '/\.muni-ds__scrim\s*\{[^}]*background:\s*(rgba\([^)]*\))/',
         'sesion-guardia.blade.php' => '/\.muni-sg__velo\s*\{[^}]*background:\s*([^;]+);\s*opacity:\s*([0-9.]+)/',
     ];
@@ -250,25 +256,18 @@ it('contra el velo, el límite del diálogo se sigue viendo en cada rama de las 
     ];
 
     /*
-     * DEUDA CONOCIDA, con piso. El velo del modal es petróleo institucional y en
-     * oscuro ACLARA la página: donde queda sobre --muni-surface-2, --muni-surface-3
-     * o --muni-panel el panel y el velo casi no se distinguen (1,24 a 1,35:1) y el
-     * borde flotante da de 2,77 a 2,85:1 (ui) y 2,89:1 (panel) contra
-     * el velo, aunque 3,59–3,74:1 contra el panel. Con --muni-border daba 1,06:1:
-     * mejora mucho, pero no llega. Ningún valor del borde lo arregla sin romper el
-     * 3:1 contra el panel: lo que falta es un token de velo (--muni-scrim) casi
-     * negro como el de drawer y paleta, que además saque los rgba() literales de
-     * esos componentes. No se inventa desde un componente; queda pedido.
-     * El piso impide que empeore; si un día cumple, la prueba pide sacarlo.
+     * SIN DEUDA, piso de 3:1. El velo del modal era petróleo institucional y en
+     * oscuro ACLARABA la página: sobre --muni-surface-2, --muni-surface-3 o
+     * --muni-panel el borde flotante daba de 2,77 a 2,85:1 (ui) y 2,89:1 (panel)
+     * contra el velo. Ningún valor del borde lo arreglaba sin romper el 3:1 contra
+     * el panel: el arreglo fue el token --muni-scrim, casi negro, que leen los tres
+     * diálogos con velo propio (modal, drawer y paleta) y que sacó los rgba()
+     * literales de drawer y paleta.
+     *
+     * En oscuro se exige además el borde contra el velo por sí solo: ahí panel y
+     * velo son casi el mismo negro y el relleno nunca dibuja el límite, así que un
+     * relleno que llegara de casualidad no puede tapar un borde que no se ve.
      */
-    $deudaConocida = [
-        'modal.blade.php | muni-ui.css oscuro | surface-2' => 2.7,
-        'modal.blade.php | muni-ui.css oscuro | surface-3' => 2.7,
-        'modal.blade.php | muni-ui.css oscuro | panel' => 2.7,
-        'modal.blade.php | muni-ui-filament.css oscuro | surface-3' => 2.8,
-    ];
-    $vistos = [];
-
     $fallos = [];
 
     foreach ($velos as $archivo => $patron) {
@@ -304,18 +303,9 @@ it('contra el velo, el límite del diálogo se sigue viendo en cada rama de las 
                 // línea que se ve contra los DOS lados. Un borde que contrasta solo
                 // con uno de ellos no dibuja nada si panel y velo son del mismo tono.
                 $cumple = $relleno >= 3.0 || min($adentro, $afuera) >= 3.0;
-                $caso = "{$archivo} | ".strtok($rama, ' ').' '.(str_contains($rama, 'oscuro') ? 'oscuro' : 'claro')." | {$debajo}";
 
-                if (isset($deudaConocida[$caso])) {
-                    $vistos[$caso] = true;
-
-                    if ($cumple) {
-                        $fallos[] = "{$caso}: ya llega a 3:1 en {$rama}; sácalo de la deuda conocida.";
-                    } elseif ($afuera < $deudaConocida[$caso]) {
-                        $fallos[] = sprintf('%s en %s: el borde bajó a %.2f:1 contra el velo, bajo el piso de %.2f:1 de la deuda conocida.', $caso, $rama, $afuera, $deudaConocida[$caso]);
-                    }
-
-                    continue;
+                if (str_contains($rama, 'oscuro')) {
+                    $cumple = min($adentro, $afuera) >= 3.0;
                 }
 
                 if (! $cumple) {
@@ -326,8 +316,78 @@ it('contra el velo, el límite del diálogo se sigue viendo en cada rama de las 
         }
     }
 
-    expect(array_keys($vistos))->toEqualCanonicalizing(array_keys($deudaConocida), 'Una entrada de la deuda conocida ya no corresponde a ningún caso medido.');
     expect($fallos)->toBe([], "El límite del diálogo se pierde contra el velo (WCAG 1.4.11):\n  ".implode("\n  ", $fallos));
+});
+
+it('declara --muni-scrim en cada rama de tema de las dos hojas', function () {
+    /*
+     * El velo de un diálogo es un token y no un valor por componente. Una rama sin
+     * él hereda el velo de la otra paleta: un contenedor `.dark` dentro de una
+     * página clara se quedaría con el claro, y al revés. Se exige en las cuatro
+     * ramas de muni-ui.css y en las dos del tema del panel, que no carga la otra
+     * hoja (DESIGN §7); cada valor tiene que resolverse a un color opaco, porque
+     * la opacidad la pone el componente.
+     */
+    $muni = cssMuniUi();
+    $fila = cssMuniUiFilament();
+
+    $ramas = [
+        'muni-ui.css claro por omisión' => [bloqueTrasAncla($muni, 'Valores LIGHT (default)'), $muni],
+        'muni-ui.css oscuro del sistema operativo' => [bloqueTrasAncla($muni, 'Regla 1: preferencia del OS'), $muni],
+        'muni-ui.css oscuro explícito' => [bloqueTrasAncla($muni, 'Regla 2: activadores EXPLÍCITOS de dark'), $muni],
+        'muni-ui.css claro congelado' => [bloqueTrasAncla($muni, 'Regla 3: override EXPLÍCITO a light'), $muni],
+        'muni-ui-filament.css claro' => [bloqueTrasAncla($fila, ':root{'), $fila],
+        'muni-ui-filament.css oscuro' => [bloqueTrasAncla($fila, 'En oscuro mandan los tonos institucionales'), $fila],
+    ];
+
+    $valores = [];
+
+    foreach ($ramas as $rama => [$bloque, $hoja]) {
+        expect(tokenValor($bloque, 'scrim'))->not->toBeNull("{$rama}: no declara --muni-scrim.");
+        expect(tokenColor($bloque, $hoja, 'scrim'))->not->toBeNull("{$rama}: --muni-scrim no se resuelve a un color opaco #rrggbb.");
+
+        $valores[$rama] = tokenValor($bloque, 'scrim');
+    }
+
+    // DESIGN §3: las ramas gemelas de muni-ui.css son idénticas byte a byte.
+    expect($valores['muni-ui.css claro por omisión'])->toBe($valores['muni-ui.css claro congelado']);
+    expect($valores['muni-ui.css oscuro del sistema operativo'])->toBe($valores['muni-ui.css oscuro explícito']);
+
+    $sinComentarios = fn (string $css): string => (string) preg_replace('#/\*.*?\*/#s', '', $css);
+
+    expect(substr_count($sinComentarios($muni), '--muni-scrim:'))->toBe(4, 'muni-ui.css: --muni-scrim tiene que estar en las cuatro ramas de tema, ni una más ni una menos.');
+    expect(substr_count($sinComentarios($fila), '--muni-scrim:'))->toBe(2, 'muni-ui-filament.css: --muni-scrim tiene que estar en :root y en .dark.');
+});
+
+it('modal, drawer y paleta pintan el velo con --muni-scrim, sin color literal y con respaldo de identidad', function () {
+    /*
+     * El respaldo es el velo que el modal tenía antes del token: el petróleo
+     * oscuro institucional, que existe en las dos hojas desde antes. Un sistema
+     * que actualiza el paquete sin republicar el CSS ve los tres diálogos con ese
+     * velo; sin respaldo, `var()` sería inválido en tiempo de cómputo y el velo
+     * saldría transparente.
+     */
+    $vistas = componentesBladeBds();
+    $uso = 'var(--muni-scrim, var(--muni-gob-petroleo-dark))';
+
+    foreach (['modal.blade.php', 'drawer.blade.php', 'command-palette.blade.php'] as $archivo) {
+        $codigo = bdsSinComentarios($vistas[$archivo] ?? '');
+
+        expect(str_contains($codigo, 'background:'.$uso))->toBeTrue("«{$archivo}» no pinta su velo con {$uso}.");
+        expect((bool) preg_match('/\b(?:rgba?|hsla?|oklch|oklab)\s*\(/i', $codigo))->toBeFalse("«{$archivo}» sigue escribiendo un color funcional literal.");
+    }
+
+    $sinRespaldo = [];
+
+    foreach ($vistas as $archivo => $fuente) {
+        $codigo = bdsSinComentarios($fuente);
+
+        if (substr_count($codigo, 'var(--muni-scrim') !== substr_count($codigo, $uso)) {
+            $sinRespaldo[] = $archivo;
+        }
+    }
+
+    expect($sinRespaldo)->toBe([], 'Usan --muni-scrim sin el respaldo de identidad: '.implode(', ', $sinRespaldo));
 });
 
 it('todo uso del borde flotante trae el respaldo al borde general', function () {
@@ -375,7 +435,7 @@ function bdsVelo(string $fondo, ?string $opacidad, string $bloque, string $hoja)
         return [sprintf('#%02x%02x%02x', (int) $m[1], (int) $m[2], (int) $m[3]), $alfa * (float) $m[4]];
     }
 
-    if (preg_match('/^var\(\s*--muni-([a-z0-9-]+)\s*(?:,[^)]*)?\)$/', $fondo, $m)) {
+    if (preg_match('/^var\(\s*--muni-([a-z0-9-]+)\s*(?:,.*)?\)$/', $fondo, $m)) {
         return [tokenColor($bloque, $hoja, $m[1]) ?? colorResuelto($fondo, $hoja), $alfa];
     }
 

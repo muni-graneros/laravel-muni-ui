@@ -440,7 +440,7 @@
         /* Base: posición absoluta, que funciona en todas partes. La mejora que
            escapa de un modal o de una tabla con overflow oculto va más abajo,
            dentro del bloque de soporte condicional. */
-        .muni-combo__lista { position: absolute; top: 100%; left: 0; right: 0; z-index: 40; margin: 4px 0 0; padding: 4px; max-height: 264px; overflow-y: auto; list-style: none; background: var(--muni-surface); border: 1px solid var(--muni-border); border-radius: var(--muni-radius-sm); box-shadow: var(--muni-shadow-lg); }
+        .muni-combo__lista { position: absolute; top: 100%; left: 0; right: 0; z-index: 40; margin: 4px 0 0; padding: 4px; max-height: 264px; overflow-y: auto; list-style: none; background: var(--muni-surface); border: 1px solid var(--muni-overlay-border, var(--muni-border)); border-radius: var(--muni-radius-sm); box-shadow: var(--muni-shadow-lg); }
         .muni-combo__opcion { display: flex; align-items: center; gap: 8px; min-height: 34px; padding: 6px 10px; border-radius: var(--muni-radius-sm); border-left: 3px solid transparent; font-size: 13.5px; line-height: 18px; color: var(--muni-text); cursor: pointer; }
         /* El resaltado no se comunica solo con color: banda al borde y negrita,
            más aria-selected para quien no ve ninguna de las dos. */

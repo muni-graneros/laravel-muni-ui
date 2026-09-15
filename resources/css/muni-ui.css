@@ -77,6 +77,19 @@
        el peor caso. Token aparte para que un municipio lo ajuste sin tocar los
        campos. */
     --muni-overlay-border: #7b849c;
+    /* Velo de un diálogo con fondo (modal, drawer, paleta de comandos). Color
+       OPACO: la opacidad la pone cada componente (.55 el modal y el drawer, .5
+       la paleta), así el fundido de entrada sigue siendo un `opacity` y el
+       respaldo sin hoja publicada no cambia de forma. Antes era un valor por
+       componente, y el del modal —petróleo institucional— ACLARABA la página en
+       oscuro: el borde flotante contra el velo daba 2,77:1 sobre
+       --muni-surface-3 y --muni-panel, bajo el 3:1 de WCAG 1.4.11, y ningún
+       borde lo arreglaba sin perder el 3:1 contra el panel. Casi negro en los
+       dos temas. Medido compuesto sobre cada superficie: en claro el panel
+       blanco contra el velo da 3,60:1 o más (el relleno dibuja el límite); en
+       oscuro el borde flotante contra el velo da 3,64:1 o más, y 3,70:1 con
+       la opacidad .55 de modal y drawer. */
+    --muni-scrim: #0a0e14;
 
     --muni-accent: #0f766e;
     --muni-accent-strong: #115e59;
@@ -172,6 +185,11 @@
            3,74:1 sobre --muni-surface y 3,24:1 sobre --muni-surface-3 y
            --muni-panel #1c2333 (peor caso). Mínimo exigido: 3:1. */
         --muni-overlay-border: #5f719d;
+        /* Ver el comentario del bloque claro. Medido: el borde flotante contra
+           el velo compuesto da 3,64:1 o más sobre toda superficie (peor caso
+           --muni-surface-3 y --muni-panel; con el petróleo que usaba el modal
+           daba 2,77:1). Mínimo exigido: 3:1. */
+        --muni-scrim: #0a0e14;
         --muni-accent: #f59e0b;
         --muni-accent-strong: #d97706;
         --muni-accent-soft: #2d1d00;
@@ -230,6 +248,11 @@
        3,74:1 sobre --muni-surface y 3,24:1 sobre --muni-surface-3 y
        --muni-panel #1c2333 (peor caso). Mínimo exigido: 3:1. */
     --muni-overlay-border: #5f719d;
+    /* Ver el comentario del bloque claro. Medido: el borde flotante contra
+       el velo compuesto da 3,64:1 o más sobre toda superficie (peor caso
+       --muni-surface-3 y --muni-panel; con el petróleo que usaba el modal
+       daba 2,77:1). Mínimo exigido: 3:1. */
+    --muni-scrim: #0a0e14;
     --muni-accent: #f59e0b;
     --muni-accent-strong: #d97706;
     --muni-accent-soft: #2d1d00;
@@ -292,6 +315,8 @@
     /* Ver el comentario del bloque LIGHT por defecto: mismo valor, mismas
        mediciones (3,22:1 sobre --muni-surface-3, el peor caso). */
     --muni-overlay-border: #7b849c;
+    /* Ver el comentario del bloque LIGHT por defecto: mismo valor. */
+    --muni-scrim: #0a0e14;
     --muni-accent: #0f766e;
     --muni-accent-strong: #115e59;
     --muni-accent-soft: #f0fdfa;

@@ -237,11 +237,13 @@
         .muni-modal-x:hover { background:var(--muni-surface-3);color:var(--muni-text); }
         /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
         .muni-modal-x:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:2px; box-shadow:var(--muni-ring); }
-        /* El velo: petróleo oscuro institucional, idéntico en claro y en oscuro por
-           diseño (DESIGN §2, tokens de identidad) y declarado en las dos hojas, con
-           opacidad propia en vez de un rgba() literal. Las clases -0/-1 son las de
-           inicio y fin del fundido; van después de la base para ganarle. */
-        .muni-modal__veil { position:absolute;inset:0;background:var(--muni-gob-petroleo-dark);opacity:.55;backdrop-filter:blur(2px); }
+        /* El velo sale de --muni-scrim, declarado en cada rama de tema de las dos
+           hojas, con opacidad propia en vez de un rgba() literal. Antes era el
+           petróleo oscuro institucional, que en oscuro ACLARABA la página y dejaba
+           el borde del panel a 2,77:1 contra el velo; ese petróleo queda de
+           respaldo para el sistema que aún no republica la hoja. Las clases -0/-1
+           son las de inicio y fin del fundido; van después de la base para ganarle. */
+        .muni-modal__veil { position:absolute;inset:0;background:var(--muni-scrim, var(--muni-gob-petroleo-dark));opacity:.55;backdrop-filter:blur(2px); }
         .muni-modal__veil-0 { opacity:0; } .muni-modal__veil-1 { opacity:.55; }
         /* .muni-fade* las definen también drawer y command-palette, cada uno en su propio bloque de estilos
            de una sola vez: este bloque tiene que bastarse solo, porque una página puede

@@ -537,10 +537,13 @@ it('centra el panel con una clase, no con un display inline que x-show borra al 
 
 it('no escribe un color literal: el velo sale de un token de identidad y el único respaldo es el de foco', function () {
     // DESIGN §10: ni un color literal en un componente. El velo era
-    // `rgba(10,14,20,.55)` de siempre; ahora es el petróleo oscuro institucional
-    // (`--muni-gob-petroleo-dark`, idéntico en claro y en oscuro por diseño, y
-    // declarado en las dos hojas) con opacidad propia. El `#767676` es el
-    // tercer respaldo del outline de foco y DESIGN §5 lo permite explícitamente.
+    // `rgba(10,14,20,.55)` de siempre; después, el petróleo oscuro institucional
+    // (`--muni-gob-petroleo-dark`) con opacidad propia, que en oscuro dejaba el
+    // borde del panel a 2,77:1 contra el velo. Ahora sale de `--muni-scrim`,
+    // declarado en cada rama de tema de las dos hojas, con ese petróleo de
+    // respaldo y la misma opacidad propia (tests/BordeDeSuperficieTest.php mide
+    // el contraste). El `#767676` es el tercer respaldo del outline de foco y
+    // DESIGN §5 lo permite explícitamente.
     $fuente = (string) preg_replace('#/\*.*?\*/#s', '', file_get_contents(__DIR__.'/../resources/views/components/modal.blade.php'));
     $fuente = (string) preg_replace('/\{\{--.*?--\}\}/s', '', $fuente);
 
@@ -551,8 +554,8 @@ it('no escribe un color literal: el velo sale de un token de identidad y el úni
     expect((bool) preg_match('/\b(rgba?|hsla?|oklch|oklab|color-mix)\s*\(/i', $fuente))->toBeFalse(
         'modal escribe un color literal (rgb/hsl/oklch/color-mix): el velo tiene que salir de un token.'
     );
-    expect((bool) preg_match('/\.muni-modal__veil\s*\{[^}]*background\s*:\s*var\(--muni-gob-petroleo-dark\)[^}]*opacity\s*:\s*\.\d+/s', $fuente))->toBeTrue(
-        'El velo no se construye con el token de identidad y una opacidad propia.'
+    expect((bool) preg_match('/\.muni-modal__veil\s*\{[^}]*background\s*:\s*var\(--muni-scrim,\s*var\(--muni-gob-petroleo-dark\)\)[^}]*opacity\s*:\s*\.\d+/s', $fuente))->toBeTrue(
+        'El velo no se construye con --muni-scrim (respaldo: el token de identidad) y una opacidad propia.'
     );
 });
 

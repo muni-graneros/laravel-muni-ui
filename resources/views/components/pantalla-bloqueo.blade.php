@@ -458,7 +458,7 @@
         .muni-pb__fade-1 { opacity:1; }
         .muni-pb { display:flex; align-items:center; justify-content:center; padding:24px 20px; font-family:var(--muni-font-sans); }
         .muni-pb__panel { position:relative; width:100%; max-width:380px; padding:24px 24px 20px; text-align:center;
-            background:var(--muni-surface); color:var(--muni-text); border:1px solid var(--muni-border);
+            background:var(--muni-surface); color:var(--muni-text); border:1px solid var(--muni-overlay-border, var(--muni-border));
             border-radius:var(--muni-radius-lg); box-shadow:var(--muni-shadow-lg); font-family:var(--muni-font-sans); }
         .muni-pb__identidad { display:flex; flex-direction:column; align-items:center; gap:8px; }
         .muni-pb__nombre { margin:0; font-size:16px; font-weight:700; color:var(--muni-text); }

@@ -67,7 +67,7 @@
 
     <template x-teleport="body">
         <div x-show="open" x-cloak style="position:fixed;inset:0;z-index:250;display:flex;align-items:flex-start;justify-content:center;padding:12vh 20px 20px;">
-            <div x-show="open" x-transition:enter="muni-fade" x-transition:enter-start="muni-fade-0" x-transition:enter-end="muni-fade-1" x-transition:leave="muni-fade" x-transition:leave-start="muni-fade-1" x-transition:leave-end="muni-fade-0" @click="open=false" style="position:absolute;inset:0;background:rgba(10,14,20,.5);backdrop-filter:blur(3px);"></div>
+            <div x-show="open" x-transition:enter="muni-fade" x-transition:enter-start="muni-cmdk__velo-0" x-transition:enter-end="muni-cmdk__velo-1" x-transition:leave="muni-fade" x-transition:leave-start="muni-cmdk__velo-1" x-transition:leave-end="muni-cmdk__velo-0" @click="open=false" class="muni-cmdk__velo"></div>
 
             {{-- La trampa se arma con `trap`, no con `open` a secas, y no es manía: x-show
                  pinta el diálogo en el SIGUIENTE requestAnimationFrame, y x-trap activa la
@@ -119,6 +119,10 @@
 @once
     <style>
         .muni-fade{transition:opacity var(--muni-dur) var(--muni-ease);}.muni-fade-0{opacity:0}.muni-fade-1{opacity:1}
+        /* El velo, como el del modal y el drawer: color de --muni-scrim y opacidad
+           propia, con clases -0/-1 del fundido después de la base para ganarle. */
+        .muni-cmdk__velo{position:absolute;inset:0;background:var(--muni-scrim, var(--muni-gob-petroleo-dark));opacity:.5;backdrop-filter:blur(3px)}
+        .muni-cmdk__velo-0{opacity:0}.muni-cmdk__velo-1{opacity:.5}
         .muni-pop{transition:opacity var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease);}
         .muni-pop-0{opacity:0;transform:scale(.97) translateY(-8px)}.muni-pop-1{opacity:1;transform:scale(1) translateY(0)}
         /* La caja de búsqueda venía con `outline:none` en el atributo style y sin

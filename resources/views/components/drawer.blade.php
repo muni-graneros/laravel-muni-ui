@@ -28,10 +28,9 @@
 
     <template x-teleport="body">
         <div x-show="open" x-cloak style="position:fixed;inset:0;z-index:210;">
-            <div x-show="open" @click="open=false"
-                 x-transition:enter="muni-fade" x-transition:enter-start="muni-fade-0" x-transition:enter-end="muni-fade-1"
-                 x-transition:leave="muni-fade" x-transition:leave-start="muni-fade-1" x-transition:leave-end="muni-fade-0"
-                 style="position:absolute;inset:0;background:rgba(10,14,20,.55);backdrop-filter:blur(2px);"></div>
+            <div x-show="open" @click="open=false" class="muni-drawer__velo"
+                 x-transition:enter="muni-fade" x-transition:enter-start="muni-drawer__velo-0" x-transition:enter-end="muni-drawer__velo-1"
+                 x-transition:leave="muni-fade" x-transition:leave-start="muni-drawer__velo-1" x-transition:leave-end="muni-drawer__velo-0"></div>
 
             {{-- Sin `title` el aria-labelledby apuntaría a un <h2> vacío y el diálogo se
                  anunciaría sin nombre: en ese caso se cae a un aria-label genérico. --}}
@@ -63,6 +62,12 @@
            de una sola vez: este bloque tiene que bastarse solo, porque una página puede
            traer el drawer y ninguno de los otros dos. */
         .muni-fade { transition:opacity var(--muni-dur) var(--muni-ease); } .muni-fade-0 { opacity:0; } .muni-fade-1 { opacity:1; }
+        /* El velo, como el del modal: color de --muni-scrim y opacidad propia, con
+           clases -0/-1 de inicio y fin del fundido DESPUÉS de la base para ganarle.
+           Con muni-fade-1 (opacidad 1) el velo terminaría opaco y saltaría a .55 al
+           soltar las clases. El respaldo es el velo del modal sin hoja publicada. */
+        .muni-drawer__velo { position:absolute; inset:0; background:var(--muni-scrim, var(--muni-gob-petroleo-dark)); opacity:.55; backdrop-filter:blur(2px); }
+        .muni-drawer__velo-0 { opacity:0; } .muni-drawer__velo-1 { opacity:.55; }
         /* El deslizamiento dura más que un fundido, pero SIEMPRE atado a --muni-dur:
            con prefers-reduced-motion muni-ui.css lo baja a 0ms y el calc() da 0ms. */
         .muni-drawer { transition:transform calc(var(--muni-dur) * 1.75) var(--muni-ease); }

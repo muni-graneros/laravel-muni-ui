@@ -1,0 +1,1460 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ficha de persona — muni-ui</title>
+<!-- GENERADO por `php demo/persona.php` desde demo/persona.blade.php. No editar a mano. -->
+<style data-demo="muni-ui.css">
+/* ============================================================================
+   laravel-muni-ui — Sistema de diseño del ecosistema municipal de Graneros
+   ----------------------------------------------------------------------------
+   Contrato de tokens `--muni-*` con dos presets:
+     - "light" → linaje `.om` (discapacidad): institucional sereno, teal.
+     - "dark"  → linaje `.fc` (feria): terminal de datos, alto contraste.
+   Valores VERBATIM de los CSS de producción (feria.css / discapacidad.css).
+
+   DARK MODE UNIVERSAL — se activa con CUALQUIERA de estos mecanismos, para ser
+   compatible con todo el ecosistema a la vez:
+     · `data-muni-theme="dark"`  → nuestro, tema fijo (feria/disc).
+     · `.dark`                    → Filament y la estrategia de clase de Tailwind.
+     · `[data-theme="dark"]`      → convención de otras UI / PWA-SPA.
+     · `@media screen and (prefers-color-scheme: dark)` → PWA/SPA que sigue el OS
+       (fallback; solo en pantalla, ver la Regla 1).
+   Jerarquía: light por defecto → dark por preferencia del OS → activadores
+   explícitos de clase/atributo (ganan sobre el OS) → `data-muni-theme` explícito
+   (override final, para congelar el tema de un sistema con identidad fija).
+
+   CSS PLANO: funciona en Tailwind v3, v4 o sin Tailwind. Los componentes usan
+   `style` inline con `var(--muni-*)`, no dependen de utilidades Tailwind.
+   ============================================================================ */
+
+[x-cloak] { display: none !important; }
+
+/* ── Identidad institucional (INVARIANTE) ────────────────────────────────────
+   Paleta oficial de la Municipalidad de Graneros, extraída de los assets del
+   sitio madre (municipalidadgraneros.cl: escudo + franja inferior de 7 colores).
+   NO cambian con el tema: la identidad del municipio es la misma en claro y
+   oscuro. Los componentes <x-muni::gob-*> (barra, franja, escudo, footer) las
+   usan para que cada subdominio se lea como parte del sitio municipal. */
+:root {
+    --muni-gob-lima: #adcd60;
+    --muni-gob-verde-dark: #7fa33f;
+    --muni-gob-petroleo: #355a63;
+    --muni-gob-petroleo-dark: #00404c;
+    --muni-gob-oro: #eab02c;
+    --muni-gob-naranja: #c76421;
+    --muni-gob-celeste: #7ccbe1;
+    --muni-gob-carmin: #ca3048;
+    --muni-gob-gris: #9c9b9b;
+}
+
+/* ── Valores LIGHT (default) — linaje `.om` (discapacidad) ──────────────────── */
+:root {
+    --muni-bg: #f5f6f8;
+    --muni-surface: #ffffff;
+    --muni-surface-2: #f5f6f8;
+    --muni-surface-3: #eceef2;
+    --muni-panel: #ffffff;
+
+    --muni-text: #1a1d24;
+    --muni-muted: #5a6070;
+    --muni-hint: #656c79;
+    --muni-border: #e0e3ea;
+    --muni-border-2: #c8ccd6;
+    /* Límite de un control de formulario. WCAG 2.2 AA 1.4.11 pide 3:1 para la
+       información visual que identifica un componente de interfaz, y el borde es
+       lo ÚNICO que dice dónde empieza y termina un campo. Medido, los bordes
+       generales no daban: --muni-border 1,28:1 y --muni-border-2 1,61:1 en claro;
+       1,43:1 y 1,90:1 en oscuro. Este token es más oscuro a propósito y SOLO se
+       usa en controles: los separadores y las tarjetas siguen con --muni-border,
+       donde 1.4.11 no aplica. Medido: 3,73:1 sobre --muni-surface y 3,22:1 sobre
+       --muni-surface-3, que es el peor caso. */
+    --muni-field-border: #7b849c;
+    --muni-field-border-error: var(--muni-danger-fg);
+    /* Límite de una superficie que FLOTA sobre la página: popover, dropdown,
+       modal, drawer, paleta de comandos y avisos flotantes. --muni-border contra
+       el fondo daba 1,19:1 en claro y 1,52:1 en oscuro: el panel lo separaba la
+       sombra, que no existe con las sombras desactivadas, en colores forzados ni
+       en papel. No se oscurece --muni-border para todo el paquete porque
+       endurecería cada separador y cada tarjeta; solo las flotantes leen este.
+       El valor coincide con --muni-field-border y no es casualidad: 3:1 contra
+       --muni-surface-3 obliga a esa oscuridad, y el tono más suave que todavía
+       llega (#7e869e, 3,12:1) no se distingue a la vista. Medido: 3,73:1 sobre
+       --muni-surface, 3,45:1 sobre --muni-bg y 3,22:1 sobre --muni-surface-3,
+       el peor caso. Token aparte para que un municipio lo ajuste sin tocar los
+       campos. */
+    --muni-overlay-border: #7b849c;
+    /* Velo de un diálogo con fondo (modal, drawer, paleta de comandos). Color
+       OPACO: la opacidad la pone cada componente (.55 el modal y el drawer, .5
+       la paleta), así el fundido de entrada sigue siendo un `opacity` y el
+       respaldo sin hoja publicada no cambia de forma. Antes era un valor por
+       componente, y el del modal —petróleo institucional— ACLARABA la página en
+       oscuro: el borde flotante contra el velo daba 2,77:1 sobre
+       --muni-surface-3 y --muni-panel, bajo el 3:1 de WCAG 1.4.11, y ningún
+       borde lo arreglaba sin perder el 3:1 contra el panel. Casi negro en los
+       dos temas. Medido compuesto sobre cada superficie: en claro el panel
+       blanco contra el velo da 3,60:1 o más (el relleno dibuja el límite); en
+       oscuro el borde flotante contra el velo da 3,64:1 o más, y 3,70:1 con
+       la opacidad .55 de modal y drawer. */
+    --muni-scrim: #0a0e14;
+
+    --muni-accent: #0f766e;
+    --muni-accent-strong: #115e59;
+    --muni-accent-soft: #f0fdfa;
+    --muni-on-accent: #ffffff;
+
+    --muni-ok-fg: #0f7a5a;
+    --muni-ok-bg: #e2f5ee;
+    --muni-ok-border: #0f7a5a;
+    --muni-warn-fg: #8a5a00;
+    --muni-warn-bg: #fef3dc;
+    --muni-warn-border: #8a5a00;
+    --muni-danger-fg: #b03030;
+    --muni-danger-bg: #fdeaea;
+    --muni-danger-border: #b03030;
+    --muni-info-fg: #1f5fb0;
+    --muni-info-bg: #e6effb;
+    --muni-info-border: #1f5fb0;
+
+    --muni-radius: 10px;
+    --muni-radius-lg: 14px;
+    --muni-radius-sm: 7px;
+    --muni-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 2px 8px rgba(16, 24, 40, 0.06);
+    --muni-shadow-md: 0 4px 16px rgba(16, 24, 40, 0.10);
+    --muni-shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.14);
+
+    --muni-ring: 0 0 0 3px color-mix(in srgb, var(--muni-accent) 30%, transparent);
+    /* Color del INDICADOR DE FOCO, separado de `--muni-ring` a propósito.
+       `--muni-ring` es una `box-shadow`, y la box-shadow es una sola propiedad
+       que cualquier hoja de la aplicación anfitriona puede pisar entera: medido
+       dentro del panel de Filament de licencias-graneros, el foco del input se
+       computaba `oklab(0 0 0 / 0) 0px 0px 0px 0px`, o sea NADA. Como los
+       componentes además traían `outline:none`, al tabular no aparecía ningún
+       indicador. Por eso el indicador real pasa a ser un `outline`, que ninguna
+       cadena de sombras de Tailwind/Filament toca, y el anillo queda como halo
+       decorativo. WCAG 2.2 AA 2.4.7 y 1.4.11 (3:1), obligatorio en sistemas del
+       Estado por el Decreto N°1/2015 SEGPRES.
+       Contraste medido con la fórmula de luminancia relativa W3C:
+       #0f766e sobre --muni-surface #ffffff = 5,47:1 · sobre --muni-surface-3
+       #eceef2 = 4,71:1 (el peor caso de este bloque). Mínimo exigido: 3:1. */
+    --muni-focus: #0f766e;
+    --muni-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --muni-dur: 160ms;
+    /* Movimiento largo: un avance que recorre un trayecto (el arco de `ring`).
+       Con --muni-dur (160 ms) el arco salta en vez de avanzar. No cambia con el
+       tema y NO se redeclara en los bloques de tema: ahí rearmaría los 600 ms
+       dentro de un contenedor anidado, donde el bloque de movimiento reducido
+       sobre `:root` ya no alcanza. Baja a 0 ms con prefers-reduced-motion. */
+    --muni-dur-slow: 600ms;
+
+    --muni-font-sans: 'DM Sans', system-ui, sans-serif;
+    --muni-font-mono: 'DM Mono', ui-monospace, monospace;
+
+    --muni-topbar-h: 56px;
+    --muni-glow: none;
+    /* Placa del escudo en `topbar` y `auth-shell`. El escudo es un PNG con el
+       contorno en petróleo casi negro (#00404c, --muni-gob-petroleo-dark): sobre
+       una superficie oscura ese contorno desaparece, por eso va sobre placa. En
+       claro la placa es blanca; en oscuro, un gris apagado (80 % de blanco sobre
+       --muni-bg) que no encandila en una sala a oscuras. --muni-logo-plate-fg es
+       el texto de respaldo cuando no hay logo. Medido: texto 19,22:1 sobre la
+       placa · contorno del escudo 11,43:1. */
+    --muni-logo-plate: #ffffff;
+    --muni-logo-plate-fg: #0b0f14;
+}
+
+/* ── Bloque de valores DARK (reutilizado por todos los activadores) ──────────── */
+/* Regla 1: preferencia del OS (PWA/SPA sin control explícito). El :not() permite
+   que un sistema con tema fijo en light (feria/disc con data-muni-theme="light")
+   NO se oscurezca aunque el usuario tenga el OS en modo oscuro.
+
+   Va atada a `screen` porque el navegador SÍ reporta la preferencia del sistema
+   al imprimir, y este selector puntúa 0,4,0: le ganaba al `:root` del bloque de
+   impresión (0,1,0) aunque ese bloque viniera después. Medido con la reja: 177
+   textos a 1,23:1 sobre el papel, con solo tener el sistema en oscuro. Una hoja
+   no tiene modo oscuro; fuera de la pantalla esta regla no tiene que existir, y
+   así el papel gana por construcción en vez de por una carrera de selectores. */
+@media screen and (prefers-color-scheme: dark) {
+    :root:not([data-muni-theme="light"]):not([data-theme="light"]):not(.light) {
+        --muni-bg: #0b0f14;
+        --muni-surface: #111620;
+        --muni-surface-2: #181e2a;
+        --muni-surface-3: #1c2333;
+        --muni-panel: #1c2333;
+        --muni-text: #e2e8f4;
+        --muni-muted: #7a8ba8;
+        --muni-hint: #7c8daa;
+        --muni-border: #2a3347;
+        --muni-border-2: #3a4560;
+        --muni-field-border: #5f719d;
+        --muni-field-border-error: var(--muni-danger-fg);
+        /* Ver el comentario del bloque claro. Medido: 3,97:1 sobre --muni-bg,
+           3,74:1 sobre --muni-surface y 3,24:1 sobre --muni-surface-3 y
+           --muni-panel #1c2333 (peor caso). Mínimo exigido: 3:1. */
+        --muni-overlay-border: #5f719d;
+        /* Ver el comentario del bloque claro. Medido: el borde flotante contra
+           el velo compuesto da 3,64:1 o más sobre toda superficie (peor caso
+           --muni-surface-3 y --muni-panel; con el petróleo que usaba el modal
+           daba 2,77:1). Mínimo exigido: 3:1. */
+        --muni-scrim: #0a0e14;
+        --muni-accent: #f59e0b;
+        --muni-accent-strong: #d97706;
+        --muni-accent-soft: #2d1d00;
+        --muni-on-accent: #0b0f14;
+        --muni-ok-fg: #22c55e;
+        --muni-ok-bg: #0d2d1a;
+        --muni-ok-border: #166534;
+        --muni-warn-fg: #f59e0b;
+        --muni-warn-bg: #2d1d00;
+        --muni-warn-border: #92400e;
+        --muni-danger-fg: #ef4444;
+        --muni-danger-bg: #2d0d0d;
+        --muni-danger-border: #991b1b;
+        --muni-info-fg: #3b82f6;
+        --muni-info-bg: #0d1a2d;
+        --muni-info-border: #1e3a5f;
+        --muni-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.35);
+        --muni-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+        --muni-shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.55);
+        --muni-ring: 0 0 0 3px color-mix(in srgb, var(--muni-accent) 35%, transparent);
+        /* Ver el comentario del bloque claro. Medido: #f59e0b sobre
+           --muni-surface #111620 = 8,43:1 · sobre --muni-surface-3 #1c2333 =
+           7,31:1 (peor caso). Mínimo exigido: 3:1. */
+        --muni-focus: #f59e0b;
+        --muni-font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --muni-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+        --muni-topbar-h: 52px;
+        --muni-glow: 0 0 6px currentColor;
+        /* Ver el comentario del bloque claro. #cecfd0 = 80 % de blanco sobre
+           --muni-bg. Medido: texto 12,32:1 sobre la placa · contorno del escudo
+           7,32:1. */
+        --muni-logo-plate: #cecfd0;
+        --muni-logo-plate-fg: #0b0f14;
+    }
+}
+
+/* Regla 2: activadores EXPLÍCITOS de dark — Filament (.dark), Tailwind class,
+   [data-theme=dark] y nuestro data-muni-theme=dark. Vienen DESPUÉS del media query
+   en la cascada, así que ganan sobre la preferencia del OS. */
+[data-muni-theme="dark"],
+[data-theme="dark"],
+.dark {
+    --muni-bg: #0b0f14;
+    --muni-surface: #111620;
+    --muni-surface-2: #181e2a;
+    --muni-surface-3: #1c2333;
+    --muni-panel: #1c2333;
+    --muni-text: #e2e8f4;
+    --muni-muted: #7a8ba8;
+    --muni-hint: #7c8daa;
+    --muni-border: #2a3347;
+    --muni-border-2: #3a4560;
+    --muni-field-border: #5f719d;
+    --muni-field-border-error: var(--muni-danger-fg);
+    /* Ver el comentario del bloque claro. Medido: 3,97:1 sobre --muni-bg,
+       3,74:1 sobre --muni-surface y 3,24:1 sobre --muni-surface-3 y
+       --muni-panel #1c2333 (peor caso). Mínimo exigido: 3:1. */
+    --muni-overlay-border: #5f719d;
+    /* Ver el comentario del bloque claro. Medido: el borde flotante contra
+       el velo compuesto da 3,64:1 o más sobre toda superficie (peor caso
+       --muni-surface-3 y --muni-panel; con el petróleo que usaba el modal
+       daba 2,77:1). Mínimo exigido: 3:1. */
+    --muni-scrim: #0a0e14;
+    --muni-accent: #f59e0b;
+    --muni-accent-strong: #d97706;
+    --muni-accent-soft: #2d1d00;
+    --muni-on-accent: #0b0f14;
+    --muni-ok-fg: #22c55e;
+    --muni-ok-bg: #0d2d1a;
+    --muni-ok-border: #166534;
+    --muni-warn-fg: #f59e0b;
+    --muni-warn-bg: #2d1d00;
+    --muni-warn-border: #92400e;
+    --muni-danger-fg: #ef4444;
+    --muni-danger-bg: #2d0d0d;
+    --muni-danger-border: #991b1b;
+    --muni-info-fg: #3b82f6;
+    --muni-info-bg: #0d1a2d;
+    --muni-info-border: #1e3a5f;
+    --muni-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.35);
+    --muni-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+    --muni-shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.55);
+    --muni-ring: 0 0 0 3px color-mix(in srgb, var(--muni-accent) 35%, transparent);
+    /* Ver el comentario del bloque claro. Medido: #f59e0b sobre
+       --muni-surface #111620 = 8,43:1 · sobre --muni-surface-3 #1c2333 =
+       7,31:1 (peor caso). Mínimo exigido: 3:1. */
+    --muni-focus: #f59e0b;
+    --muni-font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+    --muni-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --muni-topbar-h: 52px;
+    --muni-glow: 0 0 6px currentColor;
+    /* Ver el comentario del bloque claro. #cecfd0 = 80 % de blanco sobre
+       --muni-bg. Medido: texto 12,32:1 sobre la placa · contorno del escudo
+       7,32:1. */
+    --muni-logo-plate: #cecfd0;
+    --muni-logo-plate-fg: #0b0f14;
+}
+
+/* Regla 3: override EXPLÍCITO a light. Congela el tema claro de un sistema con
+   identidad fija (discapacidad) aunque el OS esté en dark o Filament ponga .dark
+   en un ancestro. Al venir el último, gana la cascada a igual especificidad. */
+[data-muni-theme="light"] {
+    --muni-bg: #f5f6f8;
+    --muni-surface: #ffffff;
+    --muni-surface-2: #f5f6f8;
+    --muni-surface-3: #eceef2;
+    --muni-panel: #ffffff;
+    --muni-text: #1a1d24;
+    --muni-muted: #5a6070;
+    --muni-hint: #656c79;
+    --muni-border: #e0e3ea;
+    --muni-border-2: #c8ccd6;
+    /* Límite de un control de formulario. WCAG 2.2 AA 1.4.11 pide 3:1 para la
+       información visual que identifica un componente de interfaz, y el borde es
+       lo ÚNICO que dice dónde empieza y termina un campo. Medido, los bordes
+       generales no daban: --muni-border 1,28:1 y --muni-border-2 1,61:1 en claro;
+       1,43:1 y 1,90:1 en oscuro. Este token es más oscuro a propósito y SOLO se
+       usa en controles: los separadores y las tarjetas siguen con --muni-border,
+       donde 1.4.11 no aplica. Medido: 3,73:1 sobre --muni-surface y 3,22:1 sobre
+       --muni-surface-3, que es el peor caso. */
+    --muni-field-border: #7b849c;
+    --muni-field-border-error: var(--muni-danger-fg);
+    /* Ver el comentario del bloque LIGHT por defecto: mismo valor, mismas
+       mediciones (3,22:1 sobre --muni-surface-3, el peor caso). */
+    --muni-overlay-border: #7b849c;
+    /* Ver el comentario del bloque LIGHT por defecto: mismo valor. */
+    --muni-scrim: #0a0e14;
+    --muni-accent: #0f766e;
+    --muni-accent-strong: #115e59;
+    --muni-accent-soft: #f0fdfa;
+    --muni-on-accent: #ffffff;
+    --muni-ok-fg: #0f7a5a;
+    --muni-ok-bg: #e2f5ee;
+    --muni-ok-border: #0f7a5a;
+    --muni-warn-fg: #8a5a00;
+    --muni-warn-bg: #fef3dc;
+    --muni-warn-border: #8a5a00;
+    --muni-danger-fg: #b03030;
+    --muni-danger-bg: #fdeaea;
+    --muni-danger-border: #b03030;
+    --muni-info-fg: #1f5fb0;
+    --muni-info-bg: #e6effb;
+    --muni-info-border: #1f5fb0;
+    --muni-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 2px 8px rgba(16, 24, 40, 0.06);
+    --muni-shadow-md: 0 4px 16px rgba(16, 24, 40, 0.10);
+    --muni-shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.14);
+    --muni-ring: 0 0 0 3px color-mix(in srgb, var(--muni-accent) 30%, transparent);
+    /* Ver el comentario del bloque LIGHT por defecto: mismos valores y mismas
+       mediciones (5,47:1 sobre --muni-surface, 4,71:1 sobre --muni-surface-3). */
+    --muni-focus: #0f766e;
+    --muni-font-sans: 'DM Sans', system-ui, sans-serif;
+    --muni-font-mono: 'DM Mono', ui-monospace, monospace;
+    --muni-topbar-h: 56px;
+    --muni-glow: none;
+    /* Ver el comentario del bloque LIGHT por defecto: mismos valores. */
+    --muni-logo-plate: #ffffff;
+    --muni-logo-plate-fg: #0b0f14;
+}
+
+/* Respeta la preferencia de movimiento reducido en todo el sistema. */
+@media (prefers-reduced-motion: reduce) {
+    :root { --muni-dur: 0ms; --muni-dur-slow: 0ms; }
+}
+
+/* ── IMPRESIÓN ───────────────────────────────────────────────────────────────
+   Lo que sale por la impresora o por «Guardar como PDF» del navegador. Antes de
+   este bloque el repo no tenía una sola regla de impresión: en modo oscuro salía
+   una hoja negra, y en cualquier modo el cromo de pantalla se dibujaba encima
+   del documento.
+
+   ESTÁ DUPLICADO en `muni-ui-filament.css` a propósito, y no es un descuido: es
+   DESIGN §7. `MuniPanel` inyecta en un panel Filament SOLO `filament.css`; esta
+   hoja la compila el Vite del sistema anfitrión para sus vistas públicas. Una
+   regla de impresión que viviera únicamente acá no existiría dentro del panel, y
+   no habría un solo error en consola que lo delatara.
+
+   PROHIBIDO `print-color-adjust: exact`. No garantiza nada —el usuario puede
+   desactivar los gráficos de fondo en el propio diálogo de impresión— y donde sí
+   se respeta, el tóner lo paga el municipio. La consecuencia se asume de frente:
+   los fondos de estado pasan a blanco y el estado queda en el BORDE y en el
+   TEXTO, que son lo que el navegador sí imprime. El color nunca es el único
+   portador de información, tampoco en papel.
+
+   Dos tokens NO se tocan a propósito: `--muni-field-border`, porque el borde de
+   un campo es un rectángulo que en papel se lee igual, y `--muni-focus`, porque
+   en papel no hay foco. */
+
+@page {
+    /* Los márgenes por defecto difieren entre Chrome y Firefox y dejan el
+       membrete pegado al borde de la hoja. */
+    margin: 16mm 18mm;
+}
+
+@media print {
+    /* PALETA CLARA FORZADA. Las declaraciones van DENTRO del media query: escritas
+       fuera pisarían la pantalla del funcionario, que es justo lo que no se quiere.
+       Los activadores explícitos de oscuro se enumeran uno por uno porque ganan por
+       cascada sobre `:root` (DESIGN §3): Filament pone `.dark` en el <html> y las
+       PWA del ecosistema usan `[data-theme="dark"]`. */
+    :root,
+    [data-muni-theme="dark"],
+    [data-theme="dark"],
+    .dark {
+        --muni-bg: #ffffff;
+        --muni-surface: #ffffff;
+        --muni-surface-2: #ffffff;
+        --muni-surface-3: #ffffff;
+        --muni-panel: #ffffff;
+        --muni-text: #000000;
+        --muni-muted: #3a3f4b;
+        /* Se deriva del atenuado en vez de repetir un hex: la pista y el
+           atenuado se leen sobre el mismo papel blanco. */
+        --muni-hint: var(--muni-muted);
+        --muni-border: #767676;
+        --muni-border-2: #3a3f4b;
+        /* En papel no hay sombra: el borde es el ÚNICO límite del panel. Se
+           declara aunque coincida con --muni-border porque, sin él, un panel
+           dentro de `.dark` imprimiría con el valor de la paleta oscura.
+           #767676 sobre la hoja blanca = 4,54:1. */
+        --muni-overlay-border: #767676;
+        /* El acento hace dos trabajos en papel y los dos tienen que llegar a 4,5:1.
+           Es COLOR DE TEXTO sobre la hoja, y es RELLENO del botón primario, la
+           página actual o el día elegido, con `--muni-on-accent` encima. Ese texto
+           va en negro porque sin «gráficos de fondo» (lo que hace la impresora por
+           omisión) el relleno desaparece y el texto cae sobre el papel: en blanco
+           se volvería invisible. Con #0f766e el negro encima daba 3,84:1 en cuanto
+           alguien activaba los fondos. #11847b es el mismo verde azulado, un punto
+           más claro: negro encima 4,61:1 · como texto sobre blanco 4,56:1. La
+           ventana en que los dos usos pasan a la vez es estrecha (luminancia
+           relativa entre 0,176 y 0,183): no hay margen para moverlo. */
+        --muni-accent: #11847b;
+        --muni-accent-strong: #115e59;
+        --muni-accent-soft: #ffffff;
+        --muni-on-accent: #000000;
+        /* Los fondos de estado pasan a blanco (no se imprimen igual) y el tono
+           se conserva en el texto y en el borde, que sí salen. */
+        --muni-ok-fg: #0f5c44;
+        --muni-ok-bg: #ffffff;
+        --muni-ok-border: #0f5c44;
+        --muni-warn-fg: #8a5a00;
+        --muni-warn-bg: #ffffff;
+        --muni-warn-border: #8a5a00;
+        --muni-danger-fg: #b03030;
+        --muni-danger-bg: #ffffff;
+        --muni-danger-border: #b03030;
+        --muni-info-fg: #1f5fb0;
+        --muni-info-bg: #ffffff;
+        --muni-info-border: #1f5fb0;
+        --muni-shadow: none;
+        --muni-shadow-md: none;
+        --muni-shadow-lg: none;
+        --muni-ring: none;
+        --muni-glow: none;
+        /* Una hoja no tiene modo oscuro: la placa vuelve a blanco, o el escudo
+           saldría sobre un recuadro gris. Texto 21:1. */
+        --muni-logo-plate: #ffffff;
+        --muni-logo-plate-fg: #000000;
+    }
+
+    /* El papel es blanco aunque el host pinte el fondo en su propio layout. */
+    html,
+    body {
+        background: #ffffff !important;
+        color: var(--muni-text) !important;
+    }
+
+    /* CROMO DE PANTALLA: nada de esto es el documento. Va con `!important`
+       porque varios de estos nodos traen su `display` en el atributo `style`, y
+       un estilo en línea le gana a cualquier hoja que no fuerce.
+       `[data-muni-imprimir]` es la salida para el caso en que lo que hay que
+       imprimir esté dentro de un diálogo abierto. */
+    .muni-skip-link,
+    .muni-sb,
+    .muni-ds__top,
+    .muni-ds__burger,
+    .muni-toast,
+    .muni-no-print,
+    [data-muni-no-print],
+    [role="dialog"][aria-modal="true"]:not([data-muni-imprimir]) {
+        display: none !important;
+    }
+
+    /* La barra superior pública (`<x-muni::topbar>`) no tiene clase propia: se
+       la reconoce por el `position:sticky` que emite en línea. */
+    .muni-topbar,
+    header[style*="position:sticky"] {
+        display: none !important;
+    }
+
+    /* Los márgenes de la hoja ya los pone `@page`: el relleno del armazón
+       sumaría una segunda banda en blanco. */
+    .muni-ds__main {
+        padding: 0 !important;
+    }
+
+    /* Y NO SOLO EL DEL ARMAZÓN DEL PAQUETE. Atado a esa única clase, el reset no
+       existía para el sistema que mete la hoja en un `<main>` propio, en una
+       tarjeta o en una página del panel: ahí el relleno sobrevivía a la
+       impresión, estrechaba el documento en cada hoja y lo descuadraba respecto
+       de los márgenes de `@page` (medido: la tabla de 70pt a 519pt contra un pie
+       de 51pt a 545pt). Se anula el relleno de CUALQUIER ancestro de la hoja, que
+       es exactamente donde el margen ya lo pone la caja de página.
+
+       Regla aparte de la de arriba a propósito: un selector no soportado
+       invalida la LISTA entera, así que escritas juntas un motor sin `:has()` se
+       quedaría también sin el reset del armazón, que hoy sí funciona. */
+    :has(.muni-hoja) {
+        padding: 0 !important;
+    }
+}
+
+</style>
+<style data-demo="propia">
+    /* Hoja propia de la demo. Cero colores literales y cero tokens --muni-*
+       redefinidos: todo sale de muni-ui.css, que va arriba tal cual. */
+    body { margin:0; background:var(--muni-bg); color:var(--muni-text); font-family:var(--muni-font-sans); }
+    .persona-barra { position:sticky; top:0; z-index:10; display:flex; align-items:center; gap:12px; min-height:var(--muni-topbar-h); padding:0 20px; background:var(--muni-surface); border-bottom:1px solid var(--muni-border); }
+    .persona-barra b { font-size:14px; }
+    .persona-barra__sp { flex:1; }
+    .persona-tema { min-height:36px; padding:6px 12px; border:1px solid var(--muni-field-border); border-radius:var(--muni-radius-sm); background:var(--muni-surface); color:var(--muni-text); font:600 13px var(--muni-font-sans); cursor:pointer; }
+    .persona-tema:hover { background:var(--muni-surface-2); }
+    .persona-tema:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent)); outline-offset:2px; box-shadow:var(--muni-ring); }
+    main { max-width:960px; margin:0 auto; padding:28px 20px 60px; scroll-margin-top:var(--muni-topbar-h); }
+    main:focus:not(:focus-visible) { outline:none; }
+    .persona-bloque { margin-bottom:20px; padding:20px; background:var(--muni-surface); border:1px solid var(--muni-border); border-radius:var(--muni-radius-lg); box-shadow:var(--muni-shadow); }
+    .persona-identidad { display:flex; align-items:center; gap:14px; margin-bottom:6px; }
+    .persona-titulo { margin:0 0 4px; font-size:15px; font-weight:700; color:var(--muni-text); }
+    .persona-estados { display:flex; flex-wrap:wrap; gap:6px; margin:4px 0 0; }
+    .persona-panel__titulo { display:none; }
+    .persona-nota { margin:0 0 10px; font-size:13px; line-height:1.5; color:var(--muni-muted); }
+    .persona-nota code { font-family:var(--muni-font-mono); font-size:12px; color:var(--muni-text); }
+    .persona-bitacora__lista { margin:0; padding-left:20px; font-size:13px; line-height:1.6; color:var(--muni-text); }
+
+    /* AL IMPRIMIR: todos los paneles visibles y sin controles (corrección del
+       juez). Una ficha con pestañas imprime solo el panel activo, y en un mesón
+       que emite certificados eso es un defecto funcional. El título de cada
+       panel aparece solo en papel, porque ahí no hay pestaña que lo nombre.
+       Sin print-color-adjust: la paleta clara la fuerza muni-ui.css. */
+    @media print {
+        #persona-pestanas [role="tablist"] { display:none !important; }
+        #persona-pestanas [role="tabpanel"] { display:block !important; }
+        .persona-panel__titulo { display:block; margin:14px 0 8px; font-size:14px; font-weight:700; }
+        main { max-width:none; padding:0; }
+        .persona-bloque { box-shadow:none; }
+    }
+</style>
+</head>
+<body>
+<a
+    href="#muni-contenido"
+    class="muni-skip-link"
+>
+            Saltar al contenido principal
+    </a>
+
+    <style>
+        .muni-skip-link {
+            position: fixed; top: 0; left: 0; z-index: 1000;
+            width: 1px; height: 1px; overflow: hidden;
+            clip-path: inset(50%); white-space: nowrap;
+            /* Sin padding mientras está recortado: así la caja fija es de 1x1 y no
+               queda un rectángulo invisible sobre la esquina de la cabecera. */
+            margin: 0; padding: 0;
+            background: var(--muni-surface); color: var(--muni-text);
+            border: 1px solid var(--muni-border); border-radius: var(--muni-radius-sm);
+            font-family: var(--muni-font-sans); font-size: 14px; font-weight: 600; line-height: 1.2;
+            text-decoration: underline; text-underline-offset: 3px;
+            transform: translateY(-8px);
+            transition: transform var(--muni-dur) var(--muni-ease);
+        }
+
+        /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
+        .muni-skip-link:focus,
+        .muni-skip-link:focus-visible {
+            top: 8px; left: 8px;
+            width: auto; height: auto; overflow: visible;
+            padding: 10px 16px;
+            clip-path: none;
+            transform: translateY(0);
+            box-shadow: var(--muni-shadow-md);
+            outline: 3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset: 2px;
+        }
+    </style>
+<header class="persona-barra muni-no-print"><b>Atención al Vecino · Graneros</b><span class="persona-barra__sp"></span><button type="button" class="persona-tema" data-persona-tema aria-pressed="false">Tema oscuro</button></header><main id="muni-contenido" tabindex="-1">
+<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
+    <div style="min-width:0;">
+        <div class="muni-page-header__migas" style="margin-bottom:10px;min-width:0;"><nav class="muni-crumbs" aria-label="Ruta">
+        <ol role="list" class="muni-crumbs__list">
+                            <li class="muni-crumbs__item">
+                    
+                                            <a href="#" class="muni-crumb">Inicio</a>
+                                    </li>
+                            <li class="muni-crumbs__item">
+                                            <span class="muni-crumbs__sep" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M6 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </span>
+                    
+                                            <a href="#" class="muni-crumb">Vecinos</a>
+                                    </li>
+                            <li class="muni-crumbs__item">
+                                            <span class="muni-crumbs__sep" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M6 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </span>
+                    
+                                            <span class="muni-crumb muni-crumb--actual" aria-current="page">Valentina Ruiz Olmedo</span>
+                                    </li>
+                    </ol>
+    </nav>
+
+
+    <style>
+        .muni-crumbs { font-family:var(--muni-font-sans);font-size:12.5px;line-height:1.2; }
+        .muni-crumbs__list { display:flex;align-items:center;flex-wrap:wrap;gap:2px 7px;list-style:none;margin:0;padding:0; }
+        .muni-crumbs__item { display:flex;align-items:center;gap:7px;min-width:0; }
+        .muni-crumbs__sep { display:inline-flex;align-items:center;color:var(--muni-hint);flex-shrink:0; }
+        .muni-crumb { display:inline-flex;align-items:center;min-height:24px;padding:0 2px;border-radius:var(--muni-radius-sm);color:var(--muni-muted);
+            min-width:0;overflow-wrap:anywhere; }
+        .muni-crumb--actual { color:var(--muni-text);font-weight:600; }
+        a.muni-crumb { text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;
+            transition:color var(--muni-dur) var(--muni-ease),background var(--muni-dur) var(--muni-ease); }
+        a.muni-crumb:hover { color:var(--muni-text);background:var(--muni-surface-2);text-decoration-thickness:2px; }
+        a.muni-crumb:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:2px; box-shadow:var(--muni-ring); color:var(--muni-text); }
+        @media (prefers-reduced-motion:reduce) { a.muni-crumb { transition:none !important; } }
+        @media print { .muni-crumbs { display:none !important; } }
+    </style></div>                    <div style="font-family:var(--muni-font-mono);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muni-accent);margin-bottom:6px;">Atención al Vecino · Ficha de persona</div>
+                <h1 style="margin:0;font-family:var(--muni-font-sans);font-size:24px;font-weight:800;line-height:1.15;letter-spacing:-.02em;color:var(--muni-text);text-wrap:balance;">Valentina Ruiz Olmedo</h1>
+        <p style="margin:6px 0 0;font-size:14px;color:var(--muni-muted);max-width:60ch;line-height:1.5;">Persona ficticia de demostración. Ningún dato de esta ficha corresponde a alguien real.</p>    </div>
+    <div style="display:flex;gap:10px;flex-shrink:0;"><button
+     type="button"     class="muni-btn muni-btn--ghost muni-no-print" style="display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:var(--muni-font-sans);font-weight:600;line-height:1;cursor:pointer;border-radius:var(--muni-radius-sm);border:1px solid transparent;text-decoration:none;transition:background var(--muni-dur) var(--muni-ease),border-color var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease);padding:9px 16px;font-size:13.5px;"
+>
+        Editar datos
+</button>
+
+    <style>
+        /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
+        .muni-btn:focus-visible { outline: 3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset: 2px; box-shadow: var(--muni-ring); }
+        .muni-btn:active { transform: translateY(1px); }
+        .muni-btn__icon { display: inline-flex; }
+        .muni-btn__icon svg { width: 15px; height: 15px; }
+
+        .muni-btn--primary { background: var(--muni-accent); color: var(--muni-on-accent); }
+        .muni-btn--primary:hover { background: var(--muni-accent-strong); box-shadow: var(--muni-shadow); }
+
+        .muni-btn--ghost { background: transparent; color: var(--muni-text); border-color: var(--muni-border); }
+        .muni-btn--ghost:hover { background: var(--muni-surface-2); border-color: var(--muni-border-2); }
+
+        .muni-btn--subtle { background: var(--muni-surface-2); color: var(--muni-text); }
+        .muni-btn--subtle:hover { background: var(--muni-surface-3); }
+
+        .muni-btn--danger { background: var(--muni-danger-bg); color: var(--muni-danger-fg); border-color: var(--muni-danger-border); }
+        .muni-btn--danger:hover { background: var(--muni-danger-fg); color: #fff; }
+    </style>
+        <button
+     type="button"     class="muni-btn muni-btn--primary muni-no-print" style="display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:var(--muni-font-sans);font-weight:600;line-height:1;cursor:pointer;border-radius:var(--muni-radius-sm);border:1px solid transparent;text-decoration:none;transition:background var(--muni-dur) var(--muni-ease),border-color var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease);padding:9px 16px;font-size:13.5px;"
+>
+        Emitir certificado
+</button></div></div>
+
+<section class="persona-bloque" aria-labelledby="persona-identidad">
+    <div class="persona-identidad">
+        <span
+    style="display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:40px;height:40px;border-radius:50%;overflow:hidden;font-family:var(--muni-font-sans);font-size:15px;font-weight:700;background:var(--muni-accent-soft);color:var(--muni-accent);border:1px solid var(--muni-border);"
+     title="Valentina Ruiz Olmedo" aria-label="Valentina Ruiz Olmedo" >
+            VO
+    </span>
+        <div class="persona-identidad__texto">
+            <h2 id="persona-identidad" class="persona-titulo">Identificación</h2>
+            <p class="persona-estados">
+                <span
+    style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;font-family:var(--muni-font-mono);font-size:11px;font-weight:600;line-height:1;letter-spacing:.02em;border-radius:999px;color:var(--muni-ok-fg);background:var(--muni-ok-bg);border:1px solid var(--muni-ok-border);"
+>
+            <span aria-hidden="true" style="width:6px;height:6px;border-radius:50%;background:var(--muni-ok-fg);box-shadow:var(--muni-glow);"></span>
+        Registro vigente
+</span>
+                <span
+    style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;font-family:var(--muni-font-mono);font-size:11px;font-weight:600;line-height:1;letter-spacing:.02em;border-radius:999px;color:var(--muni-warn-fg);background:var(--muni-warn-bg);border:1px solid var(--muni-warn-border);"
+>
+            <span aria-hidden="true" style="width:6px;height:6px;border-radius:50%;background:var(--muni-warn-fg);box-shadow:var(--muni-glow);"></span>
+        1 trámite con observación
+</span>
+            </p>
+        </div>
+    </div>
+
+    <dl class="muni-dl muni-dl--dos" aria-label="Datos de la persona"><dt>RUT</dt>
+<dd ><span
+    data-muni-pii-campo="rut"
+    data-muni-pii-etiqueta="RUT"
+    
+    id="muni-pii-rut" class="muni-pii muni-num"
+    x-data="{
+        revelado: false,
+        pendiente: false,
+        tieneValor: true,
+
+        alternar() { (this.revelado || this.pendiente) ? this.ocultar() : this.revelar(); },
+
+        revelar() {
+            /* La raíz se busca desde el nodo, NO con this.$el a secas: dentro
+               de un método invocado desde el x-on de un hijo, $el es ESE hijo
+               —el botón—, así que `dataset` e `id` venían vacíos y el detalle
+               del evento llegaba al anfitrión sin decir qué campo se abrió. El
+               HTML pasaba todas las pruebas de Blade igual; se vio midiendo el
+               evento en el navegador. */
+            const raiz = (this.$el && this.$el.closest('[data-muni-pii-campo]')) || this.$root;
+
+            /* El estado se cambia ANTES de emitir: un oyente del anfitrión que
+               mire el DOM al recibir el evento tiene que ver lo que el
+               funcionario ya está viendo. */
+            if (this.tieneValor) { this.revelado = true; } else { this.pendiente = true; }
+
+            raiz.dispatchEvent(new CustomEvent('muni-pii-revelado', {
+                bubbles: true,
+                detail: {
+                    campo: raiz.dataset.muniPiiCampo || '',
+                    etiqueta: raiz.dataset.muniPiiEtiqueta || '',
+                    id: raiz.id || '',
+                    diferido: ! this.tieneValor,
+                },
+            }));
+        },
+
+        ocultar() { this.revelado = false; this.pendiente = false; },
+    }"
+    x-on:keydown.escape="if (revelado || pendiente) { ocultar(); $event.stopPropagation(); }"
+>
+    
+    <span
+        class="muni-pii__valor"
+        id="muni-pii-rut-valor"
+        aria-live="polite"
+        x-bind:aria-busy="pendiente ? 'true' : 'false'"
+    >
+        <span class="muni-pii__mascara" x-show="! revelado && ! pendiente" >12.***.***-5</span>
+
+        
+        <span class="muni-pii__pendiente" x-show="pendiente" style="display:none;">Solicitando el dato…</span>
+
+                    
+            <span class="muni-pii__real" x-show="revelado"  style="display:none;" >12.345.678-5</span>
+            </span>
+
+    
+    <button
+     type="button"     class="muni-btn muni-btn--ghost muni-pii__boton" style="display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:var(--muni-font-sans);font-weight:600;line-height:1;cursor:pointer;border-radius:var(--muni-radius-sm);border:1px solid transparent;text-decoration:none;transition:background var(--muni-dur) var(--muni-ease),border-color var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease);padding:6px 12px;font-size:12.5px; min-height:28px;gap:6px;border-color:var(--muni-field-border);" x-cloak="x-cloak" aria-pressed="false" x-bind:aria-pressed="revelado ? 'true' : 'false'" aria-controls="muni-pii-rut-valor" x-on:click="alternar()"
+>
+        <svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" style="flex-shrink:0;">
+            <path d="M1 8s2.6-4.2 7-4.2S15 8 15 8s-2.6 4.2-7 4.2S1 8 1 8z" stroke-linejoin="round"/>
+            <circle cx="8" cy="8" r="1.9"/>
+            <path x-show="revelado"  style="display:none;"  d="M3 13L13 3" stroke-linecap="round"/>
+        </svg>
+        <span x-show="! revelado" >Mostrar <span class="muni-sr">RUT</span></span>
+        <span x-show="revelado"  style="display:none;" >Ocultar <span class="muni-sr">RUT</span></span>
+</button>
+
+</span>
+
+    <style>
+        /* Todo lo que este componente necesita para verse bien viaja con él:
+           dentro de un panel Filament solo se carga muni-ui-filament.css, y una
+           clase declarada nada más en muni-ui.css no existiría ahí, sin un solo
+           error en consola (DESIGN §7). */
+        .muni-pii { display:inline-flex; align-items:baseline; flex-wrap:wrap; gap:8px; font-family:var(--muni-font-sans); }
+        .muni-pii [x-cloak] { display:none !important; }
+        .muni-pii__valor { min-width:0; overflow-wrap:break-word; color:var(--muni-text); }
+        .muni-pii__puntos { letter-spacing:.14em; }
+        .muni-pii__pendiente { color:var(--muni-muted); font-size:12.5px; }
+        .muni-pii__boton { cursor:pointer; }
+
+        /* La mono y el texto solo para el lector viajan acá por el mismo motivo
+           que en description-list: hoy `.muni-num` vive dentro del bloque de una
+           sola emisión de data-table, y una ficha abierta en un drawer sin tabla
+           en pantalla no lo emite nunca: el RUT saldría en sans proporcional
+           justo donde se compara de un vistazo. Las declaraciones son idénticas
+           a las de allá, así que el orden de emisión da igual. */
+        .muni-num { font-family:var(--muni-font-mono); font-variant-numeric:tabular-nums; }
+        .muni-sr { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
+
+        /* En papel el control es tinta y ruido: no hay nada que pulsar en una
+           hoja. Lo que esté en pantalla al imprimir es lo que sale, que es la
+           decisión del funcionario que emite el acta y no del paquete.
+           Acotado al control: las reglas base del documento son de los dos CSS
+           del paquete, no de un componente. */
+        @media print {
+            .muni-pii__boton { display:none !important; }
+            .muni-pii { gap:0; }
+        }
+    </style></dd>
+
+
+        <dt>Edad</dt>
+<dd class="muni-num">34 años</dd>
+
+
+        <dt>Comuna</dt>
+<dd >Graneros</dd>
+
+
+        <dt>Domicilio</dt>
+<dd ><span
+    data-muni-pii-campo="domicilio"
+    data-muni-pii-etiqueta="Domicilio"
+    
+    id="muni-pii-domicilio" class="muni-pii"
+    x-data="{
+        revelado: false,
+        pendiente: false,
+        tieneValor: true,
+
+        alternar() { (this.revelado || this.pendiente) ? this.ocultar() : this.revelar(); },
+
+        revelar() {
+            /* La raíz se busca desde el nodo, NO con this.$el a secas: dentro
+               de un método invocado desde el x-on de un hijo, $el es ESE hijo
+               —el botón—, así que `dataset` e `id` venían vacíos y el detalle
+               del evento llegaba al anfitrión sin decir qué campo se abrió. El
+               HTML pasaba todas las pruebas de Blade igual; se vio midiendo el
+               evento en el navegador. */
+            const raiz = (this.$el && this.$el.closest('[data-muni-pii-campo]')) || this.$root;
+
+            /* El estado se cambia ANTES de emitir: un oyente del anfitrión que
+               mire el DOM al recibir el evento tiene que ver lo que el
+               funcionario ya está viendo. */
+            if (this.tieneValor) { this.revelado = true; } else { this.pendiente = true; }
+
+            raiz.dispatchEvent(new CustomEvent('muni-pii-revelado', {
+                bubbles: true,
+                detail: {
+                    campo: raiz.dataset.muniPiiCampo || '',
+                    etiqueta: raiz.dataset.muniPiiEtiqueta || '',
+                    id: raiz.id || '',
+                    diferido: ! this.tieneValor,
+                },
+            }));
+        },
+
+        ocultar() { this.revelado = false; this.pendiente = false; },
+    }"
+    x-on:keydown.escape="if (revelado || pendiente) { ocultar(); $event.stopPropagation(); }"
+>
+    
+    <span
+        class="muni-pii__valor"
+        id="muni-pii-domicilio-valor"
+        aria-live="polite"
+        x-bind:aria-busy="pendiente ? 'true' : 'false'"
+    >
+        <span class="muni-pii__mascara" x-show="! revelado && ! pendiente" >Calle F••••••, Graneros</span>
+
+        
+        <span class="muni-pii__pendiente" x-show="pendiente" style="display:none;">Solicitando el dato…</span>
+
+                    
+            <span class="muni-pii__real" x-show="revelado"  style="display:none;" >Calle Ficticia 1234, Villa Ejemplo, Graneros</span>
+            </span>
+
+    
+    <button
+     type="button"     class="muni-btn muni-btn--ghost muni-pii__boton" style="display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:var(--muni-font-sans);font-weight:600;line-height:1;cursor:pointer;border-radius:var(--muni-radius-sm);border:1px solid transparent;text-decoration:none;transition:background var(--muni-dur) var(--muni-ease),border-color var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease);padding:6px 12px;font-size:12.5px; min-height:28px;gap:6px;border-color:var(--muni-field-border);" x-cloak="x-cloak" aria-pressed="false" x-bind:aria-pressed="revelado ? 'true' : 'false'" aria-controls="muni-pii-domicilio-valor" x-on:click="alternar()"
+>
+        <svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" style="flex-shrink:0;">
+            <path d="M1 8s2.6-4.2 7-4.2S15 8 15 8s-2.6 4.2-7 4.2S1 8 1 8z" stroke-linejoin="round"/>
+            <circle cx="8" cy="8" r="1.9"/>
+            <path x-show="revelado"  style="display:none;"  d="M3 13L13 3" stroke-linecap="round"/>
+        </svg>
+        <span x-show="! revelado" >Mostrar <span class="muni-sr">Domicilio</span></span>
+        <span x-show="revelado"  style="display:none;" >Ocultar <span class="muni-sr">Domicilio</span></span>
+</button>
+
+</span></dd>
+
+
+        
+        <dt>Teléfono</dt>
+<dd ><span
+    data-muni-pii-campo="telefono"
+    data-muni-pii-etiqueta="Teléfono"
+    
+    id="muni-pii-telefono" class="muni-pii"
+    x-data="{
+        revelado: false,
+        pendiente: false,
+        tieneValor: false,
+
+        alternar() { (this.revelado || this.pendiente) ? this.ocultar() : this.revelar(); },
+
+        revelar() {
+            /* La raíz se busca desde el nodo, NO con this.$el a secas: dentro
+               de un método invocado desde el x-on de un hijo, $el es ESE hijo
+               —el botón—, así que `dataset` e `id` venían vacíos y el detalle
+               del evento llegaba al anfitrión sin decir qué campo se abrió. El
+               HTML pasaba todas las pruebas de Blade igual; se vio midiendo el
+               evento en el navegador. */
+            const raiz = (this.$el && this.$el.closest('[data-muni-pii-campo]')) || this.$root;
+
+            /* El estado se cambia ANTES de emitir: un oyente del anfitrión que
+               mire el DOM al recibir el evento tiene que ver lo que el
+               funcionario ya está viendo. */
+            if (this.tieneValor) { this.revelado = true; } else { this.pendiente = true; }
+
+            raiz.dispatchEvent(new CustomEvent('muni-pii-revelado', {
+                bubbles: true,
+                detail: {
+                    campo: raiz.dataset.muniPiiCampo || '',
+                    etiqueta: raiz.dataset.muniPiiEtiqueta || '',
+                    id: raiz.id || '',
+                    diferido: ! this.tieneValor,
+                },
+            }));
+        },
+
+        ocultar() { this.revelado = false; this.pendiente = false; },
+    }"
+    x-on:keydown.escape="if (revelado || pendiente) { ocultar(); $event.stopPropagation(); }"
+>
+    
+    <span
+        class="muni-pii__valor"
+        id="muni-pii-telefono-valor"
+        aria-live="polite"
+        x-bind:aria-busy="pendiente ? 'true' : 'false'"
+    >
+        <span class="muni-pii__mascara" x-show="! revelado && ! pendiente" >+56 9 •••• ••78</span>
+
+        
+        <span class="muni-pii__pendiente" x-show="pendiente" style="display:none;">Solicitando el dato…</span>
+
+            </span>
+
+    
+    <button
+     type="button"     class="muni-btn muni-btn--ghost muni-pii__boton" style="display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:var(--muni-font-sans);font-weight:600;line-height:1;cursor:pointer;border-radius:var(--muni-radius-sm);border:1px solid transparent;text-decoration:none;transition:background var(--muni-dur) var(--muni-ease),border-color var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease);padding:6px 12px;font-size:12.5px; min-height:28px;gap:6px;border-color:var(--muni-field-border);" x-cloak="x-cloak" aria-pressed="false" x-bind:aria-pressed="revelado ? 'true' : 'false'" aria-controls="muni-pii-telefono-valor" x-on:click="alternar()"
+>
+        <svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" style="flex-shrink:0;">
+            <path d="M1 8s2.6-4.2 7-4.2S15 8 15 8s-2.6 4.2-7 4.2S1 8 1 8z" stroke-linejoin="round"/>
+            <circle cx="8" cy="8" r="1.9"/>
+            <path x-show="revelado"  style="display:none;"  d="M3 13L13 3" stroke-linecap="round"/>
+        </svg>
+        <span x-show="! revelado" >Mostrar <span class="muni-sr">Teléfono</span></span>
+        <span x-show="revelado"  style="display:none;" >Ocultar <span class="muni-sr">Teléfono</span></span>
+</button>
+
+</span></dd>
+
+
+        <dt>Correo</dt>
+<dd ><span
+    data-muni-pii-campo="correo"
+    data-muni-pii-etiqueta="Correo"
+    
+    id="muni-pii-correo" class="muni-pii"
+    x-data="{
+        revelado: false,
+        pendiente: false,
+        tieneValor: false,
+
+        alternar() { (this.revelado || this.pendiente) ? this.ocultar() : this.revelar(); },
+
+        revelar() {
+            /* La raíz se busca desde el nodo, NO con this.$el a secas: dentro
+               de un método invocado desde el x-on de un hijo, $el es ESE hijo
+               —el botón—, así que `dataset` e `id` venían vacíos y el detalle
+               del evento llegaba al anfitrión sin decir qué campo se abrió. El
+               HTML pasaba todas las pruebas de Blade igual; se vio midiendo el
+               evento en el navegador. */
+            const raiz = (this.$el && this.$el.closest('[data-muni-pii-campo]')) || this.$root;
+
+            /* El estado se cambia ANTES de emitir: un oyente del anfitrión que
+               mire el DOM al recibir el evento tiene que ver lo que el
+               funcionario ya está viendo. */
+            if (this.tieneValor) { this.revelado = true; } else { this.pendiente = true; }
+
+            raiz.dispatchEvent(new CustomEvent('muni-pii-revelado', {
+                bubbles: true,
+                detail: {
+                    campo: raiz.dataset.muniPiiCampo || '',
+                    etiqueta: raiz.dataset.muniPiiEtiqueta || '',
+                    id: raiz.id || '',
+                    diferido: ! this.tieneValor,
+                },
+            }));
+        },
+
+        ocultar() { this.revelado = false; this.pendiente = false; },
+    }"
+    x-on:keydown.escape="if (revelado || pendiente) { ocultar(); $event.stopPropagation(); }"
+>
+    
+    <span
+        class="muni-pii__valor"
+        id="muni-pii-correo-valor"
+        aria-live="polite"
+        x-bind:aria-busy="pendiente ? 'true' : 'false'"
+    >
+        <span class="muni-pii__mascara" x-show="! revelado && ! pendiente" >v•••••@ejemplo.cl</span>
+
+        
+        <span class="muni-pii__pendiente" x-show="pendiente" style="display:none;">Solicitando el dato…</span>
+
+            </span>
+
+    
+    <button
+     type="button"     class="muni-btn muni-btn--ghost muni-pii__boton" style="display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:var(--muni-font-sans);font-weight:600;line-height:1;cursor:pointer;border-radius:var(--muni-radius-sm);border:1px solid transparent;text-decoration:none;transition:background var(--muni-dur) var(--muni-ease),border-color var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease);padding:6px 12px;font-size:12.5px; min-height:28px;gap:6px;border-color:var(--muni-field-border);" x-cloak="x-cloak" aria-pressed="false" x-bind:aria-pressed="revelado ? 'true' : 'false'" aria-controls="muni-pii-correo-valor" x-on:click="alternar()"
+>
+        <svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" style="flex-shrink:0;">
+            <path d="M1 8s2.6-4.2 7-4.2S15 8 15 8s-2.6 4.2-7 4.2S1 8 1 8z" stroke-linejoin="round"/>
+            <circle cx="8" cy="8" r="1.9"/>
+            <path x-show="revelado"  style="display:none;"  d="M3 13L13 3" stroke-linecap="round"/>
+        </svg>
+        <span x-show="! revelado" >Mostrar <span class="muni-sr">Correo</span></span>
+        <span x-show="revelado"  style="display:none;" >Ocultar <span class="muni-sr">Correo</span></span>
+</button>
+
+</span></dd></dl>
+
+    <style>
+        /* Rejilla sobre el propio <dl>: una columna por defecto, dos a partir de
+           40em. dt y dd son hijos directos, así que la etiqueta de cada par cae
+           siempre en la misma columna y el par sigue siendo un par para el lector. */
+        /* `.muni-num` viaja CON el componente y no se hereda del bloque de la
+           tabla: aquel se emite una sola vez y, en un drawer de ficha sin tabla
+           en pantalla, no se emite nunca — el RUT saldría en sans proporcional
+           dentro del panel, que es justo el defecto que este componente existe
+           para evitar (DESIGN §7 y §9). La declaración es idéntica a la de la
+           tabla, así que el orden de emisión da igual.
+           Va aquí y no en el par porque el par se renderiza DENTRO del <dl>, y
+           el modelo de contenido de <dl> no admite un <style> suelto entre los
+           pares: sería HTML inválido y una violación de la regla
+           `definition-list` de axe. */
+        .muni-num { font-family:var(--muni-font-mono); font-variant-numeric:tabular-nums; }
+        .muni-sr { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
+
+        .muni-dl { display:grid; grid-template-columns:1fr; margin:0; font-family:var(--muni-font-sans); }
+        .muni-dl > dt { margin:0; padding:10px 0 0; font-size:12px; font-weight:600; line-height:1.35; color:var(--muni-muted); }
+        .muni-dl > dd { margin:0; padding:2px 0 10px; font-size:14px; line-height:1.45; color:var(--muni-text); border-bottom:1px solid var(--muni-border); overflow-wrap:break-word; min-width:0; }
+        .muni-dl > dd:last-child { border-bottom:0; padding-bottom:0; }
+
+        /* Etiqueta a la izquierda y valor a la derecha. El ancho de la etiqueta
+           es elástico entre dos topes: fijo, un rótulo largo se corta; libre, la
+           columna baila de ficha en ficha. */
+        @media (min-width:40em) {
+            .muni-dl--dos { grid-template-columns:minmax(8rem,15rem) 1fr; }
+            /* El aire entre columnas va como relleno del <dt> y no como
+               `column-gap`: con gap, la línea que separa un par del siguiente se
+               corta en el hueco y la ficha sale con la regla partida en dos. */
+            .muni-dl--dos > dt { padding:10px 18px 10px 0; border-bottom:1px solid var(--muni-border); }
+            .muni-dl--dos > dd { padding:10px 0; }
+            .muni-dl--dos > dt:nth-last-child(2) { border-bottom:0; padding-bottom:0; }
+            .muni-dl--dos > dd:last-child { padding-bottom:0; }
+        }
+
+        /* Jurídica imprime el bloque «datos del titular» del panel ARCOP. Un par
+           partido deja la etiqueta en una hoja y el valor en la siguiente, y en
+           papel no hay forma de volver a juntarlos. `break-inside` por sí solo no
+           basta: el corte que importa cae ENTRE el <dt> y su <dd>, y eso lo
+           impide `break-after` sobre la etiqueta. Los alias `page-break-*` van
+           porque Firefox todavía no atiende `break-after` en todos los casos.
+           Acotado al par: las reglas base del documento son de los dos CSS del
+           paquete, no de un componente. */
+        @media print {
+            .muni-dl > dt { break-inside:avoid; break-after:avoid; page-break-inside:avoid; page-break-after:avoid; }
+            .muni-dl > dd { break-inside:avoid; page-break-inside:avoid; }
+        }
+    </style>
+</section>
+
+<section class="persona-bloque" aria-labelledby="persona-municipio">
+    <h2 id="persona-municipio" class="persona-titulo">En el municipio</h2>
+
+    <div
+    id="persona-pestanas"
+    x-data="{
+        active: 0,
+        focused: 0,
+        count: 3,
+        manual: false,
+        mover(i) {
+            if (! this.count) return;
+            this.focused = ((i % this.count) + this.count) % this.count;
+            if (! this.manual) { this.active = this.focused; }
+            this.$nextTick(() => { const b = this.$refs['tab' + this.focused]; if (b) b.focus(); });
+        },
+        seleccionar(i) { this.focused = i; this.active = i; },
+    }"
+    
+>
+    <div
+        role="tablist"
+         aria-label="Lo que la persona tiene en el municipio"         style="display:flex;gap:2px;border-bottom:1px solid var(--muni-border);margin-bottom:16px;overflow-x:auto;"
+        @keydown.right.prevent="mover(focused + 1)"
+        @keydown.left.prevent="mover(focused - 1)"
+        @keydown.home.prevent="mover(0)"
+        @keydown.end.prevent="mover(count - 1)"
+    >
+                    <button
+                type="button"
+                role="tab"
+                id="persona-pestanas-tab-0"
+                aria-controls="persona-pestanas-panel-0"
+                
+                aria-selected="true"
+                tabindex="0"
+                x-ref="tab0"
+                :aria-selected="active === 0"
+                :tabindex="focused === 0 ? 0 : -1"
+                @click="seleccionar(0)"
+                class="muni-tab"
+                :class="active === 0 && 'muni-tab--on'"
+            >Trámites</button>
+                    <button
+                type="button"
+                role="tab"
+                id="persona-pestanas-tab-1"
+                aria-controls="persona-pestanas-panel-1"
+                
+                aria-selected="false"
+                tabindex="-1"
+                x-ref="tab1"
+                :aria-selected="active === 1"
+                :tabindex="focused === 1 ? 0 : -1"
+                @click="seleccionar(1)"
+                class="muni-tab"
+                :class="active === 1 && 'muni-tab--on'"
+            >Historial</button>
+                    <button
+                type="button"
+                role="tab"
+                id="persona-pestanas-tab-2"
+                aria-controls="persona-pestanas-panel-2"
+                
+                aria-selected="false"
+                tabindex="-1"
+                x-ref="tab2"
+                :aria-selected="active === 2"
+                :tabindex="focused === 2 ? 0 : -1"
+                @click="seleccionar(2)"
+                class="muni-tab"
+                :class="active === 2 && 'muni-tab--on'"
+            >Documentos</button>
+            </div>
+
+    <div
+    role="tabpanel"
+    x-show="active === 0"
+    x-cloak
+    x-transition:enter="muni-fade" x-transition:enter-start="muni-fade-0" x-transition:enter-end="muni-fade-1"
+    id="persona-pestanas-panel-0" aria-labelledby="persona-pestanas-tab-0" class="muni-tabpanel"
+>
+    <h3 class="persona-panel__titulo">Trámites</h3>
+            <div
+    class="muni-dt__scroll"
+        tabindex="0"
+    role="region"
+    aria-label="Trámites de la persona"
+>
+    <table class="muni-dt">
+        <caption class="muni-sr">Trámites de la persona</caption>
+                    <thead>
+                <tr>
+                                        
+                                            <th scope="col">Folio</th>
+                                            <th scope="col">Trámite</th>
+                                            <th scope="col">Estado</th>
+                                            <th scope="col">Ingreso</th>
+                                    </tr>
+            </thead>
+                <tbody class="muni-data-body">
+                            <tr data-muni-row>
+                    <td class="muni-num">AV-2026-0412</td>
+                    <td>Certificado de residencia</td>
+                    <td><span
+    style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;font-family:var(--muni-font-mono);font-size:11px;font-weight:600;line-height:1;letter-spacing:.02em;border-radius:999px;color:var(--muni-ok-fg);background:var(--muni-ok-bg);border:1px solid var(--muni-ok-border);"
+>
+            <span aria-hidden="true" style="width:6px;height:6px;border-radius:50%;background:var(--muni-ok-fg);box-shadow:var(--muni-glow);"></span>
+        Emitido
+</span>
+</td>
+                    <td class="muni-num">02/09/2026</td>
+                </tr>
+                <tr data-muni-row>
+                    <td class="muni-num">AV-2026-0388</td>
+                    <td>Solicitud de poda de árbol</td>
+                    <td><span
+    style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;font-family:var(--muni-font-mono);font-size:11px;font-weight:600;line-height:1;letter-spacing:.02em;border-radius:999px;color:var(--muni-warn-fg);background:var(--muni-warn-bg);border:1px solid var(--muni-warn-border);"
+>
+            <span aria-hidden="true" style="width:6px;height:6px;border-radius:50%;background:var(--muni-warn-fg);box-shadow:var(--muni-glow);"></span>
+        Con observación
+</span>
+</td>
+                    <td class="muni-num">21/08/2026</td>
+                </tr>
+                <tr data-muni-row>
+                    <td class="muni-num">AV-2026-0107</td>
+                    <td>Retiro de voluminosos</td>
+                    <td><span
+    style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;font-family:var(--muni-font-mono);font-size:11px;font-weight:600;line-height:1;letter-spacing:.02em;border-radius:999px;color:var(--muni-muted);background:var(--muni-surface-3);border:1px solid var(--muni-border);"
+>
+            <span aria-hidden="true" style="width:6px;height:6px;border-radius:50%;background:var(--muni-muted);box-shadow:var(--muni-glow);"></span>
+        Cerrado
+</span>
+</td>
+                    <td class="muni-num">14/03/2026</td>
+                </tr>
+                    </tbody>
+    </table>
+</div>
+
+
+
+    <style>
+        /* Oculto a la vista, presente en el árbol de accesibilidad: `display:none`
+           y `visibility:hidden` sacarían el <caption> del árbol y la tabla se
+           quedaría sin nombre. */
+        .muni-sr { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
+
+        .muni-dt__scroll { overflow:auto; border:1px solid var(--muni-border); border-radius:var(--muni-radius); background:var(--muni-surface); }
+        /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
+        .muni-dt__scroll:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:2px; }
+
+        /* Las medidas de la fila viven en variables LOCALES del componente, con
+           prefijo propio. NO son tokens --muni-*: el espaciado del paquete no se
+           tokeniza (los otros 37 componentes no cambian), y un --muni-* que solo
+           existiera acá reventaría la guarda que exige que todo --muni-* leído por
+           un componente esté declarado en las dos hojas. Cada var() lleva su
+           respaldo por si la regla de la tabla no alcanzó a una fila suelta. */
+        .muni-dt { --mdt-cell-py:8px; --mdt-cell-px:12px; --mdt-head-py:9px; --mdt-head-px:12px; width:100%; border-collapse:collapse; font-family:var(--muni-font-sans); font-size:12.5px; }
+        .muni-dt th { text-align:left; white-space:nowrap; padding:var(--mdt-head-py, 9px) var(--mdt-head-px, 12px); font-family:var(--muni-font-sans); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--muni-muted); background:var(--muni-surface-2); border-bottom:1px solid var(--muni-border); }
+        .muni-data-body td, [data-muni-row] td { padding:var(--mdt-cell-py, 8px) var(--mdt-cell-px, 12px); border-bottom: 1px solid var(--muni-border); white-space: nowrap; color: var(--muni-text); }
+
+        /* UN solo lugar donde vive el compacto: la prop densidad="compacta" y la
+           herencia de [data-muni-densidad="compacta"], que el anfitrión pinta en la
+           raíz del documento, redefinen las MISMAS variables. Solo relleno: nunca
+           una `height` fija, que recortaría el texto en cuanto el usuario fuerza
+           line-height 1.5 (WCAG 2.2 AA 1.4.12 Text Spacing). */
+        .muni-dt--compact,
+        [data-muni-densidad="compacta"] .muni-dt { --mdt-cell-py:4px; --mdt-cell-px:8px; --mdt-head-py:5px; --mdt-head-px:8px; }
+        /* La tabla que pide «comoda» a mano gana sobre el modo compacto del
+           anfitrión: misma especificidad y va después. Una nómina de tres filas en
+           un panel compacto no tiene por qué encogerse. */
+        [data-muni-densidad="compacta"] .muni-dt--comoda { --mdt-cell-py:8px; --mdt-cell-px:12px; --mdt-head-py:9px; --mdt-head-px:12px; }
+
+        /* PISO DE OBJETIVO: la fila encoge, el objetivo no. Con el relleno en 4px,
+           dos botones contiguos en la columna de acciones quedarían bajo el mínimo
+           de 24×24 de 2.5.8; con este piso la celda de acciones crece y deja de
+           encoger, que es exactamente lo que AdminLTE no hace. */
+        .muni-dt td a, .muni-dt td button { display:inline-flex; align-items:center; justify-content:center; min-height:24px; min-width:24px; }
+        /* En la tablet de terreno no hay puntero fino: el objetivo sube a 44×44
+           aunque eso deshaga el compacto justo en esa columna. */
+        @media (pointer: coarse) {
+            .muni-dt td a, .muni-dt td button { min-height:44px; min-width:44px; }
+        }
+        [data-muni-row]:hover { background: var(--muni-surface-2); }
+        [data-muni-row].muni-row--danger { position: relative; }
+        [data-muni-row].muni-row--danger td:first-child { box-shadow: inset 3px 0 0 var(--muni-danger-fg); }
+        [data-muni-row].muni-row--danger td:first-child { color: var(--muni-danger-fg); font-weight: 600; }
+        .muni-num { font-family: var(--muni-font-mono); font-variant-numeric: tabular-nums; }
+
+        /* Lo que se imprime es un acta: el marco no puede recortar la nómina y la
+           cabecera se repite en cada hoja, que es lo que se quiere en un documento
+           municipal.
+
+           TODAS las reglas de impresión de la tabla viven acá y no en la hoja
+           imprimible. El bloque de estilos de un componente se emite UNA sola vez,
+           y en una hoja con nómina la tabla va antes que el pie: el de data-table
+           ya está emitido y gana, así que una copia en la hoja no se aplicaría
+           nunca. */
+        @media print {
+            .muni-dt__scroll { overflow:visible !important; border-radius:0; }
+            .muni-dt thead { display:table-header-group; }
+            [data-muni-row] { break-inside:avoid; }
+
+            /* En pantalla las celdas van `nowrap` y lo que no cabe se alcanza
+               desplazando el marco. En papel no hay desplazamiento: un domicilio
+               largo se saldría de la hoja. Se deja envolver todo MENOS las cifras
+               y los RUT, que partidos a la mitad se leen mal. */
+            .muni-dt td { white-space:normal; }
+            .muni-num { white-space:nowrap; }
+
+            /* La franja de la fila con problema es una `box-shadow` interior, y
+               los navegadores no imprimen fondos: en papel desaparecía y la fila
+               morosa quedaba igual que las demás. Se sustituye por un borde
+               SÓLIDO, que sí se imprime, más una marca de texto, porque el color
+               tampoco puede ser el único portador sobre papel (WCAG 2.2 AA 1.4.1)
+               y una impresora en blanco y negro lo deja en gris. */
+            [data-muni-row].muni-row--danger td:first-child { box-shadow:none; border-left:3px solid var(--muni-danger-fg); padding-left:9px; }
+            [data-muni-row].muni-row--danger td:first-child::before { content:"(*) "; font-family:var(--muni-font-mono); font-weight:700; }
+        }
+    </style>
+</div>
+
+        <div
+    role="tabpanel"
+    x-show="active === 1"
+    x-cloak
+    x-transition:enter="muni-fade" x-transition:enter-start="muni-fade-0" x-transition:enter-end="muni-fade-1"
+    id="persona-pestanas-panel-1" aria-labelledby="persona-pestanas-tab-1" class="muni-tabpanel"
+>
+    <h3 class="persona-panel__titulo">Historial</h3>
+            <ol role="list" class="muni-timeline">
+                    <li class="muni-tl__item" >
+            <span class="muni-tl__dot" aria-hidden="true" style="--dot:var(--muni-ok-fg);"></span>
+            <div class="muni-tl__content">
+                <div class="muni-tl__head">
+                    <span class="muni-tl__tone">Conforme</span>                    <span class="muni-tl__title">Certificado de residencia emitido</span>
+                    <time class="muni-tl__time"  datetime="2026-09-02T12:10:00-03:00" >02 sep 2026 · 12:10</time>                </div>
+                                <p class="muni-tl__actor">Registrado por Oficina de Partes</p>                            </div>
+        </li>
+                    <li class="muni-tl__item"  aria-current="step" >
+            <span class="muni-tl__dot" aria-hidden="true" style="--dot:var(--muni-warn-fg);"></span>
+            <div class="muni-tl__content">
+                <div class="muni-tl__head">
+                    <span class="muni-tl__tone">Con observación</span>                    <span class="muni-tl__title">Poda observada: falta la foto del árbol</span>
+                    <time class="muni-tl__time"  datetime="2026-08-25T09:32:00-03:00" >25 ago 2026 · 09:32</time>                </div>
+                                <p class="muni-tl__actor">Registrado por Dirección de Aseo y Ornato</p>                            </div>
+        </li>
+                    <li class="muni-tl__item" >
+            <span class="muni-tl__dot" aria-hidden="true" style="--dot:var(--muni-info-fg);"></span>
+            <div class="muni-tl__content">
+                <div class="muni-tl__head">
+                    <span class="muni-tl__tone">Informativo</span>                    <span class="muni-tl__title">Actualizó su domicilio</span>
+                    <time class="muni-tl__time"  datetime="2026-08-18T16:05:00-03:00" >18 ago 2026 · 16:05</time>                </div>
+                                                                    <details class="muni-tl__detail">
+                        <summary class="muni-tl__summary">Ver el detalle del cambio</summary>
+                        <p class="muni-tl__diff">Domicilio: Pasaje Uno 10 → Calle Ficticia 1234</p>
+                    </details>
+                            </div>
+        </li>
+                    <li class="muni-tl__item" >
+            <span class="muni-tl__dot" aria-hidden="true" style="--dot:var(--muni-border-2);"></span>
+            <div class="muni-tl__content">
+                <div class="muni-tl__head">
+                    <span class="muni-tl__tone">Sin efecto</span>                    <span class="muni-tl__title">Retiro de voluminosos cerrado</span>
+                    <time class="muni-tl__time"  datetime="2026-03-20T10:00:00-03:00" >20 mar 2026 · 10:00</time>                </div>
+                                                            </div>
+        </li>
+    </ol>
+
+    <style>
+        .muni-timeline { list-style:none; margin:0; padding:0; font-family:var(--muni-font-sans); }
+        .muni-tl__item { position:relative; display:flex; gap:14px; padding-bottom:18px; }
+        .muni-tl__item:not(:last-child)::before { content:""; position:absolute; left:6px; top:16px; bottom:0; width:2px; background:var(--muni-border); }
+        .muni-tl__dot { flex-shrink:0; width:14px; height:14px; margin-top:3px; border-radius:50%; background:var(--muni-surface); border:2px solid var(--dot); box-shadow:0 0 0 3px color-mix(in srgb,var(--dot) 15%,transparent),var(--muni-glow); z-index:1; }
+        .muni-tl__content { min-width:0; padding-bottom:2px; }
+        .muni-tl__head { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
+        .muni-tl__title { font-size:13.5px; font-weight:600; color:var(--muni-text); }
+        .muni-tl__time { font-family:var(--muni-font-mono); font-size:11px; color:var(--muni-hint); }
+        .muni-tl__desc { margin:3px 0 0; font-size:12.5px; color:var(--muni-muted); line-height:1.5; }
+        /* El estado en palabras. Va antes del título para leerse junto al punto,
+           y su color sale de tokens con las dos ramas de tema. */
+        .muni-tl__tone { flex-shrink:0; padding:1px 7px; border-radius:999px; font-family:var(--muni-font-mono); font-size:10.5px; font-weight:600; letter-spacing:.02em; line-height:1.5; color:var(--muni-muted); background:var(--muni-surface-3); border:1px solid var(--muni-border); }
+        .muni-tl__actor { margin:3px 0 0; font-size:12px; color:var(--muni-hint); }
+        /* El hito vigente ya se anuncia con aria-current; acá solo se hace ver,
+           y con peso y anillo, no con un color nuevo. */
+        .muni-tl__item[aria-current="step"] .muni-tl__title { font-weight:700; }
+        .muni-tl__item[aria-current="step"] .muni-tl__dot { background:var(--dot); box-shadow:0 0 0 4px color-mix(in srgb,var(--dot) 28%,transparent),var(--muni-glow); }
+        .muni-tl__detail { margin:5px 0 0; }
+        .muni-tl__summary { display:inline-block; min-height:24px; padding:3px 7px; margin-left:-7px; border-radius:var(--muni-radius-sm); font-size:12px; font-weight:600; color:var(--muni-accent-strong); cursor:pointer; transition:background var(--muni-dur) var(--muni-ease); }
+        .muni-tl__summary:hover { background:var(--muni-surface-3); }
+        /* Dentro de Filament la cadena de sombras de Tailwind se come cualquier
+           box-shadow: el indicador de foco es un outline y nada más. */
+        .muni-tl__summary:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:2px; }
+        .muni-tl__diff { margin:5px 0 0; padding:7px 9px; border-radius:var(--muni-radius-sm); background:var(--muni-surface-2); border:1px solid var(--muni-border); font-family:var(--muni-font-mono); font-size:11.5px; color:var(--muni-muted); line-height:1.55; white-space:pre-wrap; overflow-wrap:anywhere; }
+    </style>
+</div>
+
+        <div
+    role="tabpanel"
+    x-show="active === 2"
+    x-cloak
+    x-transition:enter="muni-fade" x-transition:enter-start="muni-fade-0" x-transition:enter-end="muni-fade-1"
+    id="persona-pestanas-panel-2" aria-labelledby="persona-pestanas-tab-2" class="muni-tabpanel" tabindex="0"
+>
+    <h3 class="persona-panel__titulo">Documentos</h3>
+            <dl class="muni-dl muni-dl--dos" aria-label="Documentos en el expediente"><dt>Cédula de identidad</dt>
+<dd >Verificada en el mesón el 02/09/2026</dd>
+
+
+                <dt>Comprobante de domicilio</dt>
+<dd >Boleta de servicios, agosto 2026</dd>
+
+
+                <dt>Foto del árbol</dt>
+<dd ><span aria-hidden="true" style="color:var(--muni-muted);">—</span><span class="muni-sr">Sin dato</span></dd></dl>
+</div>
+</div>
+
+    <style>
+        .muni-tab { position:relative;padding:10px 14px;font-family:var(--muni-font-sans);font-size:13.5px;font-weight:600;
+            color:var(--muni-muted);background:transparent;border:none;cursor:pointer;white-space:nowrap;
+            transition:color var(--muni-dur) var(--muni-ease); }
+        .muni-tab:hover { color:var(--muni-text); }
+        /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
+        .muni-tab:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:-2px; box-shadow:var(--muni-ring); border-radius:var(--muni-radius-sm); }
+        .muni-tab--on { color:var(--muni-accent); }
+        .muni-tab--on::after { content:"";position:absolute;left:8px;right:8px;bottom:-1px;height:2px;
+            background:var(--muni-accent);border-radius:2px 2px 0 0; }
+        /* El panel enfocable (tabindex=0, APG) también necesita indicador de foco propio. */
+        .muni-tabpanel:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:2px; box-shadow:var(--muni-ring); border-radius:var(--muni-radius-sm); }
+    </style>
+</section>
+<aside class="persona-bloque persona-bitacora muni-no-print" aria-labelledby="persona-bitacora"><h2 id="persona-bitacora" class="persona-titulo">Bitácora del anfitrión (simulada)</h2><p class="persona-nota">El paquete no registra nada: cada «Mostrar» emite <code>muni-pii-revelado</code> y es el sistema que usa la ficha el que lo anota en su propia bitácora. Esta lista es ese oyente, simulado.</p><ol class="persona-bitacora__lista" aria-live="polite"><li data-persona-vacia>Sin accesos todavía.</li></ol></aside></main>
+<script>
+    (function () {
+        /* El oyente del anfitrión, simulado. En un sistema real esto es un
+           endpoint que registra quién vio qué y cuándo (Ley 21.719). textContent,
+           nunca innerHTML: la etiqueta viene del DOM. */
+        var lista = document.querySelector('.persona-bitacora__lista');
+        document.addEventListener('muni-pii-revelado', function (e) {
+            var d = e.detail || {};
+            var vacia = lista.querySelector('[data-persona-vacia]');
+            if (vacia) { vacia.remove(); }
+            var li = document.createElement('li');
+            var hora = new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            li.textContent = hora + ' · «' + (d.etiqueta || d.campo || 'dato') + '» — ' + (d.diferido
+                ? 'el valor no venía en la página: el sistema registraría el acceso y lo serviría.'
+                : 'el valor ya venía tapado: el sistema registraría esta apertura.');
+            lista.appendChild(li);
+        });
+
+        /* Conmutador de tema: fija data-muni-theme en <html>, que es el
+           activador explícito de muni-ui.css. */
+        var boton = document.querySelector('[data-persona-tema]');
+        var raiz = document.documentElement;
+        function oscuro() {
+            var fijado = raiz.getAttribute('data-muni-theme');
+            return fijado ? fijado === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+        function pintar() { boton.setAttribute('aria-pressed', oscuro() ? 'true' : 'false'); }
+        boton.addEventListener('click', function () {
+            raiz.setAttribute('data-muni-theme', oscuro() ? 'light' : 'dark');
+            pintar();
+        });
+        pintar();
+    })();
+</script>
+<script>(()=>{var yt=!1,bt=!1,B=[],Et=-1,je=!1,vt=!1;function _r(e){ai(e)}function gr(){vt=!0}function xr(){vt=!1,br()}function ai(e){B.includes(e)||(B.push(e),e._x_schedulerPriority!==void 0&&(je=!0)),br()}function yr(e){let t=B.indexOf(e);t!==-1&&t>Et&&B.splice(t,1)}function br(){if(!bt&&!yt){if(vt)return;yt=!0,queueMicrotask(ci)}}function ci(){yt=!1,bt=!0;for(let e=0;e<B.length;e++)je&&li(e),B[e](),Et=e;B.length=0,Et=-1,je=!1,bt=!1}function li(e){let t=new Map,r=B.slice(e).sort((n,i)=>fi(n,i,t));for(let n=0;n<r.length;n++)B[e+n]=r[n];je=!1}function fi(e,t,r){return xt(e)?xt(t)?mr(e._x_schedulerPriority.el,r)-mr(t._x_schedulerPriority.el,r)||e._x_schedulerPriority.order-t._x_schedulerPriority.order:-1:xt(t)?1:0}function xt(e){return e._x_schedulerPriority!==void 0}function mr(e,t){if(t.has(e))return t.get(e);let r=0,n=e;for(;e;)r++,e._x_teleportBack?e=e._x_teleportBack:typeof ShadowRoot=="function"&&e.parentNode instanceof ShadowRoot?e=e.parentNode.host:e=e.parentElement;return t.set(n,r),r}var R,k,H,St,ui=0,wt=!0;function Er(e){wt=!1,e(),wt=!0}function vr(e){R=e.reactive,H=e.release,k=t=>e.effect(t,{scheduler:r=>{wt?_r(r):r()}}),St=e.raw}function At(e){k=e}function wr(e){let t=()=>{};return[(n,i)=>{let o=i?.priority==="structural"?ui++:void 0,s=k(n);return o!==void 0&&s!==void 0&&(s._x_schedulerPriority={el:e,order:o}),e._x_effects||(e._x_effects=new Set,e._x_runEffects=()=>{e._x_effects.forEach(a=>a())}),e._x_effects.add(s),t=()=>{s!==void 0&&(e._x_effects.delete(s),H(s))},s},()=>{t()}]}function Fe(e,t){let r=!0,n,i,o=k(()=>{let s=e(),a=JSON.stringify(s);if(!r&&(typeof s=="object"||s!==n)){let c=typeof n=="object"?JSON.parse(i):n;queueMicrotask(()=>{t(s,c)})}n=s,i=a,r=!1});return()=>H(o)}async function Sr(e){gr();try{await e(),await Promise.resolve()}finally{xr()}}var Ar=[],Tr=[],Or=[];function Nr(e){Or.push(e)}function ue(e,t){typeof t=="function"?(e._x_cleanups||(e._x_cleanups=[]),e._x_cleanups.push(t)):(t=e,Tr.push(t))}function $e(e){Ar.push(e)}function Be(e,t,r){e._x_attributeCleanups||(e._x_attributeCleanups={}),e._x_attributeCleanups[t]||(e._x_attributeCleanups[t]=[]),e._x_attributeCleanups[t].push(r)}function Tt(e,t){e._x_attributeCleanups&&Object.entries(e._x_attributeCleanups).forEach(([r,n])=>{(t===void 0||t.includes(r))&&(n.forEach(i=>i()),delete e._x_attributeCleanups[r])})}function Cr(e){for(e._x_effects?.forEach(yr);e._x_cleanups?.length;)e._x_cleanups.pop()()}var He=new MutationObserver(Ue),Ot=!1;function ve(){He.observe(document,{subtree:!0,childList:!0,attributes:!0,attributeOldValue:!0}),Ot=!0}function Nt(){di(),He.disconnect(),Ot=!1}var Z=[];function di(){let e=He.takeRecords();Z.push(()=>e.length>0&&Ue(e));let t=Z.length;queueMicrotask(()=>{if(Z.length===t)for(;Z.length>0;)Z.shift()()})}function Rr(){for(;Z.length>0;)Z.shift()();let e=He.takeRecords();e.length>0&&Ue(e)}function h(e){if(!Ot)return e();Nt();let t=e();return ve(),t}var Ct=!1,Ve=[];function Dr(){Ct=!0}function Mr(){Ct=!1,Ue(Ve),Ve=[]}function Ue(e){if(Ct){Ve=Ve.concat(e);return}let t=[],r=new Set,n=new Map,i=new Map;for(let o=0;o<e.length;o++)if(!e[o].target._x_ignoreMutationObserver&&(e[o].type==="childList"&&(e[o].removedNodes.forEach(s=>{s.nodeType===1&&s._x_marker&&r.add(s)}),e[o].addedNodes.forEach(s=>{if(s.nodeType===1){if(r.has(s)){r.delete(s);return}s._x_marker||t.push(s)}})),e[o].type==="attributes")){let s=e[o].target,a=e[o].attributeName,c=e[o].oldValue,l=()=>{n.has(s)||n.set(s,[]),n.get(s).push({name:a,value:s.getAttribute(a)})},f=()=>{i.has(s)||i.set(s,[]),i.get(s).push(a)};s.hasAttribute(a)&&c===null?l():s.hasAttribute(a)?(f(),l()):f()}i.forEach((o,s)=>{Tt(s,o)}),n.forEach((o,s)=>{Ar.forEach(a=>a(s,o))});for(let o of r)t.some(s=>s.contains(o))||Tr.forEach(s=>s(o));for(let o of t)o.isConnected&&Or.forEach(s=>s(o));t=null,r=null,n=null,i=null}function ze(e){return I(U(e))}function P(e,t,r){return e._x_dataStack=[t,...U(r||e)],()=>{e._x_dataStack=e._x_dataStack.filter(n=>n!==t)}}function U(e){return e._x_dataStack?e._x_dataStack:typeof ShadowRoot=="function"&&e instanceof ShadowRoot?U(e.host):e.parentNode?U(e.parentNode):[]}function I(e){return new Proxy({objects:e},pi)}function kr(e,t){return e===null||e===Object.prototype?null:Object.prototype.hasOwnProperty.call(e,t)?e:kr(Object.getPrototypeOf(e),t)}var pi={ownKeys({objects:e}){return Array.from(new Set(e.flatMap(t=>Object.keys(t))))},has({objects:e},t){return t==Symbol.unscopables?!1:e.some(r=>Object.prototype.hasOwnProperty.call(r,t)||Reflect.has(r,t))},get({objects:e},t,r){return t=="toJSON"?hi:Reflect.get(e.find(n=>Reflect.has(n,t))||{},t,r)},set({objects:e},t,r,n){let i;for(let s of e)if(i=kr(s,t),i)break;i||(i=e[e.length-1]);let o=Object.getOwnPropertyDescriptor(i,t);return o?.set&&o?.get?o.set.call(n,r)||!0:Reflect.set(i,t,r)}};function hi(){return Reflect.ownKeys(this).reduce((t,r)=>(t[r]=Reflect.get(this,r),t),{})}function de(e,t=()=>{}){let r=i=>typeof i=="object"&&!Array.isArray(i)&&i!==null,n=(i,o="")=>{Object.entries(Object.getOwnPropertyDescriptors(i)).forEach(([s,{value:a,enumerable:c}])=>{if(c===!1||a===void 0||typeof a=="object"&&a!==null&&a.__v_skip)return;let l=o===""?s:`${o}.${s}`;typeof a=="object"&&a!==null&&a._x_interceptor?i[s]=a.initialize(e,l,s,t):r(a)&&a!==i&&!(a instanceof Element)&&n(a,l)})};return n(e)}function We(e,t=()=>{}){let r={initialValue:void 0,_x_interceptor:!0,initialize(n,i,o,s){return e(this.initialValue,()=>mi(n,i),a=>Rt(n,i,a),i,o,s)}};return t(r),n=>{if(typeof n=="object"&&n!==null&&n._x_interceptor){let i=r.initialize.bind(r);r.initialize=(o,s,a,c)=>{let l=n.initialize(o,s,a,c);return r.initialValue=l,i(o,s,a,c)}}else r.initialValue=n;return r}}function mi(e,t){return t.split(".").reduce((r,n)=>r[n],e)}function Rt(e,t,r){if(typeof t=="string"&&(t=t.split(".")),t.length===1)e[t[0]]=r;else{if(t.length===0)throw error;return e[t[0]]||(e[t[0]]={}),Rt(e[t[0]],t.slice(1),r)}}var Pr={};function b(e,t){Pr[e]=t}function G(e,t){let r=_i(t);return Object.entries(Pr).forEach(([n,i])=>{Object.defineProperty(e,`$${n}`,{get(){return i(t,r)},enumerable:!1})}),e}function _i(e){let[t,r]=Dt(e),n={interceptor:We,...t};return ue(e,r),n}function Ir(e,t,r,...n){try{return r(...n)}catch(i){Y(i,e,t)}}function Y(...e){return Lr(...e)}var Lr=gi;function jr(e){Lr=e}function gi(e,t,r=void 0){e=Object.assign(e??{message:"No error message given."},{el:t,expression:r}),console.warn(`Alpine Expression Error: ${e.message}
+
+${r?'Expression: "'+r+`"
+
+`:""}`,t),setTimeout(()=>{throw e},0)}var pe=!0;function qe(e){let t=pe;pe=!1;let r=e();return pe=t,r}function D(e,t,r={}){let n;return x(e,t)(i=>n=i,r),n}function x(...e){return Fr(...e)}var Fr=()=>{};function Vr(e){Fr=e}var $r;function Br(e){$r=e}function Hr(e,t){let r={};G(r,e);let n=[r,...U(e)],i=typeof t=="function"?xi(n,t):bi(n,t,e);return Ir.bind(null,e,t,i)}function xi(e,t){return(r=()=>{},{scope:n={},params:i=[],context:o}={})=>{if(!pe){we(r,t,I([n,...e]),i);return}let s=t.apply(I([n,...e]),i);we(r,s)}}var Mt={};function yi(e,t){if(Mt[e])return Mt[e];let r=Object.getPrototypeOf(async function(){}).constructor,n=/^[\n\s]*if.*\(.*\)/.test(e.trim())||/^(let|const)\s/.test(e.trim())?`(async()=>{ ${e} })()`:e,o=(()=>{try{let s=new r(["__self","scope"],`with (scope) { __self.result = ${n} }; __self.finished = true; return __self.result;`);return Object.defineProperty(s,"name",{value:`[Alpine] ${e}`}),s}catch(s){return Y(s,t,e),Promise.resolve()}})();return Mt[e]=o,o}function bi(e,t,r){let n=yi(t,r);return(i=()=>{},{scope:o={},params:s=[],context:a}={})=>{n.result=void 0,n.finished=!1;let c=I([o,...e]);if(typeof n=="function"){let l=n.call(a,n,c).catch(f=>Y(f,r,t));n.finished?(we(i,n.result,c,s,r),n.result=void 0):l.then(f=>{we(i,f,c,s,r)}).catch(f=>Y(f,r,t)).finally(()=>n.result=void 0)}}}function we(e,t,r,n,i){if(pe&&typeof t=="function"){let o=t.apply(r,n);o instanceof Promise?o.then(s=>we(e,s,r,n)).catch(s=>Y(s,i,t)):e(o)}else typeof t=="object"&&t instanceof Promise?t.then(o=>e(o)):e(t)}function Ur(...e){return $r(...e)}function zr(e,t,r={}){let n={};G(n,e);let i=[n,...U(e)],o=I([r.scope??{},...i]),s=r.params??[];if(t.includes("await")){let a=Object.getPrototypeOf(async function(){}).constructor,c=/^[\n\s]*if.*\(.*\)/.test(t.trim())||/^(let|const)\s/.test(t.trim())?`(async()=>{ ${t} })()`:t;return new a(["scope"],`with (scope) { let __result = ${c}; return __result }`).call(r.context,o)}else{let a=/^[\n\s]*if.*\(.*\)/.test(t.trim())||/^(let|const)\s/.test(t.trim())?`(()=>{ ${t} })()`:t,l=new Function(["scope"],`with (scope) { let __result = ${a}; return __result }`).call(r.context,o);return typeof l=="function"&&pe?l.apply(o,s):l}}var It="x-";function N(e=""){return It+e}function Wr(e){It=e}var Ke={};function p(e,t){return Ke[e]=t,{before(r){if(!Ke[r]){console.warn(String.raw`Cannot find directive \`${r}\`. \`${e}\` will use the default order of execution`);return}let n=Q.indexOf(r);Q.splice(n>=0?n:Q.indexOf("DEFAULT"),0,e)}}}function qr(e){return Object.keys(Ke).includes(e)}function ee(e,t,r){if(t=Array.from(t),e._x_virtualDirectives){let o=Object.entries(e._x_virtualDirectives).map(([a,c])=>({name:a,value:c})),s=Lt(o);o=o.map(a=>s.find(c=>c.name===a.name)?{name:`x-bind:${a.name}`,value:`"${a.value}"`}:a),t=t.concat(o)}let n={};return t.map(Yr((o,s)=>n[o]=s)).filter(Xr).map(vi(n,r)).sort(wi).map(o=>Ei(e,o))}function Lt(e){return Array.from(e).map(Yr()).filter(t=>!Xr(t))}var kt=!1,Se=new Map,Kr=Symbol();function Gr(e){kt=!0;let t=Symbol();Kr=t,Se.set(t,[]);let r=()=>{for(;Se.get(t).length;)Se.get(t).shift()();Se.delete(t)},n=()=>{kt=!1,r()};e(r),n()}function Dt(e){let t=[],r=a=>t.push(a),[n,i]=wr(e);return t.push(i),[{Alpine:z,effect:n,cleanup:r,evaluateLater:x.bind(x,e),evaluate:D.bind(D,e)},()=>t.forEach(a=>a())]}function Ei(e,t){let r=()=>{},n=Ke[t.type]||r,[i,o]=Dt(e);Be(e,t.original,o);let s=()=>{e._x_ignore||e._x_ignoreSelf||(n.inline&&n.inline(e,t,i),n=n.bind(n,e,t,i),kt?Se.get(Kr).push(n):n())};return s.runCleanups=o,s}var Ge=(e,t)=>({name:r,value:n})=>(r.startsWith(e)&&(r=r.replace(e,t)),{name:r,value:n}),Ye=e=>e;function Yr(e=()=>{}){return({name:t,value:r})=>{let{name:n,value:i}=Jr.reduce((o,s)=>s(o),{name:t,value:r});return n!==t&&e(n,t),{name:n,value:i}}}var Jr=[];function he(e){Jr.push(e)}function Xr({name:e}){return Zr().test(e)}var Zr=()=>new RegExp(`^${It}([^:^.]+)\\b`);function vi(e,t){return({name:r,value:n})=>{r===n&&(n="");let i=r.match(Zr()),o=r.match(/:([a-zA-Z0-9\-_:]+)/),s=r.match(/\.[^.\]]+(?=[^\]]*$)/g)||[],a=t||e[r]||r;return{type:i?i[1]:null,value:o?o[1]:null,modifiers:s.map(c=>c.replace(".","")),expression:n,original:a}}}var Pt="DEFAULT",Q=["ignore","ref","id","data","anchor","bind","init","for","model","modelable","transition","show","if",Pt,"teleport"];function wi(e,t){let r=Q.indexOf(e.type)===-1?Pt:e.type,n=Q.indexOf(t.type)===-1?Pt:t.type;return Q.indexOf(r)-Q.indexOf(n)}function L(e,t){if(typeof ShadowRoot=="function"&&e instanceof ShadowRoot){Array.from(e.children).forEach(i=>L(i,t));return}let r=!1;if(t(e,()=>r=!0),r)return;let n=e.firstElementChild;for(;n;)L(n,t,!1),n=n.nextElementSibling}var j=!1;function T(e,t=()=>{}){return(...r)=>j?t(...r):e(...r)}function Qr(e){return(...t)=>j&&e(...t)}var en=[];function F(e){en.push(e)}function tn(e,t){en.forEach(r=>r(e,t)),j=!0,nn(()=>{w(t,(r,n)=>{n(r,()=>{})})}),j=!1}var Je=!1;function rn(e,t){t._x_dataStack||(t._x_dataStack=e._x_dataStack),j=!0,Je=!0,nn(()=>{Si(t)}),j=!1,Je=!1}function Si(e){let t=!1;w(e,(n,i)=>{L(n,(o,s)=>{if(t&&on(o))return s();t=!0,i(o,s)})})}function nn(e){let t=k;At((r,n)=>{let i=t(r);return H(i),()=>{}}),e(),At(t)}var Xe=0;function sn(e,t){let r=e._x_deferInit;r||(r=e._x_deferInit={pending:0,ownsIgnore:!e._x_ignore,queuedAttributes:new Map},r.ownsIgnore&&(e._x_ignore=!0),Xe++),r.pending++,Promise.resolve(t).catch(n=>{try{Y(n,e)}catch(i){setTimeout(()=>{throw i},0)}}).then(()=>Ai(e,r))}function Ai(e,t){t.pending--,!(t.pending>0)&&(Rr(),!(t.pending>0)&&e._x_deferInit===t&&(delete e._x_deferInit,t.ownsIgnore&&delete e._x_ignore,Xe--,e.isConnected&&(Ti(t),w(e))))}function an(e,t){if(Xe===0)return!1;let r=S(e,n=>n._x_deferInit);return r?(cn(r._x_deferInit,e,t.map(({name:n})=>n)),!0):!1}function cn(e,t,r){let n=e.queuedAttributes.get(t);(!n||n.marker!==t._x_marker)&&(n={marker:t._x_marker,names:new Set},e.queuedAttributes.set(t,n)),r.forEach(i=>n.names.add(i))}function Ti(e){e.queuedAttributes.forEach((t,r)=>{if(!r.isConnected||!r._x_marker||r._x_marker!==t.marker)return;let n=S(r,o=>o._x_deferInit);if(n){cn(n._x_deferInit,r,Array.from(t.names));return}let i=Array.from(t.names).filter(o=>r.hasAttribute(o)).map(o=>({name:o,value:r.getAttribute(o)}));i.length!==0&&ee(r,i).forEach(o=>o())})}F((e,t)=>{Xe!==0&&(!e||e.nodeType!==1||!t||t.nodeType!==1||S(e,r=>r._x_deferInit)&&(t._x_ignore=!0))});function te(e,t,r={},n={}){return e.dispatchEvent(new CustomEvent(t,{detail:r,bubbles:!0,composed:!0,cancelable:!0,...n}))}function A(e,...t){console.warn(`Alpine Warning: ${e}`,...t)}var ln=!1;function fn(){ln&&A("Alpine has already been initialized on this page. Calling Alpine.start() more than once can cause problems."),ln=!0,document.body||A("Unable to initialize. Trying to load Alpine before `<body>` is available. Did you forget to add `defer` in Alpine's `<script>` tag?"),te(document,"alpine:init"),te(document,"alpine:initializing"),ve(),Nr(t=>w(t,L)),ue(t=>C(t)),$e((t,r)=>{an(t,r)||ee(t,r).forEach(n=>n())});let e=t=>!re(t.parentElement,!0);Array.from(document.querySelectorAll(pn().join(","))).filter(e).forEach(t=>{w(t)}),te(document,"alpine:initialized"),setTimeout(()=>{Ni()})}var jt=[],un=[];function dn(){return jt.map(e=>e())}function pn(){return jt.concat(un).map(e=>e())}function Ze(e){jt.push(e)}function Qe(e){un.push(e)}function re(e,t=!1){return S(e,r=>{if((t?pn():dn()).some(i=>r.matches(i)))return!0})}function S(e,t){if(e){if(t(e))return e;if(e._x_teleportBack)return S(e._x_teleportBack,t);if(e.parentNode instanceof ShadowRoot)return S(e.parentNode.host,t);if(e.parentElement)return S(e.parentElement,t)}}function on(e){return dn().some(t=>e.matches(t))}var hn=[];function mn(e){hn.push(e)}var Oi=1;function w(e,t=L,r=()=>{}){S(e,n=>n._x_ignore)||Gr(()=>{t(e,(n,i)=>{n._x_marker||(r(n,i),hn.forEach(o=>o(n,i)),ee(n,n.attributes).forEach(o=>o()),n._x_ignore||(n._x_marker=Oi++),n._x_ignore&&i())})})}function C(e,t=L){t(e,r=>{Cr(r),Tt(r),delete r._x_marker})}function Ni(){[["ui","dialog",["[x-dialog], [x-popover]"]],["anchor","anchor",["[x-anchor]"]],["sort","sort",["[x-sort]"]]].forEach(([t,r,n])=>{qr(r)||n.some(i=>{if(document.querySelector(i))return A(`found "${i}", but missing ${t} plugin`),!0})})}var Ft=[],Vt=!1;function me(e=()=>{}){return queueMicrotask(()=>{Vt||setTimeout(()=>{et()})}),new Promise(t=>{Ft.push(()=>{e(),t()})})}function et(){for(Vt=!1;Ft.length;)Ft.shift()()}function _n(){Vt=!0}function Ae(e,t){return Array.isArray(t)?gn(e,t.join(" ")):typeof t=="object"&&t!==null?Ci(e,t):typeof t=="function"?Ae(e,t()):gn(e,t)}function $t(e){return e.split(/\s/).filter(Boolean)}function gn(e,t){let r=i=>$t(i).filter(o=>!e.classList.contains(o)).filter(Boolean),n=i=>(e.classList.add(...i),()=>{e.classList.remove(...i)});return t=t===!0?t="":t||"",n(r(t))}function Ci(e,t){let r=Object.entries(t).flatMap(([s,a])=>a?$t(s):!1).filter(Boolean),n=Object.entries(t).flatMap(([s,a])=>a?!1:$t(s)).filter(Boolean),i=[],o=[];return n.forEach(s=>{e.classList.contains(s)&&(e.classList.remove(s),o.push(s))}),r.forEach(s=>{e.classList.contains(s)||(e.classList.add(s),i.push(s))}),()=>{o.forEach(s=>e.classList.add(s)),i.forEach(s=>e.classList.remove(s))}}function ne(e,t){return typeof t=="object"&&t!==null?Ri(e,t):Di(e,t)}function Ri(e,t){let r={};return Object.entries(t).forEach(([n,i])=>{r[n]=e.style[n],n.startsWith("--")||(n=Mi(n)),e.style.setProperty(n,i)}),setTimeout(()=>{e.style.length===0&&e.removeAttribute("style")}),()=>{ne(e,r)}}function Di(e,t){let r=e.getAttribute("style",t);return e.setAttribute("style",t),()=>{e.setAttribute("style",r||"")}}function Mi(e){return e.replace(/([a-z])([A-Z])/g,"$1-$2").toLowerCase()}function Te(e,t=()=>{}){let r=!1;return function(){r?t.apply(this,arguments):(r=!0,e.apply(this,arguments))}}p("transition",(e,{value:t,modifiers:r,expression:n},{evaluate:i})=>{typeof n=="function"&&(n=i(n)),n!==!1&&(!n||typeof n=="boolean"?Pi(e,r,t):ki(e,n,t))});function ki(e,t,r){xn(e,Ae,""),{enter:i=>{e._x_transition.enter.during=i},"enter-start":i=>{e._x_transition.enter.start=i},"enter-end":i=>{e._x_transition.enter.end=i},leave:i=>{e._x_transition.leave.during=i},"leave-start":i=>{e._x_transition.leave.start=i},"leave-end":i=>{e._x_transition.leave.end=i}}[r](t)}function Pi(e,t,r){xn(e,ne);let n=!t.includes("in")&&!t.includes("out")&&!r,i=n||t.includes("in")||["enter"].includes(r),o=n||t.includes("out")||["leave"].includes(r);t.includes("in")&&!n&&(t=t.filter((v,fe)=>fe<t.indexOf("out"))),t.includes("out")&&!n&&(t=t.filter((v,fe)=>fe>t.indexOf("out")));let s=!t.includes("opacity")&&!t.includes("scale"),a=s||t.includes("opacity"),c=s||t.includes("scale"),l=a?0:1,f=c?Oe(t,"scale",95)/100:1,u=Oe(t,"delay",0)/1e3,g=Oe(t,"origin","center"),y="opacity, transform",$=Oe(t,"duration",150)/1e3,d=Oe(t,"duration",75)/1e3,E="cubic-bezier(0.4, 0.0, 0.2, 1)";i&&(e._x_transition.enter.during={transformOrigin:g,transitionDelay:`${u}s`,transitionProperty:y,transitionDuration:`${$}s`,transitionTimingFunction:E},e._x_transition.enter.start={opacity:l,transform:`scale(${f})`},e._x_transition.enter.end={opacity:1,transform:"scale(1)"}),o&&(e._x_transition.leave.during={transformOrigin:g,transitionDelay:`${u}s`,transitionProperty:y,transitionDuration:`${d}s`,transitionTimingFunction:E},e._x_transition.leave.start={opacity:1,transform:"scale(1)"},e._x_transition.leave.end={opacity:l,transform:`scale(${f})`})}function xn(e,t,r={}){e._x_transition||(e._x_transition={enter:{during:r,start:r,end:r},leave:{during:r,start:r,end:r},in(n=()=>{},i=()=>{}){tt(e,t,{during:this.enter.during,start:this.enter.start,end:this.enter.end},n,i)},out(n=()=>{},i=()=>{}){tt(e,t,{during:this.leave.during,start:this.leave.start,end:this.leave.end},n,i)}})}window.Element.prototype._x_toggleAndCascadeWithTransitions=function(e,t,r,n){let i=document.visibilityState==="visible"?requestAnimationFrame:setTimeout,o=()=>i(r);if(t){e._x_transition&&(e._x_transition.enter||e._x_transition.leave)?e._x_transition.enter&&(Object.entries(e._x_transition.enter.during).length||Object.entries(e._x_transition.enter.start).length||Object.entries(e._x_transition.enter.end).length)?e._x_transition.in(r):o():e._x_transition?e._x_transition.in(r):o();return}e._x_hidePromise=e._x_transition?new Promise((s,a)=>{e._x_transition.out(()=>{},()=>s(n)),e._x_transitioning&&e._x_transitioning.beforeCancel(()=>a({isFromCancelledTransition:!0}))}):Promise.resolve(n),queueMicrotask(()=>{let s=yn(e);s?(s._x_hideChildren||(s._x_hideChildren=[]),s._x_hideChildren.push(e)):i(()=>{let a=c=>{let l=Promise.all([c._x_hidePromise,...(c._x_hideChildren||[]).map(a)]).then(([f])=>f?.());return delete c._x_hidePromise,delete c._x_hideChildren,l};a(e).catch(c=>{if(!c.isFromCancelledTransition)throw c})})})};function yn(e){let t=e.parentNode;if(t)return t._x_hidePromise?t:yn(t)}function tt(e,t,{during:r,start:n,end:i}={},o=()=>{},s=()=>{}){if(e._x_transitioning&&e._x_transitioning.cancel(),Object.keys(r).length===0&&Object.keys(n).length===0&&Object.keys(i).length===0){o(),s();return}let a,c,l;Ii(e,{start(){a=t(e,n)},during(){c=t(e,r)},before:o,end(){a(),l=t(e,i)},after:s,cleanup(){c(),l()}})}function Ii(e,t){let r,n,i,o=Te(()=>{h(()=>{r=!0,n||t.before(),i||(t.end(),et()),t.after(),e.isConnected&&t.cleanup(),delete e._x_transitioning})});e._x_transitioning={beforeCancels:[],beforeCancel(s){this.beforeCancels.push(s)},cancel:Te(function(){for(;this.beforeCancels.length;)this.beforeCancels.shift()();o()}),finish:o},h(()=>{t.start(),t.during()}),_n(),requestAnimationFrame(()=>{if(r)return;let s=Number(getComputedStyle(e).transitionDuration.replace(/,.*/,"").replace("s",""))*1e3,a=Number(getComputedStyle(e).transitionDelay.replace(/,.*/,"").replace("s",""))*1e3;s===0&&(s=Number(getComputedStyle(e).animationDuration.replace("s",""))*1e3),h(()=>{t.before()}),n=!0,requestAnimationFrame(()=>{r||(h(()=>{t.end()}),et(),setTimeout(e._x_transitioning.finish,s+a),i=!0)})})}function Oe(e,t,r){if(e.indexOf(t)===-1)return r;let n=e[e.indexOf(t)+1];if(!n||t==="scale"&&isNaN(n))return r;if(t==="duration"||t==="delay"){let i=n.match(/([0-9]+)ms/);if(i)return i[1]}return t==="origin"&&["top","right","left","center","bottom"].includes(e[e.indexOf(t)+2])?[n,e[e.indexOf(t)+2]].join(" "):n}function Ne(e,t,r,n=[]){switch(e._x_bindings||(e._x_bindings=R({})),e._x_bindings[t]=r,t=n.includes("camel")?Ui(t):t,t){case"value":Li(e,r);break;case"style":Fi(e,r);break;case"class":ji(e,r);break;case"selected":case"checked":Vi(e,t,r);break;default:Bt(e,t,r);break}}function Li(e,t){if(rt(e))e.attributes.value===void 0&&(e.value=t);else if(Re(e))Number.isInteger(t)?e.value=t:!Array.isArray(t)&&typeof t!="boolean"&&![null,void 0].includes(t)?e.value=String(t):Array.isArray(t)?e.checked=t.some(r=>zi(r,e.value)):e.checked=!!t;else if(e.tagName==="SELECT")Hi(e,t);else if(e.tagName==="OPTION")Bt(e,"value",t);else{if(e.value===t&&(typeof t!="object"||t===null))return;e.value=t===void 0?"":t}}function ji(e,t){e._x_undoAddedClasses&&e._x_undoAddedClasses(),e._x_undoAddedClasses=Ae(e,t)}function Fi(e,t){e._x_undoAddedStyles&&e._x_undoAddedStyles(),e._x_undoAddedStyles=ne(e,t)}function Vi(e,t,r){Bt(e,t,r),Bi(e,t,r)}function Bt(e,t,r){[null,void 0,!1].includes(r)&&qi(t)?e.removeAttribute(t):(bn(t)&&(r=t),Ki(r)&&(r=JSON.stringify(r)),$i(e,t,r))}function $i(e,t,r){e.getAttribute(t)!=r&&e.setAttribute(t,r)}function Bi(e,t,r){e[t]!==r&&(e[t]=r)}function Hi(e,t){let r=[].concat(t).map(n=>n+"");Array.from(e.options).forEach(n=>{n.selected=r.includes(n.value)})}function Ui(e){return e.toLowerCase().replace(/-(\w)/g,(t,r)=>r.toUpperCase())}function zi(e,t){return e==t}function Ce(e){return[1,"1","true","on","yes",!0].includes(e)?!0:[0,"0","false","off","no",!1].includes(e)?!1:e?Boolean(e):null}var Wi=new Set(["allowfullscreen","async","autofocus","autoplay","checked","controls","default","defer","disabled","formnovalidate","inert","ismap","itemscope","loop","multiple","muted","nomodule","novalidate","open","playsinline","readonly","required","reversed","selected","shadowrootclonable","shadowrootdelegatesfocus","shadowrootserializable"]);function bn(e){return Wi.has(e)}function qi(e){return!["aria-pressed","aria-checked","aria-expanded","aria-selected"].includes(e)}function Ki(e){return typeof e=="object"&&e!==null}function En(e,t,r){return e._x_bindings&&e._x_bindings[t]!==void 0?e._x_bindings[t]:wn(e,t,r)}function vn(e,t,r,n=!0){if(e._x_bindings&&e._x_bindings[t]!==void 0)return e._x_bindings[t];if(e._x_inlineBindings&&e._x_inlineBindings[t]!==void 0){let i=e._x_inlineBindings[t];return i.extract=n,qe(()=>D(e,i.expression))}return wn(e,t,r)}function wn(e,t,r){let n=e.getAttribute(t);return n===null?typeof r=="function"?r():r:n===""?!0:bn(t)?!![t,"true"].includes(n):n}function Re(e){return e.type==="checkbox"||e.localName==="ui-checkbox"||e.localName==="ui-switch"}function rt(e){return e.type==="radio"||e.localName==="ui-radio"}function nt(e,t){let r;return function(){let n=this,i=arguments,o=function(){r=null,e.apply(n,i)};clearTimeout(r),r=setTimeout(o,t)}}function it(e,t){let r;return function(){let n=this,i=arguments;r||(e.apply(n,i),r=!0,setTimeout(()=>r=!1,t))}}function ot({get:e,set:t},{get:r,set:n}){let i=!0,o,s,a=k(()=>{let c=e(),l=r();if(i)n(Ht(c)),i=!1;else{let f=JSON.stringify(c),u=JSON.stringify(l);f!==o?n(Ht(c)):f!==u&&t(Ht(l))}o=JSON.stringify(e()),s=JSON.stringify(r())});return()=>{H(a)}}function Ht(e){return typeof e=="object"?JSON.parse(JSON.stringify(e)):e}function Sn(e){(Array.isArray(e)?e:[e]).forEach(r=>r(z))}var W={},An=!1;function Tn(e,t){if(An||(W=R(W),An=!0),t===void 0)return W[e];W[e]=t,typeof t=="object"&&t!==null&&t._x_interceptor?W[e]=t.initialize(W,e,e,()=>{}):de(W[e]),typeof t=="object"&&t!==null&&t.hasOwnProperty("init")&&typeof t.init=="function"&&W[e].init()}function On(){return W}var Nn={};function Cn(e,t){let r=typeof t!="function"?()=>t:t;return e instanceof Element?Ut(e,r()):(Nn[e]=r,()=>{})}function Rn(e){return Object.entries(Nn).forEach(([t,r])=>{Object.defineProperty(e,t,{get(){return(...n)=>r(...n)}})}),e}function Ut(e,t,r){let n=[];for(;n.length;)n.pop()();let i=Object.entries(t).map(([s,a])=>({name:s,value:a})),o=Lt(i);return i=i.map(s=>o.find(a=>a.name===s.name)?{name:`x-bind:${s.name}`,value:`"${s.value}"`}:s),ee(e,i,r).map(s=>{n.push(s.runCleanups),s()}),()=>{for(;n.length;)n.pop()()}}var Dn={};function Mn(e,t){Dn[e]=t}function kn(e,t){return Object.entries(Dn).forEach(([r,n])=>{Object.defineProperty(e,r,{get(){return(...i)=>n.bind(t)(...i)},enumerable:!1})}),e}var Gi={get reactive(){return R},get release(){return H},get effect(){return k},get raw(){return St},get transaction(){return Sr},version:"3.17.2",flushAndStopDeferringMutations:Mr,dontAutoEvaluateFunctions:qe,disableEffectScheduling:Er,startObservingMutations:ve,stopObservingMutations:Nt,setReactivityEngine:vr,onAttributeRemoved:Be,onAttributesAdded:$e,closestDataStack:U,skipDuringClone:T,onlyDuringClone:Qr,addRootSelector:Ze,addInitSelector:Qe,setErrorHandler:jr,interceptClone:F,addScopeToNode:P,deferMutations:Dr,mapAttributes:he,evaluateLater:x,interceptInit:mn,initInterceptors:de,injectMagics:G,setEvaluator:Vr,setRawEvaluator:Br,mergeProxies:I,extractProp:vn,findClosest:S,onElRemoved:ue,closestRoot:re,destroyTree:C,interceptor:We,transition:tt,setStyles:ne,mutateDom:h,deferInit:sn,directive:p,entangle:ot,throttle:it,debounce:nt,evaluate:D,evaluateRaw:Ur,initTree:w,nextTick:me,prefixed:N,prefix:Wr,plugin:Sn,magic:b,store:Tn,start:fn,clone:rn,cloneNode:tn,bound:En,$data:ze,watch:Fe,walk:L,data:Mn,bind:Cn},z=Gi;function zt(e){let t=Object.create(null);for(let r of e.split(","))t[r]=1;return r=>r in t}var Yi=Object.freeze({}),Oa=Object.freeze([]);var _e=Object.assign;var Ji=Object.prototype.hasOwnProperty,st=(e,t)=>Ji.call(e,t),ge=Array.isArray,xe=e=>Pn(e)==="[object Map]";var Xi=e=>typeof e=="string",ye=e=>typeof e=="symbol",be=e=>e!==null&&typeof e=="object";var Zi=Object.prototype.toString,Pn=e=>Zi.call(e),Wt=e=>Pn(e).slice(8,-1);var at=e=>Xi(e)&&e!=="NaN"&&e[0]!=="-"&&""+parseInt(e,10)===e;var ct=e=>{let t=Object.create(null);return r=>t[r]||(t[r]=e(r))},Qi=/-\w/g,Na=ct(e=>e.replace(Qi,t=>t.slice(1).toUpperCase())),eo=/\B([A-Z])/g,Ca=ct(e=>e.replace(eo,"-$1").toLowerCase()),qt=ct(e=>e.charAt(0).toUpperCase()+e.slice(1)),Ra=ct(e=>e?`on${qt(e)}`:""),J=(e,t)=>!Object.is(e,t);var to="itemscope,allowfullscreen,formnovalidate,ismap,nomodule,novalidate,readonly";var Da=zt(to+",async,autofocus,autoplay,controls,default,defer,disabled,inert,loop,open,required,reversed,scoped,seamless,checked,muted,multiple,selected");function oe(e,...t){console.warn(`[Vue warn] ${e}`,...t)}var Kt;var m;var Gt=new WeakSet,ut=class{constructor(t){this.fn=t,this.deps=void 0,this.depsTail=void 0,this.flags=5,this.next=void 0,this.cleanup=void 0,this.scheduler=void 0,Kt&&(Kt.active?Kt.effects.push(this):this.flags&=-2)}pause(){this.flags|=64}resume(){this.flags&64&&(this.flags&=-65,Gt.has(this)&&(Gt.delete(this),this.trigger()))}notify(){this.flags&2&&!(this.flags&32)||this.flags&8||ro(this)}run(){if(!(this.flags&1))return this.fn();this.flags|=2,In(this),Vn(this);let t=m,r=M;m=this,M=!0;try{return this.fn()}finally{m!==this&&oe("Active effect was not restored correctly - this is likely a Vue internal bug."),$n(this),m=t,M=r,this.flags&=-3}}stop(){if(this.flags&1){for(let t=this.deps;t;t=t.nextDep)cr(t);this.deps=this.depsTail=void 0,In(this),this.onStop&&this.onStop(),this.flags&=-2}}trigger(){this.flags&64?Gt.add(this):this.scheduler?this.scheduler():this.runIfDirty()}runIfDirty(){Xt(this)&&this.run()}get dirty(){return Xt(this)}},Fn=0,Me,ke;function ro(e,t=!1){if(e.flags|=8,t){e.next=ke,ke=e;return}e.next=Me,Me=e}function sr(){Fn++}function ar(){if(--Fn>0)return;if(ke){let t=ke;for(ke=void 0;t;){let r=t.next;t.next=void 0,t.flags&=-9,t=r}}let e;for(;Me;){let t=Me;for(Me=void 0;t;){let r=t.next;if(t.next=void 0,t.flags&=-9,t.flags&1)try{t.trigger()}catch(n){e||(e=n)}t=r}}if(e)throw e}function Vn(e){for(let t=e.deps;t;t=t.nextDep)t.version=-1,t.prevActiveLink=t.dep.activeLink,t.dep.activeLink=t}function $n(e){let t,r=e.depsTail,n=r;for(;n;){let i=n.prevDep;n.version===-1?(n===r&&(r=i),cr(n),io(n)):t=n,n.dep.activeLink=n.prevActiveLink,n.prevActiveLink=void 0,n=i}e.deps=t,e.depsTail=r}function Xt(e){for(let t=e.deps;t;t=t.nextDep)if(t.dep.version!==t.version||t.dep.computed&&(no(t.dep.computed)||t.dep.version!==t.version))return!0;return!!e._dirty}function no(e){if(e.flags&4&&!(e.flags&16)||(e.flags&=-17,e.globalVersion===dt)||(e.globalVersion=dt,!e.isSSR&&e.flags&128&&(!e.deps&&!e._dirty||!Xt(e))))return;e.flags|=2;let t=e.dep,r=m,n=M;m=e,M=!0;try{Vn(e);let i=e.fn(e._value);(t.version===0||J(i,e._value))&&(e.flags|=128,e._value=i,t.version++)}catch(i){throw t.version++,i}finally{m=r,M=n,$n(e),e.flags&=-3}}function cr(e,t=!1){let{dep:r,prevSub:n,nextSub:i}=e;if(n&&(n.nextSub=i,e.prevSub=void 0),i&&(i.prevSub=n,e.nextSub=void 0),r.subsHead===e&&(r.subsHead=i),r.subs===e&&(r.subs=n,!n&&r.computed)){r.computed.flags&=-5;for(let o=r.computed.deps;o;o=o.nextDep)cr(o,!0)}!t&&!--r.sc&&r.map&&r.map.delete(r.key)}function io(e){let{prevDep:t,nextDep:r}=e;t&&(t.nextDep=r,e.prevDep=void 0),r&&(r.prevDep=t,e.nextDep=void 0)}function Bn(e,t){e.effect instanceof ut&&(e=e.effect.fn);let r=new ut(e);t&&_e(r,t);try{r.run()}catch(i){throw r.stop(),i}let n=r.run.bind(r);return n.effect=r,n}function Hn(e){e.effect.stop()}var M=!0,Un=[];function oo(){Un.push(M),M=!1}function so(){let e=Un.pop();M=e===void 0?!0:e}function In(e){let{cleanup:t}=e;if(e.cleanup=void 0,t){let r=m;m=void 0;try{t()}finally{m=r}}}var dt=0,Zt=class{constructor(t,r){this.sub=t,this.dep=r,this.version=r.version,this.nextDep=this.prevDep=this.nextSub=this.prevSub=this.prevActiveLink=void 0}},Qt=class{constructor(t){this.computed=t,this.version=0,this.activeLink=void 0,this.subs=void 0,this.map=void 0,this.key=void 0,this.sc=0,this.__v_skip=!0,this.subsHead=void 0}track(t){if(!m||!M||m===this.computed)return;let r=this.activeLink;if(r===void 0||r.sub!==m)r=this.activeLink=new Zt(m,this),m.deps?(r.prevDep=m.depsTail,m.depsTail.nextDep=r,m.depsTail=r):m.deps=m.depsTail=r,zn(r);else if(r.version===-1&&(r.version=this.version,r.nextDep)){let n=r.nextDep;n.prevDep=r.prevDep,r.prevDep&&(r.prevDep.nextDep=n),r.prevDep=m.depsTail,r.nextDep=void 0,m.depsTail.nextDep=r,m.depsTail=r,m.deps===r&&(m.deps=n)}return m.onTrack&&m.onTrack(_e({effect:m},t)),r}trigger(t){this.version++,dt++,this.notify(t)}notify(t){sr();try{for(let r=this.subsHead;r;r=r.nextSub)r.sub.onTrigger&&!(r.sub.flags&8)&&r.sub.onTrigger(_e({effect:r.sub},t));for(let r=this.subs;r;r=r.prevSub)r.sub.notify()&&r.sub.dep.notify()}finally{ar()}}};function zn(e){if(e.dep.sc++,e.sub.flags&4){let t=e.dep.computed;if(t&&!e.dep.subs){t.flags|=20;for(let n=t.deps;n;n=n.nextDep)zn(n)}let r=e.dep.subs;r!==e&&(e.prevSub=r,r&&(r.nextSub=e)),e.dep.subsHead===void 0&&(e.dep.subsHead=e),e.dep.subs=e}}var er=new WeakMap,ie=Symbol("Object iterate"),tr=Symbol("Map keys iterate"),Ie=Symbol("Array iterate");function O(e,t,r){if(M&&m){let n=er.get(e);n||er.set(e,n=new Map);let i=n.get(r);i||(n.set(r,i=new Qt),i.map=n,i.key=r),i.track({target:e,type:t,key:r})}}function X(e,t,r,n,i,o){let s=er.get(e);if(!s){dt++;return}let a=c=>{c&&c.trigger({target:e,type:t,key:r,newValue:n,oldValue:i,oldTarget:o})};if(sr(),t==="clear")s.forEach(a);else{let c=ge(e),l=c&&at(r);if(c&&r==="length"){let f=Number(n);s.forEach((u,g)=>{(g==="length"||g===Ie||!ye(g)&&g>=f)&&a(u)})}else switch((r!==void 0||s.has(void 0))&&a(s.get(r)),l&&a(s.get(Ie)),t){case"add":c?l&&a(s.get("length")):(a(s.get(ie)),xe(e)&&a(s.get(tr)));break;case"delete":c||(a(s.get(ie)),xe(e)&&a(s.get(tr)));break;case"set":xe(e)&&a(s.get(ie));break}}ar()}function Ee(e){let t=_(e);return t===e?t:(O(t,"iterate",Ie),ae(e)?t:t.map(ce))}function lr(e){return O(e=_(e),"iterate",Ie),e}function V(e,t){return se(e)?Jn(e)?Le(ce(t)):Le(t):ce(t)}var ao={__proto__:null,[Symbol.iterator](){return Yt(this,Symbol.iterator,e=>V(this,e))},concat(...e){return Ee(this).concat(...e.map(t=>ge(t)?Ee(t):t))},entries(){return Yt(this,"entries",e=>(e[1]=V(this,e[1]),e))},every(e,t){return q(this,"every",e,t,void 0,arguments)},filter(e,t){return q(this,"filter",e,t,r=>r.map(n=>V(this,n)),arguments)},find(e,t){return q(this,"find",e,t,r=>V(this,r),arguments)},findIndex(e,t){return q(this,"findIndex",e,t,void 0,arguments)},findLast(e,t){return q(this,"findLast",e,t,r=>V(this,r),arguments)},findLastIndex(e,t){return q(this,"findLastIndex",e,t,void 0,arguments)},forEach(e,t){return q(this,"forEach",e,t,void 0,arguments)},includes(...e){return Jt(this,"includes",e)},indexOf(...e){return Jt(this,"indexOf",e)},join(e){return Ee(this).join(e)},lastIndexOf(...e){return Jt(this,"lastIndexOf",e)},map(e,t){return q(this,"map",e,t,void 0,arguments)},pop(){return De(this,"pop")},push(...e){return De(this,"push",e)},reduce(e,...t){return Ln(this,"reduce",e,t)},reduceRight(e,...t){return Ln(this,"reduceRight",e,t)},shift(){return De(this,"shift")},some(e,t){return q(this,"some",e,t,void 0,arguments)},splice(...e){return De(this,"splice",e)},toReversed(){return Ee(this).toReversed()},toSorted(e){return Ee(this).toSorted(e)},toSpliced(...e){return Ee(this).toSpliced(...e)},unshift(...e){return De(this,"unshift",e)},values(){return Yt(this,"values",e=>V(this,e))}};function Yt(e,t,r){let n=lr(e),i=n[t]();return n!==e&&!ae(e)&&(i._next=i.next,i.next=()=>{let o=i._next();return o.done||(o.value=r(o.value)),o}),i}var co=Array.prototype;function q(e,t,r,n,i,o){let s=lr(e),a=s!==e&&!ae(e),c=s[t];if(c!==co[t]){let u=c.apply(e,o);return a?ce(u):u}let l=r;s!==e&&(a?l=function(u,g){return r.call(this,V(e,u),g,e)}:r.length>2&&(l=function(u,g){return r.call(this,u,g,e)}));let f=c.call(s,l,n);return a&&i?i(f):f}function Ln(e,t,r,n){let i=lr(e),o=i!==e&&!ae(e),s=r,a=!1;i!==e&&(o?(a=n.length===0,s=function(l,f,u){return a&&(a=!1,l=V(e,l)),r.call(this,l,V(e,f),u,e)}):r.length>3&&(s=function(l,f,u){return r.call(this,l,f,u,e)}));let c=i[t](s,...n);return a?V(e,c):c}function Jt(e,t,r){let n=_(e);O(n,"iterate",Ie);let i=n[t](...r);return(i===-1||i===!1)&&Eo(r[0])?(r[0]=_(r[0]),n[t](...r)):i}function De(e,t,r=[]){oo(),sr();let n=_(e)[t].apply(e,r);return ar(),so(),n}var lo=zt("__proto__,__v_isRef,__isVue"),Wn=new Set(Object.getOwnPropertyNames(Symbol).filter(e=>e!=="arguments"&&e!=="caller").map(e=>Symbol[e]).filter(ye));function fo(e){ye(e)||(e=String(e));let t=_(this);return O(t,"has",e),t.hasOwnProperty(e)}var pt=class{constructor(t=!1,r=!1){this._isReadonly=t,this._isShallow=r}get(t,r,n){if(r==="__v_skip")return t.__v_skip;let i=this._isReadonly,o=this._isShallow;if(r==="__v_isReactive")return!i;if(r==="__v_isReadonly")return i;if(r==="__v_isShallow")return o;if(r==="__v_raw")return n===(i?o?yo:Gn:o?xo:Kn).get(t)||Object.getPrototypeOf(t)===Object.getPrototypeOf(n)?t:void 0;let s=ge(t);if(!i){let c;if(s&&(c=ao[r]))return c;if(r==="hasOwnProperty")return fo}let a=Reflect.get(t,r,Pe(t)?t:n);if((ye(r)?Wn.has(r):lo(r))||(i||O(t,"get",r),o))return a;if(Pe(a)){let c=s&&at(r)?a:a.value;return i&&be(c)?or(c):c}return be(a)?i?or(a):ht(a):a}},rr=class extends pt{constructor(t=!1){super(!1,t)}set(t,r,n,i){let o=t[r],s=ge(t)&&at(r);if(!this._isShallow){let l=se(o);if(!ae(n)&&!se(n)&&(o=_(o),n=_(n)),!s&&Pe(o)&&!Pe(n))return l?(oe(`Set operation on key "${String(r)}" failed: target is readonly.`,t[r]),!0):(o.value=n,!0)}let a=s?Number(r)<t.length:st(t,r),c=Reflect.set(t,r,n,Pe(t)?t:i);return t===_(i)&&c&&(a?J(n,o)&&X(t,"set",r,n,o):X(t,"add",r,n)),c}deleteProperty(t,r){let n=st(t,r),i=t[r],o=Reflect.deleteProperty(t,r);return o&&n&&X(t,"delete",r,void 0,i),o}has(t,r){let n=Reflect.has(t,r);return(!ye(r)||!Wn.has(r))&&O(t,"has",r),n}ownKeys(t){return O(t,"iterate",ge(t)?"length":ie),Reflect.ownKeys(t)}},nr=class extends pt{constructor(t=!1){super(!0,t)}set(t,r){return oe(`Set operation on key "${String(r)}" failed: target is readonly.`,t),!0}deleteProperty(t,r){return oe(`Delete operation on key "${String(r)}" failed: target is readonly.`,t),!0}},uo=new rr,po=new nr;var ir=e=>e,lt=e=>Reflect.getPrototypeOf(e);function ho(e,t,r){return function(...n){let i=this.__v_raw,o=_(i),s=xe(o),a=e==="entries"||e===Symbol.iterator&&s,c=e==="keys"&&s,l=i[e](...n),f=r?ir:t?Le:ce;return!t&&O(o,"iterate",c?tr:ie),_e(Object.create(l),{next(){let{value:u,done:g}=l.next();return g?{value:u,done:g}:{value:a?[f(u[0]),f(u[1])]:f(u),done:g}}})}}function ft(e){return function(...t){{let r=t[0]?`on key "${t[0]}" `:"";oe(`${qt(e)} operation ${r}failed: target is readonly.`,_(this))}return e==="delete"?!1:e==="clear"?void 0:this}}function mo(e,t){let r={get(i){let o=this.__v_raw,s=_(o),a=_(i);e||(J(i,a)&&O(s,"get",i),O(s,"get",a));let{has:c}=lt(s),l=t?ir:e?Le:ce;if(c.call(s,i))return l(o.get(i));if(c.call(s,a))return l(o.get(a));o!==s&&o.get(i)},get size(){let i=this.__v_raw;return!e&&O(_(i),"iterate",ie),i.size},has(i){let o=this.__v_raw,s=_(o),a=_(i);return e||(J(i,a)&&O(s,"has",i),O(s,"has",a)),i===a?o.has(i):o.has(i)||o.has(a)},forEach(i,o){let s=this,a=s.__v_raw,c=_(a),l=t?ir:e?Le:ce;return!e&&O(c,"iterate",ie),a.forEach((f,u)=>i.call(o,l(f),l(u),s))}};return _e(r,e?{add:ft("add"),set:ft("set"),delete:ft("delete"),clear:ft("clear")}:{add(i){let o=_(this),s=lt(o),a=_(i),c=!t&&!ae(i)&&!se(i)?a:i;return s.has.call(o,c)||J(i,c)&&s.has.call(o,i)||J(a,c)&&s.has.call(o,a)||(o.add(c),X(o,"add",c,c)),this},set(i,o){!t&&!ae(o)&&!se(o)&&(o=_(o));let s=_(this),{has:a,get:c}=lt(s),l=a.call(s,i);l?jn(s,a,i):(i=_(i),l=a.call(s,i));let f=c.call(s,i);return s.set(i,o),l?J(o,f)&&X(s,"set",i,o,f):X(s,"add",i,o),this},delete(i){let o=_(this),{has:s,get:a}=lt(o),c=s.call(o,i);c?jn(o,s,i):(i=_(i),c=s.call(o,i));let l=a?a.call(o,i):void 0,f=o.delete(i);return c&&X(o,"delete",i,void 0,l),f},clear(){let i=_(this),o=i.size!==0,s=xe(i)?new Map(i):new Set(i),a=i.clear();return o&&X(i,"clear",void 0,void 0,s),a}}),["keys","values","entries",Symbol.iterator].forEach(i=>{r[i]=ho(i,e,t)}),r}function qn(e,t){let r=mo(e,t);return(n,i,o)=>i==="__v_isReactive"?!e:i==="__v_isReadonly"?e:i==="__v_raw"?n:Reflect.get(st(r,i)&&i in n?r:n,i,o)}var _o={get:qn(!1,!1)};var go={get:qn(!0,!1)};function jn(e,t,r){let n=_(r);if(n!==r&&t.call(e,n)){let i=Wt(e);oe(`Reactive ${i} contains both the raw and reactive versions of the same object${i==="Map"?" as keys":""}, which can lead to inconsistencies. Avoid differentiating between the raw and reactive versions of an object and only use the reactive version if possible.`)}}var Kn=new WeakMap,xo=new WeakMap,Gn=new WeakMap,yo=new WeakMap;function bo(e){switch(e){case"Object":case"Array":return 1;case"Map":case"Set":case"WeakMap":case"WeakSet":return 2;default:return 0}}function ht(e){return se(e)?e:Yn(e,!1,uo,_o,Kn)}function or(e){return Yn(e,!0,po,go,Gn)}function Yn(e,t,r,n,i){if(!be(e))return oe(`value cannot be made ${t?"readonly":"reactive"}: ${String(e)}`),e;if(e.__v_raw&&!(t&&e.__v_isReactive)||e.__v_skip||!Object.isExtensible(e))return e;let o=i.get(e);if(o)return o;let s=bo(Wt(e));if(s===0)return e;let a=new Proxy(e,s===2?n:r);return i.set(e,a),a}function Jn(e){return se(e)?Jn(e.__v_raw):!!(e&&e.__v_isReactive)}function se(e){return!!(e&&e.__v_isReadonly)}function ae(e){return!!(e&&e.__v_isShallow)}function Eo(e){return e?!!e.__v_raw:!1}function _(e){let t=e&&e.__v_raw;return t?_(t):e}var ce=e=>be(e)?ht(e):e,Le=e=>be(e)?or(e):e;function Pe(e){return e?e.__v_isRef===!0:!1}b("nextTick",()=>me);b("dispatch",e=>te.bind(te,e));b("watch",(e,{evaluateLater:t,cleanup:r})=>(n,i)=>{let o=t(n),a=Fe(()=>{let c;return o(l=>c=l),c},i);r(a)});b("store",On);b("data",e=>ze(e));b("root",e=>re(e));b("refs",e=>(e._x_refs_proxy||(e._x_refs_proxy=I(vo(e))),e._x_refs_proxy));function vo(e){let t=[];return S(e,r=>{r._x_refs&&t.push(r._x_refs)}),t}var fr={};function ur(e){return fr[e]||(fr[e]=0),++fr[e]}function Xn(e,t){return S(e,r=>{if(r._x_ids&&r._x_ids[t])return!0})}function Zn(e,t){e._x_ids||(e._x_ids={}),e._x_ids[t]||(e._x_ids[t]=ur(t))}b("id",(e,{cleanup:t})=>(r,n=null)=>{let i=`${r}${n?`-${n}`:""}`;return wo(e,i,t,()=>{let o=Xn(e,r),s=o?o._x_ids[r]:ur(r);return n?`${r}-${s}-${n}`:`${r}-${s}`})});F((e,t)=>{e._x_id&&(t._x_id=e._x_id)});function wo(e,t,r,n){if(e._x_id||(e._x_id={}),e._x_id[t])return e._x_id[t];let i=n();return e._x_id[t]=i,r(()=>{delete e._x_id[t]}),i}b("el",e=>e);Qn("Focus","focus","focus");Qn("Persist","persist","persist");function Qn(e,t,r){b(t,n=>A(`You can't use [$${t}] without first installing the "${e}" plugin here: https://alpinejs.dev/plugins/${r}`,n))}p("modelable",(e,{expression:t},{effect:r,evaluateLater:n,cleanup:i})=>{let o=n(t),s=()=>{let f;return o(u=>f=u),f},a=n(`${t} = __placeholder`),c=f=>a(()=>{},{scope:{__placeholder:f}}),l=s();c(l),queueMicrotask(()=>{if(!e._x_model)return;e._x_removeModelListeners.default();let f=e._x_model.get,u=e._x_model.setWithModifiers,g=ot({get(){return f()},set(y){u(y)}},{get(){return s()},set(y){c(y)}});i(g)})});p("teleport",(e,{modifiers:t,expression:r},{cleanup:n})=>{e.tagName.toLowerCase()!=="template"&&A("x-teleport can only be used on a <template> tag",e);let i=ei(r),o=e.content.cloneNode(!0).firstElementChild;e._x_teleport=o,o._x_teleportBack=e,e.setAttribute("data-teleport-template",!0),o.setAttribute("data-teleport-target",!0),e._x_forwardEvents&&e._x_forwardEvents.forEach(a=>{o.addEventListener(a,c=>{c.stopPropagation(),e.dispatchEvent(new c.constructor(c.type,c))})}),P(o,{},e);let s=(a,c,l)=>{l.includes("prepend")?c.parentNode.insertBefore(a,c):l.includes("append")?c.parentNode.insertBefore(a,c.nextSibling):c.appendChild(a)};h(()=>{T(()=>{s(o,i,t),w(o)})()}),e._x_teleportPutBack=()=>{let a=ei(r);h(()=>{s(e._x_teleport,a,t)})},n(()=>h(()=>{o.remove(),C(o)}))});var So=document.createElement("div");function ei(e){let t=T(()=>document.querySelector(e),()=>So)();return t||A(`Cannot find x-teleport element for selector: "${e}"`),t}var ti=()=>{};ti.inline=(e,{modifiers:t},{cleanup:r})=>{t.includes("self")?e._x_ignoreSelf=!0:e._x_ignore=!0,r(()=>{t.includes("self")?delete e._x_ignoreSelf:delete e._x_ignore})};p("ignore",ti);p("effect",T((e,{expression:t},{effect:r})=>{r(x(e,t))}));function K(e,t,r,n){let i=e,o=c=>n(c),s={},a=(c,l)=>f=>l(c,f);return r.includes("dot")&&(t=Ao(t)),r.includes("camel")&&(t=To(t)),r.includes("capture")&&(s.capture=!0),r.includes("window")&&(i=window),r.includes("document")&&(i=document),r.includes("passive")&&(s.passive=r[r.indexOf("passive")+1]!=="false"),o=dr(r,o),r.includes("prevent")&&(o=a(o,(c,l)=>{l.preventDefault(),c(l)})),r.includes("stop")&&(o=a(o,(c,l)=>{l.stopPropagation(),c(l)})),r.includes("once")&&(o=a(o,(c,l)=>{c(l),i.removeEventListener(t,o,s)})),(r.includes("away")||r.includes("outside"))&&(i=document,o=a(o,(c,l)=>{e.contains(l.target)||l.target.isConnected!==!1&&(e.offsetWidth<1&&e.offsetHeight<1||e._x_isShown!==!1&&c(l))})),r.includes("self")&&(o=a(o,(c,l)=>{l.target===e&&c(l)})),t==="submit"&&(o=a(o,(c,l)=>{l.target._x_pendingModelUpdates&&l.target._x_pendingModelUpdates.forEach(f=>f()),c(l)})),(No(t)||ni(t))&&(o=a(o,(c,l)=>{Co(l,r)||c(l)})),i.addEventListener(t,o,s),()=>{i.removeEventListener(t,o,s)}}function dr(e,t){if(e.includes("debounce")){let r=e[e.indexOf("debounce")+1]||"invalid-wait",n=mt(r.split("ms")[0])?Number(r.split("ms")[0]):250;t=nt(t,n)}if(e.includes("throttle")){let r=e[e.indexOf("throttle")+1]||"invalid-wait",n=mt(r.split("ms")[0])?Number(r.split("ms")[0]):250;t=it(t,n)}return t}function Ao(e){return e.replace(/-/g,".")}function To(e){return e.toLowerCase().replace(/-(\w)/g,(t,r)=>r.toUpperCase())}function mt(e){return!Array.isArray(e)&&!isNaN(e)}function Oo(e){return[" ","_"].includes(e)?e:e.replace(/([a-z])([A-Z])/g,"$1-$2").replace(/[_\s]/,"-").toLowerCase()}function No(e){return["keydown","keyup"].includes(e)}function ni(e){return["contextmenu","click","mouse"].some(t=>e.includes(t))}function Co(e,t){let r=t.filter(o=>!["window","document","prevent","stop","once","capture","self","away","outside","passive","preserve-scroll","blur","change","lazy"].includes(o));if(r.includes("debounce")){let o=r.indexOf("debounce");r.splice(o,mt((r[o+1]||"invalid-wait").split("ms")[0])?2:1)}if(r.includes("throttle")){let o=r.indexOf("throttle");r.splice(o,mt((r[o+1]||"invalid-wait").split("ms")[0])?2:1)}if(r.length===0||r.length===1&&ri(e.key).includes(r[0]))return!1;let i=["ctrl","shift","alt","meta","cmd","super"].filter(o=>r.includes(o));return r=r.filter(o=>!i.includes(o)),!(i.length>0&&i.filter(s=>((s==="cmd"||s==="super")&&(s="meta"),e[`${s}Key`])).length===i.length&&(ni(e.type)||ri(e.key).includes(r[0])))}function ri(e){if(!e)return[];e=Oo(e);let t={ctrl:"control",slash:"/",space:" ",spacebar:" ",cmd:"meta",esc:"escape",up:"arrow-up",down:"arrow-down",left:"arrow-left",right:"arrow-right",period:".",comma:",",equal:"=",minus:"-",underscore:"_"};return t[e]=e,Object.keys(t).map(r=>{if(t[r]===e)return r}).filter(r=>r)}p("model",(e,{modifiers:t,expression:r},{effect:n,cleanup:i})=>{let o=e;t.includes("parent")&&(o=S(e,d=>d!==e));let s=x(o,r),a;typeof r=="string"?a=x(o,`${r} = __placeholder`):typeof r=="function"&&typeof r()=="string"?a=x(o,`${r()} = __placeholder`):a=()=>{};let c=()=>{let d;return s(E=>d=E),ii(d)?d.get():d},l=d=>{let E;s(v=>E=v),ii(E)?E.set(d):a(()=>{},{scope:{__placeholder:d}})};typeof r=="string"&&e.type==="radio"&&h(()=>{e.hasAttribute("name")||e.setAttribute("name",r)});let f=t.includes("change")||t.includes("lazy"),u=t.includes("blur"),g=t.includes("enter"),y=f||u||g,$;if(j)$=()=>{};else if(y){let d=[],E=v=>l(_t(e,t,v,c()));if(f&&d.push(K(e,"change",t,E)),u&&(d.push(K(e,"blur",t,E)),e.form)){let v=e.form,fe=()=>E({target:e});v._x_pendingModelUpdates||(v._x_pendingModelUpdates=[]),v._x_pendingModelUpdates.push(fe),i(()=>{v._x_pendingModelUpdates&&v._x_pendingModelUpdates.splice(v._x_pendingModelUpdates.indexOf(fe),1)})}g&&d.push(K(e,"keydown",t,v=>{v.key==="Enter"&&E(v)})),$=()=>d.forEach(v=>v())}else{let d=e.tagName.toLowerCase()==="select"||["checkbox","radio"].includes(e.type)?"change":"input";$=K(e,d,t,E=>{l(_t(e,t,E,c()))})}if(t.includes("fill")&&([void 0,null,""].includes(c())||Re(e)&&Array.isArray(c())||e.tagName.toLowerCase()==="select"&&e.multiple)&&l(_t(e,t,{target:e},c())),e._x_removeModelListeners||(e._x_removeModelListeners={}),e._x_removeModelListeners.default=$,i(()=>e._x_removeModelListeners.default()),e.form){let d=K(e.form,"reset",[],E=>{me(()=>e._x_model&&e._x_model.set(_t(e,t,{target:e},c())))});i(()=>d())}if(e._x_model={get(){return c()},set(d){l(d)},setWithModifiers:dr(t,l)},e._x_forceModelUpdate=d=>{d===void 0&&typeof r=="string"&&r.match(/\./)&&(d=""),h(()=>{Re(e)?Array.isArray(d)?e.checked=d.some(E=>E==e.value):e.checked=!!d:rt(e)?typeof d=="boolean"?e.checked=Ce(e.value)===d:e.checked=e.value==d:Ne(e,"value",d)})},e.tagName==="SELECT"){let d=new MutationObserver(()=>{e._x_forceModelUpdate(c())});d.observe(e,{childList:!0}),i(()=>d.disconnect())}n(()=>{let d=c();t.includes("unintrusive")&&document.activeElement.isSameNode(e)||e._x_forceModelUpdate(d)})});function _t(e,t,r,n){return h(()=>{if(r instanceof CustomEvent&&r.detail!==void 0)return r.detail!==null&&r.detail!==void 0?r.detail:r.target.value;if(Re(e))if(Array.isArray(n)){let i=null;return t.includes("number")?i=pr(r.target.value):t.includes("boolean")?i=Ce(r.target.value):i=r.target.value,r.target.checked?n.includes(i)?n:n.concat([i]):n.filter(o=>!Ro(o,i))}else return r.target.checked;else{if(e.tagName.toLowerCase()==="select"&&e.multiple)return t.includes("number")?Array.from(r.target.selectedOptions).map(i=>{let o=i.value||i.text;return pr(o)}):t.includes("boolean")?Array.from(r.target.selectedOptions).map(i=>{let o=i.value||i.text;return Ce(o)}):Array.from(r.target.selectedOptions).map(i=>i.value||i.text);{let i;return rt(e)?r.target.checked?i=r.target.value:i=n:i=r.target.value,t.includes("number")?pr(i):t.includes("boolean")?Ce(i):t.includes("trim")?i.trim():i}}})}function pr(e){let t=e?parseFloat(e):null;return Do(t)?t:e}function Ro(e,t){return e==t}function Do(e){return!Array.isArray(e)&&!isNaN(e)}function ii(e){return e!==null&&typeof e=="object"&&typeof e.get=="function"&&typeof e.set=="function"}p("cloak",e=>queueMicrotask(()=>h(()=>e.removeAttribute(N("cloak")))));Qe(()=>`[${N("init")}]`);p("init",T((e,{expression:t},{evaluate:r})=>typeof t=="string"?!!t.trim()&&r(t,{},!1):r(t,{},!1)));p("text",(e,{expression:t},{effect:r,evaluateLater:n})=>{let i=n(t);r(()=>{i(o=>{h(()=>{e.textContent=o})})})});p("html",(e,{expression:t},{effect:r,evaluateLater:n})=>{let i=n(t);r(()=>{i(o=>{h(()=>{Array.from(e.children).forEach(s=>C(s)),e.innerHTML=o??"",e._x_ignoreSelf=!0,w(e),delete e._x_ignoreSelf})})},{priority:"structural"})});he(Ge(":",Ye(N("bind:"))));var oi=(e,{value:t,modifiers:r,expression:n,original:i},{effect:o,cleanup:s})=>{if(!t){let c={};Rn(c),x(e,n)(f=>{Ut(e,f,i)},{scope:c});return}if(t==="key")return Mo(e,n);if(e._x_inlineBindings&&e._x_inlineBindings[t]&&e._x_inlineBindings[t].extract)return;let a=x(e,n);o(()=>a(c=>{c===void 0&&typeof n=="string"&&n.match(/\./)&&(c=""),h(()=>Ne(e,t,c,r))})),s(()=>{e._x_undoAddedClasses&&e._x_undoAddedClasses(),e._x_undoAddedStyles&&e._x_undoAddedStyles()})};oi.inline=(e,{value:t,modifiers:r,expression:n})=>{t&&(e._x_inlineBindings||(e._x_inlineBindings={}),e._x_inlineBindings[t]={expression:n,extract:!1})};p("bind",oi);function Mo(e,t){e._x_keyExpression=t}Ze(()=>`[${N("data")}]`);var le=Symbol();p("data",(e,{expression:t},{cleanup:r})=>{if(Po(e))return;let n=e[le];if(n?.expression===t)return;t=t===""?"{}":t;let i={};G(i,e);let o={};kn(o,i);let s=D(e,t,{scope:o});(s===void 0||s===!0)&&(s={}),G(s,e);let a;if(n?.reactiveData){a=n.reactiveData,ko(a,s);let l={expression:t};e[le]=l,queueMicrotask(()=>{e[le]===l&&delete e[le]})}else a=R(s);de(a,r);let c=P(e,a);a.init&&D(e,a.init),r(()=>{a.destroy&&D(e,a.destroy),c();let l={reactiveData:a};e[le]=l,queueMicrotask(()=>{e[le]===l&&delete e[le]})})});function ko(e,t){Object.keys(t).forEach(r=>{let n=Object.getOwnPropertyDescriptor(t,r),i=Object.getOwnPropertyDescriptor(e,r);n.get||n.set||i?.get||i?.set?(i&&delete e[r],i||(e[r]=void 0),n.get||n.set?Object.defineProperty(e,r,n):e[r]=t[r]):e[r]=t[r]}),Object.keys(e).filter(r=>!Object.prototype.hasOwnProperty.call(t,r)).forEach(r=>delete e[r])}F((e,t)=>{e._x_dataStack&&(t._x_dataStack=e._x_dataStack,t.setAttribute("data-has-alpine-state",!0))});function Po(e){return j?Je?!0:e.hasAttribute("data-has-alpine-state"):!1}p("show",(e,{modifiers:t,expression:r},{effect:n})=>{let i=x(e,r);e._x_doHide||(e._x_doHide=()=>{h(()=>{e.style.setProperty("display","none",t.includes("important")?"important":void 0)})}),e._x_doShow||(e._x_doShow=()=>{h(()=>{e.style.length===1&&e.style.display==="none"?e.removeAttribute("style"):e.style.removeProperty("display")})});let o=()=>{e._x_doHide(),e._x_isShown=!1},s=()=>{e._x_doShow(),e._x_isShown=!0},a=()=>setTimeout(s),c=Te(u=>u?s():o(),u=>{typeof e._x_toggleAndCascadeWithTransitions=="function"?e._x_toggleAndCascadeWithTransitions(e,u,s,o):u?a():o()}),l,f=!0;n(()=>i(u=>{!f&&u===l||(t.includes("immediate")&&(u?a():o()),c(u),l=u,f=!1)}))});p("for",T((e,{expression:t},{effect:r,cleanup:n})=>{let i=jo(t),o=x(e,i.items),s=x(e,e._x_keyExpression||"index");e._x_lookup=new Map,r(()=>Lo(e,i,o,s),{priority:"structural"}),n(()=>{e._x_lookup.forEach(a=>h(()=>{C(a),a.remove()})),delete e._x_lookup,delete e._x_lastRenderedEl})}));function Io(e){return t=>{Object.entries(t).forEach(([r,n])=>{e[r]=n})}}function Lo(e,t,r,n){r(i=>{Vo(i)&&(i=Array.from({length:i},(l,f)=>f+1)),i==null&&(i=[]),i instanceof Set&&(i=Array.from(i)),i instanceof Map&&(i=Array.from(i));let o=e._x_lookup,s=new Map;e._x_lookup=s;let a=$o(i),c=Object.entries(i).map(([l,f])=>{a||(l=parseInt(l));let u=Fo(t,f,l,i),g;return n(y=>{typeof y=="object"&&A("x-for key cannot be an object, it must be a string or an integer",e),o.has(y)&&(s.set(y,o.get(y)),o.delete(y)),g=y},{scope:{index:l,...u}}),[g,u]});h(()=>{o.forEach(u=>{C(u),u.remove()});let l=new Set,f=e;c.forEach(([u,g])=>{if(s.has(u)){let d=s.get(u);d._x_refreshXForScope(g),f.nextElementSibling!==d&&(f.nextElementSibling&&d.replaceWith(f.nextElementSibling),f.after(d)),f=d,d._x_currentIfEl&&(d.nextElementSibling!==d._x_currentIfEl&&f.after(d._x_currentIfEl),f=d._x_currentIfEl);return}e.content.children.length>1&&A("x-for templates require a single root element, additional elements will be ignored.",e);let y=document.importNode(e.content,!0).firstElementChild,$=R(g);P(y,$,e),y._x_refreshXForScope=Io($),s.set(u,y),l.add(y),f.after(y),f=y}),l.forEach(u=>w(u)),f!==e?e._x_lastRenderedEl=f:delete e._x_lastRenderedEl})})}function jo(e){let t=/,([^,\}\]]*)(?:,([^,\}\]]*))?$/,r=/^\s*\(|\)\s*$/g,n=/([\s\S]*?)\s+(?:in|of)\s+([\s\S]*)/,i=e.match(n);if(!i)return;let o={};o.items=i[2].trim();let s=i[1].replace(r,"").trim(),a=s.match(t);return a?(o.item=s.replace(t,"").trim(),o.index=a[1].trim(),a[2]&&(o.collection=a[2].trim())):o.item=s,o}function Fo(e,t,r,n){let i={};return/^\[.*\]$/.test(e.item)&&Array.isArray(t)?e.item.replace("[","").replace("]","").split(",").map(s=>s.trim()).forEach((s,a)=>{i[s]=t[a]}):/^\{.*\}$/.test(e.item)&&!Array.isArray(t)&&typeof t=="object"?e.item.replace("{","").replace("}","").split(",").map(s=>s.trim()).forEach(s=>{i[s]=t[s]}):i[e.item]=t,e.index&&(i[e.index]=r),e.collection&&(i[e.collection]=n),i}function Vo(e){return typeof e!="object"&&!isNaN(e)}function $o(e){return typeof e=="object"&&!Array.isArray(e)}function si(){}si.inline=(e,{expression:t},{cleanup:r})=>{let n=re(e);n&&(n._x_refs||(n._x_refs={}),n._x_refs[t]=e,r(()=>delete n._x_refs[t]))};p("ref",si);p("if",T((e,{expression:t},{effect:r,cleanup:n})=>{e.tagName.toLowerCase()!=="template"&&A("x-if can only be used on a <template> tag",e);let i=x(e,t),o=()=>{if(e._x_currentIfEl)return e._x_currentIfEl;let a=e.content.cloneNode(!0).firstElementChild;return P(a,{},e),h(()=>{e.after(a),w(a)}),e._x_currentIfEl=a,e._x_lastRenderedEl=a,e._x_undoIf=()=>{h(()=>{C(a),a.remove()}),delete e._x_currentIfEl,delete e._x_lastRenderedEl},a},s=()=>{e._x_undoIf&&(e._x_undoIf(),delete e._x_undoIf)};r(()=>i(a=>{a?o():s()}),{priority:"structural"}),n(()=>e._x_undoIf&&e._x_undoIf())}));p("id",(e,{expression:t},{evaluate:r})=>{r(t).forEach(i=>Zn(e,i))});F((e,t)=>{e._x_ids&&(t._x_ids=e._x_ids)});he(Ge("@",Ye(N("on:"))));p("on",T((e,{value:t,modifiers:r,expression:n},{cleanup:i})=>{let o=n?x(e,n):()=>{};e.tagName.toLowerCase()==="template"&&(e._x_forwardEvents||(e._x_forwardEvents=[]),e._x_forwardEvents.includes(t)||e._x_forwardEvents.push(t));let s=K(e,t,r,a=>{o(()=>{},{scope:{$event:a},params:[a]})});i(()=>s())}));gt("Collapse","collapse","collapse");gt("Intersect","intersect","intersect");gt("Focus","trap","focus");gt("Mask","mask","mask");function gt(e,t,r){p(t,n=>A(`You can't use [x-${t}] without first installing the "${e}" plugin here: https://alpinejs.dev/plugins/${r}`,n))}z.setEvaluator(Hr);z.setRawEvaluator(zr);z.setReactivityEngine({reactive:ht,effect:(e,t={})=>{let r;return r=Bn(e,{scheduler:()=>{r&&(t.scheduler?t.scheduler(r):r())}}),r},release:Hn,raw:_});var hr=z;window.Alpine=hr;queueMicrotask(()=>{hr.start()});})();
+/*! Bundled license information:
+
+@vue/shared/dist/shared.esm-bundler.js:
+  (**
+  * @vue/shared v3.5.41
+  * (c) 2018-present Yuxi (Evan) You and Vue contributors
+  * @license MIT
+  **)
+
+@vue/reactivity/dist/reactivity.esm-bundler.js:
+  (**
+  * @vue/reactivity v3.5.41
+  * (c) 2018-present Yuxi (Evan) You and Vue contributors
+  * @license MIT
+  **)
+*/
+</script>
+</body>
+</html>

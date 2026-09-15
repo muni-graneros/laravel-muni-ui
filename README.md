@@ -279,21 +279,110 @@ la regla `[x-cloak]` para evitar el flash inicial.
 `<tr data-muni-row class="muni-row--danger">` pinta una franja de estado en el borde
 izquierdo (banda de libro mayor), y los RUT/cifras usan `.muni-num` (mono tabular).
 
+## Ficha de persona: composición, no componente
+
+La pantalla del sujeto —el vecino en Atención al Vecino, el titular en Licencias, la persona
+inscrita en Discapacidad, el contribuyente en Patentes— **no tiene componente propio, y no lo va a
+tener.** Esos cuatro sistemas guardan a la persona con modelos de datos distintos: un
+`<x-muni::ficha-persona>` con props para foto, RUN, domicilio y estado se forkea en el primer
+sistema que no calce, y a partir de ahí hay cuatro copias que divergen. Lo que viaja en el paquete
+son las piezas; la ficha la compone cada sistema con sus propios datos:
+
+| Pieza | Qué pone en la ficha |
+|---|---|
+| `page-header` (+ `breadcrumb` en el slot `migas`) | el nombre como único `<h1>`, la ruta encima y las acciones a la derecha |
+| `avatar` + `badge` | la identidad de un vistazo y el estado en palabras, no solo en color |
+| `description-list` + `description-item` | los pares dato-valor con `<dl>/<dt>/<dd>` real |
+| `pii` | todo dato personal que no hace falta ver para atender, **tapado por omisión** |
+| `tabs` + `tab-panel` | lo que la persona tiene en el municipio, sin cargar todo a la vista |
+| `data-table` y `timeline` | los trámites y la bitácora de lo que pasó |
+
+```blade
+<x-muni::page-header :title="$persona->nombre" eyebrow="Ficha de persona">
+    <x-slot:migas><x-muni::breadcrumb :items="$migas" /></x-slot:migas>
+    <x-slot:actions>
+        <x-muni::button variant="ghost" class="muni-no-print" :href="route('vecinos.edit', $persona)">Editar datos</x-muni::button>
+    </x-slot:actions>
+</x-muni::page-header>
+
+<x-muni::avatar :name="$persona->nombre" size="lg" />
+<x-muni::badge tone="ok">Registro vigente</x-muni::badge>
+
+<x-muni::description-list label="Datos de la persona">
+    {{-- Con valor en el slot: viaja en el HTML, pero nace tapado (la mirada por encima del hombro). --}}
+    <x-muni::description-item label="RUT">
+        <x-muni::pii label="RUT" name="rut" :masked="$persona->rutEnmascarado()" class="muni-num">{{ $persona->rut }}</x-muni::pii>
+    </x-muni::description-item>
+    {{-- Modo diferido: sin slot, el valor NO está en la página hasta que el sistema lo sirve. --}}
+    <x-muni::description-item label="Teléfono">
+        <x-muni::pii label="Teléfono" name="telefono" :masked="$persona->telefonoEnmascarado()" />
+    </x-muni::description-item>
+</x-muni::description-list>
+
+<x-muni::tabs :tabs="['Trámites', 'Historial']" id="ficha-pestanas" label="Lo que la persona tiene en el municipio">
+    <x-muni::tab-panel :index="0">
+        <x-muni::data-table caption="Trámites de la persona" :columns="['Folio', 'Trámite', 'Estado']">
+            @foreach ($tramites as $t)
+                <tr data-muni-row><td class="muni-num">{{ $t->folio }}</td><td>{{ $t->nombre }}</td><td><x-muni::badge :tone="$t->tono">{{ $t->estado }}</x-muni::badge></td></tr>
+            @endforeach
+        </x-muni::data-table>
+    </x-muni::tab-panel>
+    <x-muni::tab-panel :index="1">
+        <x-muni::timeline :items="$historial" />
+    </x-muni::tab-panel>
+</x-muni::tabs>
+```
+
+Tres cosas que la composición tiene que resolver y que el paquete **no** puede resolver por ella:
+
+- **La bitácora de accesos es del sistema.** Este paquete no tiene Livewire, Eloquent ni auth con
+  que registrar nada. `pii` ofrece el gesto: al revelar, dispara `muni-pii-revelado` con
+  `detail.campo`. El sistema lo engancha a su registro (quién vio qué y cuándo, Ley 21.719) y, en
+  modo diferido, recién ahí sirve el valor devolviendo la vista con el slot y `revealed`. El
+  enmascarado (`rutEnmascarado()` arriba) también es del sistema: la regla para un RUT, un correo
+  o un diagnóstico es distinta.
+- **Minimización.** Lo que no hace falta para atender no se pasa a la vista. Entre los dos modos
+  de `pii`, el diferido es el único donde el dato de verdad no salió del servidor.
+- **La impresión.** Una ficha con pestañas imprime solo el panel activo, y el mesón emite
+  certificados. La página que compone la ficha agrega su regla: todos los paneles visibles y sin
+  controles.
+
+  ```css
+  @media print {
+      #ficha-pestanas [role="tablist"] { display: none !important; }
+      #ficha-pestanas [role="tabpanel"] { display: block !important; }
+  }
+  ```
+
+Armada entera, con datos ficticios, en `demo/persona.html`.
+
+## Vitrina de desarrollo (`workbench/`)
+
+`vendor/bin/testbench serve` → `http://127.0.0.1:8000/vitrina`. Una tarjeta por cada componente
+de `resources/views/components/`, renderizada con el `<x-muni::…>` real y la hoja del paquete, en
+los dos temas. Vive en `workbench/` y no la exponen los sistemas: el service provider no registra
+rutas y `workbench/` no viaja en el paquete. Los datos de ejemplo están en
+`workbench/ejemplos.php`, siempre ficticios.
+
 ## Demos (`demo/`)
 
-Todas self-contained (Alpine inline, sin CDN).
+Todas self-contained (Alpine inline, sin CDN). **Son maquetas, no la fuente de los tokens:** la
+paleta está en `resources/css/muni-ui.css` y se copia de ahí. `tests/DemosConTokensDelPaqueteTest.php`
+falla si una demo declara un `--muni-*` con un valor que la hoja del paquete no tiene.
 
 **Componentes y sistema**
 - `index.html` — panel de datos en ambos temas · `interactive.html` — modal/dropdown/tabs/toasts
-- `showcase.html` — sala de control cívica con consola viva · `templates.html` — galería de pantallas (landing, login, paneles por rol, error)
+- `templates.html` — galería de pantallas (landing, login, paneles por rol, error)
 - `app.html` — **dashboard de patentes funcional completo** (command palette ⌘K, charts, tabla sortable, drawer, modal, toasts)
+- `persona.html` — ficha de persona compuesta con los componentes reales; se **genera** con
+  `php demo/persona.php` desde `demo/persona.blade.php`, no se edita a mano
+- `solicitud.html` — seguimiento de una solicitud · `wizard.html` — solicitud por pasos
+- `login-mfa.html` — ingreso con segundo factor · `settings.html` — «Mi cuenta»
 
-**Landings novedosas por sistema** — cada una con identidad propia anclada a su mundo
-- `landing-hub.html` — hub del ecosistema (dark mode universal en vivo)
-- `landing-licencias.html` — "la ruta" (carretera en perspectiva, señalética vial)
-- `landing-discapacidad.html` — "accesibilidad como belleza" (controles reales de a11y)
-- `landing-control-acceso.html` — "terminal de vigilancia" (feed biométrico en vivo)
-- `landing-patentes.html` — "el libro de rentas" (sello municipal, cifras que respiran)
+**Landings e intranet por sistema** — cada una con identidad propia anclada a su mundo
+- `landing-licencias.html` — Licencias de Conducir · `landing-discapacidad.html` — Oficina de Inclusión
+- `landing-feria.html` — Ferias Libres
+- `intranet-hub.html` — intranet municipal · `intranet-control-acceso.html` — Control de Acceso
 
 ## Panel ARCOP (Ley 21.719)
 

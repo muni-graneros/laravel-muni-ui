@@ -24,6 +24,29 @@ return [
     'page-header' => '<x-muni::page-header title="Patentes morosas" subtitle="3.412 contribuyentes con deuda vigente" />',
     'stat' => '<x-muni::stat :value="128" label="Solicitudes ingresadas hoy" :delta="12" delta-dir="up" />',
     'kpi' => '<x-muni::kpi :value="3412" label="Patentes morosas" tone="danger" hint="al 6 de septiembre" />',
+    'card' => '<x-muni::card title="Solicitud 2026-04871" subtitle="Licencia clase B · ingresada el 18 jul 2026">'
+        .'<x-slot:actions><x-muni::button variant="ghost" size="sm">Ver expediente</x-muni::button></x-slot:actions>'
+        .'<p style="margin:0;">Examen práctico agendado para el lunes 21 de julio a las 09:00, Dirección de Tránsito.</p>'
+        .'</x-muni::card>',
+    'accordion' => '<x-muni::accordion :default="0" :items="['
+        .'[\'title\' => \'¿Qué documentos necesito para renovar la licencia?\', \'content\' => \'Cédula de identidad vigente, la licencia anterior y el certificado médico del examen.\'],'
+        .'[\'title\' => \'¿Cuánto demora el trámite?\', \'content\' => \'Entre 5 y 10 días hábiles desde que se aprueba el examen práctico.\'],'
+        .'[\'title\' => \'¿Puedo reagendar mi hora?\', \'content\' => \'Sí, hasta 24 horas antes de la cita, desde la misma solicitud.\'],'
+        .']" />',
+    'chart-bar' => '<x-muni::chart-bar :data="['
+        .'[\'label\' => \'Abr\', \'value\' => 212],'
+        .'[\'label\' => \'May\', \'value\' => 248],'
+        .'[\'label\' => \'Jun\', \'value\' => 231],'
+        .'[\'label\' => \'Jul\', \'value\' => 305],'
+        .'[\'label\' => \'Ago\', \'value\' => 342],'
+        .'[\'label\' => \'Sep\', \'value\' => 128],'
+        .']" />',
+    'stepper' => '<x-muni::stepper label="Avance de la solicitud" orientation="vertical" :current="2" :steps="['
+        .'[\'label\' => \'Datos del titular\', \'state\' => \'done\'],'
+        .'[\'label\' => \'Documentos\', \'hint\' => \'Falta el certificado médico\', \'state\' => \'error\'],'
+        .'[\'label\' => \'Examen\', \'hint\' => \'Lun 21 jul, 09:00\'],'
+        .'[\'label\' => \'Emisión\'],'
+        .']" />',
     'badge' => '<x-muni::badge tone="danger">Vencida</x-muni::badge> <x-muni::badge tone="ok">Al día</x-muni::badge> <x-muni::badge tone="warn">Por vencer</x-muni::badge>',
     'button' => '<x-muni::button>Guardar</x-muni::button> <x-muni::button variant="ghost">Cancelar</x-muni::button> <x-muni::button variant="danger">Anular</x-muni::button>',
     'alert' => '<x-muni::alert tone="warn" title="217 patentes por vencer">Vencen dentro de 30 días.</x-muni::alert>',

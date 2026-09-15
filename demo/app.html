@@ -14,13 +14,13 @@
         --muni-ok-fg:#0f7a5a;--muni-ok-bg:#e2f5ee;--muni-warn-fg:#8a5a00;--muni-warn-bg:#fef3dc;
         --muni-danger-fg:#b03030;--muni-danger-bg:#fdeaea;--muni-info-fg:#1f5fb0;
         --muni-radius:10px;--muni-radius-lg:14px;--muni-radius-sm:7px;
-        --muni-shadow:0 1px 2px rgba(16,24,40,.04),0 2px 8px rgba(16,24,40,.06);--muni-shadow-md:0 4px 16px rgba(16,24,40,.1);--muni-shadow-lg:0 16px 40px rgba(16,24,40,.16);
+        --muni-shadow:0 1px 2px rgba(16,24,40,.04),0 2px 8px rgba(16,24,40,.06);--muni-shadow-md:0 4px 16px rgba(16,24,40,.1);--muni-shadow-lg:0 12px 32px rgba(16,24,40,.14);
         --muni-ring:0 0 0 3px color-mix(in srgb,var(--muni-accent) 30%,transparent);--muni-ease:cubic-bezier(.22,1,.36,1);--muni-dur:160ms;
         --muni-font-sans:'DM Sans',system-ui,sans-serif;--muni-font-mono:'DM Mono',ui-monospace,monospace;--muni-glow:none;
     }
     .dark,[data-muni-theme=dark]{
         --muni-bg:#0b0f14;--muni-surface:#111620;--muni-surface-2:#181e2a;--muni-surface-3:#1c2333;
-        --muni-text:#e2e8f4;--muni-muted:#7a8ba8;--muni-hint:#7a8ba8;--muni-border:#2a3347;--muni-border-2:#3a4560;
+        --muni-text:#e2e8f4;--muni-muted:#7a8ba8;--muni-hint:#7c8daa;--muni-border:#2a3347;--muni-border-2:#3a4560;
         --muni-field-border:#5f719d;
         --muni-accent:#f59e0b;--muni-accent-strong:#d97706;--muni-accent-soft:#2d1d00;--muni-on-accent:#0b0f14;
         --muni-ok-fg:#22c55e;--muni-ok-bg:#0d2d1a;--muni-warn-fg:#f59e0b;--muni-warn-bg:#2d1d00;
@@ -165,7 +165,7 @@
         @page{margin:16mm 18mm}
         :root,.dark,[data-muni-theme]{
             --muni-bg:#fff;--muni-surface:#fff;--muni-surface-2:#fff;--muni-surface-3:#fff;
-            --muni-text:#000;--muni-muted:#3a3f4b;--muni-hint:#3a3f4b;--muni-border:#767676;--muni-border-2:#3a3f4b;
+            --muni-text:#000;--muni-muted:#3a3f4b;--muni-hint:var(--muni-muted);--muni-border:#767676;--muni-border-2:#3a3f4b;
             --muni-accent:#0f766e;--muni-accent-strong:#115e59;--muni-accent-soft:#fff;--muni-on-accent:#000;
             --muni-ok-fg:#0f5c44;--muni-ok-bg:#fff;--muni-warn-fg:#8a5a00;--muni-warn-bg:#fff;
             --muni-danger-fg:#b03030;--muni-danger-bg:#fff;--muni-info-fg:#1f5fb0;

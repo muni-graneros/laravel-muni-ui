@@ -23,9 +23,14 @@
      1. UN SOLO <h1>, enfocable y enfocado. El foco va al título al cargar, que es lo
         que hace que un lector de pantalla lea el resultado sin que nadie lo busque
         (WCAG 2.2 AA 2.4.3 y 4.1.3). Va por el atributo `autofocus` —así funciona sin
-        una línea de JS— y Alpine lo repite solo si NADIE tenía el foco todavía: dentro
-        de una página que repinta Livewire, robarle el foco al funcionario que está
-        escribiendo es peor que no anunciar nada.
+        una línea de JS— y Alpine lo repite cuando el atributo no vuelve a dispararse
+        (`wire:navigate`), pero solo si NADIE tenía el foco todavía: dentro de una
+        página que repinta Livewire, robarle el foco al funcionario que está
+        escribiendo es peor que no anunciar nada. Con `autofocus="false"` no enfoca
+        NI el atributo NI Alpine: es lo que usa el anfitrión cuando la pantalla es una
+        tarjeta dentro de otra página, para que no le arranque el scroll. Las dos
+        ramas están medidas en navegador (`tests/navegador/pantalla-resultado.py`),
+        porque un `str_contains` sobre el fuente no distingue una de otra.
      2. EL FOLIO ES TEXTO, en mono tabular (DESIGN §9), y se copia con un botón real que
         confirma CON PALABRAS. Un icono verde no es una confirmación: no lo lee un lector
         de pantalla y no lo distingue quien no ve el verde.
@@ -75,16 +80,45 @@
      */
     $resId = $attributes->get('id')
         ?: 'muni-res-'.substr(sha1(((string) $folio).'|'.((string) $title)), 0, 8);
+
+    /*
+     * `autofocus` tiene que decidir las DOS cosas: el atributo HTML y la rama de
+     * Alpine. Con la bandera puesta solo en el atributo, el init() enfocaba
+     * igual —justo después de cargar, `activeElement` ES el body—, así que la
+     * prop mentía: la pantalla robaba el foco, jalaba el scroll del anfitrión y
+     * dos tarjetas en una misma página peleaban por él. Se normaliza porque una
+     * prop escrita como texto llega como "false", que en PHP es truthy.
+     */
+    $autofoco = filter_var($autofocus, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? (bool) $autofocus;
+
+    /*
+     * El nombre de la sección viaja por `->merge()` y NUNCA escrito a mano antes
+     * del derrame (DESIGN §8): a mano salían DOS `aria-labelledby` en el mismo
+     * <section> —HTML inválido, y el Decreto N°1/2015 no lo toma como cosmético—
+     * y el del anfitrión se perdía en silencio, porque el navegador se queda con
+     * el primero. Un `aria-labelledby` vacío se saca de la bolsa, para que no
+     * deje la sección sin nombre; se reasigna `$attributes` y no otra variable
+     * porque el derrame solo se compila si la expresión empieza literalmente por
+     * `$attributes`.
+     */
+    if (trim((string) $attributes->get('aria-labelledby')) === '') {
+        $attributes = $attributes->except('aria-labelledby');
+    }
 @endphp
 
 <section
     x-data="{
         folio: @js((string) $folio),
+        autofoco: @js($autofoco),
         aviso: '',
 
         init() {
             const titulo = this.$refs.titulo;
             if (! titulo) return;
+
+            /* La prop manda también acá: si el anfitrión muestra esta pantalla
+               como una tarjeta dentro de otra cosa, nadie le arranca el foco. */
+            if (! this.autofoco) return;
 
             /* Solo si NADIE tiene el foco: si el funcionario ya estaba en un control,
                arrancárselo es peor que no anunciar. Con `autofocus` el navegador ya
@@ -113,9 +147,16 @@
 
             if (! copiado) this.seleccionar();
 
-            this.aviso = copiado
+            const texto = copiado
                 ? 'Folio copiado: ' + this.folio
                 : 'No se pudo copiar. El folio quedó seleccionado: cópialo con Control y C.';
+
+            /* Vaciar y volver a escribir en el ciclo siguiente. Si el texto es
+               idéntico al que ya estaba no hay mutación de DOM y el lector de
+               pantalla NO vuelve a hablar: la segunda confirmación sería muda,
+               que es justo lo contrario de «confirma en texto». */
+            this.aviso = '';
+            this.$nextTick(() => { this.aviso = texto; });
         },
 
         copiarALaAntigua() {
@@ -149,21 +190,22 @@
             } catch (e) {}
         }
     }"
-    aria-labelledby="{{ $resId }}-titulo"
-    {{ $attributes->merge(['class' => 'muni-res']) }}
+    {{ $attributes->merge(['class' => 'muni-res', 'aria-labelledby' => $resId.'-titulo']) }}
 >
     <span class="muni-res__icono" aria-hidden="true"
           style="--mres-fg:var(--muni-{{ $tonoResuelto }}-fg);--mres-bg:var(--muni-{{ $tonoResuelto }}-bg);--mres-br:var(--muni-{{ $tonoResuelto }}-border);">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="30" height="30">{!! $dibujos[$tonoResuelto] !!}</svg>
     </span>
 
-    <h1 id="{{ $resId }}-titulo" class="muni-res__titulo" tabindex="-1" x-ref="titulo" @if ($autofocus) autofocus @endif>{{ $title }}</h1>
+    <h1 id="{{ $resId }}-titulo" class="muni-res__titulo" tabindex="-1" x-ref="titulo" @if ($autofoco) autofocus @endif>{{ $title }}</h1>
 
     @if ($message)
         <p class="muni-res__mensaje">{{ $message }}</p>
     @endif
 
-    @if ($folio)
+    {{-- `@if ($folio)` descartaba valores falsy VÁLIDOS: con folio="0" desaparecían
+         el bloque, el botón de copiar y el aria-describedby, sin un solo aviso. --}}
+    @if ($folio !== null && $folio !== '')
         <div class="muni-res__folio">
             <span class="muni-res__rotulo">{{ $folioLabel }}</span>
             <span id="{{ $resId }}-folio" class="muni-res__valor muni-num" x-ref="valor">{{ $folio }}</span>
@@ -218,7 +260,11 @@
         /* DESIGN §9: el folio es una cifra y va en mono tabular. `user-select:all` para
            que un clic lo seleccione entero cuando el portapapeles no está disponible. */
         .muni-res__valor { font-family:var(--muni-font-mono); font-variant-numeric:tabular-nums; font-size:20px;
-            font-weight:700; letter-spacing:.02em; color:var(--muni-text); user-select:all; }
+            font-weight:700; letter-spacing:.02em; color:var(--muni-text); -webkit-user-select:all; user-select:all; }
+        /* La firma del sistema viaja con el componente: `.muni-num` declarada
+           solo en muni-ui.css es letra muerta dentro de un panel Filament, que
+           solo inyecta filament.css (DESIGN §7 y §9), como ya pasó en `stat`. */
+        .muni-res .muni-num { font-family:var(--muni-font-mono); font-variant-numeric:tabular-nums; }
         .muni-res__copiar { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:44px;
             padding:0 14px; font-family:var(--muni-font-sans); font-size:13px; font-weight:600; color:var(--muni-text);
             background:var(--muni-surface); border:1px solid var(--muni-field-border); border-radius:var(--muni-radius-sm);

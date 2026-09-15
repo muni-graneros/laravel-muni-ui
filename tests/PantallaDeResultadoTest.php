@@ -393,3 +393,345 @@ it('el estado no se comunica solo con color', function () {
         'Sin `tone` el cierre no cae en el tono de éxito, que es el caso del 95% de las pantallas.'
     );
 });
+
+/*
+|--------------------------------------------------------------------------
+| LO QUE EL REVISOR DEMOSTRÓ QUE NO SE ESTABA MIDIENDO
+|--------------------------------------------------------------------------
+|
+| Las pruebas de arriba miraban el TEXTO del fuente («document.activeElement»,
+| «execCommand», un `role="status"` vacío) y daban verde aunque el
+| comportamiento estuviera roto: borrar `titulo.focus()` entero, o el
+| `x-text="aviso"` de la región viva, las dejaba pasar igual. Acá se cierra cada
+| hueco con la aserción que sí detecta el defecto, y la capa Alpine —que ningún
+| `str_contains` puede medir— se verifica en navegador más abajo.
+*/
+
+it('con autofocus="false" NO enfoca el título: ni el atributo ni la rama de Alpine', function () {
+    $html = Blade::render(
+        '<x-muni::pantalla-resultado :autofocus="false" title="Su solicitud fue recibida" folio="2026-04871" exit-href="/" />'
+    );
+
+    expect((bool) preg_match('/<h1[^>]*\bautofocus\b/', $html))->toBeFalse(
+        'Con `autofocus="false"` el <h1> sigue trayendo el atributo: el navegador enfoca igual.'
+    );
+
+    // El defecto que el revisor encontró: la prop apagaba el ATRIBUTO pero el
+    // init() de Alpine seguía llamando a focus() siempre que nadie tuviera el
+    // foco — y justo después de cargar una página, `activeElement` ES el body.
+    // Con varias tarjetas en la vitrina todas peleaban por el foco y jalaban el
+    // scroll. La bandera tiene que viajar DENTRO del x-data.
+    preg_match('/x-data="(.*?)"/s', $html, $m);
+
+    expect(isset($m[1]))->toBeTrue('El componente no declara x-data.');
+
+    expect((bool) preg_match('/autofoco:\s*false/', $m[1]))->toBeTrue(
+        'La prop `autofocus` no llega al x-data: Alpine enfoca el <h1> igual y le arranca el '.
+        'scroll a la página que hospeda la pantalla.'
+    );
+
+    $conFoco = resultadoHtmlCompleto();
+    preg_match('/x-data="(.*?)"/s', $conFoco, $m2);
+
+    expect((bool) preg_match('/autofoco:\s*true/', $m2[1] ?? ''))->toBeTrue(
+        'Por defecto la pantalla es la página entera y el foco SÍ va al título: la bandera tiene '.
+        'que nacer en true.'
+    );
+});
+
+it('Alpine pone el foco en el título de verdad, no solo lo menciona', function () {
+    $fuente = resultadoFuenteSinComentarios();
+
+    // Con `wire:navigate` el atributo `autofocus` no vuelve a dispararse: el
+    // único que anuncia el resultado es Alpine. Si `titulo.focus()` desaparece,
+    // la prueba vieja («contiene document.activeElement») seguía en verde.
+    expect((bool) preg_match('/\btitulo\.focus\(\)/', $fuente))->toBeTrue(
+        'Nadie llama a focus() sobre el título: con wire:navigate el atributo `autofocus` no se '.
+        'vuelve a disparar y el resultado no se anuncia.'
+    );
+
+    expect((bool) preg_match('/if\s*\(\s*!\s*this\.autofoco\s*\)\s*return/', $fuente))->toBeTrue(
+        'El init() de Alpine no respeta la bandera `autofoco`: la prop `autofocus` sería una mentira.'
+    );
+
+    expect(str_contains($fuente, 'document.activeElement'))->toBeTrue(
+        'El componente enfoca el título sin mirar si alguien ya tenía el foco.'
+    );
+});
+
+it('la región viva se LLENA: nace vacía pero está enlazada al aviso', function () {
+    $html = resultadoHtmlCompleto();
+
+    // El regex viejo casaba con una región vacía PARA SIEMPRE: si se borraba el
+    // x-text, el aviso no llegaba nunca y la prueba seguía verde.
+    expect((bool) preg_match('/<p[^>]*role="status"[^>]*x-text="aviso"[^>]*>\s*<\/p>|<p[^>]*x-text="aviso"[^>]*role="status"[^>]*>\s*<\/p>/', $html))->toBeTrue(
+        'La región viva no está enlazada al aviso (`x-text="aviso"`) o no nace vacía: o no se '.
+        'anuncia nunca, o se anuncia sola al cargar.'
+    );
+});
+
+it('el segundo copiado también se anuncia: el aviso se vacía antes de volver a escribirse', function () {
+    $fuente = resultadoFuenteSinComentarios();
+
+    // Si el texto es idéntico al que ya estaba, no hay mutación de DOM y el
+    // lector de pantalla NO vuelve a hablar: la segunda confirmación es muda.
+    expect((bool) preg_match('/this\.aviso\s*=\s*\x27\x27/', $fuente))->toBeTrue(
+        'El aviso se reescribe con la misma cadena: al pulsar «Copiar folio» dos veces seguidas no '.
+        'hay mutación y el lector de pantalla se queda callado.'
+    );
+
+    expect(str_contains($fuente, '$nextTick'))->toBeTrue(
+        'El aviso se vacía y se rellena en el mismo ciclo: Alpine junta las dos escrituras en una '.
+        'sola mutación y el lector no vuelve a anunciar.'
+    );
+});
+
+it('el aria-labelledby del anfitrión no duplica el atributo', function () {
+    $propio = resultadoHtmlCompleto();
+
+    expect(substr_count($propio, 'aria-labelledby='))->toBe(1,
+        'El componente emite más de un aria-labelledby.'
+    );
+
+    expect((bool) preg_match('/aria-labelledby="muni-res-[0-9a-f]{8}-titulo"/', $propio))->toBeTrue(
+        'La sección no queda nombrada por su propio <h1>.'
+    );
+
+    // DESIGN §8: los atributos condicionales van por ->merge(), nunca escritos a
+    // mano antes del derrame. Escrito a mano salían DOS aria-labelledby en el
+    // mismo <section>: HTML inválido (Decreto N°1/2015) y el valor del anfitrión
+    // perdido en silencio, porque el navegador se queda con el primero.
+    $ajeno = resultadoHtml('title="Su solicitud fue recibida" folio="2026-04871" exit-href="/" aria-labelledby="titulo-del-anfitrion"');
+
+    expect(substr_count($ajeno, 'aria-labelledby='))->toBe(1,
+        'Con un aria-labelledby del anfitrión el <section> sale con DOS: HTML inválido y el valor '.
+        'del anfitrión se pierde, porque el navegador se queda con el primero.'
+    );
+
+    expect(str_contains($ajeno, 'aria-labelledby="titulo-del-anfitrion"'))->toBeTrue(
+        'El aria-labelledby del anfitrión no gana: el que manda el consumidor tiene que ser el que '.
+        'queda (DESIGN §8, `->merge()` reemplaza).'
+    );
+});
+
+it('un folio "0" sigue siendo un folio', function () {
+    $html = resultadoHtml('title="Su solicitud fue recibida" folio="0" exit-href="/"');
+
+    // Se busca la CLASE EN EL ATRIBUTO y no la cadena suelta: el bloque de
+    // estilos del `@once` también nombra `.muni-res__folio`, así que buscarla a
+    // secas daría verde con el bloque del folio borrado.
+    expect(str_contains($html, 'class="muni-res__folio"'))->toBeTrue(
+        'Con folio="0" desaparece el bloque del folio, el botón de copiar y el aria-describedby: '.
+        '`@if ($folio)` descarta valores falsy válidos.'
+    );
+
+    expect(str_contains($html, 'Copiar folio'))->toBeTrue(
+        'Con folio="0" no hay botón de copiar.'
+    );
+
+    $sin = resultadoHtml('title="Su solicitud fue recibida" exit-href="/"');
+
+    expect(str_contains($sin, 'class="muni-res__folio"'))->toBeFalse(
+        'Sin folio el componente dibuja el bloque vacío.'
+    );
+});
+
+it('la salida sigue siendo lo último enfocable cuando hay texto libre en la ranura', function () {
+    $html = resultadoHtml(
+        'title="Su solicitud fue recibida" folio="2026-04871" '
+        .'print-href="/comprobante/2026-04871" exit-href="/"',
+        'Le llegará un correo cuando cambie el estado de su solicitud.'
+    );
+
+    preg_match_all('/<(?:a\s[^>]*href=|button\b)/i', $html, $m, PREG_OFFSET_CAPTURE);
+
+    $ultimo = end($m[0])[1];
+
+    expect(str_contains(substr($html, $ultimo, 400), 'href="/"'))->toBeTrue(
+        'Con la ranura llena la salida deja de ser lo último enfocable. Es justo el caso que el '.
+        'comentario del componente declara riesgoso: prosa sí, enlaces no.'
+    );
+});
+
+it('lleva consigo la declaración de .muni-num y el prefijo de WebKit', function () {
+    $css = resultadoCss();
+
+    // DESIGN §7: dentro de un panel Filament solo se inyecta
+    // muni-ui-filament.css. `.muni-num` declarada solo en muni-ui.css es letra
+    // muerta ahí dentro, como ya pasó en `stat` y en `description-list`.
+    expect((bool) preg_match('/\.muni-num\s*\{[^}]*font-variant-numeric\s*:\s*tabular-nums/', $css))->toBeTrue(
+        'El componente aplica .muni-num pero no la declara en su bloque de estilos: dentro de un '.
+        'panel Filament la clase no existe (DESIGN §7 y §9).'
+    );
+
+    // El folio seleccionable de un clic es la ÚLTIMA alternativa de la cadena de
+    // copiado: si en WebKit no aplica, el usuario de Safari se queda sin ninguna.
+    expect((bool) preg_match('/-webkit-user-select\s*:\s*all/', $css))->toBeTrue(
+        'Falta `-webkit-user-select:all`: en Safari el folio no se selecciona de un clic y ahí se '.
+        'acaba la última alternativa al portapapeles.'
+    );
+});
+
+// ---------------------------------------------------------------------------
+// Verificación en navegador
+// ---------------------------------------------------------------------------
+
+/*
+ * El banco. Se genera acá y no en un script suelto porque este es el único sitio
+ * del paquete con Blade arrancado (mismo criterio que `GeneraVitrinaTest`,
+ * `CampoDeClaveTest` y `SolapasDeRutaTest`). Sale a `build/pantalla-resultado/`,
+ * ignorado por git.
+ *
+ * Seis páginas, y cada una existe por algo que ninguna prueba de texto alcanza:
+ *
+ * · `claro` y `oscuro` — la pantalla completa con Alpine: el foco al <h1>, la
+ *   cadena de copiado, el llenado de la región viva y el recorrido de Tab.
+ * · `panel-claro` y `panel-oscuro` — la MISMA pantalla cargando ÚNICAMENTE
+ *   `muni-ui-filament.css` (DESIGN §7): dentro de un panel `muni-ui.css` no se
+ *   carga, y es ahí donde una clase declarada fuera del `@once` —`.muni-num`—
+ *   se queda sin estilo y sin un solo error en consola.
+ * · `tarjeta` — el componente con `autofocus="false"` DEBAJO de contenido largo:
+ *   si la prop miente, el foco salta al título y la página se desplaza sola.
+ *   Es el defecto exacto que el revisor encontró y que ninguna prueba de Blade
+ *   veía, porque la prop apagaba el atributo pero no la rama de Alpine.
+ * · `sin-alpine` — la misma pantalla SIN el script: el botón de copiar no puede
+ *   aparecer (x-cloak) y el folio tiene que seguir visible y seleccionable.
+ */
+function resultadoAlpineDelBanco(): ?string
+{
+    $ruta = __DIR__.'/../node_modules/alpinejs/dist/cdn.min.js';
+
+    return is_file($ruta) ? (string) file_get_contents($ruta) : null;
+}
+
+it('genera el banco de navegador en build/pantalla-resultado/', function () {
+    $dir = __DIR__.'/../build/pantalla-resultado';
+
+    if (! is_dir($dir)) {
+        mkdir($dir, 0775, true);
+    }
+
+    $alpine = resultadoAlpineDelBanco();
+
+    expect($alpine)->not->toBeNull(
+        'No está node_modules/alpinejs: corre `npm install`. Sin Alpine el banco no puede medir '.
+        'ni el copiado ni el foco, que es justo lo que ninguna prueba de texto alcanza.'
+    );
+
+    $pantalla = Blade::render(
+        '<x-muni::pantalla-resultado title="Su solicitud fue recibida" '
+        .'message="La Dirección de Tránsito la revisará en un plazo de 5 días hábiles." '
+        .'folio="2026-04871" print-href="#comprobante" exit-href="#inicio" exit-label="Volver al inicio">'
+        .'Le llegará un correo cuando cambie el estado de su solicitud.'
+        .'</x-muni::pantalla-resultado>'
+    );
+
+    /* La MISMA pantalla, pero como tarjeta dentro de otra página: es el caso que
+       entrega la entrada de vitrina y el que el revisor demostró que fallaba. */
+    $tarjeta = Blade::render(
+        '<x-muni::pantalla-resultado :autofocus="false" title="Su solicitud fue recibida" '
+        .'message="La Dirección de Tránsito la revisará en un plazo de 5 días hábiles." '
+        .'folio="2026-04871" print-href="#comprobante" exit-href="#inicio" />'
+    );
+
+    $paginas = [
+        'claro' => ['light', cssMuniUi(), false, $pantalla, true],
+        'oscuro' => ['dark', cssMuniUi(), false, $pantalla, true],
+        'panel-claro' => ['light', cssMuniUiFilament(), true, $pantalla, true],
+        'panel-oscuro' => ['dark', cssMuniUiFilament(), true, $pantalla, true],
+        'tarjeta' => ['light', cssMuniUi(), false, $tarjeta, true],
+        'sin-alpine' => ['light', cssMuniUi(), false, $pantalla, false],
+    ];
+
+    foreach ($paginas as $nombre => [$tema, $css, $panel, $cuerpoPantalla, $conAlpine]) {
+        $oscuro = $tema === 'dark';
+        $hoja = $panel ? 'muni-ui-filament.css' : 'muni-ui.css';
+
+        /* El armazón no aporta ni un color: fondo y texto salen de los mismos
+           tokens que lee el componente. */
+        $armazon = 'body{margin:0;background:var(--muni-bg);color:var(--muni-text);font-family:var(--muni-font-sans)}'
+            .'.relleno{padding:24px;max-width:60ch}';
+
+        /* En `tarjeta` la pantalla va DEBAJO de una pantalla de alto: si el
+           componente enfoca el título igual, el navegador desplaza la página
+           para mostrarlo y `scrollY` deja de ser 0. Así el robo de foco se mide
+           con un número, no con una impresión. */
+        $antes = $nombre === 'tarjeta'
+            ? '<div class="relleno" style="min-height:140vh"><h1>Solicitudes de la Dirección de Tránsito</h1>'
+                .'<p>El detalle de la solicitud sigue abajo.</p></div>'
+            : '';
+
+        $script = $conAlpine && $alpine !== null
+            ? '<script data-banco="alpine-core">'.$alpine.'</script>'
+            : '';
+
+        $cuerpo = $panel
+            ? '<body class="fi-body"><div class="fi-main-ctn"><main class="fi-main" id="muni-contenido" tabindex="-1">'
+                .$antes.'<section class="fi-section">'.$cuerpoPantalla.'</section></main></div>'.$script.'</body>'
+            : '<body><main id="muni-contenido" tabindex="-1">'.$antes.$cuerpoPantalla.'</main>'.$script.'</body>';
+
+        $pagina = '<!doctype html><html lang="es" data-muni-theme="'.$tema.'"'.($oscuro ? ' class="dark"' : '').' data-vitrina-hoja="'.$hoja.'">'
+            .'<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+            .'<title>Banco pantalla-resultado — '.$nombre.'</title>'
+            .'<style>'.$css.'</style><style>'.$armazon.'</style></head>'
+            .$cuerpo.'</html>';
+
+        file_put_contents($dir.'/'.$nombre.'.html', $pagina);
+
+        expect(str_contains($pagina, 'class="muni-res"'))->toBeTrue('El banco '.$nombre.' salió sin la pantalla.');
+        expect(str_contains($pagina, 'data-banco="alpine-core"'))->toBe($conAlpine,
+            'El banco '.$nombre.' no trae el Alpine que le corresponde.'
+        );
+    }
+
+    // El bloque `@once` se emite UNA vez por petición: si la pantalla de la
+    // tarjeta se hubiera renderizado sin estilos, las medidas del navegador
+    // serían las del navegador y no las del componente.
+    expect(str_contains((string) file_get_contents($dir.'/claro.html'), '.muni-res__valor'))->toBeTrue(
+        'El banco salió sin el bloque de estilos del componente: nada de lo que se mida arriba sería suyo.'
+    );
+});
+
+/** El Python del entorno de la reja (`npm run a11y:instalar`), o null si no está. */
+function resultadoPythonDeLaReja(): ?string
+{
+    $ruta = __DIR__.'/../.venv-a11y/bin/python';
+
+    return is_executable($ruta) ? $ruta : null;
+}
+
+/*
+ * Lo que ningún `str_contains` sobre el fuente puede ver, medido en Chromium y
+ * Firefox. El encabezado de `tests/navegador/solapas-de-ruta.py` lo dice con el
+ * caso real: leer el TEXTO del CSS «ya engañó una vez en `stat`: la regla pasó
+ * el test de texto y en el navegador el defecto seguía vivo».
+ */
+it('en Chromium y Firefox: el foco, la cadena de copiado, la región viva y el x-cloak', function () {
+    $python = resultadoPythonDeLaReja();
+
+    if ($python === null) {
+        $this->markTestSkipped('Sin .venv-a11y (npm run a11y:instalar) no hay navegador: la verificación se salta, no se da por hecha.');
+    }
+
+    $lineas = [];
+    $codigo = 0;
+
+    exec(
+        escapeshellarg((string) $python).' '.escapeshellarg(__DIR__.'/navegador/pantalla-resultado.py').' '
+        .escapeshellarg(__DIR__.'/../build/pantalla-resultado').' 2>&1',
+        $lineas,
+        $codigo,
+    );
+
+    expect($codigo)->toBe(0, "La verificación en navegador de la pantalla de cierre falló:\n".implode("\n", $lineas));
+
+    // Las cuatro páginas completas × dos navegadores tienen que reportar el foco
+    // en el <h1> y el aviso lleno tras el copiado. Si el banco se quedara sin
+    // páginas, el script diría «todo pasa» sobre nada.
+    expect(count(array_filter($lineas, fn (string $l) => str_contains($l, 'foco=h1'))))->toBe(8,
+        "Los ocho recorridos de la pantalla completa tienen que poner el foco en el <h1>:\n".implode("\n", $lineas));
+    expect(count(array_filter($lineas, fn (string $l) => str_contains($l, 'cadena=3/3'))))->toBe(8,
+        "Los tres eslabones del copiado (portapapeles, execCommand y selección) tienen que responder:\n".implode("\n", $lineas));
+    expect(count(array_filter($lineas, fn (string $l) => str_contains($l, 'no-roba-foco'))))->toBe(2,
+        "La tarjeta con autofocus=\"false\" tiene que dejar el foco donde estaba en los dos navegadores:\n".implode("\n", $lineas));
+});

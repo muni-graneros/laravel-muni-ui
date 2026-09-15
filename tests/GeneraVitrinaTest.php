@@ -212,6 +212,66 @@ function ejemplosDeVitrina(): array
         // región viva vacía, diálogo oculto); los estados visibles los mide su propio banco
         // (build/sesion-guardia/, tests/navegador/guardia-de-sesion.py) en los dos temas.
         'sesion-guardia' => '<x-muni::sesion-guardia id="vitrina-sesion" expira-en="2030-01-01T12:00:00-03:00" renovar-url="#" salir-url="#" ingresar-url="#" duracion="7200" />',
+        // Entradas devueltas por los agentes del workflow de cierre del backlog.
+        'toast-host' => '<div style="position:relative;min-height:240px;transform:translateZ(0)" x-data x-init="$nextTick(() => { [[\'danger\', \'No se pudo guardar\', \'El RUT ya tiene licencia clase B vigente.\'], [\'ok\', \'Solicitud ingresada\', \'Solicitud N.º 2026-4831 ingresada — derivada a Obras.\']].forEach(([tone, title, message]) => window.dispatchEvent(new CustomEvent(\'muni-toast\', { detail: { tone, title, message, duration: 0 } }))) })"><x-muni::toast-host /></div>',
+        'data-table' => '<x-muni::data-table caption="Patentes morosas — cobranza" :columns="[\'Rol\', \'Contribuyente\', \'Giro\', \'Deuda\', \'Acciones\']">'
+            .'<tr data-muni-row><td class="muni-num">4501-2</td><td>Ana Soto Miranda</td><td>Almacén de abarrotes</td><td class="muni-num">$ 320.500</td>'
+            .'<td><x-muni::button variant="ghost" size="sm" href="#patente-4501">Ver</x-muni::button></td></tr>'
+            .'<tr data-muni-row class="muni-row--danger"><td class="muni-num">4502-9</td><td>Luis Pérez Vidal</td><td>Patente de alcoholes</td><td class="muni-num">$ 1.240.000</td>'
+            .'<td><x-muni::button variant="ghost" size="sm" href="#patente-4502">Ver</x-muni::button></td></tr>'
+            .'</x-muni::data-table>'
+            .'<x-muni::data-table densidad="compacta" caption="Patentes morosas — fila compacta" :columns="[\'Rol\', \'Contribuyente\', \'Giro\', \'Deuda\', \'Acciones\']">'
+            .'<tr data-muni-row><td class="muni-num">4503-7</td><td>Rosa Díaz Núñez</td><td>Peluquería</td><td class="muni-num">$ 98.000</td>'
+            .'<td><x-muni::button variant="ghost" size="sm" href="#patente-4503">Ver</x-muni::button></td></tr>'
+            .'<tr data-muni-row class="muni-row--danger"><td class="muni-num">4504-5</td><td>Carlos Muñoz Rivas</td><td>Restaurante</td><td class="muni-num">$ 2.104.900</td>'
+            .'<td><x-muni::button variant="ghost" size="sm" href="#patente-4504">Ver</x-muni::button></td></tr>'
+            .'</x-muni::data-table>',
+        'tabs-ruta' => '<x-muni::tabs-ruta label="Secciones del vecino" actual="vecino.documentos" :items="['
+            .'[\'etiqueta\' => \'Solicitudes\', \'href\' => \'#solicitudes\', \'clave\' => \'vecino.solicitudes\', \'badge\' => 3, \'badgeLabel\' => \'solicitudes abiertas\'],'
+            .'[\'etiqueta\' => \'Documentos\', \'href\' => \'#documentos\', \'clave\' => \'vecino.documentos\', \'badge\' => 2, \'badgeLabel\' => \'documentos adjuntos\'],'
+            .'[\'etiqueta\' => \'Historial de contactos\', \'href\' => \'#contactos\', \'clave\' => \'vecino.contactos\'],'
+            .']" />',
+        'description-list' => '<x-muni::description-list label="Datos del solicitante">'
+            .'<x-muni::description-item label="RUT" mono>12.345.678-9</x-muni::description-item>'
+            .'<x-muni::description-item label="Nombre completo">Ana Soto Miranda</x-muni::description-item>'
+            .'<x-muni::description-item label="Domicilio">Manuel Rodríguez 545, Graneros</x-muni::description-item>'
+            .'<x-muni::description-item label="Clase solicitada">B — no profesional</x-muni::description-item>'
+            .'<x-muni::description-item label="Estado"><x-muni::badge tone="warn">Por vencer</x-muni::badge></x-muni::description-item>'
+            .'<x-muni::description-item label="Correo" />'
+            .'<x-muni::description-item label="Derechos municipales" mono>$ 48.230</x-muni::description-item>'
+            .'</x-muni::description-list>',
+        'record-list' => '<x-muni::record-list label="Mis solicitudes"><x-muni::record-item tone="warn" folio="AV-2026-4821" href="#solicitud-4821"><x-slot:title>Poda de árbol en Manuel Rodríguez 545</x-slot:title><x-slot:meta>Ingresada el 3 de septiembre · Aseo y Ornato</x-slot:meta><x-slot:actions><x-muni::button variant="ghost" href="#solicitud-4821">Ver detalle</x-muni::button></x-slot:actions></x-muni::record-item><x-muni::record-item tone="ok" folio="AV-2026-4712" href="#solicitud-4712"><x-slot:title>Retiro de escombros en Los Aromos 120</x-slot:title><x-slot:meta>Cerrada el 28 de agosto · Aseo y Ornato</x-slot:meta></x-muni::record-item><x-muni::record-item tone="danger" folio="AV-2026-4655" href="#solicitud-4655"><x-slot:title>Permiso de ocupación de vereda</x-slot:title><x-slot:meta>Rechazada el 12 de agosto · Rentas y Patentes</x-slot:meta></x-muni::record-item></x-muni::record-list>',
+        'input-password' => '<x-muni::input-password name="clave_nueva" label="Clave nueva" autocomplete="new-password" hint="Al menos 12 caracteres, con una mayúscula y un número." />',
+        'pantalla-resultado' => '<x-muni::pantalla-resultado :autofocus="false" title="Su solicitud fue recibida" message="La Dirección de Tránsito la revisará en un plazo de 5 días hábiles." folio="2026-04871" print-href="/comprobante/2026-04871" exit-href="/" exit-label="Volver al inicio">Le llegará un correo cuando cambie el estado de su solicitud.</x-muni::pantalla-resultado>',
+        'pantalla-bloqueo' => '<x-muni::pantalla-bloqueo modo="pagina" :autofoco="false" nombre="María Fernanda Soto" cargo="Atención al Vecino · Mesón 2" accion="#desbloquear" otro-url="#salir" error="La contraseña no coincide. Vuelve a intentarlo." />',
+        'pii' => '<x-muni::pii label="RUT" name="rut" masked="12.***.***-9" class="muni-num">12.345.678-9</x-muni::pii> <x-muni::pii label="Diagnóstico" name="diagnostico" /> <x-muni::pii label="Correo" name="correo" masked="a****@example.cl" revealed>ana.soto@example.cl</x-muni::pii>',
+        'formulario-tramite' => '<x-muni::formulario-tramite title="Solicitud de patente comercial" '
+    .'subtitle="Ingreso presencial en el mesón de Rentas" action="/patentes" cancel-href="/patentes" '
+    .'requisitos-note="Sin los cuatro requisitos la solicitud queda observada." '
+    .':requisitos="[[\'texto\' => \'Cédula de identidad vigente\', \'cumplido\' => true, \'nota\' => \'Ya está en el expediente\'], '
+    .'[\'texto\' => \'Certificado de dominio\', \'nota\' => \'Emitido hace menos de 60 días\'], '
+    .'[\'texto\' => \'Informe sanitario de la SEREMI\', \'campo\' => \'patente_informe\'], '
+    .'[\'texto\' => \'Giro declarado\', \'campo\' => \'patente_giro\']]">'
+    .'<x-muni::formulario-seccion legend="Identificación del solicitante" description="Los datos del titular, tal como están en la cédula.">'
+    .'<x-muni::input label="RUT del titular" name="patente_rut" hint="Formato 12.345.678-9" required required-text-visible />'
+    .'<x-muni::input label="Nombre completo" name="patente_nombre" required />'
+    .'<x-muni::input label="Correo de contacto" name="patente_correo" type="email" />'
+    .'<x-muni::input label="Teléfono" name="patente_telefono" />'
+    .'</x-muni::formulario-seccion>'
+    .'<x-muni::formulario-seccion legend="Antecedentes del local" columns="1">'
+    .'<x-muni::input label="Dirección del local" name="patente_direccion" hint="Calle, número y comuna" />'
+    .'<x-muni::textarea label="Giro solicitado" name="patente_giro" hint="Describe la actividad" :maxlength="500" />'
+    .'</x-muni::formulario-seccion>'
+    .'<x-muni::formulario-seccion legend="Documentos adjuntos">'
+    .'<x-muni::file-dropzone name="patente_informe" label="Informe sanitario" class="muni-fsec__ancho" />'
+    .'</x-muni::formulario-seccion>'
+    .'</x-muni::formulario-tramite>',
+        'ajustes-cuenta' => '<x-muni::ajustes-cuenta id="vitrina-ajc-seguridad" default="1" :sessions="[[\'id\' => \'s-actual\', \'device\' => \'Chrome · Windows 11\', \'detail\' => \'Graneros, Región de O\\\'Higgins · ahora mismo\', \'current\' => true],[\'id\' => \'s-iphone\', \'device\' => \'Safari · iPhone\', \'detail\' => \'Rancagua, Región de O\\\'Higgins · hace 2 horas\', \'current\' => false],]" sessions-action="/mi-cuenta/sesiones/cerrar" danger-action="/mi-cuenta/eliminar" danger-word="ELIMINAR" danger-method="delete" danger-description="La cuenta deja de existir y el acceso se revoca en todos los sistemas."><x-slot:perfil><x-muni::card title="Datos personales"><x-muni::input label="Correo institucional" name="correo" value="c.bugueno@graneros.cl" /></x-muni::card></x-slot:perfil><x-slot:preferencias><x-muni::card title="Accesibilidad"><x-muni::switch label="Reducir animaciones" name="mov" /></x-muni::card></x-slot:preferencias></x-muni::ajustes-cuenta><x-muni::ajustes-cuenta id="vitrina-ajc-peligro" default="3" :sessions="[[\'id\' => \'s-actual\', \'device\' => \'Chrome · Windows 11\', \'detail\' => \'Graneros, Región de O\\\'Higgins · ahora mismo\', \'current\' => true],[\'id\' => \'s-iphone\', \'device\' => \'Safari · iPhone\', \'detail\' => \'Rancagua, Región de O\\\'Higgins · hace 2 horas\', \'current\' => false],]" sessions-action="/mi-cuenta/sesiones/cerrar" danger-action="/mi-cuenta/eliminar" danger-word="ELIMINAR" danger-method="delete" danger-description="La cuenta deja de existir y el acceso se revoca en todos los sistemas."><x-slot:perfil><x-muni::card title="Datos personales"><x-muni::input label="Correo institucional" name="correo" value="c.bugueno@graneros.cl" /></x-muni::card></x-slot:perfil><x-slot:preferencias><x-muni::card title="Accesibilidad"><x-muni::switch label="Reducir animaciones" name="mov" /></x-muni::card></x-slot:preferencias></x-muni::ajustes-cuenta>',
+        'bulk-bar' => '<form method="post" action="#"><x-muni::bulk-bar for="vitrina-bandeja" label="Acciones sobre las solicitudes" count-singular="1 solicitud seleccionada" count-plural=":n solicitudes seleccionadas"><button type="submit" name="accion" value="derivar">Derivar a Obras</button></x-muni::bulk-bar><x-muni::data-table id="vitrina-bandeja" selectable :columns="[\'Folio\', \'Vecino\', \'Materia\', \'Detalle\']" caption="Bandeja de requerimientos"><tr data-muni-row><td><input type="checkbox" data-muni-pick name="ids[]" value="4821" checked aria-label="Seleccionar la solicitud 4821"></td><td class="muni-num">4821</td><td>Ana Soto Miranda</td><td>Alumbrado público</td><td><a href="#detalle-4821" data-muni-open aria-label="Ver la solicitud 4821">Ver</a></td></tr><tr data-muni-row class="muni-row--danger"><td><input type="checkbox" data-muni-pick name="ids[]" value="4823" aria-label="Seleccionar la solicitud 4823"></td><td class="muni-num">4823</td><td>Rosa Díaz Núñez</td><td>Tapa de cámara suelta</td><td><a href="#detalle-4823" data-muni-open aria-label="Ver la solicitud 4823">Ver</a></td></tr></x-muni::data-table></form>',
+        'agenda-horas' => '<x-muni::agenda-horas name="hora_examen" mes="2026-05" value="2026-05-12" label="Agenda de exámenes de licencia de conducir" accion="Reservar la hora" :franjas="[\'2026-05-12\' => [[\'inicio\' => \'09:00\', \'fin\' => \'09:30\', \'estado\' => \'libre\'], [\'inicio\' => \'09:30\', \'fin\' => \'10:00\', \'estado\' => \'tomada\', \'detalle\' => \'Reservada\'], [\'inicio\' => \'10:00\', \'fin\' => \'10:30\', \'estado\' => \'libre\'], [\'inicio\' => \'10:30\', \'fin\' => \'11:00\', \'estado\' => \'bloqueada\', \'detalle\' => \'Mantención del vehículo de examen\']], \'2026-05-13\' => [[\'inicio\' => \'09:00\', \'fin\' => \'09:30\', \'estado\' => \'tomada\'], [\'inicio\' => \'09:30\', \'fin\' => \'10:00\', \'estado\' => \'libre\']], \'2026-05-14\' => [[\'inicio\' => \'09:00\', \'fin\' => \'09:30\', \'estado\' => \'tomada\']]]" />',
+        'asistente' => '<x-muni::asistente :steps="[\'Identificación\', [\'label\' => \'Antecedentes médicos\', \'hint\' => \'Informe del médico tratante\'], [\'label\' => \'Documentos\', \'state\' => \'error\'], [\'label\' => \'Declaración\', \'state\' => \'skipped\'], \'Revisión\']" :current="1" title="Solicitud de credencial de discapacidad" subtitle="Municipalidad de Graneros · Dirección de Desarrollo Comunitario" action="/credencial" nav-name="_ir_a_paso" skippable :csrf="false" :focus-step="false" step-subtitle="Los antecedentes que entregó el médico tratante."><x-muni::input label="Nombre del médico tratante" name="medico" hint="Como aparece en el informe" required /></x-muni::asistente>',
+        'ring' => '<x-muni::ring :value="31" :max="40" label="Cupos ocupados hoy" />',
+        'gob-escudo' => '<x-muni::topbar system="Central de cámaras" subtitle="Turno de noche"><x-slot:logo><x-muni::gob-escudo size="26" /></x-slot:logo></x-muni::topbar>',
     ];
 }
 

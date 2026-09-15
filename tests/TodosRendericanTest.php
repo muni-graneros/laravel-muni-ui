@@ -39,6 +39,11 @@ function propsObligatorias(): array
         'tab-panel' => ':index="0"',
         'selector-tema' => 'action="/preferencias/tema"',
         'sesion-guardia' => 'expira-en="2026-09-13T15:30:00-03:00"',
+        // Componentes de la tanda de cierre del backlog con props sin defecto.
+        'description-item' => 'label="RUT"',
+        'pantalla-bloqueo' => 'nombre="María Fernanda Soto"',
+        'pii' => 'label="RUT"',
+        'plantilla-pantalla' => 'title="Inicio"',
     ];
 }
 

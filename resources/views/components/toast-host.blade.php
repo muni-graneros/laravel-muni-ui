@@ -367,7 +367,7 @@
            Filament solo se carga muni-ui-filament.css. */
         .muni-sr { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0; }
         .muni-toast { display:flex;align-items:flex-start;gap:10px;padding:12px 14px;
-            background:var(--muni-surface);border:1px solid var(--muni-border);border-left-width:3px;
+            background:var(--muni-surface);border:1px solid var(--muni-overlay-border, var(--muni-border));border-left-width:3px;
             border-radius:var(--muni-radius);box-shadow:var(--muni-shadow-lg);font-family:var(--muni-font-sans); }
         .muni-toast__glifo { flex-shrink:0;margin-top:1px; }
         .muni-toast__title { font-size:13px;font-weight:700;color:var(--muni-text);margin-bottom:1px; }

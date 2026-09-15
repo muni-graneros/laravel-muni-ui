@@ -20,9 +20,21 @@ dentro del panel solo se carga `muni-ui-filament.css`, DESIGN §7):
     anillo NO cuenta: dentro de Filament se computa transparente;
   · el objetivo táctil mide 44×44 px REALES —el de terreno, no el 24×24 mínimo
     de 2.5.8— tanto en el título como en el botón de la zona de acciones;
-  · la banda de estado se PINTA: 3 px de borde izquierdo, opaco, y a 3:1 contra
-    el fondo de la ficha (1.4.11); y la ficha SIN tono no pinta ninguna, para no
-    inventar un estado que nadie declaró;
+  · la banda de estado se PINTA: 3 px de borde izquierdo y opaco, en LOS SEIS
+    tonos (antes solo se abrían tres en el banco y los otros tres se daban por
+    buenos). Contra el fondo de la ficha se exigen 3:1 a los cinco tonos que
+    señalan un estado con carga —ok, warn, danger, info y accent—. `muted`
+    («Sin efecto») queda a propósito por debajo: su banda es --muni-border-2,
+    el mismo token que el punto `muted` de `timeline`, y mide 1,61:1 en ui
+    claro · 1,90:1 en ui oscuro · 1,68:1 en filament claro · 1,75:1 en filament
+    oscuro. No incumple 1.4.11 —ese criterio pide contraste a lo que hace falta
+    para ENTENDER el contenido, y el estado va además en palabras («Sin
+    efecto»), que sí pasan 4,5:1—, y bajarlo de relieve es justo lo que
+    significa: un registro sin efecto no compite por la atención con uno
+    rechazado. Lo que no se hace es afirmar que llega a 3:1, porque no llega;
+  · la ficha SIN tono no pinta ninguna banda de COLOR: su franja queda del mismo
+    color que el resto del recuadro, así que no inventa un estado que nadie
+    declaró y la tarjeta igual cierra por los cuatro lados;
   · el estado no cuelga del color: la etiqueta textual existe, tiene alto real y
     pasa su propio contraste;
   · el folio se pinta en tipografía mono (la firma `.muni-num`), que es la razón
@@ -52,13 +64,24 @@ NAVEGADORES = ("chromium", "firefox")
 # razón de ser del componente no tiene red.
 ANCHOS = (("escritorio", 1440, 900), ("telefono", 390, 780), ("estrecho", 320, 780))
 
-# Los títulos del banco, en orden del DOM.
-TITULOS = (
-    "Poda de árbol en Manuel Rodríguez 545",
-    "Retiro de escombros en Los Aromos 120",
-    "Permiso de ocupación de vereda",
-    "Consulta por corte de agua",
+# Las fichas del banco, en orden del DOM: título y tono declarado (None = el
+# anfitrión no declaró estado). Los SEIS tonos se abren en el navegador; medir
+# tres y dar por buenos los otros es lo que dejó pasar que `muted` no llega a
+# 3:1 contra la ficha.
+FICHAS = (
+    ("Poda de árbol en Manuel Rodríguez 545", "warn"),
+    ("Retiro de escombros en Los Aromos 120", "ok"),
+    ("Permiso de ocupación de vereda", "danger"),
+    ("Copia de certificado de residencia", "info"),
+    ("Reposición de luminaria en Los Aromos", "accent"),
+    ("Reclamo por ruido molesto", "muted"),
+    ("Consulta por corte de agua", None),
 )
+TITULOS = tuple(titulo for titulo, _ in FICHAS)
+# Los tonos que señalan un estado con carga: a estos se les exige 3:1 contra la
+# ficha. `muted` significa «sin efecto» y su banda es deliberadamente apagada
+# (ver el encabezado); el estado no cuelga de ella, va en palabras.
+TONOS_CON_CARGA = ("ok", "warn", "danger", "info", "accent")
 # El objetivo táctil de TERRENO que exige la ficha del componente: 44, no 24.
 TACTIL = 44
 
@@ -99,6 +122,10 @@ SONDA = r"""
     return {
       etiqueta: li.tagName,
       banda: { ancho: c.borderLeftWidth, estilo: c.borderLeftStyle, color: c.borderLeftColor },
+      // El resto del recuadro. Sin tono la banda tiene que valer esto MISMO: ni
+      // un color de estado inventado, ni un lado sin línea (la tarjeta abierta
+      // por la izquierda que dejaba el respaldo `transparent`).
+      borde: { ancho: c.borderTopWidth, estilo: c.borderTopStyle, color: c.borderTopColor },
       fondo: c.backgroundColor,
       transicion: c.transitionDuration,
       titulo: texto(enlace || li.querySelector('.muni-rec__titulo'), {
@@ -228,7 +255,7 @@ def verificar_estructura(d: dict, donde: str, fallos: list[str]) -> None:
         if not ficha["titulo"] or esperado not in ficha["titulo"]["texto"]:
             fallos.append(f"{donde}: falta el título «{esperado}».")
 
-    # Una parada por título (4) más el único control de acciones del banco.
+    # Una parada por título más el único control de acciones del banco.
     if d["enfocables"] != len(TITULOS) + 1:
         fallos.append(
             f"{donde}: el documento tiene {d['enfocables']} paradas de teclado y se esperaban "
@@ -240,32 +267,60 @@ def verificar_firma(d: dict, donde: str, fallos: list[str]) -> None:
     """Banda de estado, etiqueta en palabras, folio en mono y objetivo de 44px."""
     for i, ficha in enumerate(d["fichas"]):
         etiqueta = (ficha["titulo"] or {}).get("texto", f"#{i}")[:40]
+        tono = FICHAS[i][1] if i < len(FICHAS) else None
         conTono = ficha["tono"] is not None
+
+        if conTono != (tono is not None):
+            fallos.append(
+                f"{donde} «{etiqueta}»: el banco declara tono={tono!r} y la ficha "
+                f"{'sí' if conTono else 'no'} pinta etiqueta de estado."
+            )
 
         ancho = float(re.sub(r"[^\d.]", "", ficha["banda"]["ancho"]) or 0)
 
+        # La franja mide 3px SIEMPRE, con tono y sin él: ese ancho de reserva es
+        # lo que mantiene alineadas al mismo margen las fichas con y sin estado.
+        if ancho < 3:
+            fallos.append(
+                f"{donde} «{etiqueta}»: la banda mide {ancho}px; la firma del sistema es una franja "
+                "de 3px al borde de la fila (DESIGN §9)."
+            )
+        # Y nunca es «nada»: con `transparent` la tarjeta salía con línea en tres
+        # lados y ninguna en el cuarto, abierta por la izquierda.
+        if transparente(ficha["banda"]["color"]) or ficha["banda"]["estilo"] in ("none", "hidden"):
+            fallos.append(
+                f"{donde} «{etiqueta}»: la banda no se pinta ({ficha['banda']['color']}, "
+                f"{ficha['banda']['estilo']}): la ficha queda abierta por la izquierda."
+            )
+
         if conTono:
-            if ancho < 3:
-                fallos.append(
-                    f"{donde} «{etiqueta}»: la banda de estado mide {ancho}px; la firma del sistema "
-                    "es una franja de 3px al borde de la fila (DESIGN §9)."
-                )
-            if transparente(ficha["banda"]["color"]):
-                fallos.append(f"{donde} «{etiqueta}»: la banda de estado es transparente.")
-            else:
-                r = contraste(ficha["banda"]["color"], ficha["fondo"])
+            r = contraste(ficha["banda"]["color"], ficha["fondo"])
+
+            if tono in TONOS_CON_CARGA:
                 if r is not None and r < 3.0:
                     fallos.append(
-                        f"{donde} «{etiqueta}»: la banda da {r:.2f}:1 contra la ficha (<3, WCAG 1.4.11)."
+                        f"{donde} «{etiqueta}» (tono {tono}): la banda da {r:.2f}:1 contra la ficha "
+                        "(<3, WCAG 1.4.11)."
                     )
+            elif ficha["banda"]["color"] == ficha["borde"]["color"]:
+                # `muted` es deliberadamente apagado, pero tiene que distinguirse
+                # de «sin estado declarado»: si coincidiera con el resto del
+                # recuadro, «Sin efecto» y una ficha sin tono se verían iguales.
+                fallos.append(
+                    f"{donde} «{etiqueta}» (tono {tono}): la banda vale lo mismo que el resto del "
+                    f"recuadro ({ficha['borde']['color']}): no se distingue de una ficha sin estado."
+                )
+
             if ficha["tono"]["alto"] < 8:
                 fallos.append(f"{donde} «{etiqueta}»: la etiqueta de estado no tiene alto real.")
         else:
-            # Sin tono declarado no se inventa un estado: ni banda de color ni palabra.
-            if not transparente(ficha["banda"]["color"]):
+            # Sin tono declarado no se inventa un estado: la franja queda del
+            # mismo color que el resto del recuadro, ni palabra ni color propio.
+            if ficha["banda"]["color"] != ficha["borde"]["color"]:
                 fallos.append(
                     f"{donde} «{etiqueta}»: pinta banda de estado ({ficha['banda']['color']}) sin que "
-                    "el anfitrión haya declarado tono."
+                    f"el anfitrión haya declarado tono; el resto del recuadro es "
+                    f"{ficha['borde']['color']}."
                 )
 
         if ficha["folio"] and "mono" not in ficha["folio"]["familia"].lower():
@@ -339,7 +394,9 @@ def verificar_teclado(pagina, donde: str, fallos: list[str]) -> str:
     pagina.evaluate("() => { document.activeElement && document.activeElement.blur(); window.scrollTo(0, 0); }")
     pagina.keyboard.press("Tab")
 
-    esperados = [TITULOS[0], "Ver detalle", TITULOS[1], TITULOS[2], TITULOS[3]]
+    # El título de la primera ficha, su botón de acción —el único del banco— y
+    # después el título de cada una de las demás, en orden del DOM.
+    esperados = [TITULOS[0], "Ver detalle", *TITULOS[1:]]
     visto: list[str] = []
 
     for i, esperado in enumerate(esperados):

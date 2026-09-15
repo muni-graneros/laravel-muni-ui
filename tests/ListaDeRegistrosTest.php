@@ -149,6 +149,75 @@ it('es un <ul> con role="list" y los registros son <li>, no divs con rol inventa
     );
 });
 
+it('el <ul> solo tiene <li> por hijo: el bloque de estilos NO va en la ficha', function () {
+    /*
+     * El modelo de contenido de `<ul>` admite `<li>` y elementos de soporte de
+     * script (`script`, `template`). Un `<style>` ahí es HTML inválido, y el
+     * Decreto N°1/2015 SEGPRES obliga a los sitios del Estado a los estándares
+     * del W3C. Como la ficha se renderiza DENTRO de la lista, su bloque de una
+     * sola emisión salía como hermano de los `<li>`.
+     *
+     * No lo caza ninguna reja: axe (`only-listitems`) salta todo hijo que el
+     * lector de pantalla no ve, y un `<style>` es `display:none`. Por eso la
+     * comprobación mira el ÁRBOL, y por eso es exactamente el mismo arreglo que
+     * la ficha hermana ya documentó en `description-item.blade.php`: las clases
+     * del par las declara el CONTENEDOR, que es su único padre válido.
+     */
+    $html = listaDeRegistros('label="Mis solicitudes"');
+
+    $doc = new DOMDocument;
+    $previo = libxml_use_internal_errors(true);
+    $doc->loadHTML('<?xml encoding="utf-8" ?><div>'.$html.'</div>', LIBXML_NOWARNING | LIBXML_NOERROR);
+    libxml_clear_errors();
+    libxml_use_internal_errors($previo);
+
+    $ul = (new DOMXPath($doc))->query('//ul')->item(0);
+    expect($ul)->not->toBeNull('No se emitió la lista.');
+
+    $hijos = [];
+
+    foreach ($ul->childNodes as $hijo) {
+        if ($hijo->nodeType === XML_ELEMENT_NODE) {
+            $hijos[] = strtolower($hijo->nodeName);
+        }
+    }
+
+    expect(array_values(array_unique($hijos)))->toBe(['li'],
+        'El <ul> tiene hijos que no son <li> ('.implode(', ', $hijos).'). El modelo de contenido de '.
+        '<ul> solo admite <li>, <script> y <template>: un <style> suelto entre las fichas es HTML '.
+        'inválido (Decreto N°1/2015 SEGPRES) y axe no lo delata porque salta los hijos invisibles.'
+    );
+
+    expect((bool) preg_match('/<style\b/i', fuenteDeRegistrosSinComentarios('record-item')))->toBeFalse(
+        'La ficha lleva su propio bloque <style> y se renderiza dentro del <ul>: eso es justo lo '.
+        'que `description-item` documentó y evitó a propósito. Las clases del par las declara el '.
+        '@once de `record-list`, que es su único padre válido.'
+    );
+});
+
+it('el contenedor declara TODAS las clases del par, o la ficha sale sin estilo', function () {
+    /*
+     * Mover el bloque al contenedor solo sirve si llega completo: si una clase
+     * de la ficha se queda por el camino, el componente se ve roto justo donde
+     * más importa —el panel Filament, donde `muni-ui.css` no se carga (DESIGN
+     * §7)— y ningún test de marcado lo nota.
+     */
+    $css = fuenteDeRegistros('record-list');
+
+    $clases = [
+        '.muni-rec', '.muni-rec__item', '.muni-rec__cuerpo', '.muni-rec__cabeza', '.muni-rec__tono',
+        '.muni-rec__folio', '.muni-rec__titulo', '.muni-rec__meta', '.muni-rec__extra',
+        '.muni-rec__acciones', '.muni-rec__sr', '.muni-num',
+    ];
+
+    foreach ($clases as $clase) {
+        expect(str_contains($css, $clase))->toBeTrue(
+            "El @once de `record-list` no declara «{$clase}», y la ficha ya no trae bloque propio: ".
+            'dentro de un panel Filament esa clase no existiría en ninguna parte.'
+        );
+    }
+});
+
 it('la lista lleva nombre accesible solo si el anfitrión lo da, y nunca dos a la vez', function () {
     $conNombre = listaDeRegistros('label="Mis solicitudes"');
 
@@ -220,7 +289,7 @@ it('el estado pinta la banda izquierda Y se dice con palabras', function () {
         'distingue el rojo VE la pantalla: la etiqueta va en texto visible, como en timeline.'
     );
 
-    $banda = reglaDeRegistros('record-item', '.muni-rec__item');
+    $banda = reglaDeRegistros('record-list', '.muni-rec__item');
 
     expect((bool) preg_match('/border-left\s*:\s*3px/i', $banda))->toBeTrue(
         'La banda no se dibuja con un borde de 3px. Va como BORDE y no como box-shadow inset '.
@@ -308,7 +377,7 @@ it('define `.muni-num` en su propio @once, porque en el portal no hay ninguna ta
      * defecto exacto que el componente promete evitar. Es DESIGN §7: lo que un
      * componente necesita para verse bien viaja con el componente.
      */
-    $num = reglaDeRegistros('record-item', '.muni-num');
+    $num = reglaDeRegistros('record-list', '.muni-num');
 
     expect($num !== '')->toBeTrue(
         'El componente no declara `.muni-num` en su bloque de estilos. En una página sin '.
@@ -323,7 +392,7 @@ it('define `.muni-num` en su propio @once, porque en el portal no hay ninguna ta
 });
 
 it('el área táctil es la de terreno: 44 px, no 24', function () {
-    $enlace = reglaDeRegistros('record-item', 'a.muni-rec__titulo');
+    $enlace = reglaDeRegistros('record-list', 'a.muni-rec__titulo');
 
     expect((bool) preg_match('/min-height\s*:\s*(\d+)px/', $enlace, $m) && (int) $m[1] >= 44)->toBeTrue(
         'El enlace de la ficha no llega a 44px de alto. La ficha del componente lo dice explícito: '.
@@ -331,7 +400,7 @@ it('el área táctil es la de terreno: 44 px, no 24', function () {
         'el sol encima. Regla: '.$enlace
     );
 
-    $acciones = reglaDeRegistros('record-item', '.muni-rec__acciones a, .muni-rec__acciones button');
+    $acciones = reglaDeRegistros('record-list', '.muni-rec__acciones a, .muni-rec__acciones button');
 
     expect((bool) preg_match('/min-height\s*:\s*(\d+)px/', $acciones, $m) && (int) $m[1] >= 44)->toBeTrue(
         'Los controles de la zona de acciones no llegan a 44px de alto: '.$acciones
@@ -546,7 +615,7 @@ it('los ids y el HTML son estables entre renders: nada de uniqid()', function ()
 // ---------------------------------------------------------------------------
 
 it('el foco se dibuja con outline y la cadena de respaldo completa', function () {
-    $foco = reglaDeRegistros('record-item', '.muni-rec__titulo:focus-visible');
+    $foco = reglaDeRegistros('record-list', '.muni-rec__titulo:focus-visible');
 
     expect($foco !== '')->toBeTrue('El enlace de la ficha no declara ninguna regla de foco.');
 
@@ -569,7 +638,7 @@ it('el movimiento se apaga solo, también dentro de un panel Filament', function
 
     expect((bool) preg_match(
         '/@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{\s*\.muni-rec__item\s*\{[^}]*transition\s*:\s*none\s*!important/i',
-        fuenteDeRegistrosSinComentarios('record-item')
+        fuenteDeRegistrosSinComentarios('record-list')
     ))->toBeTrue(
         'Falta la regla propia de movimiento reducido. Dentro de un panel Filament `muni-ui.css` no '.
         'se carga (DESIGN §7) y la hoja del panel NO baja --muni-dur: medido en tabs-ruta, la '.
@@ -595,16 +664,19 @@ it('la variable local de la banda no usurpa el espacio de nombres --muni-', func
      * declarado en las DOS hojas publicables. Una variable local del componente
      * no es un token del sistema: va con prefijo propio.
      */
-    $fuente = fuenteDeRegistrosSinComentarios('record-item');
+    foreach (['record-list', 'record-item'] as $componente) {
+        $fuente = fuenteDeRegistrosSinComentarios($componente);
 
-    expect((bool) preg_match('/--muni-[a-z0-9-]+\s*:/i', $fuente))->toBeFalse(
-        'El componente DECLARA un --muni-*: los tokens del sistema se definen en las dos hojas del '.
-        'paquete, no dentro de un componente. La variable de la banda es local y se llama --mrec-banda.'
-    );
+        expect((bool) preg_match('/--muni-[a-z0-9-]+\s*:/i', $fuente))->toBeFalse(
+            "«{$componente}» DECLARA un --muni-*: los tokens del sistema se definen en las dos hojas ".
+            'del paquete, no dentro de un componente. La variable de la banda es local y se llama '.
+            '--mrec-banda.'
+        );
+    }
 });
 
 it('en el papel la ficha no se parte y los botones no se imprimen', function () {
-    $impresion = fuenteDeRegistrosSinComentarios('record-item');
+    $impresion = fuenteDeRegistrosSinComentarios('record-list');
 
     expect((bool) preg_match('/@media\s+print\s*\{[^}]*\.muni-rec__item\s*\{[^}]*break-inside\s*:\s*avoid/is', $impresion))->toBeTrue(
         'La ficha se parte entre dos páginas al imprimir la nómina: el folio en una hoja y el '.
@@ -635,10 +707,12 @@ it('los dos se renderizan SIN UNA SOLA PROP, que es como los llama el candado de
 
 it('la entrada de la vitrina renderiza la bandeja del vecino con datos reales', function () {
     /*
-     * La misma cadena que va en `ejemplosDeVitrina()` de GeneraVitrinaTest, que
-     * es lo que la reja de accesibilidad abre en los dos temas y las dos paletas.
-     * Se comprueba acá porque ese arreglo vive en un archivo compartido: si la
-     * entrada se copia mal, la reja mediría una tarjeta vacía y no lo diría.
+     * La cadena que el par APORTA para `ejemplosDeVitrina()` de GeneraVitrinaTest
+     * —el archivo compartido que aplica el orquestador, no este agente—. Mientras
+     * no esté allá, `npm run a11y:vitrina` no cubre el par (DESIGN §11) y lo que
+     * hay medido es la reja sobre el banco propio de `build/lista-de-registros/`.
+     * Se comprueba acá para que la cadena no se copie rota: si se copiara mal, la
+     * reja mediría una tarjeta vacía y no lo diría.
      */
     $html = Blade::render(entradaDeVitrinaDeRegistros());
 
@@ -713,9 +787,27 @@ it('genera el banco de navegador en build/lista-de-registros/', function () {
         .'<x-slot:title>Permiso de ocupación de vereda</x-slot:title>'
         .'<x-slot:meta>Rechazada el 12 de agosto · Rentas y Patentes</x-slot:meta>'
         .'</x-muni::record-item>'
+        /* LOS SEIS TONOS, no tres. El revisor demostró que el banco medía warn,
+           ok y danger y daba por verificados los otros tres: la afirmación de
+           «la banda se pinta y llega a 3:1» era más ancha que lo medido, y
+           `muted` —la más floja de las seis— era justamente una de las que no
+           se abrían en ningún navegador. Ahora se miden las seis. */
+        .'<x-muni::record-item tone="info" folio="AV-2026-4399" href="#solicitud-4399">'
+        .'<x-slot:title>Copia de certificado de residencia</x-slot:title>'
+        .'<x-slot:meta>Ingresada el 5 de agosto · Oficina de Partes</x-slot:meta>'
+        .'</x-muni::record-item>'
+        .'<x-muni::record-item tone="accent" folio="AV-2026-4380" href="#solicitud-4380">'
+        .'<x-slot:title>Reposición de luminaria en Los Aromos</x-slot:title>'
+        .'<x-slot:meta>En terreno desde el 4 de agosto · Alumbrado Público</x-slot:meta>'
+        .'</x-muni::record-item>'
+        .'<x-muni::record-item tone="muted" folio="AV-2026-4102" href="#solicitud-4102">'
+        .'<x-slot:title>Reclamo por ruido molesto</x-slot:title>'
+        .'<x-slot:meta>Desistida por el solicitante el 30 de julio</x-slot:meta>'
+        .'</x-muni::record-item>'
         /* Una ficha SIN tono: comprueba en el navegador que no se pinta ninguna
-           banda de color donde el anfitrión no declaró estado, y que igual queda
-           alineada con las demás. */
+           banda de COLOR donde el anfitrión no declaró estado —la franja queda
+           del mismo color que el resto del recuadro— y que la tarjeta igual
+           cierra por los cuatro lados y queda alineada con las demás. */
         .'<x-muni::record-item folio="AV-2026-4501" href="#solicitud-4501">'
         .'<x-slot:title>Consulta por corte de agua</x-slot:title>'
         .'<x-slot:meta>Respondida el 2 de agosto</x-slot:meta>'

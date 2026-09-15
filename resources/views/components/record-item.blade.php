@@ -116,9 +116,9 @@
      modelo entero rompería la minimización de la Ley 21.719 él solo.
 
      EL RUT Y LAS CIFRAS DE LA RANURA `meta` van en `<span class="muni-num">`: la
-     clase la declara este componente en su propio bloque de estilos, así que
-     funciona también en el portal del vecino, donde no hay ninguna tabla en la
-     página que la traiga.
+     clase la declara el bloque de estilos de `record-list` —el único padre
+     válido de esta ficha, ver el comentario del final—, así que funciona también
+     en el portal del vecino, donde no hay ninguna tabla en la página que la traiga.
 
      NO HAY «TARJETA ENTERA PULSABLE». El truco de estirar el enlace con un
      `::after` que tapa la ficha impide seleccionar el texto que hay debajo, y
@@ -158,81 +158,19 @@
     @isset($actions)<div class="muni-rec__acciones">{{ $actions }}</div>@endisset
 </li>
 
-{{-- Lo que el componente necesita para verse bien viaja con el componente
-     (DESIGN §7): dentro de un panel Filament `muni-ui.css` no se carga y una
-     clase declarada solo ahí no existiría. Todo color sale de un token con rama
-     clara y rama oscura; el único literal es el tercer respaldo del foco. --}}
-@once
-    <style>
-        .muni-rec__item { display:flex; flex-wrap:wrap; align-items:flex-start; gap:12px;
-            padding:12px 14px; background:var(--muni-surface);
-            border:1px solid var(--muni-border);
-            {{-- La banda de estado va como BORDE y no como `box-shadow: inset`
-                 —que es como la pinta data-table— porque esto se imprime: las
-                 sombras y los fondos no salen por impresora y los bordes sí. Es
-                 la misma conversión que data-table tuvo que escribir dentro de
-                 su bloque de impresión, hecha desde el principio.
-                 Transparente cuando no hay tono declarado, para que las fichas
-                 con y sin estado sigan alineadas al mismo margen. --}}
-            border-left:3px solid var(--mrec-banda, transparent);
-            border-radius:var(--muni-radius);
-            box-shadow:var(--muni-shadow);
-            transition:box-shadow var(--muni-dur) var(--muni-ease),background var(--muni-dur) var(--muni-ease); }
-        .muni-rec__item:hover { background:var(--muni-surface-2); box-shadow:var(--muni-shadow-md); }
-        {{-- 16rem de base: la ficha ocupa una columna y las acciones bajan solas
-             cuando no caben, sin una sola consulta de medios ni de contenedor. --}}
-        .muni-rec__cuerpo { flex:1 1 16rem; min-width:0; }
-        .muni-rec__cabeza { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
-        {{-- El estado en palabras, con los mismos tokens que timeline: --muni-muted
-             sobre --muni-surface-3, un par ya medido en las cuatro paletas. Un
-             color de texto por tono obligaría a auditar seis pares nuevos en dos
-             temas para no ganar nada, porque la información ya la lleva la palabra. --}}
-        .muni-rec__tono { flex-shrink:0; padding:1px 7px; border-radius:999px;
-            font-family:var(--muni-font-mono); font-size:10.5px; font-weight:600; line-height:1.5;
-            letter-spacing:.02em; color:var(--muni-muted); background:var(--muni-surface-3);
-            border:1px solid var(--muni-border); }
-        .muni-rec__folio { font-size:11.5px; color:var(--muni-hint); overflow-wrap:anywhere; }
-        .muni-rec__titulo { display:block; margin:3px 0 0; font-size:14px; font-weight:600;
-            line-height:1.35; color:var(--muni-text); overflow-wrap:anywhere; }
-        {{-- El área táctil de TERRENO, 44px, y solo sobre lo que se pulsa: un
-             título que no es enlace no es un objetivo y estirarlo a 44px sería
-             aire muerto en una lista que vive de la densidad. --}}
-        a.muni-rec__titulo { display:inline-flex; align-items:center; min-height:44px; min-width:44px;
-            color:var(--muni-accent-strong); text-decoration:underline; text-underline-offset:3px; }
-        a.muni-rec__titulo:hover { color:var(--muni-accent); }
-        {{-- El outline es el indicador REAL: dentro de Filament la cadena de
-             sombras de Tailwind se come cualquier box-shadow (DESIGN §5). --}}
-        .muni-rec__titulo:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676));
-            outline-offset:2px; border-radius:var(--muni-radius-sm);
-            {{-- Que el foco no quede tapado por la barra superior fija del armazón. --}}
-            scroll-margin-top:calc(var(--muni-topbar-h) + 8px); }
-        .muni-rec__meta { margin:3px 0 0; font-size:12.5px; line-height:1.5; color:var(--muni-muted);
-            overflow-wrap:anywhere; }
-        .muni-rec__extra { margin:6px 0 0; font-size:12.5px; line-height:1.5; color:var(--muni-muted); }
-        .muni-rec__acciones { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-left:auto; }
-        {{-- El piso del objetivo táctil, para el botón de solo icono que el
-             consumidor meta acá: 44×44 en terreno, no 24×24. --}}
-        .muni-rec__acciones a, .muni-rec__acciones button { display:inline-flex; align-items:center;
-            justify-content:center; min-height:44px; min-width:44px; }
-        .muni-rec__sr { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
-            clip-path:inset(50%); white-space:nowrap; border:0; }
-        {{-- `.muni-num` vive hoy SOLO dentro del bloque de estilos de data-table,
-             y este componente existe justamente para las pantallas donde no hay
-             ninguna tabla: sin esta declaración el folio saldría en sans
-             proporcional, que es el defecto que el componente promete evitar.
-             Misma definición, byte a byte, que la de data-table. --}}
-        .muni-num { font-family: var(--muni-font-mono); font-variant-numeric: tabular-nums; }
-        {{-- --muni-dur ya baja a 0 ms con la preferencia... en muni-ui.css. Dentro
-             de un panel Filament esa hoja no se carga (DESIGN §7) y la del panel
-             NO la baja: medido en tabs-ruta, la transición seguía en 160 ms con
-             movimiento reducido. La regla propia lo cierra. --}}
-        @media (prefers-reduced-motion:reduce) { .muni-rec__item { transition:none !important; } }
-        {{-- En papel: la ficha no se parte entre dos hojas —el folio en una y el
-             estado en la otra— y los controles no se imprimen, porque un botón
-             sobre papel no hace nada. El estado no se pierde: es texto. --}}
-        @media print {
-            .muni-rec__item { break-inside:avoid; box-shadow:none; }
-            .muni-rec__acciones { display:none; }
-        }
-    </style>
-@endonce
+{{-- ESTE COMPONENTE NO LLEVA BLOQUE DE ESTILOS, y no es un olvido: la ficha se
+     renderiza DENTRO del <ul> de <x-muni::record-list>, y el modelo de contenido
+     de <ul> solo admite <li> y elementos de soporte de script (script y
+     template). Un <style> ahí es HTML inválido —y el Decreto N°1/2015 SEGPRES
+     obliga a los sitios del Estado a los estándares del W3C—, sin que ninguna
+     reja lo delate: axe salta todo hijo que el lector de pantalla no ve, y un
+     <style> es display:none.
+
+     Las clases que esta ficha usa —`.muni-rec__*`, `.muni-num` y `.muni-sr`— las
+     declara el bloque de una sola emisión de <x-muni::record-list>, que es su
+     único padre válido. Ahí está también el comentario que explica por qué la
+     banda va como borde y no como sombra, y por qué la mono viaja con el
+     componente y no se hereda de la tabla (DESIGN §7).
+
+     Es el mismo arreglo, por el mismo motivo, que la ficha hermana
+     `description-item` ya documentó para el <dl>. --}}

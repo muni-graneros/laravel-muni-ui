@@ -10,6 +10,69 @@ las etiquetas de git, así que dicen *qué* cambió pero no siempre *qué había
 republicar*. Desde acá en adelante cada versión anota si el sistema que la adopta debe
 volver a publicar artefactos, porque subir el `composer.json` no aplica nada por sí solo.
 
+## [0.19.0] — 2026-09-15
+
+**La 0.18.0 publicada no trae nada de esto.** Su etiqueta quedó apuntando a un commit del 13 de
+septiembre —la publicó un proceso automático de la máquina, no esta sesión— y una etiqueta
+publicada no se mueve. Por eso el trabajo de los días 14 y 15 sale como 0.19.0, y el constraint
+de cada sistema pasa a `^0.19`: en versionado 0.x, `^0.18` **no** cruza a 0.19.
+
+Antes de subirla, lee [`docs/UPGRADE-0.19.0.md`](docs/UPGRADE-0.19.0.md).
+
+### Agregado
+
+- **Diecisiete fichas más del backlog, cada una con revisión adversarial y verificación en
+  Chromium y Firefox** —bancos reproducibles en `tests/navegador/`—:
+  - `<x-muni::description-list>`/`description-item` (pares dato-valor con `dl`), `<x-muni::record-list>`
+    (los registros como fichas cuando la tabla no cabe), `<x-muni::input-password>` (ver lo que se
+    escribe, con botón real), `<x-muni::tabs-ruta>` (solapas que navegan en vez de cargar todos los
+    paneles).
+  - Pantallas completas: `pantalla-resultado` (cierre con folio), `pantalla-bloqueo` (bloqueo por
+    inactividad sin perder el trabajo), `formulario-tramite`, `ajustes-cuenta`, `agenda-horas`,
+    `asistente` (pasos con validación) y `plantilla-pantalla`.
+  - `<x-muni::bulk-bar>` para acciones en lote; densidad compacta en `data-table` y `sortable-table`.
+  - `<x-muni::pii>`: el dato personal oculto por omisión, revelado con un acto explícito que avisa al
+    anfitrión para la bitácora de accesos (Ley 21.719).
+  - Tokens `--muni-overlay-border`, `--muni-dur-slow` y `--muni-logo-plate` en las dos hojas.
+- **Vitrina de desarrollo** con `vendor/bin/testbench serve` en `/vitrina`, generada recorriendo el
+  directorio de componentes. Vive en `workbench/`: el paquete no registra rutas.
+- Candado `SinRastrosDeDepuracionTest`: falla ante escrituras a disco, volcados de variables y
+  marcadores de depuración en cualquier componente.
+- `<x-muni::spinner>` y `<x-muni::busy-region>`: decir que algo está en curso **en texto** y
+  decir cuándo terminó, con `aria-busy` y anuncio del recuento. Queda un paso manual con NVDA y
+  VoiceOver que no existe en esta máquina.
+- `<x-muni::selector-tema>`: claro, oscuro o seguir al sistema, con la elección persistida por
+  el anfitrión. **Los tres armazones dejan de forzar `light` por defecto**: `theme` sin valor ya
+  no escribe nada y manda el sistema operativo; un sistema con identidad fija pasa `light`.
+- `<x-muni::sesion-guardia>`: avisa antes de que caduque la sesión y deja prorrogarla; el tiempo
+  lo pasa el servidor.
+- `modal` gana la variante de confirmación (`role="alertdialog"`, sin cierre por clic fuera,
+  foco inicial en cancelar, cuerpo atado con `aria-describedby`). Todas las props nuevas
+  conservan el comportamiento de siempre por defecto.
+- `stat` ata la cifra a su rótulo (`role="group"` + `aria-labelledby`) y dice «subió»/«bajó» en
+  texto con `deltaDir`; `calendar` respeta el rango también por teclado; el rótulo del atajo de
+  `command-palette` nace de la misma prop `hotkey` que el manejador.
+
+### Corregido
+
+- **Dentro de un panel Filament, la preferencia de movimiento reducido no llegaba a ningún
+  componente del paquete.** `muni-ui-filament.css` bajaba `--muni-dur-slow` pero no `--muni-dur`,
+  así que en los nueve sistemas toda transición seguía animando con `prefers-reduced-motion:
+  reduce`. Medido en Chromium y Firefox: `0.16s` con la preferencia activada, ahora `0s`.
+- **El borde de un diálogo contra su velo medía 2,77:1 en oscuro** (WCAG 1.4.11 pide 3:1). Token
+  nuevo `--muni-scrim` en las dos hojas para el velo de `modal`, `drawer` y `command-palette`:
+  pasa a 3,70–4,20:1. **Cambio visible: el velo del modal deja de ser petróleo institucional y
+  pasa a casi negro**, igual que los otros dos.
+- **`toast-host` autodestruía todo aviso a los 4,5 s** sin pausa al puntero ni al foco: un folio no
+  alcanzaba a leerse. Los errores ya no se autocierran y dos avisos seguidos se anuncian los dos.
+- **`breadcrumb` eran enlaces sueltos que solo se distinguían por color**; ahora es una lista con
+  `aria-current`. **`ring` no exponía el porcentaje** a tecnologías de apoyo. **`filter-bar` no
+  llevaba `@csrf`**: con `method="post"` daba 419. **La banda de peligro no se pintaba en
+  `sortable-table`**, porque el primer hijo de la fila es el `<template>` de Alpine.
+- **`alert` inventaba la región viva por el tono**: `danger` salía siempre con `role="alert"`,
+  así que una nota fija de instrucciones se anunciaba como aviso cada vez que se pintaba. El rol
+  lo declara ahora el consumidor cuando de verdad anuncia algo.
+
 ## [0.18.0] — 2026-09-13
 
 **Antes de subirla, lee [`docs/UPGRADE-0.18.0.md`](docs/UPGRADE-0.18.0.md).** Dos cosas no son
@@ -79,37 +142,6 @@ versionado 0.x) y hay que **republicar el tema del panel**, o nada de esto llega
   regla de «activo» escrita una vez. **El paquete no consulta `Gate`, `Auth` ni `request()`**:
   recibe el árbol ya filtrado y el permiso ya evaluado. Esconder un ítem del menú es cosmético y
   nunca protege un endpoint.
-- **Diecisiete fichas más del backlog, cada una con revisión adversarial y verificación en
-  Chromium y Firefox** —bancos reproducibles en `tests/navegador/`—:
-  - `<x-muni::description-list>`/`description-item` (pares dato-valor con `dl`), `<x-muni::record-list>`
-    (los registros como fichas cuando la tabla no cabe), `<x-muni::input-password>` (ver lo que se
-    escribe, con botón real), `<x-muni::tabs-ruta>` (solapas que navegan en vez de cargar todos los
-    paneles).
-  - Pantallas completas: `pantalla-resultado` (cierre con folio), `pantalla-bloqueo` (bloqueo por
-    inactividad sin perder el trabajo), `formulario-tramite`, `ajustes-cuenta`, `agenda-horas`,
-    `asistente` (pasos con validación) y `plantilla-pantalla`.
-  - `<x-muni::bulk-bar>` para acciones en lote; densidad compacta en `data-table` y `sortable-table`.
-  - `<x-muni::pii>`: el dato personal oculto por omisión, revelado con un acto explícito que avisa al
-    anfitrión para la bitácora de accesos (Ley 21.719).
-  - Tokens `--muni-overlay-border`, `--muni-dur-slow` y `--muni-logo-plate` en las dos hojas.
-- **Vitrina de desarrollo** con `vendor/bin/testbench serve` en `/vitrina`, generada recorriendo el
-  directorio de componentes. Vive en `workbench/`: el paquete no registra rutas.
-- Candado `SinRastrosDeDepuracionTest`: falla ante escrituras a disco, volcados de variables y
-  marcadores de depuración en cualquier componente.
-- `<x-muni::spinner>` y `<x-muni::busy-region>`: decir que algo está en curso **en texto** y
-  decir cuándo terminó, con `aria-busy` y anuncio del recuento. Queda un paso manual con NVDA y
-  VoiceOver que no existe en esta máquina.
-- `<x-muni::selector-tema>`: claro, oscuro o seguir al sistema, con la elección persistida por
-  el anfitrión. **Los tres armazones dejan de forzar `light` por defecto**: `theme` sin valor ya
-  no escribe nada y manda el sistema operativo; un sistema con identidad fija pasa `light`.
-- `<x-muni::sesion-guardia>`: avisa antes de que caduque la sesión y deja prorrogarla; el tiempo
-  lo pasa el servidor.
-- `modal` gana la variante de confirmación (`role="alertdialog"`, sin cierre por clic fuera,
-  foco inicial en cancelar, cuerpo atado con `aria-describedby`). Todas las props nuevas
-  conservan el comportamiento de siempre por defecto.
-- `stat` ata la cifra a su rótulo (`role="group"` + `aria-labelledby`) y dice «subió»/«bajó» en
-  texto con `deltaDir`; `calendar` respeta el rango también por teclado; el rótulo del atajo de
-  `command-palette` nace de la misma prop `hotkey` que el manejador.
 - **`data-muni-print-plain`** (opt-in del sistema anfitrión, apagado por defecto): dentro de un
   panel en modo oscuro, el contenido propio de Filament salía a 1,00:1 en papel, porque sus 218
   clases eligen un gris en vez de leer un token. Con el atributo puesto, el texto se aplana a
@@ -188,23 +220,6 @@ versionado 0.x) y hay que **republicar el tema del panel**, o nada de esto llega
 - **`dropdown` declaraba `role="menu"` sin implementar el patrón**: cada ítem era una parada de
   `Tab`, las flechas no hacían nada y `Escape` dejaba el foco perdido. Ahora flechas con vuelta,
   `Home`/`End`, roving tabindex y retorno del foco al disparador.
-- **Dentro de un panel Filament, la preferencia de movimiento reducido no llegaba a ningún
-  componente del paquete.** `muni-ui-filament.css` bajaba `--muni-dur-slow` pero no `--muni-dur`,
-  así que en los nueve sistemas toda transición seguía animando con `prefers-reduced-motion:
-  reduce`. Medido en Chromium y Firefox: `0.16s` con la preferencia activada, ahora `0s`.
-- **El borde de un diálogo contra su velo medía 2,77:1 en oscuro** (WCAG 1.4.11 pide 3:1). Token
-  nuevo `--muni-scrim` en las dos hojas para el velo de `modal`, `drawer` y `command-palette`:
-  pasa a 3,70–4,20:1. **Cambio visible: el velo del modal deja de ser petróleo institucional y
-  pasa a casi negro**, igual que los otros dos.
-- **`toast-host` autodestruía todo aviso a los 4,5 s** sin pausa al puntero ni al foco: un folio no
-  alcanzaba a leerse. Los errores ya no se autocierran y dos avisos seguidos se anuncian los dos.
-- **`breadcrumb` eran enlaces sueltos que solo se distinguían por color**; ahora es una lista con
-  `aria-current`. **`ring` no exponía el porcentaje** a tecnologías de apoyo. **`filter-bar` no
-  llevaba `@csrf`**: con `method="post"` daba 419. **La banda de peligro no se pintaba en
-  `sortable-table`**, porque el primer hijo de la fila es el `<template>` de Alpine.
-- **`alert` inventaba la región viva por el tono**: `danger` salía siempre con `role="alert"`,
-  así que una nota fija de instrucciones se anunciaba como aviso cada vez que se pintaba. El rol
-  lo declara ahora el consumidor cuando de verdad anuncia algo.
 - **`rut-input` repintaba el borde con los tokens viejos a la primera tecla**, así que el campo
   dejaba de verse justo al empezar a escribir. El borde de error de `checkbox` y `combobox`
   también quedaba por debajo del de un campo correcto.

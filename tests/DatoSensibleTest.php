@@ -679,15 +679,13 @@ it('en Chromium y Firefox: el evento burbujea, el teclado revela y tapa, sin JS 
     expect(count(array_filter($lineas, fn (string $l) => str_contains($l, 'sinJS=tapado'))))->toBe(8,
         "Los ocho recorridos tienen que dejar el dato tapado y el control fuera sin JavaScript:\n".implode("\n", $lineas));
 
-    /* El movimiento apagado con la preferencia, medido y no supuesto. Son al
-       menos CUATRO y no ocho a propósito: las dos páginas que cargan
-       `muni-ui.css` en los dos navegadores dan 0 s, y las dos de panel NO,
-       porque `muni-ui-filament.css` declara `--muni-dur:160ms` y no trae el
-       bloque `prefers-reduced-motion` que sí trae la otra hoja. Eso no es de
-       este componente —ningún componente puede redefinir un token del sistema,
-       y las hojas son archivo compartido— y afecta a TODO el paquete dentro de
-       un panel. Queda medido acá y el umbral es «al menos 4» para que el día
-       que la hoja del panel se arregle esta prueba no se ponga roja por mejorar. */
-    expect(count(array_filter($lineas, fn (string $l) => str_contains($l, 'transición(reduce)=0s'))) >= 4)->toBeTrue(
-        "Con prefers-reduced-motion la transición del control tiene que computar 0 s donde el token la apaga:\n".implode("\n", $lineas));
+    /* El movimiento apagado con la preferencia, medido y no supuesto, en las
+       OCHO combinaciones: cuatro páginas por dos navegadores. Durante un tiempo
+       el umbral fue «al menos 4», porque las dos páginas de panel daban 160 ms:
+       `muni-ui-filament.css` declaraba `--muni-dur:160ms` y no lo bajaba con la
+       preferencia. La hoja del panel ya trae el mismo bloque que `muni-ui.css`
+       (tests/MovimientoReducidoEnPanelTest.php), así que la transición del
+       botón tiene que computar 0 s también dentro del panel. */
+    expect(count(array_filter($lineas, fn (string $l) => str_contains($l, 'transición(reduce)=0s'))))->toBe(8,
+        "Con prefers-reduced-motion la transición del control tiene que computar 0 s en las cuatro páginas y los dos navegadores, panel incluido:\n".implode("\n", $lineas));
 });

@@ -49,6 +49,12 @@
        --muni-surface, 3,52:1 sobre --muni-bg y 3,24:1 sobre --muni-surface-3
        (papel-2), el peor caso. */
     --muni-overlay-border: #90815b;
+    /* Velo de un diálogo con fondo (modal, drawer, paleta). Color opaco: la
+       opacidad la pone el componente. Se declara acá TAMBIÉN porque muni-ui.css
+       no se carga en un panel (DESIGN §7); comentario completo en esa hoja.
+       Medido compuesto sobre cada superficie del panel: el panel blanco contra
+       el velo da 3,60:1 o más. */
+    --muni-scrim:       #0a0e14;
 
     --muni-accent:        var(--mg-petroleo);
     --muni-accent-strong: var(--mg-petroleo-d);
@@ -119,9 +125,17 @@
     --muni-logo-plate-fg: #08252b;
 }
 
-/* Solo el token nuevo: --muni-dur sigue sin bajar en esta hoja, y los
-   componentes que lo leen llevan su propia guardia (DESIGN §7). */
-@media (prefers-reduced-motion:reduce){ :root{ --muni-dur-slow:0ms; } }
+/* Respeta la preferencia de movimiento reducido en todo el panel. Mismo bloque
+   y mismos tokens que muni-ui.css: dentro de un panel Filament esta es la ÚNICA
+   hoja que se carga (DESIGN §7), y cuando solo bajaba --muni-dur-slow toda
+   transición de todo componente <x-muni::*> seguía en 160 ms con la preferencia
+   activa (medido en Chromium y Firefox: <x-muni::button> computaba 0.16s). Va
+   DESPUÉS del :root de arriba para ganarle la cascada a igual especificidad.
+   Las guardias propias de cada componente se quedan: cubren al sistema que
+   todavía tiene publicada la hoja anterior. */
+@media (prefers-reduced-motion: reduce) {
+    :root { --muni-dur: 0ms; --muni-dur-slow: 0ms; }
+}
 
 /* En oscuro mandan los tonos institucionales: sobre la superficie del panel
    (#0f2025) rinden entre 7:1 y 10:1, muy por encima del mínimo. */
@@ -147,6 +161,10 @@
     /* Medido: 4,01:1 sobre --muni-bg, 3,59:1 sobre --muni-surface y 3,21:1
        sobre --muni-surface-3 #142a30 (peor caso). Mínimo exigido: 3:1. */
     --muni-overlay-border: #467c89;
+    /* Ver el comentario del bloque claro. Medido: el borde flotante contra el
+       velo compuesto da 3,72:1 o más sobre toda superficie (peor caso
+       --muni-surface-3). Con el petróleo que usaba el modal daba 2,89:1. */
+    --muni-scrim:       #0a0e14;
 
     --muni-accent:        var(--mg-celeste);
     --muni-accent-strong: var(--mg-lima-br);

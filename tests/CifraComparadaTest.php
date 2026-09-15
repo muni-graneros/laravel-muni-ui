@@ -247,12 +247,13 @@ it('escapa el rótulo, el valor y el delta', function () {
 });
 
 it('apaga la elevación del hover con movimiento reducido, también dentro del panel', function () {
-    // El hover eleva la tarjeta con `transition: … var(--muni-dur)`. En
-    // `muni-ui.css` el token baja a 0 ms bajo `prefers-reduced-motion`, pero
+    // El hover eleva la tarjeta con `transition: … var(--muni-dur)`. Las dos
+    // hojas bajan hoy el token a 0 ms bajo `prefers-reduced-motion`, pero
     // `muni-ui-filament.css` —la ÚNICA hoja que se carga dentro de un panel—
-    // no lo baja: medido en el banco del panel, la transición seguía en 160 ms
-    // con la preferencia activa. El componente la apaga por su cuenta, como ya
-    // hacen command-palette y file-dropzone, y así no depende de la hoja.
+    // no lo hacía hasta hace poco: medido en el banco del panel, la transición
+    // seguía en 160 ms con la preferencia activa. Un sistema con esa hoja
+    // publicada sigue igual, así que el componente la apaga por su cuenta, como
+    // hacen command-palette y file-dropzone, y no depende de la hoja.
     //
     // Con `!important`, y no es capricho: la transición viaja en el `style`
     // inline de la raíz, y una regla de clase sin `!important` pierde contra

@@ -194,7 +194,27 @@
 
     <div style="display:flex;justify-content:flex-end;">
         {{-- Nace oculto: sin Alpine, un botón que no alterna nada es peor que
-             no tener botón, porque el lector de pantalla lo anuncia igual. --}}
+             no tener botón, porque el lector de pantalla lo anuncia igual.
+
+             POR QUÉ EL BORDE VA EN EL `style` Y NO EN EL BLOQUE DE ESTILO DE
+             ABAJO. No es descuido: es el único sitio donde llega. El botón del
+             paquete emite `border:1px solid transparent` en su PROPIO `style`,
+             y un estilo en línea le gana a cualquier regla de hoja sin
+             `!important`. Medido en Chromium sobre un botón fantasma pelado: en
+             reposo y con el ratón encima el borde computa `rgba(0, 0, 0, 0)` en
+             los dos casos, o sea que las reglas `.muni-btn--ghost` y su `:hover`
+             que mueven `border-color` son inertes para TODOS los botones
+             fantasma del paquete —no las mata este componente: ya estaban
+             muertas— y el hover se comunica por el fondo, que sí cambia. Este
+             alternador es un control junto a un campo y necesita borde de 3:1
+             (WCAG 1.4.11), así que lo pone en línea con `--muni-field-border`,
+             el único token calibrado a 3:1 contra las superficies en los dos
+             temas (`--muni-border` da 1,28:1 y `--muni-border-2` 1,61:1 en
+             claro, según la propia hoja). El banco del navegador mide lo que
+             de verdad pasa —3,45:1 en reposo y en hover, en claro y en
+             oscuro— y hay candado en la prueba por los dos lados. Que el borde
+             fantasma sea inerte es un defecto de `button.blade.php` y se
+             arregla ahí, no acá. --}}
         <x-muni::button
             type="button"
             variant="ghost"
@@ -227,5 +247,8 @@
            no existiría ahí (DESIGN §7). */
         .muni-pw [x-cloak] { display: none !important; }
         .muni-pw__ojo { cursor: pointer; }
+
+        /* El borde del alternador NO se declara acá: no llegaría. El porqué,
+           medido, está en el comentario Blade que acompaña al botón. */
     </style>
 @endonce

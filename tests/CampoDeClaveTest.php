@@ -123,6 +123,22 @@ it('el alternador es un <button type="button">, que es el bug clásico de este p
         'El alternador no declara type="button". Dentro de un <form> un botón sin type es '.
         'submit: pulsar «Mostrar» enviaría el formulario de ingreso. '.$boton[0]
     );
+
+    // Y ADEMÁS ESCRITO ACÁ A PROPÓSITO. El botón del paquete ya pone
+    // type="button" por omisión, así que la medición de arriba sobre el HTML
+    // renderizado seguiría verde aunque alguien borrara el atributo de la
+    // fuente: mediría el valor por omisión del otro componente, no la decisión
+    // de este. Lo que el juez exigió es que este componente NO dependa de esa
+    // omisión —cambiarla en button.blade.php convertiría en submit al
+    // alternador de todas las pantallas de ingreso—, y eso solo se protege
+    // leyendo la fuente.
+    $fuente = fuenteCampoDeClaveSinComentarios();
+
+    expect((bool) preg_match('/<x-muni::button\b[^>]*\btype="button"/s', $fuente))->toBeTrue(
+        'El alternador ya no escribe type="button" en su fuente y queda colgando del valor por '.
+        'omisión de <x-muni::button>. Dentro de un <form>, un botón que vuelva a ser submit envía '.
+        'el formulario de ingreso al pulsar «Mostrar»: el atributo va escrito acá.'
+    );
 });
 
 it('el botón dice su estado y cambia de nombre accesible', function () {
@@ -301,6 +317,35 @@ it('el blanco de pulsación del alternador llega a 24 px', function () {
     );
 });
 
+it('el borde del alternador va en el estilo en línea, que es el único sitio donde llega', function () {
+    // Medido en Chromium sobre un botón fantasma pelado: `<x-muni::button>`
+    // emite `border:1px solid transparent` en su PROPIO `style`, y un estilo en
+    // línea le gana a cualquier regla de hoja sin `!important`. O sea que
+    // `.muni-btn--ghost { border-color }` y su `:hover` son inertes para todos
+    // los botones fantasma del paquete —defecto de button.blade.php, no de
+    // acá— y el hover se comunica por el fondo. Como este alternador es un
+    // control junto a un campo y necesita 3:1 (WCAG 1.4.11), su borde tiene
+    // que ir en línea. Si alguien lo "ordena" moviéndolo al bloque de estilo
+    // del componente, el botón se queda sin borde visible y nadie se entera:
+    // por eso el candado mira los dos lados.
+    $html = clave('name="password"');
+
+    preg_match('/<button\b[^>]*>/', $html, $boton);
+    preg_match('/style="([^"]*)"/', $boton[0], $estilo);
+
+    expect((bool) preg_match('/border-color:\s*var\(--muni-field-border\)/', $estilo[1] ?? ''))->toBeTrue(
+        'El borde del alternador no está en su estilo en línea con --muni-field-border. El botón '.
+        'del paquete pinta `border:1px solid transparent` en línea y le gana a la hoja: fuera del '.
+        'atributo `style` el borde no llega, y --muni-field-border es el único token del paquete '.
+        'calibrado a 3:1 contra las superficies en los dos temas. Estilo medido: '.($estilo[1] ?? '(sin style)')
+    );
+
+    expect((bool) preg_match('/border-color/', cssCampoDeClave()))->toBeFalse(
+        'El bloque de estilo del componente declara un border-color: ahí es inerte (le gana el '.
+        'estilo en línea del botón del paquete) y deja el alternador sin borde visible.'
+    );
+});
+
 it('el movimiento sale del token, que ya baja a 0 ms con la preferencia', function () {
     $css = cssCampoDeClave().' '.clave('name="password"');
 
@@ -451,9 +496,28 @@ it('en Chromium y Firefox: alterna sin perder el cursor ni enviar el form, se oc
     expect($codigo)->toBe(0, "La verificación en navegador del campo de clave falló:\n".implode("\n", $lineas));
 
     // Dos páginas × dos navegadores: los cuatro recorridos tienen que reportar
-    // el cursor repuesto y la transición apagada con la preferencia.
+    // el cursor repuesto y la transición apagada con la preferencia. Las dos
+    // cifras SALEN DE LA MEDICIÓN del banco: hasta hace poco la del movimiento
+    // era un literal impreso a mano, así que este recuento daba 4 aunque la
+    // transición siguiera viva y aparentaba medir algo que no medía.
     expect(count(array_filter($lineas, fn (string $l) => str_contains($l, 'cursor=5'))))->toBe(4,
         "Los cuatro recorridos tienen que reponer el punto de inserción:\n".implode("\n", $lineas));
     expect(count(array_filter($lineas, fn (string $l) => str_contains($l, 'transición(reduce)=0s'))))->toBe(4,
         "Los cuatro recorridos tienen que reportar la transición apagada con la preferencia:\n".implode("\n", $lineas));
+
+    // El borde del alternador CON EL RATÓN ENCIMA, que es el estado donde el
+    // fondo del hover se le acerca: en los cuatro recorridos tiene que seguir
+    // por encima de 3:1 (WCAG 1.4.11), en claro y en oscuro.
+    $bordes = [];
+
+    foreach ($lineas as $linea) {
+        if (preg_match('/borde\/hover=([\d.]+):1/', $linea, $m)) {
+            $bordes[] = (float) $m[1];
+        }
+    }
+
+    expect(count($bordes))->toBe(4, "Faltan mediciones del borde en hover:\n".implode("\n", $lineas));
+    expect(min($bordes) >= 3.0)->toBeTrue(
+        'El borde del alternador con el ratón encima baja de 3:1 en algún recorrido: '.implode(', ', $bordes)
+    );
 });

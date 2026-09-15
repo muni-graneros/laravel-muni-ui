@@ -26,6 +26,8 @@ el HTML que emite Blade: que el alternador sea `type="button"`, que lleve
   · Escape sobre la clave revelada la oculta, y cuando no hay nada que ocultar
     la tecla sigue su camino (no se la queda el campo);
   · el foco del botón es un `outline` sólido de 3 px con color, no una sombra;
+  · con el ratón encima el fondo del alternador cambia (el hover se ve) y su
+    borde sigue por encima de 3:1 sobre ese fondo nuevo;
   · el texto del alternador y su borde pasan WCAG 2.2 AA contra el fondo
     efectivo, en claro y en oscuro;
   · con `prefers-reduced-motion: reduce` la transición del botón computa 0 s, y
@@ -199,6 +201,32 @@ def recorrer(pagina, nombre: str, fallos: list[str]) -> dict:
         if visto != cuantos:
             fallos.append(f"{quien}: hay {visto} botón(es) «{rotulo}», esperaba {cuantos}")
 
+    # ---- El ratón encima: el fondo cambia y el borde SIGUE dando 3:1 ----
+    # El borde del alternador va en `style` en línea y no en la hoja del
+    # componente porque `<x-muni::button>` ya emite `border:1px solid
+    # transparent` en línea, y un estilo en línea le gana a cualquier regla sin
+    # `!important`: medido aparte en Chromium, `.muni-btn--ghost` y su `:hover`
+    # NO mueven el borde de ningún botón fantasma del paquete —el hover se
+    # comunica por el fondo—. Acá se mide eso mismo sobre el alternador real: que
+    # el fondo cambie de verdad al pasar el ratón (el hover se ve) y que el borde
+    # se quede por encima de 3:1 también en ese estado, en los dos temas.
+    reposo = d["campos"][0]["boton"]
+    pagina.locator(".muni-pw__ojo").first.hover()
+    pagina.wait_for_timeout(80)
+    encima = pagina.evaluate(SONDA)["campos"][0]["boton"]
+    hover_borde = contraste(encima["borde"], encima["fondo"], d["fondoPagina"])
+    if encima["fondo"] == reposo["fondo"]:
+        fallos.append(
+            f"{quien}: con el ratón encima no cambia nada en el alternador (fondo {reposo['fondo']}); "
+            "el hover no se ve"
+        )
+    if hover_borde < 3.0:
+        fallos.append(
+            f"{quien}: el borde del alternador con el ratón encima da {hover_borde:.2f}:1 (mínimo 3:1); "
+            "el fondo del hover se comió el contraste del borde"
+        )
+    pagina.mouse.move(0, 0)
+
     # ---- Orden de tabulación: correo → clave → alternador ----
     pagina.focus("#banco-correo")
     pagina.keyboard.press("Tab")
@@ -304,6 +332,7 @@ def recorrer(pagina, nombre: str, fallos: list[str]) -> dict:
         fallos.append(f"{quien}: la clave se ocultó pero el botón sigue diciendo pulsado")
 
     d["cursor"] = cursor
+    d["hoverBorde"] = f"{hover_borde:.2f}"
     return d
 
 
@@ -387,9 +416,16 @@ def main(argv: list[str]) -> int:
 
                 sin_javascript(navegador, url, f"{marca}/{ruta.name}", fallos)
 
+                # `transición(reduce)` sale de la MEDICIÓN de arriba (`duraciones`), no
+                # de un literal: escrito a mano, el recuento que hace
+                # tests/CampoDeClaveTest.php sobre esta línea daría 4 aunque la
+                # transición siguiera viva, y aparentaría medir algo que no mide.
+                reduccion = "0s" if duraciones and all(x == "0s" for x in duraciones) else ",".join(duraciones)
+
                 resumen.append(
                     f"{marca:<9} {ruta.name:<12} cursor={d.get('cursor')} "
-                    f"transición(reduce)=0s  envíos={d.get('envios')}  "
+                    f"transición(reduce)={reduccion or '?'}  envíos={d.get('envios')}  "
+                    f"borde/hover={d.get('hoverBorde')}:1  "
                     f"alternador={d['campos'][0]['boton']['ancho']:.0f}×{d['campos'][0]['boton']['alto']:.0f}px"
                 )
             navegador.close()

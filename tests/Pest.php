@@ -6,6 +6,25 @@ uses(TestCase::class)->in(__DIR__);
 
 /*
 |--------------------------------------------------------------------------
+| Helpers compartidos entre archivos de prueba
+|--------------------------------------------------------------------------
+|
+| Una función que usa MÁS DE UN `*Test.php` vive acá o en `tests/Helpers/`,
+| nunca dentro de otro archivo de prueba: eso funciona en la suite entera por
+| casualidad (Pest carga todos los archivos antes de ejecutar) y revienta con
+| «Call to undefined function» en `pest --parallel` o al correr un archivo solo.
+| Lo vigila `ArchivosDePruebaIndependientesTest`.
+|
+| Pest ya carga `tests/Helpers/` en el arranque (`BootFiles`, con include_once);
+| el require explícito es para que quien lea este archivo sepa dónde buscar, y
+| no duplica nada.
+*/
+foreach (glob(__DIR__.'/Helpers/*.php') ?: [] as $helper) {
+    require_once $helper;
+}
+
+/*
+|--------------------------------------------------------------------------
 | Medición de contraste WCAG, compartida
 |--------------------------------------------------------------------------
 |

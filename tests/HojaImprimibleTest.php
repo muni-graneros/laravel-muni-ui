@@ -32,19 +32,12 @@ use Illuminate\Support\Facades\Blade;
 | argumento es otra aguja—, así que todo va con `expect(bool)->toBeTrue('…')`.
 */
 
-/** Ruta de una vista de componente del paquete. */
-function rutaDeLaVista(string $nombre): string
-{
-    return __DIR__.'/../resources/views/components/'.$nombre.'.blade.php';
-}
-
-/** El fuente crudo de un componente, o cadena vacía si todavía no existe. */
-function fuenteDeLaVista(string $nombre): string
-{
-    $ruta = rutaDeLaVista($nombre);
-
-    return file_exists($ruta) ? (string) file_get_contents($ruta) : '';
-}
+/*
+ * `rutaDeLaVista()` y `fuenteDeLaVista()` vivían acá. Ahora están en
+ * `tests/Helpers/FuentesEnDisco.php`, porque también las usan
+ * `CamposConErrorTest` y `TablaOrdenableAccesibleTest`, y un archivo de prueba no
+ * puede tomar funciones de otro (lo vigila `ArchivosDePruebaIndependientesTest`).
+ */
 
 /**
  * El fuente SIN comentarios CSS ni comentarios Blade.

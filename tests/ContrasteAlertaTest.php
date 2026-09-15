@@ -25,28 +25,12 @@ use Illuminate\Support\Facades\Blade;
  * cambie.
  */
 
-/**
- * Las cuatro paletas del paquete: dos hojas × dos temas. Hay que medir las dos
- * hojas porque dentro de un panel Filament solo se carga la segunda (DESIGN §7)
- * y declara valores DISTINTOS para los mismos tokens.
- *
- * @return array<string, array{0: string, 1: string}>
+/*
+ * `paletasDelPaquete()` y `tonosDeAlerta()` vivían acá. Ahora están en
+ * `tests/Helpers/PaletasYTonosDeAlerta.php`, porque `AlertaRolEIconoTest` también
+ * las recorre y un archivo de prueba no puede tomar funciones de otro (lo vigila
+ * `ArchivosDePruebaIndependientesTest`).
  */
-function paletasDelPaquete(): array
-{
-    return [
-        'muni-ui.css · claro' => [cssMuniUi(), 'Valores LIGHT (default)'],
-        'muni-ui.css · oscuro' => [cssMuniUi(), 'Regla 2: activadores EXPLÍCITOS de dark'],
-        'muni-ui-filament.css · claro' => [cssMuniUiFilament(), 'Tema Filament municipal'],
-        'muni-ui-filament.css · oscuro' => [cssMuniUiFilament(), 'En oscuro mandan los tonos institucionales'],
-    ];
-}
-
-/** Los cinco tonos que `alert` sabe rendir: los cuatro del mapa y el respaldo. */
-function tonosDeAlerta(): array
-{
-    return ['ok', 'warn', 'danger', 'info', 'tono-inexistente'];
-}
 
 /**
  * Renderiza una alerta y devuelve los NOMBRES de token que usa de verdad:

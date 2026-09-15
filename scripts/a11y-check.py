@@ -859,10 +859,20 @@ def main() -> int:
     filas = []
     with sync_playwright() as p:
         navegador = p.chromium.launch()
-        ctx = navegador.new_context(viewport={"width": 1440, "height": 900}, reduced_motion="reduce")
         try:
             for pagina in paginas:
-                for r in revisar(pagina, temas, axe_src, ctx):
+                # UN CONTEXTO POR PÁGINA, no uno para toda la corrida. Con uno solo,
+                # el proceso de render acumulaba memoria carga tras carga —20 páginas
+                # de vitrina de hasta 700 KB más las demos, en dos temas, cada una con
+                # cuatro recorridos de contraste y axe— y con 88 componentes el sistema
+                # mató la reja dos veces por falta de memoria. Cerrar solo la pestaña no
+                # libera lo que retiene el contexto; cerrar el contexto sí.
+                ctx = navegador.new_context(viewport={"width": 1440, "height": 900}, reduced_motion="reduce")
+                try:
+                    resultados_pagina = revisar(pagina, temas, axe_src, ctx)
+                finally:
+                    ctx.close()
+                for r in resultados_pagina:
                     filas.append(r)
                     marca = "FALLA" if falla(r) else "ok"
                     peor = f"{r['contraste'][0]['ratio']:.2f}" if r["contraste"] else "—"
@@ -873,7 +883,6 @@ def main() -> int:
                           f"peor={peor:6s} impresión↓={impr:3d} 1.4.11↓={len(r['no_texto']):2d} "
                           f"axe grave={len(r['axe_graves']):2d}")
         finally:
-            ctx.close()
             navegador.close()
 
     # TRES TABLAS Y NO UNA. Una falla de impresión y una de pantalla no se

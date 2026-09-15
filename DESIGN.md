@@ -139,11 +139,19 @@ el arco salta en vez de avanzar. Se declara solo en `:root` y nunca en un bloque
 rearmaría los `600 ms` dentro de un contenedor `.dark` o `[data-muni-theme]` anidado, donde el
 bloque de movimiento reducido sobre `:root` ya no alcanza.
 
-Las dos hojas bajan `--muni-dur-slow` a `0 ms` con la preferencia, pero `muni-ui-filament.css` **no
-baja `--muni-dur`**. Por eso el componente que anima lleva además su guardia dentro de su `@once`
+**Las dos hojas bajan ahora `--muni-dur` y `--muni-dur-slow` a `0 ms` con la preferencia.** Hasta
+el 2026-09-15 `muni-ui-filament.css` bajaba solo `--muni-dur-slow`, así que **dentro de un panel
+Filament la preferencia de movimiento reducido no llegaba a ningún componente del paquete**, en los
+nueve sistemas: medido en Chromium y Firefox, la transición de `<x-muni::button>` computaba
+`0.16s` con `prefers-reduced-motion: reduce`. Lo vigila `tests/MovimientoReducidoEnPanelTest.php`,
+que además exige que las dos hojas apaguen el mismo conjunto de tokens y que ningún bloque de tema
+rearme la duración.
+
+Aun así, el componente que anima conserva su guardia dentro de su `@once`
 (`@media (prefers-reduced-motion: reduce) { .clase { transition: none !important } }`, con
 `!important` cuando la transición va en `style`), y el `var()` lleva respaldo (`var(--muni-dur-slow,
-600ms)`) para un sistema que todavía tiene publicada la hoja anterior.
+600ms)`): un sistema que actualiza el paquete **sin republicar el tema** sigue con la hoja vieja, y
+esa guardia es lo único que lo protege mientras tanto.
 
 Un componente que anima con una duración fija —`transition: width .5s`— **ignora la preferencia**.
 Eso es un defecto, no un detalle. Los cuatro que lo hacían (`ring`, `progress`, `chart-donut` y

@@ -188,6 +188,14 @@ versionado 0.x) y hay que **republicar el tema del panel**, o nada de esto llega
 - **`dropdown` declaraba `role="menu"` sin implementar el patrón**: cada ítem era una parada de
   `Tab`, las flechas no hacían nada y `Escape` dejaba el foco perdido. Ahora flechas con vuelta,
   `Home`/`End`, roving tabindex y retorno del foco al disparador.
+- **Dentro de un panel Filament, la preferencia de movimiento reducido no llegaba a ningún
+  componente del paquete.** `muni-ui-filament.css` bajaba `--muni-dur-slow` pero no `--muni-dur`,
+  así que en los nueve sistemas toda transición seguía animando con `prefers-reduced-motion:
+  reduce`. Medido en Chromium y Firefox: `0.16s` con la preferencia activada, ahora `0s`.
+- **El borde de un diálogo contra su velo medía 2,77:1 en oscuro** (WCAG 1.4.11 pide 3:1). Token
+  nuevo `--muni-scrim` en las dos hojas para el velo de `modal`, `drawer` y `command-palette`:
+  pasa a 3,70–4,20:1. **Cambio visible: el velo del modal deja de ser petróleo institucional y
+  pasa a casi negro**, igual que los otros dos.
 - **`toast-host` autodestruía todo aviso a los 4,5 s** sin pausa al puntero ni al foco: un folio no
   alcanzaba a leerse. Los errores ya no se autocierran y dos avisos seguidos se anuncian los dos.
 - **`breadcrumb` eran enlaces sueltos que solo se distinguían por color**; ahora es una lista con

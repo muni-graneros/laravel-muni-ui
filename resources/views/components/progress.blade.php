@@ -32,6 +32,19 @@
     <div role="progressbar" aria-valuenow="{{ $pct }}" aria-valuemin="0" aria-valuemax="100"
          aria-label="{{ $attributes->get('aria-label', $label ?: 'Progreso') }}"
          style="height:7px;border-radius:999px;background:var(--muni-surface-3);overflow:hidden;">
-        <div style="height:100%;width:{{ $pct }}%;border-radius:999px;background:{{ $color }};transition:width .5s var(--muni-ease);"></div>
+        <div class="muni-progress__relleno" style="height:100%;width:{{ $pct }}%;border-radius:999px;background:{{ $color }};transition:width var(--muni-dur-slow, 600ms) var(--muni-ease);"></div>
     </div>
 </div>
+
+{{--
+    La barra recorre un trayecto: dura --muni-dur-slow (600 ms), no --muni-dur
+    (160 ms), y no una duración fija, que ignoraba prefers-reduced-motion
+    (DESIGN §6). La guardia local cubre el panel Filament, donde --muni-dur no
+    baja, y una hoja publicada vieja sin el token, que cae en el respaldo.
+--}}
+@once
+    <style>
+        /* Con !important: la transición va en el style del relleno. */
+        @media (prefers-reduced-motion:reduce) { .muni-progress__relleno { transition:none !important; } }
+    </style>
+@endonce

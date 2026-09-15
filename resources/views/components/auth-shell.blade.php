@@ -40,8 +40,9 @@
 
     <aside class="muni-auth-aside">
         <div style="position:relative;display:flex;align-items:center;gap:11px;">
-            <div style="height:40px;display:flex;align-items:center;padding:5px 12px;background:#fff;border-radius:var(--muni-radius-sm);">
-                @if ($logo){{ $logo }}@else<span style="font-family:var(--muni-font-mono);font-weight:700;color:#0b0f14;">GRA</span>@endif
+            {{-- Placa del escudo con token de dos ramas: ver topbar. --}}
+            <div style="height:40px;display:flex;align-items:center;padding:5px 12px;background:var(--muni-logo-plate, var(--muni-surface));border-radius:var(--muni-radius-sm);">
+                @if ($logo){{ $logo }}@else<span style="font-family:var(--muni-font-mono);font-weight:700;color:var(--muni-logo-plate-fg, var(--muni-text));">GRA</span>@endif
             </div>
             <div><div style="font-weight:700;font-size:14px;">{{ $system }}</div><div style="font-size:12px;color:var(--muni-muted);">Ecosistema municipal</div></div>
         </div>

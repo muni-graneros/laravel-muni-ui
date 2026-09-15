@@ -41,6 +41,14 @@
        porque muni-ui.css no se carga dentro de un panel Filament. */
     --muni-field-border: #90815b;
     --muni-field-border-error: var(--muni-danger-fg);
+    /* Límite de una superficie que FLOTA (popover, dropdown, modal, drawer,
+       avisos): el beige de --muni-border daba 1,15:1 sobre el papel y el panel
+       lo separaba solo la sombra. Se declara acá TAMBIÉN, como el de campo,
+       porque muni-ui.css no se carga en un panel Filament (DESIGN §7). El
+       comentario completo está en muni-ui.css. Medido: 3,83:1 sobre
+       --muni-surface, 3,52:1 sobre --muni-bg y 3,24:1 sobre --muni-surface-3
+       (papel-2), el peor caso. */
+    --muni-overlay-border: #90815b;
 
     --muni-accent:        var(--mg-petroleo);
     --muni-accent-strong: var(--mg-petroleo-d);
@@ -92,13 +100,28 @@
 
     --muni-ease:        cubic-bezier(.22, 1, .36, 1);
     --muni-dur:         160ms;
+    /* Movimiento largo (el arco de `ring`): mismo valor y misma regla que en
+       muni-ui.css. Solo en :root, nunca en `.dark`, y baja a 0 ms con
+       prefers-reduced-motion en el bloque que sigue a este. */
+    --muni-dur-slow:    600ms;
     --muni-topbar-h:    56px;
 
     /* La tipografía la manda el panel: pedir aquí una familia propia haría que
        un componente suelto se viera distinto al resto de la pantalla. */
     --muni-font-sans:   inherit;
     --muni-font-mono:   ui-monospace, SFMono-Regular, Menlo, monospace;
+    /* Placa del escudo en `topbar` y `auth-shell` (comentario completo en
+       muni-ui.css). Se declara acá TAMBIÉN porque muni-ui.css no se carga en un
+       panel Filament (DESIGN §7). El texto usa la tinta oscura del panel.
+       Medido: texto #08252b 16,03:1 sobre la placa · contorno del escudo
+       (#00404c) 11,43:1. */
+    --muni-logo-plate:    #ffffff;
+    --muni-logo-plate-fg: #08252b;
 }
+
+/* Solo el token nuevo: --muni-dur sigue sin bajar en esta hoja, y los
+   componentes que lo leen llevan su propia guardia (DESIGN §7). */
+@media (prefers-reduced-motion:reduce){ :root{ --muni-dur-slow:0ms; } }
 
 /* En oscuro mandan los tonos institucionales: sobre la superficie del panel
    (#0f2025) rinden entre 7:1 y 10:1, muy por encima del mínimo. */
@@ -121,6 +144,9 @@
     --muni-border-2:    #2a4a52;
     --muni-field-border: #467c89;
     --muni-field-border-error: var(--muni-danger-fg);
+    /* Medido: 4,01:1 sobre --muni-bg, 3,59:1 sobre --muni-surface y 3,21:1
+       sobre --muni-surface-3 #142a30 (peor caso). Mínimo exigido: 3:1. */
+    --muni-overlay-border: #467c89;
 
     --muni-accent:        var(--mg-celeste);
     --muni-accent-strong: var(--mg-lima-br);
@@ -148,6 +174,11 @@
     --muni-shadow-md:   0 4px 16px rgba(0,0,0,.40);
     --muni-shadow-lg:   0 12px 32px rgba(0,0,0,.50);
     --muni-topbar-h:    52px;
+    /* Placa apagada: 80 % de blanco sobre --muni-bg (#081418), para que el escudo
+       no sea un recuadro blanco en la cabecera oscura. Medido: texto #08252b
+       10,36:1 sobre la placa · contorno del escudo 7,38:1. */
+    --muni-logo-plate:    #ced0d1;
+    --muni-logo-plate-fg: #08252b;
 }
 
 /* ══ BARRA LATERAL OSCURA — el gran cambio ══════════════════════════════════ */
@@ -487,6 +518,10 @@
         --muni-hint:var(--muni-muted);
         --muni-border:#767676;
         --muni-border-2:#3a3f4b;
+        /* Sin sombra en papel, el borde es el único límite del panel. Sin esta
+           línea, un panel dentro de `.dark` imprimiría con el valor oscuro.
+           #767676 sobre blanco = 4,54:1. */
+        --muni-overlay-border:#767676;
         /* Texto sobre el papel Y relleno con `--muni-on-accent` negro encima: los
            dos a 4,5:1. Con #0f766e el negro sobre el botón primario daba 3,84:1 al
            imprimir con fondos. #11847b: 4,61:1 encima · 4,56:1 como texto. Ver el
@@ -518,6 +553,9 @@
            La barra lateral, que es su otro uso, no se imprime. */
         --mg-sb-txt:var(--muni-text);
         --mg-sb-mut:var(--muni-muted);
+        /* En papel la placa vuelve a blanco. Texto 21:1. */
+        --muni-logo-plate:#ffffff;
+        --muni-logo-plate-fg:#000000;
     }
 
     /* El papel es blanco aunque el panel pinte el suyo. */

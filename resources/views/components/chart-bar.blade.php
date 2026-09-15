@@ -44,7 +44,11 @@
 
 @once
     <style>
-        .muni-chartbar__bar { width:100%; max-width:38px; border-radius:5px 5px 0 0; transition:height .6s var(--muni-ease); }
+        /* La barra crece un trayecto: --muni-dur-slow, con respaldo para una
+           hoja publicada vieja. La guardia de abajo cubre el panel Filament,
+           donde --muni-dur no baja con movimiento reducido. */
+        .muni-chartbar__bar { width:100%; max-width:38px; border-radius:5px 5px 0 0; transition:height var(--muni-dur-slow, 600ms) var(--muni-ease); }
+        @media (prefers-reduced-motion:reduce) { .muni-chartbar__bar { transition:none !important; } }
         .muni-chartbar__val { font-family:var(--muni-font-mono); font-variant-numeric:tabular-nums; font-size:11px; font-weight:600; color:var(--muni-muted); margin-bottom:5px; }
     </style>
 @endonce

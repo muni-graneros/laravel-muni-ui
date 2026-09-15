@@ -21,7 +21,7 @@ color que ningún adoptante puede cambiar sin editar el paquete.
 
 ## 2. El catálogo de tokens
 
-Son 49. Nueve de identidad y cuarenta de tema.
+Son 52. Nueve de identidad y cuarenta y tres de tema.
 
 ### Identidad — iguales en claro y en oscuro, a propósito
 
@@ -45,9 +45,16 @@ legible como texto, es un token de estado, no un token de identidad.
 | Foco | `--muni-focus` `--muni-ring` |
 | Sombra | `--muni-shadow` `--muni-shadow-md` `--muni-shadow-lg` `--muni-glow` |
 | Radio | `--muni-radius-sm` `--muni-radius` `--muni-radius-lg` |
-| Movimiento | `--muni-dur` `--muni-ease` |
+| Movimiento | `--muni-dur` `--muni-dur-slow` `--muni-ease` |
 | Tipografía | `--muni-font-sans` `--muni-font-mono` |
 | Layout | `--muni-topbar-h` |
+| Placa del escudo | `--muni-logo-plate` `--muni-logo-plate-fg` |
+
+La placa del escudo (`topbar`, `auth-shell`) **sigue clara en oscuro**, a propósito: el escudo es
+un PNG con el contorno en `--muni-gob-petroleo-dark` y sobre una superficie oscura se pierde. En
+oscuro pasa de blanco a un gris apagado (80 % de blanco sobre `--muni-bg`) que no encandila y
+conserva el contorno sobre 3:1. No hay escudo en negativo: hacerlo exige una variante autorizada
+por el municipio, y cuando exista se diseña junto con la placa, no por separado.
 
 Los radios, el easing y la duración **no cambian con el tema**: heredan de `:root`. Es correcto y
 deliberado.
@@ -126,8 +133,21 @@ Toda transición usa `var(--muni-dur)` y `var(--muni-ease)`. `--muni-dur` pasa a
 `prefers-reduced-motion: reduce`, así que un componente que respeta el token respeta la preferencia
 sin escribir una sola media query.
 
+Un avance que recorre un trayecto (el arco de `ring` y de `chart-donut`, el relleno de `progress`,
+la barra de `chart-bar`) usa `var(--muni-dur-slow)`, que vale `600 ms`. Con `--muni-dur` (`160 ms`)
+el arco salta en vez de avanzar. Se declara solo en `:root` y nunca en un bloque de tema: ahí
+rearmaría los `600 ms` dentro de un contenedor `.dark` o `[data-muni-theme]` anidado, donde el
+bloque de movimiento reducido sobre `:root` ya no alcanza.
+
+Las dos hojas bajan `--muni-dur-slow` a `0 ms` con la preferencia, pero `muni-ui-filament.css` **no
+baja `--muni-dur`**. Por eso el componente que anima lleva además su guardia dentro de su `@once`
+(`@media (prefers-reduced-motion: reduce) { .clase { transition: none !important } }`, con
+`!important` cuando la transición va en `style`), y el `var()` lleva respaldo (`var(--muni-dur-slow,
+600ms)`) para un sistema que todavía tiene publicada la hoja anterior.
+
 Un componente que anima con una duración fija —`transition: width .5s`— **ignora la preferencia**.
-Eso es un defecto, no un detalle: hay cuatro componentes de gráficos que hoy lo hacen.
+Eso es un defecto, no un detalle. Los cuatro que lo hacían (`ring`, `progress`, `chart-donut` y
+`chart-bar`) ya pasaron a `--muni-dur-slow`, y `tests/AnilloDeAvanceTest.php` impide que vuelva.
 
 Corolario del ecosistema: los números de un KPI cuentan desde cero, la tarjeta no. Lo que empieza
 invisible no cuenta como pintado y el LCP se va con la animación; medido, el desvanecido costaba

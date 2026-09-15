@@ -79,7 +79,7 @@
                  Alpine retiene hasta el frame final de la transición (el diálogo ya pintado),
                  y baja al cerrar. Medido en tests/navegador/rotulo-del-atajo.py. --}}
             <div x-show="open" x-trap.inert.noscroll="open && trap" x-transition:enter="muni-pop" x-transition:enter-start="muni-pop-0" x-transition:enter-end="muni-pop-1" role="dialog" aria-modal="true" aria-label="Paleta de comandos"
-                 style="position:relative;width:100%;max-width:560px;background:var(--muni-surface);border:1px solid var(--muni-border);border-radius:var(--muni-radius-lg);box-shadow:var(--muni-shadow-lg);overflow:hidden;font-family:var(--muni-font-sans);">
+                 style="position:relative;width:100%;max-width:560px;background:var(--muni-surface);border:1px solid var(--muni-overlay-border, var(--muni-border));border-radius:var(--muni-radius-lg);box-shadow:var(--muni-shadow-lg);overflow:hidden;font-family:var(--muni-font-sans);">
                 <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--muni-border);">
                     <svg viewBox="0 0 20 20" fill="none" stroke="var(--muni-muted)" stroke-width="1.6" width="17" height="17"><circle cx="9" cy="9" r="6"/><path d="M18 18l-4.5-4.5" stroke-linecap="round"/></svg>
                     {{-- `autofocus` es el contrato de x-trap para el foco inicial (como en modal), no

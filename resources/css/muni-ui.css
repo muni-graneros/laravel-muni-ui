@@ -64,6 +64,19 @@
        --muni-surface-3, que es el peor caso. */
     --muni-field-border: #7b849c;
     --muni-field-border-error: var(--muni-danger-fg);
+    /* Límite de una superficie que FLOTA sobre la página: popover, dropdown,
+       modal, drawer, paleta de comandos y avisos flotantes. --muni-border contra
+       el fondo daba 1,19:1 en claro y 1,52:1 en oscuro: el panel lo separaba la
+       sombra, que no existe con las sombras desactivadas, en colores forzados ni
+       en papel. No se oscurece --muni-border para todo el paquete porque
+       endurecería cada separador y cada tarjeta; solo las flotantes leen este.
+       El valor coincide con --muni-field-border y no es casualidad: 3:1 contra
+       --muni-surface-3 obliga a esa oscuridad, y el tono más suave que todavía
+       llega (#7e869e, 3,12:1) no se distingue a la vista. Medido: 3,73:1 sobre
+       --muni-surface, 3,45:1 sobre --muni-bg y 3,22:1 sobre --muni-surface-3,
+       el peor caso. Token aparte para que un municipio lo ajuste sin tocar los
+       campos. */
+    --muni-overlay-border: #7b849c;
 
     --muni-accent: #0f766e;
     --muni-accent-strong: #115e59;
@@ -107,12 +120,27 @@
     --muni-focus: #0f766e;
     --muni-ease: cubic-bezier(0.22, 1, 0.36, 1);
     --muni-dur: 160ms;
+    /* Movimiento largo: un avance que recorre un trayecto (el arco de `ring`).
+       Con --muni-dur (160 ms) el arco salta en vez de avanzar. No cambia con el
+       tema y NO se redeclara en los bloques de tema: ahí rearmaría los 600 ms
+       dentro de un contenedor anidado, donde el bloque de movimiento reducido
+       sobre `:root` ya no alcanza. Baja a 0 ms con prefers-reduced-motion. */
+    --muni-dur-slow: 600ms;
 
     --muni-font-sans: 'DM Sans', system-ui, sans-serif;
     --muni-font-mono: 'DM Mono', ui-monospace, monospace;
 
     --muni-topbar-h: 56px;
     --muni-glow: none;
+    /* Placa del escudo en `topbar` y `auth-shell`. El escudo es un PNG con el
+       contorno en petróleo casi negro (#00404c, --muni-gob-petroleo-dark): sobre
+       una superficie oscura ese contorno desaparece, por eso va sobre placa. En
+       claro la placa es blanca; en oscuro, un gris apagado (80 % de blanco sobre
+       --muni-bg) que no encandila en una sala a oscuras. --muni-logo-plate-fg es
+       el texto de respaldo cuando no hay logo. Medido: texto 19,22:1 sobre la
+       placa · contorno del escudo 11,43:1. */
+    --muni-logo-plate: #ffffff;
+    --muni-logo-plate-fg: #0b0f14;
 }
 
 /* ── Bloque de valores DARK (reutilizado por todos los activadores) ──────────── */
@@ -140,6 +168,10 @@
         --muni-border-2: #3a4560;
         --muni-field-border: #5f719d;
         --muni-field-border-error: var(--muni-danger-fg);
+        /* Ver el comentario del bloque claro. Medido: 3,97:1 sobre --muni-bg,
+           3,74:1 sobre --muni-surface y 3,24:1 sobre --muni-surface-3 y
+           --muni-panel #1c2333 (peor caso). Mínimo exigido: 3:1. */
+        --muni-overlay-border: #5f719d;
         --muni-accent: #f59e0b;
         --muni-accent-strong: #d97706;
         --muni-accent-soft: #2d1d00;
@@ -168,6 +200,11 @@
         --muni-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
         --muni-topbar-h: 52px;
         --muni-glow: 0 0 6px currentColor;
+        /* Ver el comentario del bloque claro. #cecfd0 = 80 % de blanco sobre
+           --muni-bg. Medido: texto 12,32:1 sobre la placa · contorno del escudo
+           7,32:1. */
+        --muni-logo-plate: #cecfd0;
+        --muni-logo-plate-fg: #0b0f14;
     }
 }
 
@@ -189,6 +226,10 @@
     --muni-border-2: #3a4560;
     --muni-field-border: #5f719d;
     --muni-field-border-error: var(--muni-danger-fg);
+    /* Ver el comentario del bloque claro. Medido: 3,97:1 sobre --muni-bg,
+       3,74:1 sobre --muni-surface y 3,24:1 sobre --muni-surface-3 y
+       --muni-panel #1c2333 (peor caso). Mínimo exigido: 3:1. */
+    --muni-overlay-border: #5f719d;
     --muni-accent: #f59e0b;
     --muni-accent-strong: #d97706;
     --muni-accent-soft: #2d1d00;
@@ -217,6 +258,11 @@
     --muni-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
     --muni-topbar-h: 52px;
     --muni-glow: 0 0 6px currentColor;
+    /* Ver el comentario del bloque claro. #cecfd0 = 80 % de blanco sobre
+       --muni-bg. Medido: texto 12,32:1 sobre la placa · contorno del escudo
+       7,32:1. */
+    --muni-logo-plate: #cecfd0;
+    --muni-logo-plate-fg: #0b0f14;
 }
 
 /* Regla 3: override EXPLÍCITO a light. Congela el tema claro de un sistema con
@@ -243,6 +289,9 @@
        --muni-surface-3, que es el peor caso. */
     --muni-field-border: #7b849c;
     --muni-field-border-error: var(--muni-danger-fg);
+    /* Ver el comentario del bloque LIGHT por defecto: mismo valor, mismas
+       mediciones (3,22:1 sobre --muni-surface-3, el peor caso). */
+    --muni-overlay-border: #7b849c;
     --muni-accent: #0f766e;
     --muni-accent-strong: #115e59;
     --muni-accent-soft: #f0fdfa;
@@ -270,11 +319,14 @@
     --muni-font-mono: 'DM Mono', ui-monospace, monospace;
     --muni-topbar-h: 56px;
     --muni-glow: none;
+    /* Ver el comentario del bloque LIGHT por defecto: mismos valores. */
+    --muni-logo-plate: #ffffff;
+    --muni-logo-plate-fg: #0b0f14;
 }
 
 /* Respeta la preferencia de movimiento reducido en todo el sistema. */
 @media (prefers-reduced-motion: reduce) {
-    :root { --muni-dur: 0ms; }
+    :root { --muni-dur: 0ms; --muni-dur-slow: 0ms; }
 }
 
 /* ── IMPRESIÓN ───────────────────────────────────────────────────────────────
@@ -328,6 +380,11 @@
         --muni-hint: var(--muni-muted);
         --muni-border: #767676;
         --muni-border-2: #3a3f4b;
+        /* En papel no hay sombra: el borde es el ÚNICO límite del panel. Se
+           declara aunque coincida con --muni-border porque, sin él, un panel
+           dentro de `.dark` imprimiría con el valor de la paleta oscura.
+           #767676 sobre la hoja blanca = 4,54:1. */
+        --muni-overlay-border: #767676;
         /* El acento hace dos trabajos en papel y los dos tienen que llegar a 4,5:1.
            Es COLOR DE TEXTO sobre la hoja, y es RELLENO del botón primario, la
            página actual o el día elegido, con `--muni-on-accent` encima. Ese texto
@@ -361,6 +418,10 @@
         --muni-shadow-lg: none;
         --muni-ring: none;
         --muni-glow: none;
+        /* Una hoja no tiene modo oscuro: la placa vuelve a blanco, o el escudo
+           saldría sobre un recuadro gris. Texto 21:1. */
+        --muni-logo-plate: #ffffff;
+        --muni-logo-plate-fg: #000000;
     }
 
     /* El papel es blanco aunque el host pinte el fondo en su propio layout. */

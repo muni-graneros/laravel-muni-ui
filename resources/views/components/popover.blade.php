@@ -251,6 +251,7 @@
             inset: auto;
             margin: 0;
             border: 1px solid var(--muni-border);
+            border-color: var(--muni-overlay-border, var(--muni-border));
             padding: 12px;
             /* Y lo propio del componente. Sin anclaje nativo, el sitio exacto lo
                escribe el respaldo medido; estos valores son el punto de partida

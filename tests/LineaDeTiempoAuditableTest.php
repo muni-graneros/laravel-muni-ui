@@ -266,3 +266,51 @@ it('sigue renderizando un ítem que solo trae title, sin avisos ni markup nuevo'
     expect(str_contains($html, '<details'))->toBeFalse('Sin `detail` no hay bloque colapsable.');
     expect(str_contains($html, 'muni-tl__actor'))->toBeFalse('Sin `actor` no hay línea de actor.');
 });
+
+it('el <ol> declara role="list", porque `list-style:none` se la quita en Safari', function () {
+    /*
+     * La corrección exigida del juez para `record-list` (docs/GAP-ANALYSIS.md,
+     * ficha `lista-registros`, punto 4) manda arreglar esto «en el mismo lote»:
+     *
+     *   «SEMÁNTICA: role="list" en el <ul> contenedor, no role="listitem" en
+     *    cada hijo — el bug de WebKit/VoiceOver lo dispara list-style:none en el
+     *    contenedor y se corrige ahí. De paso, timeline ya tiene ese defecto
+     *    latente (.muni-timeline { list-style:none } sobre un <ol> sin
+     *    role="list") y conviene arreglarlo en el mismo lote.»
+     *
+     * No es cosmético: esta línea de tiempo es la BITÁCORA auditable del
+     * expediente (Ley 21.719, trazabilidad de accesos). Sin el rol, Safari con
+     * VoiceOver lee los hitos como párrafos sueltos y el funcionario pierde el
+     * «lista de 7 elementos» que le dice cuántos movimientos tuvo el trámite
+     * antes de recorrerlos —y no tiene forma de saber que se le quedó uno.
+     */
+    $html = lineaDeTiempoHtml([['title' => 'Ingreso por oficina de partes']]);
+
+    expect((bool) preg_match('/<ol\b[^>]*\brole="list"/i', $html))->toBeTrue(
+        'El <ol> de la bitácora no declara role="list" y su CSS lleva list-style:none: WebKit le '.
+        'quita la semántica de lista y los hitos se leen como texto suelto. HTML: '.substr($html, 0, 200)
+    );
+
+    expect((bool) preg_match('/\brole="listitem"/i', $html))->toBeFalse(
+        'Repite role="listitem" en cada hito: el defecto lo dispara el CONTENEDOR y ahí se corrige.'
+    );
+
+    /* Que el rol exista solo mientras el CSS siga quitando el marcador. Si
+       alguien devuelve el `list-style`, esta prueba deja de tener sentido y hay
+       que mirarla, no borrarla a ciegas. */
+    expect(str_contains(fuenteLineaDeTiempoSinComentarios(), 'list-style:none'))->toBeTrue(
+        'El componente ya no quita el marcador de lista: revisa si el role="list" sigue haciendo falta.'
+    );
+});
+
+it('el anfitrión puede cambiar el rol del <ol> sin que se emita dos veces', function () {
+    /* `merge()` y no un atributo fijo: un `role` del consumidor pisa al nuestro
+       en vez de salir duplicado en la etiqueta, que es HTML inválido. */
+    $html = Blade::render(
+        '<x-muni::timeline :items="$items" role="none" />',
+        ['items' => [['title' => 'Ingreso por oficina de partes']]]
+    );
+
+    expect(substr_count($html, 'role='))->toBe(1, 'El role sale dos veces en la misma etiqueta: '.substr($html, 0, 200));
+    expect((bool) preg_match('/<ol\b[^>]*\brole="none"/i', $html))->toBeTrue('El role del anfitrión no ganó.');
+});

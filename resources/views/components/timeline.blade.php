@@ -70,7 +70,16 @@
     $vigenteYaMarcado = false;
 @endphp
 
-<ol {{ $attributes->merge(['class' => 'muni-timeline']) }}>
+{{-- `role="list"` EN EL CONTENEDOR. El CSS de abajo quita el marcador
+     (`list-style:none`) y WebKit/VoiceOver le quita entonces la semántica de
+     lista a todo el `<ol>`: los hitos se leerían como párrafos sueltos y el
+     funcionario perdería el «lista de N elementos» que le dice cuántos
+     movimientos tuvo el expediente antes de recorrerlos. En una BITÁCORA
+     auditable (Ley 21.719) eso no es cosmético: no hay forma de notar que se
+     quedó un hito sin leer. Va por `merge`, así que un `role` del anfitrión lo
+     pisa en vez de salir duplicado. El rol va en el contenedor y NO como
+     `role="listitem"` en cada hijo, que es donde el defecto NO está. --}}
+<ol {{ $attributes->merge(['role' => 'list', 'class' => 'muni-timeline']) }}>
     @foreach ($items as $item)
         @php
             $tone = $item['tone'] ?? 'accent';

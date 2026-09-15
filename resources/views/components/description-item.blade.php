@@ -2,6 +2,13 @@
     /*
      * El rótulo del dato. Va como <dt> y sale escapado: en una ficha municipal
      * hasta la etiqueta puede venir de una configuración del anfitrión.
+     *
+     * OBLIGATORIA, sin valor por defecto: un <dd> sin su <dt> rotulado no es un
+     * par dato-valor, es un valor suelto que el lector de pantalla anuncia sin
+     * decir de qué (WCAG 2.2 AA 1.3.1). Por eso el candado de humo de
+     * `tests/TodosRendericanTest.php` la lleva en `propsObligatorias()`:
+     *
+     *     'description-item' => 'label="RUT"',
      */
     'label',
     /*
@@ -25,6 +32,12 @@
        un enlace al expediente o un botón de copiar el RUT. Una API de array de
        pares se queda corta en el primer caso real y todos vuelven al <div>. */
     $muniDiSinDato = trim((string) $slot) === '';
+
+    /* Sin `mono` y sin clase del consumidor no se toca el `class`: pedirle la
+       clase a la bolsa igual dejaría un `class=""` vacío en el <dd> de cada par
+       de cada ficha. Con `mono`, `class()` CONCATENA con la del consumidor en
+       vez de pisarla (DESIGN §8). */
+    $muniDiAtributos = $muniDiMono ? $attributes->class(['muni-num']) : $attributes;
 @endphp
 
 {{-- UN PAR DE LA FICHA. Emite <dt> y <dd> SUELTOS, sin envoltorio: tienen que
@@ -37,9 +50,18 @@
 
      Ley 21.719: el valor llega como string YA redactado por el anfitrión. El
      componente no recibe modelos ni registros completos, y por eso no hay
-     ninguna prop que acepte un array del que sacar todas las claves. --}}
-<dt class="muni-dl__k">{{ $label }}</dt>
-<dd {{ $attributes->merge(['class' => 'muni-dl__v'.($muniDiMono ? ' muni-num' : '')]) }}>@if ($muniDiSinDato)<span aria-hidden="true" style="color:var(--muni-muted);">—</span><span class="muni-sr">{{ $empty }}</span>@else{{ $slot }}@endif</dd>
+     ninguna prop que acepte un array del que sacar todas las claves.
+
+     QUIÉN ESCAPA QUÉ, sin adornos. La etiqueta y el texto de «sin dato» los
+     emite este componente y salen escapados. El VALOR no: entra por slot, y un
+     slot es Htmlable —`{{ $slot }}` compila a `e($slot)`, que en un Htmlable
+     devuelve `toHtml()` TAL CUAL—, así que el marcado del slot llega crudo al
+     <dd>. Tiene que ser así: sin eso no hay badge de estado, ni enlace al
+     expediente, ni botón de copiar el RUT, que es la mitigación que el juez
+     exigió. Escapar el valor es del anfitrión, al interpolarlo con `{{ }}` en
+     SU vista; acá dentro no hay un solo `{!! !!}` y hay una prueba que lo fija. --}}
+<dt>{{ $label }}</dt>
+<dd {{ $muniDiAtributos }}>@if ($muniDiSinDato)<span aria-hidden="true" style="color:var(--muni-muted);">—</span><span class="muni-sr">{{ $empty }}</span>@else{{ $slot }}@endif</dd>
 
 {{-- Este componente NO lleva bloque de estilos, y no es un olvido: se renderiza
      DENTRO del <dl>, y el modelo de contenido de <dl> solo admite dt, dd y

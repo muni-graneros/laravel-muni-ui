@@ -36,15 +36,25 @@ use Illuminate\Support\Facades\Blade;
 | redactados por el anfitrión, nunca un modelo—, y nada de `request()`, `Auth`
 | ni `uniqid()`.
 |
+| Lo que esta prueba NO puede ver —la tipografía computada, las dos columnas de
+| verdad, el contraste contra el fondo efectivo, axe— se mide en el navegador,
+| al final del archivo, sobre el banco de `build/pares-dato-valor/`:
+|
+|     vendor/bin/pest tests/ParesDatoValorTest.php   # genera el banco y lo mide
+|     npm run a11y -- build/pares-dato-valor/*.html  # la reja: contraste + axe
+|
+| y el componente entra además en la vitrina (`npm run a11y:vitrina`), que es el
+| candado que DESIGN §11 y SKILL.md ponen antes de dar una pantalla por cerrada.
+|
 | Todo va con `expect(bool)->toBeTrue('mensaje')`: en Pest el segundo argumento
 | de `toContain()` es OTRA aguja, no un mensaje, y la aserción se desactivaría
 | sin avisar.
 */
 
 /** El HTML servido de la lista con los pares que se le pasen. */
-function paresHtml(string $atributos = '', string $contenido = ''): string
+function paresHtml(string $atributos = '', string $contenido = '', array $datos = []): string
 {
-    return Blade::render("<x-muni::description-list {$atributos}>{$contenido}</x-muni::description-list>");
+    return Blade::render("<x-muni::description-list {$atributos}>{$contenido}</x-muni::description-list>", $datos);
 }
 
 /** El fuente crudo de un componente del par, o cadena vacía si todavía no existe. */
@@ -280,19 +290,107 @@ it('colapsa a una columna con CSS de siempre, sin container queries', function (
     );
 });
 
-it('escapa la etiqueta y el valor', function () {
+it('la etiqueta sale escapada y el componente no tiene un solo eco crudo', function () {
+    // La ETIQUETA sí la escapa el componente: la emite él, con `{{ }}`, y en una
+    // ficha municipal hasta el rótulo puede venir de una configuración del host.
     $html = Blade::render(
-        '<x-muni::description-list><x-muni::description-item :label="$etiqueta">{{ $valor }}'
+        '<x-muni::description-list><x-muni::description-item :label="$etiqueta">Ana Soto'
         .'</x-muni::description-item></x-muni::description-list>',
-        ['etiqueta' => '<script>alert(1)</script>', 'valor' => '<img src=x onerror=alert(1)>']
+        ['etiqueta' => '<script>alert(1)</script>']
     );
 
     expect(str_contains($html, '<script>alert(1)</script>'))->toBeFalse(
         'La etiqueta sale sin escapar: la ficha del solicitante es el vector de XSS almacenado '
         .'más directo del ecosistema.'
     );
-    expect(str_contains($html, '<img src=x'))->toBeFalse('El valor sale sin escapar.');
     expect(str_contains($html, '&lt;script&gt;'))->toBeTrue('La etiqueta no llega escapada al HTML.');
+
+    // Y el texto de respaldo del dato ausente, que también lo emite el componente.
+    $ausente = paresHtml('', '<x-muni::description-item label="Correo" :empty="$e" />',
+        ['e' => '<script>alert(2)</script>']);
+    expect(str_contains($ausente, '<script>alert(2)</script>'))->toBeFalse(
+        'El texto de «sin dato» sale sin escapar.'
+    );
+
+    // EL VALOR NO LO ESCAPA ESTE COMPONENTE, Y NO PUEDE HACERLO: va por slot,
+    // que es Htmlable, y `{{ $slot }}` compila a `e($slot)`, que en un Htmlable
+    // devuelve `toHtml()` TAL CUAL. Es el comportamiento correcto —sin él no
+    // habría badge, ni enlace al expediente, ni botón de copiar el RUT, que es
+    // la única mitigación que el juez aceptó— pero hay que decirlo sin adornos:
+    // quien escapa el valor es el anfitrión, al interpolarlo con `{{ }}` en SU
+    // vista. Una prueba que pase el payload por `{{ $valor }}` desde el
+    // consumidor no prueba nada del componente: ahí ya escapó Blade, pase lo que
+    // pase acá dentro. Esta lo deja fijado como contrato, no como ilusión.
+    $crudo = paresHtml('', '<x-muni::description-item label="Estado">'
+        .'<x-muni::badge tone="warn">Por vencer</x-muni::badge></x-muni::description-item>');
+    expect(str_contains($crudo, '<span'))->toBeTrue(
+        'El marcado del slot no llega al <dd>: sin eso el valor no admite un badge y el '
+        .'componente muere en el primer caso real.'
+    );
+
+    // Lo que SÍ es del componente, y es lo que cazaría a un reimplementador que
+    // cambiara el slot por una prop: aquí no hay un solo eco crudo. `{!! !!}`
+    // sobre una prop convertiría la ficha en XSS almacenado de verdad.
+    foreach (paresComponentes() as $nombre) {
+        expect(str_contains(paresFuenteSinComentarios($nombre), '{!!'))->toBeFalse(
+            "«{$nombre}» usa un eco crudo `{!! !!}`: lo que el componente emite por su cuenta "
+            .'—la etiqueta, el texto de «sin dato»— va escapado siempre. El marcado libre entra '
+            .'por el slot, que es responsabilidad declarada del anfitrión.'
+        );
+        expect((bool) preg_match('/@php\s*echo|<\?=|\bprint\s+\$/', paresFuenteSinComentarios($nombre)))->toBeFalse(
+            "«{$nombre}» imprime por fuera de Blade, saltándose el escapado."
+        );
+    }
+});
+
+it('el par no emite clases muertas ni un atributo class vacío', function () {
+    // Ganchos BEM que ningún CSS del paquete declara: prometen un punto de
+    // enganche estable que no existe, y el que los use se queda sin estilo.
+    $css = paresCss('description-list').paresCss('description-item');
+
+    preg_match_all('/class="([^"]*)"/', paresFuenteSinComentarios('description-item'), $clases);
+
+    foreach ($clases[1] as $lista) {
+        foreach (preg_split('/\s+/', trim($lista)) ?: [] as $clase) {
+            if ($clase === '') {
+                continue;
+            }
+
+            expect(str_contains($css, '.'.$clase))->toBeTrue(
+                "El par emite la clase «{$clase}» y ningún bloque de estilos del componente la "
+                .'declara: es un gancho muerto.'
+            );
+        }
+    }
+
+    // Y sin `mono` ni clase del consumidor, el <dd> no arrastra un `class=""`.
+    $plano = paresHtml('', '<x-muni::description-item label="Domicilio">Calle Uno 100</x-muni::description-item>');
+    expect(str_contains($plano, 'class=""'))->toBeFalse(
+        'El <dd> emite un atributo `class` vacío: ruido en el DOM de cada par de cada ficha.'
+    );
+});
+
+it('se renderiza con la prop mínima que declara el candado de humo', function () {
+    // `label` NO tiene valor por defecto, y es a propósito: un <dd> sin su <dt>
+    // rotulado no es un par dato-valor, es un valor suelto que el lector de
+    // pantalla anuncia sin decir de qué. La convención del repo para eso es
+    // declararlo en `propsObligatorias()` de tests/TodosRendericanTest.php —hay
+    // trece componentes así—, y esta prueba fija la línea que va allí:
+    //
+    //     'description-item' => 'label="RUT"',
+    //
+    // Si alguien le pone un defecto a `label`, esta prueba se lo dice: el
+    // contrato es que la etiqueta es obligatoria.
+    expect((bool) preg_match("/'label'\s*=>/", paresFuenteSinComentarios('description-item')))->toBeFalse(
+        'La prop `label` tiene valor por defecto: entonces un par puede quedarse sin etiqueta y '
+        .'el <dd> queda huérfano para el lector de pantalla. Si de verdad se le pone defecto, '
+        .'saca la entrada de propsObligatorias() del candado de humo.'
+    );
+
+    $html = Blade::render('<x-muni::description-item label="RUT">12.345.678-9</x-muni::description-item>');
+
+    expect(trim($html))->not->toBe('', 'El par se renderiza vacío con las props mínimas del candado.');
+    expect(str_contains($html, '<dt>RUT</dt>'))->toBeTrue('La etiqueta no llega al <dt>.');
 });
 
 it('un valor ausente se dice, no se deja en blanco', function () {
@@ -456,4 +554,181 @@ it('el par no mete un bloque de estilos dentro del <dl>', function () {
         'No se emite ningún bloque de estilos: sin él no existen ni `.muni-num` ni `.muni-sr` '
         .'dentro de un panel Filament (DESIGN §7).'
     );
+});
+
+// ---------------------------------------------------------------------------
+// Verificación en navegador
+// ---------------------------------------------------------------------------
+
+/*
+ * El banco de navegador. Se genera acá y no en un script suelto porque este es
+ * el único sitio del paquete con Blade arrancado (mismo criterio que
+ * `GeneraVitrinaTest`, `ListaDeRegistrosTest` y `GuardiaDeSesionTest`). Sale a
+ * `build/pares-dato-valor/`, ignorado por git.
+ *
+ * Son CUATRO páginas por lo que dice DESIGN §7: dentro de un panel Filament
+ * `muni-ui.css` no se carga y la paleta del panel vale distinto, así que
+ * `panel-*` carga ÚNICAMENTE `muni-ui-filament.css`.
+ *
+ * Y en la página NO HAY UNA SOLA TABLA, a propósito: es la condición exacta de
+ * la corrección #2 del juez. Si `.muni-num` no viajara dentro del `@once` de
+ * este componente, el RUT y el monto saldrían en sans proporcional acá, y el
+ * navegador lo dice midiendo la `font-family` computada, que es lo que un test
+ * de texto sobre el CSS no puede ver.
+ *
+ * El bloque del drawer es el que justifica la prop `stacked`: un contenedor de
+ * 360 px dentro de una ventana de 1440. Ahí el media query mira el VIEWPORT y
+ * da dos columnas que no caben; el banco mide las dos listas, la suelta y la
+ * apilada, y deja la demostración por escrito en cada corrida.
+ */
+it('genera el banco de navegador en build/pares-dato-valor/', function () {
+    $dir = __DIR__.'/../build/pares-dato-valor';
+
+    if (! is_dir($dir)) {
+        mkdir($dir, 0775, true);
+    }
+
+    $ficha = Blade::render(
+        '<h1 id="titulo-ficha">Solicitud 4821 — licencia de conducir</h1>'
+        .'<x-muni::description-list label="Datos del solicitante" data-banco="ficha">'
+        .'<x-muni::description-item label="RUT" mono>12.345.678-9</x-muni::description-item>'
+        .'<x-muni::description-item label="Nombre completo">Ana Soto Miranda</x-muni::description-item>'
+        .'<x-muni::description-item label="Domicilio">Manuel Rodríguez 545, Graneros</x-muni::description-item>'
+        .'<x-muni::description-item label="Clase solicitada">B — no profesional</x-muni::description-item>'
+        .'<x-muni::description-item label="Estado">'
+        .'<x-muni::badge tone="warn">Por vencer</x-muni::badge></x-muni::description-item>'
+        /* El dato ausente, que es donde vive la raya `aria-hidden` y el texto
+           para el lector: en el navegador se mide que la raya se pinta con
+           contraste y que el «Sin dato» está oculto SIN salir del árbol de
+           accesibilidad (nada de display:none). */
+        .'<x-muni::description-item label="Correo" />'
+        .'<x-muni::description-item label="Derechos municipales" mono>$ 48.230</x-muni::description-item>'
+        .'</x-muni::description-list>'
+        .'<h2 id="titulo-drawer">La misma ficha dentro de un drawer de 360 px</h2>'
+        .'<div class="banco-drawer">'
+        .'<x-muni::description-list label="En el drawer, sin apilar" data-banco="drawer-suelto">'
+        .'<x-muni::description-item label="RUT" mono>12.345.678-9</x-muni::description-item>'
+        .'<x-muni::description-item label="Domicilio">Manuel Rodríguez 545, Graneros</x-muni::description-item>'
+        .'</x-muni::description-list>'
+        .'<x-muni::description-list label="En el drawer, apilada" stacked data-banco="drawer-apilado">'
+        .'<x-muni::description-item label="RUT" mono>12.345.678-9</x-muni::description-item>'
+        .'<x-muni::description-item label="Domicilio">Manuel Rodríguez 545, Graneros</x-muni::description-item>'
+        .'</x-muni::description-list>'
+        .'</div>'
+    );
+
+    $paginas = [
+        'claro' => ['light', cssMuniUi(), false],
+        'oscuro' => ['dark', cssMuniUi(), false],
+        'panel-claro' => ['light', cssMuniUiFilament(), true],
+        'panel-oscuro' => ['dark', cssMuniUiFilament(), true],
+    ];
+
+    foreach ($paginas as $nombre => [$tema, $css, $panel]) {
+        $oscuro = $tema === 'dark';
+        $hoja = $panel ? 'muni-ui-filament.css' : 'muni-ui.css';
+
+        /* El armazón no aporta ni un color: fondo y texto salen de los mismos
+           tokens que lee el componente. El drawer es un ancho, nada más. */
+        $armazon = 'body{margin:0;padding:24px;background:var(--muni-bg);color:var(--muni-text);font-family:var(--muni-font-sans)}'
+            .'h1{font-size:20px;margin:0 0 16px}h2{font-size:16px;margin:24px 0 8px}'
+            .'.banco-drawer{width:360px;max-width:100%}';
+
+        $cuerpo = $panel
+            ? '<body class="fi-body"><div class="fi-main-ctn"><main class="fi-main" id="muni-contenido" tabindex="-1">'
+                .'<section class="fi-section">'.$ficha.'</section></main></div></body>'
+            : '<body><main id="muni-contenido" tabindex="-1">'.$ficha.'</main></body>';
+
+        $pagina = '<!doctype html><html lang="es" data-muni-theme="'.$tema.'"'.($oscuro ? ' class="dark"' : '').' data-vitrina-hoja="'.$hoja.'">'
+            .'<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+            .'<title>Banco description-list — '.$nombre.'</title>'
+            .'<style>'.$css.'</style><style>'.$armazon.'</style></head>'
+            .$cuerpo.'</html>';
+
+        file_put_contents($dir.'/'.$nombre.'.html', $pagina);
+    }
+
+    foreach (array_keys($paginas) as $nombre) {
+        expect(is_file($dir.'/'.$nombre.'.html'))->toBeTrue('No se escribió el banco '.$nombre.'.');
+    }
+
+    /* La entrada que este componente entrega para `ejemplosDeVitrina()` de
+       tests/GeneraVitrinaTest.php —el archivo compartido que arma la vitrina y
+       que un agente no toca— renderizada tal cual se entrega. La reja
+       `npm run a11y:vitrina` es el candado de DESIGN §11 y de SKILL.md, y sin
+       entrada ahí el componente no se mide nunca: esto al menos garantiza que
+       la línea entregada es Blade válido y que pinta los pares. */
+    $vitrina = Blade::render(
+        '<x-muni::description-list label="Datos del solicitante">'
+        .'<x-muni::description-item label="RUT" mono>12.345.678-9</x-muni::description-item>'
+        .'<x-muni::description-item label="Nombre completo">Ana Soto Miranda</x-muni::description-item>'
+        .'<x-muni::description-item label="Domicilio">Manuel Rodríguez 545, Graneros</x-muni::description-item>'
+        .'<x-muni::description-item label="Clase solicitada">B — no profesional</x-muni::description-item>'
+        .'<x-muni::description-item label="Estado">'
+        .'<x-muni::badge tone="warn">Por vencer</x-muni::badge></x-muni::description-item>'
+        .'<x-muni::description-item label="Correo" />'
+        .'<x-muni::description-item label="Derechos municipales" mono>$ 48.230</x-muni::description-item>'
+        .'</x-muni::description-list>'
+    );
+
+    /* Solo el interior del <dl>: el comentario del bloque de estilos nombra un
+       <dt> en prosa y contarlo sobre el HTML entero daría ocho. */
+    preg_match('#<dl[^>]*>(.*?)</dl>#s', $vitrina, $dentroVitrina);
+
+    expect(substr_count($dentroVitrina[1] ?? '', '<dt>'))->toBe(7,
+        'La entrada de vitrina no pinta los siete pares.'
+    );
+    expect(str_contains($vitrina, 'Sin dato'))->toBeTrue(
+        'La entrada de vitrina no incluye un dato ausente: la reja no mediría ni la raya ni su texto.'
+    );
+    expect(str_contains($vitrina, 'muni-num'))->toBeTrue(
+        'La entrada de vitrina no incluye un valor mono: la reja no mediría la firma del sistema.'
+    );
+
+    /* La página no puede traer una tabla de contrabando: si la trajera, el
+       `@once` de data-table emitiría `.muni-num` y la medición de la mono
+       dejaría de probar lo que la corrección #2 exige. */
+    $claro = (string) file_get_contents($dir.'/claro.html');
+    expect(str_contains($claro, '<table'))->toBeFalse(
+        'El banco tiene una tabla: entonces `.muni-num` podría venir del @once de data-table y '
+        .'la medición de la mono no probaría nada.'
+    );
+});
+
+/** El Python del entorno de la reja (`npm run a11y:instalar`), o null si no está. */
+function pythonDeLaRejaPares(): ?string
+{
+    $ruta = __DIR__.'/../.venv-a11y/bin/python';
+
+    return is_executable($ruta) ? $ruta : null;
+}
+
+/*
+ * Lo que un test de Blade no puede ver, medido en Chromium Y Firefox sobre las
+ * cuatro páginas del banco: la `font-family` computada del RUT en una página
+ * SIN tablas, las dos columnas de verdad (y el colapso a una en el teléfono),
+ * el drawer angosto donde el media query miente, la línea de separación sin
+ * hueco, el contraste contra el fondo efectivo, el texto de «sin dato» oculto
+ * pero vivo en el árbol de accesibilidad y las reglas de impresión COMPUTADAS
+ * con `@media print` emulado.
+ * Se SALTA —no se finge— cuando no está `.venv-a11y`, que en CI no se instala.
+ */
+it('en Chromium y Firefox: dos columnas reales, mono sin tabla en la página, línea continua, contraste y reglas de impresión computadas', function () {
+    $python = pythonDeLaRejaPares();
+
+    if ($python === null) {
+        $this->markTestSkipped('Sin .venv-a11y (npm run a11y:instalar) no hay navegador: la verificación se salta, no se da por hecha.');
+    }
+
+    $lineas = [];
+    $codigo = 0;
+
+    exec(
+        escapeshellarg((string) $python).' '.escapeshellarg(__DIR__.'/navegador/pares-dato-valor.py').' '
+        .escapeshellarg(__DIR__.'/../build/pares-dato-valor').' 2>&1',
+        $lineas,
+        $codigo,
+    );
+
+    expect($codigo)->toBe(0, "La verificación en navegador de <x-muni::description-list> falló:\n".implode("\n", $lineas));
 });

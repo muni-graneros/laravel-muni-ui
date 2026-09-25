@@ -24,7 +24,7 @@
         move(d){ const n=this.results.length; if(!n) return; this.active=(this.active+d+n)%n; },
         go(){ const r=this.results[this.active]; if(r && r.url) window.location.href=r.url; }
     }"
-    @keydown.window="if((($event.metaKey||$event.ctrlKey) && $event.key==='{{ $hotkey }}')){ $event.preventDefault(); show(); }"
+    @keydown.window="if((($event.metaKey||$event.ctrlKey) && $event.key==={{ \Illuminate\Support\Js::from($hotkey) }})){ $event.preventDefault(); show(); }"
     @keydown.escape.window="open=false"
     {{ $attributes }}
 >
@@ -34,17 +34,17 @@
         <div x-show="open" x-cloak style="position:fixed;inset:0;z-index:250;display:flex;align-items:flex-start;justify-content:center;padding:12vh 20px 20px;">
             <div x-show="open" x-transition:enter="muni-fade" x-transition:enter-start="muni-fade-0" x-transition:enter-end="muni-fade-1" x-transition:leave="muni-fade" x-transition:leave-start="muni-fade-1" x-transition:leave-end="muni-fade-0" @click="open=false" style="position:absolute;inset:0;background:rgba(10,14,20,.5);backdrop-filter:blur(3px);"></div>
 
-            <div x-show="open" x-transition:enter="muni-pop" x-transition:enter-start="muni-pop-0" x-transition:enter-end="muni-pop-1" role="dialog" aria-modal="true"
+            <div x-show="open" x-transition:enter="muni-pop" x-transition:enter-start="muni-pop-0" x-transition:enter-end="muni-pop-1" role="dialog" aria-modal="true" aria-label="Paleta de comandos"
                  style="position:relative;width:100%;max-width:560px;background:var(--muni-surface);border:1px solid var(--muni-border);border-radius:var(--muni-radius-lg);box-shadow:var(--muni-shadow-lg);overflow:hidden;font-family:var(--muni-font-sans);">
                 <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--muni-border);">
                     <svg viewBox="0 0 20 20" fill="none" stroke="var(--muni-muted)" stroke-width="1.6" width="17" height="17"><circle cx="9" cy="9" r="6"/><path d="M18 18l-4.5-4.5" stroke-linecap="round"/></svg>
-                    <input x-ref="input" x-model="q" @keydown.down.prevent="move(1)" @keydown.up.prevent="move(-1)" @keydown.enter.prevent="go()"
-                           :placeholder="'{{ $placeholder }}'" autocomplete="off"
+                    <input x-ref="input" x-model="q" @input="active=0" @keydown.down.prevent="move(1)" @keydown.up.prevent="move(-1)" @keydown.enter.prevent="go()"
+                           placeholder="{{ $placeholder }}" aria-label="{{ $placeholder }}" autocomplete="off"
                            style="flex:1;border:none;outline:none;background:transparent;font-family:inherit;font-size:15px;color:var(--muni-text);">
                     <kbd style="font-family:var(--muni-font-mono);font-size:10.5px;padding:3px 6px;border:1px solid var(--muni-border);border-radius:5px;color:var(--muni-muted);">esc</kbd>
                 </div>
                 <div style="max-height:52vh;overflow-y:auto;padding:6px;">
-                    <template x-for="(item, i) in results" :key="item.url || item.label">
+                    <template x-for="(item, i) in results" :key="i">
                         <a :href="item.url || '#'" @mouseenter="active=i" @click="open=false"
                            :style="`display:flex;align-items:center;gap:11px;padding:10px 11px;border-radius:var(--muni-radius-sm);text-decoration:none;color:var(--muni-text);${active===i?'background:var(--muni-surface-2);':''}`">
                             <span style="width:6px;height:6px;border-radius:50%;background:var(--muni-accent);flex-shrink:0;box-shadow:var(--muni-glow);"></span>

@@ -4,20 +4,37 @@
 ])
 
 {{-- Pestañas (Alpine 3). `tabs` es un array de etiquetas; los paneles van en el slot como
-     <x-muni::tab-panel> en el mismo orden. Navegación con flechas ←/→. --}}
-<div x-data="{ active: {{ (int) $default }}, count: {{ count($tabs) }} }" {{ $attributes }}>
+     tab-panel de muni en el mismo orden. Navegación con flechas ←/→, Inicio y Fin. --}}
+<div
+    x-data="{
+        active: {{ (int) $default }}, count: {{ count($tabs) }},
+        ir(i) {
+            if (! this.count) return;
+            this.active = (i + this.count) % this.count;
+            this.$nextTick(() => this.$refs.tablist.children[this.active]?.focus());
+        }
+    }"
+    x-id="['muni-tab', 'muni-tabpanel']"
+    {{ $attributes }}
+>
     <div
         role="tablist"
+        x-ref="tablist"
         style="display:flex;gap:2px;border-bottom:1px solid var(--muni-border);margin-bottom:16px;overflow-x:auto;"
-        @keydown.right.prevent="active = (active + 1) % count"
-        @keydown.left.prevent="active = (active - 1 + count) % count"
+        @keydown.right.prevent="ir(active + 1)"
+        @keydown.left.prevent="ir(active - 1)"
+        @keydown.home.prevent="ir(0)"
+        @keydown.end.prevent="ir(count - 1)"
     >
         @foreach ($tabs as $i => $label)
             <button
                 type="button"
                 role="tab"
+                aria-selected="{{ $i == (int) $default ? 'true' : 'false' }}"
                 :aria-selected="active === {{ $i }}"
                 :tabindex="active === {{ $i }} ? 0 : -1"
+                :id="$id('muni-tab', {{ $i }})"
+                :aria-controls="$id('muni-tabpanel', {{ $i }})"
                 @click="active = {{ $i }}"
                 class="muni-tab"
                 :class="active === {{ $i }} && 'muni-tab--on'"

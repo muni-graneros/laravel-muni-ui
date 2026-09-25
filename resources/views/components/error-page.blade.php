@@ -16,7 +16,7 @@
     {{ $head ?? '' }}
     <style>
         *,*::before,*::after{ box-sizing:border-box; }
-        body{ margin:0; min-height:100vh; display:grid; place-items:center; padding:24px; background:var(--muni-bg); color:var(--muni-text); font-family:var(--muni-font-sans); text-align:center; overflow:hidden; }
+        body{ margin:0; min-height:100vh; display:grid; place-items:center; padding:24px; background:var(--muni-bg); color:var(--muni-text); font-family:var(--muni-font-sans); text-align:center; }
         .muni-err__grid{ position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.6;
             background-image:linear-gradient(color-mix(in srgb,var(--muni-accent) 5%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--muni-accent) 5%,transparent) 1px,transparent 1px);
             background-size:46px 46px; mask-image:radial-gradient(ellipse 60% 50% at 50% 45%,#000,transparent); }

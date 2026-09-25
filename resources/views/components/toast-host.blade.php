@@ -20,10 +20,20 @@
         items: [],
         push(detail) {
             const id = Date.now() + Math.random();
-            this.items.push({ id, tone: detail.tone || 'info', title: detail.title || null, message: detail.message || '' });
+            this.items.push({ id, shown: false, tone: detail.tone || 'info', title: detail.title || null, message: detail.message || '' });
+            this.$nextTick(() => { const t = this.items.find(i => i.id === id); if (t) t.shown = true; });
             setTimeout(() => this.remove(id), detail.duration || 4500);
         },
-        remove(id) { this.items = this.items.filter(i => i.id !== id); }
+        remove(id) {
+            const t = this.items.find(i => i.id === id);
+            if (! t) return;
+            const quitar = () => { this.items = this.items.filter(i => i.id !== id); };
+            if (! t.shown) return quitar();
+            t.shown = false;
+            /* espera la transición de salida (--muni-dur; 0 con movimiento reducido) */
+            const d = getComputedStyle(this.$root).getPropertyValue('--muni-dur').trim();
+            setTimeout(quitar, (parseFloat(d) || 0) * (d.endsWith('ms') ? 1 : 1000) + 20);
+        }
     }"
     @muni-toast.window="push($event.detail || {})"
     style="position:fixed;z-index:300;display:flex;flex-direction:column;gap:10px;max-width:360px;{{ $pos }}"
@@ -32,6 +42,7 @@
 >
     <template x-for="item in items" :key="item.id">
         <div
+            x-show="item.shown"
             x-transition:enter="muni-toast-enter"
             x-transition:enter-start="muni-toast-enter-start"
             x-transition:enter-end="muni-toast-enter-end"

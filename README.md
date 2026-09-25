@@ -218,6 +218,7 @@ izquierdo (banda de libro mayor), y los RUT/cifras usan `.muni-num` (mono tabula
 Todas self-contained (Alpine inline, sin CDN).
 
 **Componentes y sistema**
+- `catalogo.html` — **catálogo de los 53 componentes** renderizados con Blade real, en ambos temas, con guía de qué combinar. Se regenera con `composer install && php demo/catalogo/build.php <ruta a alpinejs/dist/cdn.min.js>`
 - `index.html` — panel de datos en ambos temas · `interactive.html` — modal/dropdown/tabs/toasts
 - `showcase.html` — sala de control cívica con consola viva · `templates.html` — galería de pantallas (landing, login, paneles por rol, error)
 - `app.html` — **dashboard de patentes funcional completo** (command palette ⌘K, charts, tabla sortable, drawer, modal, toasts)

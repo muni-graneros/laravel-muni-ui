@@ -39,7 +39,9 @@
     <div class="muni-cal__grid">
         <template x-for="d in dias" :key="d"><span class="muni-cal__dow" x-text="d"></span></template>
         <template x-for="(c,i) in celdas" :key="i">
-            <template x-if="c"><button type="button" class="muni-cal__day" :class="same(c,sel) && 'muni-cal__day--on'" @click="pick(c)" x-text="c.getDate()"></button></template>
+            {{-- Las celdas vacías previas al día 1 deben ocupar su columna: con x-if no
+                 renderizaban nada y todos los meses empezaban en lunes. --}}
+            <button type="button" class="muni-cal__day" :class="same(c,sel) && 'muni-cal__day--on'" :style="c ? '' : 'visibility:hidden'" :disabled="!c" @click="c && pick(c)" x-text="c ? c.getDate() : ''"></button>
         </template>
     </div>
 </div>

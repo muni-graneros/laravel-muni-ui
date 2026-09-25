@@ -1,13 +1,13 @@
 @props([
-    'text' => '',
-    'placement' => 'top',
+    'text' => '', // texto de la ayuda
+    'placement' => 'top', // top | bottom | left | right
     /*
      * Asociación por `aria-describedby`: OPT-IN, y a propósito. Ver la regla de uso
      * de más abajo. `describe` y `as="description"` son la misma cosa escrita de dos
      * formas; la segunda existe porque es como se lee en la APG.
      */
     'describe' => false,
-    'as' => null,
+    'as' => null, // 'description' asocia por aria-describedby
 ])
 
 @php

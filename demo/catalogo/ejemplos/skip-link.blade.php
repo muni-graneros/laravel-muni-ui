@@ -1,0 +1,1 @@
+<x-muni::skip-link />

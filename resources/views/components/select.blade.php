@@ -1,14 +1,14 @@
 @props([
-    'label' => null,
-    'name' => null,
-    'options' => [],
-    'selected' => null,
-    'placeholder' => null,
-    'error' => null,
-    'hint' => null,
-    'required' => false,
-    'requiredText' => 'obligatorio',
-    'requiredTextVisible' => false,
+    'label' => null, // rótulo del campo
+    'name' => null, // nombre del campo; también base del id
+    'options' => [], // opciones: ['valor' => 'texto', …]
+    'selected' => null, // valor seleccionado
+    'placeholder' => null, // primera opción vacía
+    'error' => null, // mensaje de error del servidor
+    'hint' => null, // ayuda bajo el campo
+    'required' => false, // marca el campo como obligatorio
+    'requiredText' => 'obligatorio', // texto que acompaña al rótulo si es obligatorio
+    'requiredTextVisible' => false, // muestra ese texto a la vista (si no, solo lector)
 ])
 
 @php
@@ -83,7 +83,7 @@
 <div style="display:flex;flex-direction:column;gap:6px;">
     @if ($label)
         <label for="{{ $muniId }}" style="font-family:var(--muni-font-sans);font-size:12.5px;font-weight:600;color:var(--muni-text);">
-            {{ $label }}@if ($required)@if ($muniObl !== '')<span aria-hidden="true" style="color:var(--muni-danger-fg);margin-left:2px;">*</span><span class="{{ $muniOblClase }}"> {{ $muniOblTexto }}</span>@else<span style="color:var(--muni-danger-fg);margin-left:2px;">*</span>@endif@endif
+            {{ $label }}@if ($required)@if ($muniObl !== '')<span aria-hidden="true" style="color:var(--muni-danger-fg);margin-left:2px;">*</span><span class="{{ $muniOblClase }}"> {{ $muniOblTexto }}</span>@else<span style="color:var(--muni-danger-fg);margin-left:2px;">*</span>@endif @endif
         </label>
     @endif
 

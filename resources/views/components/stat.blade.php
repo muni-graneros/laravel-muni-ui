@@ -1,11 +1,11 @@
 @props([
-    'value',
-    'label',
-    'tone' => 'neutral',
-    'delta' => null,
-    'deltaDir' => null,
-    'spark' => null,
-    'hint' => null,
+    'value', // la cifra
+    'label', // qué mide la cifra
+    'tone' => 'neutral', // neutral | ok | warn | danger | info
+    'delta' => null, // variación que acompaña a la cifra
+    'deltaDir' => null, // up | down | null (color de la variación)
+    'spark' => null, // serie de números para la minilínea
+    'hint' => null, // nota bajo la cifra
 ])
 
 @php
@@ -16,6 +16,9 @@
 
     // Sparkline: array de números → path SVG normalizado en un viewbox 100x28.
     $sparkPath = null;
+    // Se reindexa: una serie con claves (['ene' => 3, ...]) dividía una cadena y tronaba.
+    if ($spark instanceof \Illuminate\Contracts\Support\Arrayable) { $spark = $spark->toArray(); }
+    if (is_array($spark)) { $spark = array_values(array_map(fn ($v) => (float) $v, $spark)); }
     if (is_array($spark) && count($spark) > 1) {
         $min = min($spark); $max = max($spark); $range = ($max - $min) ?: 1;
         $n = count($spark) - 1;

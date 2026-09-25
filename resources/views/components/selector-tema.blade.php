@@ -1,11 +1,11 @@
 @props([
-    'action',
-    'value' => null,
-    'name' => 'muni-tema',
-    'label' => 'Tema',
-    'hint' => 'Con «Sistema» se sigue la preferencia del equipo.',
-    'submitLabel' => 'Guardar',
-    'enabled' => true,
+    'action', // URL a la que el formulario envía la elección
+    'value' => null, // sistema | claro | oscuro (acepta system | light | dark)
+    'name' => 'muni-tema', // nombre del campo; también base de los ids
+    'label' => 'Tema', // rótulo del grupo
+    'hint' => 'Con «Sistema» se sigue la preferencia del equipo.', // ayuda bajo el grupo
+    'submitLabel' => 'Guardar', // texto del botón de guardar
+    'enabled' => true, // false no emite nada (sistema con tema fijo)
 ])
 
 {{-- Selector de tema: sistema / claro / oscuro, para que el funcionario elija y la

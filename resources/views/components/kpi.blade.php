@@ -1,8 +1,8 @@
 @props([
-    'value',
-    'label',
-    'tone' => 'neutral',
-    'hint' => null,
+    'value', // cifra principal, obligatoria
+    'label', // rótulo de la cifra, obligatorio
+    'tone' => 'neutral', // neutral | ok | warn | danger | info
+    'hint' => null, // línea secundaria bajo el rótulo
 ])
 
 @php

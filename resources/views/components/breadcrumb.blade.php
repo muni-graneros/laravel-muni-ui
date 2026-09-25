@@ -1,5 +1,5 @@
 @props([
-    'items' => [],
+    'items' => [], // ['label'=>, 'url'=>?] o texto; la última es la actual
 ])
 
 {{-- MIGAS DE RUTA (WCAG 2.2 AA · patrón «breadcrumb» de la APG).

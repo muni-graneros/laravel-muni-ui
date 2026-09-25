@@ -1,12 +1,20 @@
 @props([
-    'items' => [],
-    'placeholder' => 'Buscar o ir a…',
-    'hotkey' => 'k',
+    'items' => [], // ['label'=>, 'url'=>, 'group'=>?, 'hint'=>?]
+    'placeholder' => 'Buscar o ir a…', // texto del disparador y del campo de búsqueda
+    'hotkey' => 'k', // tecla del atajo con Ctrl/⌘ (por defecto k)
 ])
 
 @php
     // $items: array de ['label'=>, 'url'=>, 'group'=>?, 'hint'=>?]
-    $itemsJson = json_encode(array_values($items), JSON_UNESCAPED_UNICODE | JSON_HEX_APOS | JSON_HEX_QUOT);
+    /*
+     * Cada ítem lleva su posición como `clave` del x-for. `url || label` no es único:
+     * dos ítems con la misma url (medido en Chromium) y Alpine no pinta NINGÚN
+     * resultado. La posición en la lista original sí lo es y sobrevive al filtro.
+     */
+    $itemsJson = json_encode(
+        array_map(fn ($item, $n) => ['clave' => $n] + (array) $item, array_values($items), array_keys(array_values($items))),
+        JSON_UNESCAPED_UNICODE | JSON_HEX_APOS | JSON_HEX_QUOT
+    );
 
     /*
      * El rótulo del atajo y el manejador salen de la MISMA prop. Un «Ctrl K» escrito a
@@ -35,11 +43,15 @@
             return this.items.filter(i => (i.label+' '+(i.group||'')).toLowerCase().includes(t));
         },
         show(){ this.open=true; this.q=''; this.active=0; },
-        move(d){ const n=this.results.length; if(!n) return; this.active=(this.active+d+n)%n; },
+        move(d){ const n=this.results.length; if(!n) return; this.active=(this.active+d+n)%n;
+            this.$nextTick(() => document.getElementById(this.$id('muni-cmdk-lista') + '-' + this.active)?.scrollIntoView({ block: 'nearest' })); },
         go(){ const r=this.results[this.active]; if(r && r.url) window.location.href=r.url; },
         mac: /mac|iphone|ipad|ipod/i.test(navigator.userAgentData?.platform ?? navigator.platform ?? '')
     }"
-    @keydown.window="if((($event.metaKey||$event.ctrlKey) && $event.key.toLowerCase()===@js($hotkeyKey))){ $event.preventDefault(); show(); }"
+    x-id="['muni-cmdk-lista']"
+    {{-- `defaultPrevented`: con dos paletas en la página (una en la barra y otra en un
+         panel) el atajo abría las dos, apiladas. La primera que lo atiende lo marca. --}}
+    @keydown.window="if(!$event.defaultPrevented && ($event.metaKey||$event.ctrlKey) && $event.key.toLowerCase()===@js($hotkeyKey)){ $event.preventDefault(); show(); }"
     @keydown.escape.window="open=false"
     {{ $attributes }}
 >
@@ -89,8 +101,16 @@
                          que esté enfocado en ese instante; si la caja ya tenía el foco, al cerrar
                          con Escape lo devolvía a una caja con display:none y el foco caía al <body>.
                          Medido en Firefox siempre y en Chromium con movimiento reducido. --}}
-                    <input x-ref="input" x-model="q" @keydown.down.prevent="move(1)" @keydown.up.prevent="move(-1)" @keydown.enter.prevent="go()"
-                           placeholder="{{ $placeholder }}" autocomplete="off" autofocus
+                    {{-- `aria-label` porque el placeholder no es un nombre accesible fiable (se
+                         borra al escribir y no todos los lectores lo leen). `@input` vuelve al primer
+                         resultado: filtrar deja `active` apuntando fuera de la lista y Enter no hacía nada. --}}
+                    {{-- Combobox con listbox: el foco se queda en la caja y aria-activedescendant
+                         le dice al lector cuál resultado está marcado; sin eso las flechas movían un
+                         resaltado que solo se veía. --}}
+                    <input x-ref="input" x-model="q" @input="active=0"
+                           role="combobox" aria-expanded="true" aria-autocomplete="list" :aria-controls="$id('muni-cmdk-lista')"
+                           :aria-activedescendant="results.length ? $id('muni-cmdk-lista') + '-' + active : null" @keydown.down.prevent="move(1)" @keydown.up.prevent="move(-1)" @keydown.enter.prevent="go()"
+                           placeholder="{{ $placeholder }}" aria-label="{{ $placeholder }}" autocomplete="off" autofocus
                            class="muni-cmdk__input"
                            style="flex:1;border:none;background:transparent;font-family:inherit;font-size:15px;color:var(--muni-text);">
                     {{-- La tecla dibujada va aria-hidden como el ⌘ del disparador: «esc» suelto se lee
@@ -99,16 +119,19 @@
                     <span class="muni-cmdk__sr">Escape cierra la paleta</span>
                 </div>
                 <div style="max-height:52vh;overflow-y:auto;padding:6px;">
-                    <template x-for="(item, i) in results" :key="item.url || item.label">
+                    <div role="listbox" :id="$id('muni-cmdk-lista')" aria-label="Resultados" x-show="results.length">
+                    <template x-for="(item, i) in results" :key="item.clave">
                         <a :href="item.url || '#'" @mouseenter="active=i" @click="open=false"
-                           :style="`display:flex;align-items:center;gap:11px;padding:10px 11px;border-radius:var(--muni-radius-sm);text-decoration:none;color:var(--muni-text);${active===i?'background:var(--muni-surface-2);':''}`">
+                           role="option" tabindex="-1" :id="$id('muni-cmdk-lista') + '-' + i" :aria-selected="active===i ? 'true' : 'false'"
+                           class="muni-cmdk__opcion" :class="active===i && 'muni-cmdk__opcion--activa'">
                             <span style="width:6px;height:6px;border-radius:50%;background:var(--muni-accent);flex-shrink:0;box-shadow:var(--muni-glow);"></span>
                             <span style="flex:1;min-width:0;font-size:13.5px;font-weight:500;" x-text="item.label"></span>
                             <template x-if="item.group"><span style="font-size:11px;color:var(--muni-muted);font-family:var(--muni-font-mono);" x-text="item.group"></span></template>
                         </a>
                     </template>
+                    </div>
                     <template x-if="results.length===0">
-                        <div style="padding:28px 12px;text-align:center;color:var(--muni-muted);font-size:13px;">Sin coincidencias para «<span x-text="q"></span>».</div>
+                        <div role="status" style="padding:28px 12px;text-align:center;color:var(--muni-muted);font-size:13px;">Sin coincidencias para «<span x-text="q"></span>».</div>
                     </template>
                 </div>
             </div>
@@ -118,6 +141,10 @@
 
 @once
     <style>
+        .muni-cmdk__opcion{display:flex;align-items:center;gap:11px;padding:10px 11px;border-radius:var(--muni-radius-sm);text-decoration:none;color:var(--muni-text);}
+        /* La opción marcada no puede ser solo un gris casi igual a la superficie (1,1:1):
+           fondo de acento suave y una barra de acento a la izquierda. */
+        .muni-cmdk__opcion--activa{background:var(--muni-accent-soft, var(--muni-surface-2));box-shadow:inset 3px 0 0 var(--muni-accent);}
         .muni-fade{transition:opacity var(--muni-dur) var(--muni-ease);}.muni-fade-0{opacity:0}.muni-fade-1{opacity:1}
         /* El velo, como el del modal y el drawer: color de --muni-scrim y opacidad
            propia, con clases -0/-1 del fundido después de la base para ganarle. */

@@ -1,16 +1,16 @@
 @props([
-    'name' => 'agenda',
-    'mes' => null,
-    'franjas' => [],
-    'dias' => [],
-    'value' => null,
-    'franja' => null,
-    'label' => 'Agenda de horas',
-    'accion' => 'Reservar',
-    'mesUrl' => null,
-    'mesEvento' => false,
-    'operacion' => 'reservar',
-    'error' => null,
+    'name' => 'agenda', // name del radio de hora; también {name}_dia y {name}_mes
+    'mes' => null, // mes a la vista, 'Y-m'; por defecto el del día elegido
+    'franjas' => [], // ['Y-m-d' => [['inicio','fin','estado','valor','detalle']]]
+    'dias' => [], // carga ya calculada: ['Y-m-d' => ['total'=>, 'tomados'=>]]
+    'value' => null, // día elegido, 'Y-m-d' o DateTimeInterface
+    'franja' => null, // valor de la franja elegida; solo vale si está libre
+    'label' => 'Agenda de horas', // nombre accesible del grupo
+    'accion' => 'Reservar', // texto del botón de acción
+    'mesUrl' => null, // callable('Y-m') => url; dibuja ‹ › como enlaces
+    'mesEvento' => false, // true: ‹ › emiten muni-agenda:mes (Livewire)
+    'operacion' => 'reservar', // reservar | reagendar | bloquear (va en muni-agenda:accion)
+    'error' => null, // mensaje de error ya redactado
 ])
 
 @php

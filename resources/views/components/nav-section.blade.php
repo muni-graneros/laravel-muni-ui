@@ -1,5 +1,5 @@
 @props([
-    'title' => null,
+    'title' => null, // encabezado del grupo
 ])
 
 <div style="margin:14px 0 4px;">

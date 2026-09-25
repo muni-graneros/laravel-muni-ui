@@ -1,13 +1,13 @@
 @props([
     /* Rótulo del grupo. Obligatorio: es el nombre accesible del disclosure y la
        semilla del id, así que sin él el componente no tiene contrato. */
-    'titulo',
+    'titulo', // rótulo del grupo, obligatorio
     /* Estado INICIAL, decidido en el servidor por quien sabe qué página se está
        mirando (en `nav-menu`, el propio menú). Ver la nota de abajo. */
-    'abierto' => false,
+    'abierto' => false, // estado inicial del grupo, decidido en el servidor
     /* SVG en crudo, igual que `nav-item`: viene del layout del anfitrión, nunca
        de datos de usuario. */
-    'icono' => null,
+    'icono' => null, // SVG crudo del layout, nunca datos de usuario
 ])
 
 @php

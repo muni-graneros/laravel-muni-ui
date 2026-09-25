@@ -1,7 +1,7 @@
 @props([
-    'system' => null,
-    'home' => 'https://www.municipalidadgraneros.cl/',
-    'sticky' => false,
+    'system' => null, // nombre del sistema tras el municipio
+    'home' => 'https://www.municipalidadgraneros.cl/', // URL del sitio municipal
+    'sticky' => false, // queda fija arriba al hacer scroll
 ])
 
 {{-- Barra institucional de gobierno. Va ARRIBA de todo en cada subdominio del ecosistema

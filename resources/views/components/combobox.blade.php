@@ -1,22 +1,22 @@
 @props([
-    'name',
-    'label' => null,
-    'options' => [],
-    'value' => null,
-    'selectedLabel' => null,
-    'search' => null,
-    'model' => null,
-    'searchModel' => null,
-    'placeholder' => 'Escribe para buscar…',
-    'listLabel' => null,
-    'emptyText' => 'Sin resultados.',
-    'clearLabel' => 'Limpiar la búsqueda',
-    'hint' => null,
-    'error' => null,
-    'required' => false,
-    'requiredText' => 'obligatorio',
-    'requiredTextVisible' => false,
-    'loading' => false,
+    'name', // name del campo oculto con el id elegido (obligatorio)
+    'label' => null, // texto de la etiqueta
+    'options' => [], // resultados ya acotados (tope 20): arreglos o valor => texto
+    'value' => null, // id elegido
+    'selectedLabel' => null, // etiqueta visible del id elegido (la pinta el servidor)
+    'search' => null, // texto de búsqueda actual
+    'model' => null, // propiedad Livewire del id (wire:model.live)
+    'searchModel' => null, // propiedad Livewire del texto (debounce 300 ms)
+    'placeholder' => 'Escribe para buscar…', // placeholder del campo de búsqueda
+    'listLabel' => null, // nombre accesible de la lista; por defecto «label: resultados»
+    'emptyText' => 'Sin resultados.', // texto cuando no hay resultados
+    'clearLabel' => 'Limpiar la búsqueda', // nombre accesible del botón limpiar
+    'hint' => null, // texto de ayuda bajo el campo
+    'error' => null, // mensaje de error ya redactado
+    'required' => false, // marca el campo como obligatorio
+    'requiredText' => 'obligatorio', // texto accesible junto al asterisco
+    'requiredTextVisible' => false, // muestra requiredText entre paréntesis
+    'loading' => false, // true: muestra el estado de carga y aria-busy
 ])
 
 @php
@@ -275,7 +275,7 @@
 >
     @if ($label)
         <label for="{{ $muniId }}" style="font-family:var(--muni-font-sans);font-size:12.5px;font-weight:600;color:var(--muni-text);">
-            {{ $label }}@if ($required)@if ($muniObl !== '')<span aria-hidden="true" style="color:var(--muni-danger-fg);margin-left:2px;">*</span><span class="{{ $muniOblClase }}"> {{ $muniOblTexto }}</span>@else<span style="color:var(--muni-danger-fg);margin-left:2px;">*</span>@endif@endif
+            {{ $label }}@if ($required)@if ($muniObl !== '')<span aria-hidden="true" style="color:var(--muni-danger-fg);margin-left:2px;">*</span><span class="{{ $muniOblClase }}"> {{ $muniOblTexto }}</span>@else<span style="color:var(--muni-danger-fg);margin-left:2px;">*</span>@endif @endif
         </label>
     @endif
 

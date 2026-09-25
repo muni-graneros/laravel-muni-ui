@@ -1,10 +1,10 @@
 @props([
-    'value' => 0,
-    'max' => 100,
-    'size' => 96,
-    'tone' => 'accent',
-    'label' => null,
-    'showValue' => true,
+    'value' => 0, // valor actual
+    'max' => 100, // valor que equivale al 100 %
+    'size' => 96, // diámetro en px
+    'tone' => 'accent', // accent | ok | warn | danger | info
+    'label' => null, // rótulo bajo el anillo y nombre accesible
+    'showValue' => true, // muestra el porcentaje al centro
 ])
 
 @php

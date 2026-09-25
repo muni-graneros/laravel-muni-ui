@@ -1,7 +1,7 @@
 @props([
-    'title' => null,
-    'side' => 'right',
-    'width' => '400px',
+    'title' => null, // título del panel lateral
+    'side' => 'right', // right | left
+    'width' => '400px', // ancho del panel (CSS); tope de 92vw
 ])
 
 @php

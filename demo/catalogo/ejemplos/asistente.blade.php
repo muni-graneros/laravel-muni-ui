@@ -1,0 +1,3 @@
+<x-muni::asistente :steps="['Identificación', ['label' => 'Antecedentes médicos', 'hint' => 'Informe del médico tratante'], ['label' => 'Documentos', 'state' => 'error'], ['label' => 'Declaración', 'state' => 'skipped'], 'Revisión']" :current="1" title="Solicitud de credencial de discapacidad" subtitle="Municipalidad de Graneros · Dirección de Desarrollo Comunitario" action="/credencial" nav-name="_ir_a_paso" skippable :csrf="false" :focus-step="false" step-subtitle="Los antecedentes que entregó el médico tratante.">
+    <x-muni::input label="Nombre del médico tratante" name="medico" hint="Como aparece en el informe" required />
+</x-muni::asistente>

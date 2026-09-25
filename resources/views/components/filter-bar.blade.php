@@ -1,6 +1,6 @@
 @props([
-    'action' => null,
-    'method' => 'get',
+    'action' => null, // URL del formulario; null envía a la misma página
+    'method' => 'get', // get | post | put | patch | delete (CSRF fuera de GET)
 ])
 
 {{-- Barra de filtros GET: los valores quedan en la URL para que las descargas
@@ -13,11 +13,18 @@
        copia y pega en un correo. En POST, sin token, Laravel responde 419 y el
        filtro no se aplica jamás: es el defecto que el juez mandó arreglar antes
        que cualquier componente nuevo. */
-    $muniFbProtegido = strtolower(trim((string) $method)) !== 'get';
+    $muniFbVerbo = strtolower(trim((string) $method));
+    $muniFbProtegido = $muniFbVerbo !== 'get';
+
+    /* Un <form> solo sabe GET y POST: `method="put"` lo trata el navegador como
+       GET y el token terminaba en la URL. PUT, PATCH y DELETE van por POST con el
+       campo `_method` que entiende Laravel. */
+    $muniFbMetodoForm = $muniFbProtegido ? 'post' : 'get';
+    $muniFbSuplanta = ! in_array($muniFbVerbo, ['get', 'post'], true);
 @endphp
 
 <form
-    method="{{ $method }}"
+    method="{{ $muniFbMetodoForm }}"
     @if ($action) action="{{ $action }}" @endif
     {{ $attributes->merge([
         'style' => 'display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;'
@@ -27,6 +34,9 @@
 >
     @if ($muniFbProtegido)
         @csrf
+    @endif
+    @if ($muniFbSuplanta)
+        @method(strtoupper($muniFbVerbo))
     @endif
 
     {{ $slot }}

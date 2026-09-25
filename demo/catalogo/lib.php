@@ -115,5 +115,8 @@ function catalogo_datos(Factory $view, string $root): array
 
     $total = count($vistos);
 
-    return compact('grupos', 'recetas', 'total');
+    // Armado por partes: Blade compila la etiqueta de componente aunque esté dentro de un string.
+    $inicio = resaltar('<'.'x-muni::badge tone="ok">Al día</'.'x-muni::badge>');
+
+    return compact('grupos', 'recetas', 'total', 'inicio');
 }

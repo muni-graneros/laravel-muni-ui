@@ -42,15 +42,16 @@
         .cat-hero{ padding:40px 0 12px; display:grid; gap:18px; }
         .cat-hero h1{ margin:0; font-size:clamp(26px,4vw,34px); letter-spacing:-.015em; line-height:1.1; text-wrap:balance; }
         .cat-hero p{ margin:0; color:var(--muni-muted); font-size:15px; max-width:68ch; }
-        .cat-facts{ display:flex; gap:22px; flex-wrap:wrap; font-size:12.5px; color:var(--muni-muted); }
+        .cat-facts{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px 22px; max-width:760px; font-size:12.5px; color:var(--muni-muted); }
         .cat-facts b{ display:block; font-family:var(--muni-font-mono); font-size:22px; color:var(--muni-text); font-variant-numeric:tabular-nums; }
         .cat-start{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px; }
-        .cat-start > div{ display:grid; gap:6px; align-content:start; }
+        .cat-start > div{ display:grid; gap:6px; align-content:start; min-width:0; }
+        .cat-start .cat-code{ border:1px solid var(--muni-border); border-radius:var(--muni-radius); min-width:0; }
         .cat-start span{ font-size:12px; font-weight:600; color:var(--muni-muted); }
         .cat-group{ display:flex; align-items:baseline; gap:12px; margin:56px 0 16px; padding-bottom:8px; border-bottom:1px solid var(--muni-border); }
         .cat-group h2{ margin:0; font-size:19px; letter-spacing:-.01em; }
         .cat-group span{ font-family:var(--muni-font-mono); font-size:12px; color:var(--muni-hint); }
-        .cat-item{ display:grid; gap:10px; margin:0 0 36px; }
+        .cat-item{ display:grid; grid-template-columns:minmax(0,1fr); gap:10px; margin:0 0 36px; }
         .cat-item__head{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
         .cat-item__head h3{ margin:0; font-family:var(--muni-font-mono); font-size:15px; font-weight:600; }
         .cat-item__head a{ color:inherit; text-decoration:none; }
@@ -73,7 +74,7 @@
         .cat-demo--iframe{ padding:0; display:grid; grid-template-columns:1fr; overflow:hidden; background:var(--muni-surface-2); }
         .cat-demo--iframe iframe{ width:100%; height:480px; border:0; display:block; background:var(--muni-bg); }
         .cat-more{ display:flex; gap:8px; flex-wrap:wrap; align-items:flex-start; }
-        .cat-more details{ flex:1 1 100%; border:1px solid var(--muni-border); border-radius:var(--muni-radius); background:var(--muni-surface); overflow:hidden; }
+        .cat-more details{ flex:1 1 100%; min-width:0; border:1px solid var(--muni-border); border-radius:var(--muni-radius); background:var(--muni-surface); overflow:hidden; }
         .cat-more summary{ cursor:pointer; list-style:none; display:flex; align-items:center; gap:8px; padding:9px 14px; font-size:12.5px; font-weight:600; color:var(--muni-muted); user-select:none; }
         .cat-more summary::-webkit-details-marker{ display:none; }
         .cat-more summary::before{ content:"›"; font-size:15px; line-height:1; transition:transform var(--muni-dur) var(--muni-ease); }
@@ -99,9 +100,9 @@
         .cat-slots{ display:flex; gap:6px; flex-wrap:wrap; align-items:center; padding:10px 14px; font-size:12px; color:var(--muni-muted); border-top:1px solid var(--muni-border); }
         .cat-slots code{ font-size:11.5px; }
         .cat-note{ margin:0; padding:10px 14px; font-size:12.5px; color:var(--muni-muted); border-top:1px solid var(--muni-border); }
-        .cat-recipe{ display:grid; gap:10px; margin:0 0 44px; }
+        .cat-recipe{ display:grid; grid-template-columns:minmax(0,1fr); gap:10px; margin:0 0 44px; }
         .cat-recipe h3{ margin:0; font-size:16px; }
-        .cat-recipe .cat-demo{ display:grid; gap:16px; background:var(--muni-bg); padding:22px; }
+        .cat-recipe .cat-demo{ display:grid; grid-template-columns:minmax(0,1fr); gap:16px; background:var(--muni-bg); padding:22px; }
         .cat-recipe .cat-demo--flush{ padding:0; gap:0; overflow:hidden; }
         .cat-uses{ display:flex; gap:6px; flex-wrap:wrap; }
         .cat-uses a{ font-family:var(--muni-font-mono); font-size:11.5px; color:var(--muni-accent); text-decoration:none; padding:2px 7px; border:1px solid color-mix(in srgb,var(--muni-accent) 30%,transparent); border-radius:999px; }
@@ -155,11 +156,11 @@
                 <div><b>0</b>dependencias JS además de Alpine</div>
             </div>
             <div class="cat-start">
-                <div><span>1 · Instalar</span><div class="cat-code" style="border:1px solid var(--muni-border);border-radius:var(--muni-radius);"><pre>composer require muni-graneros/laravel-muni-ui</pre></div></div>
-                <div><span>2 · Importar en resources/css/app.css</span><div class="cat-code" style="border:1px solid var(--muni-border);border-radius:var(--muni-radius);"><pre>@import "tailwindcss";
+                <div><span>1 · Instalar</span><div class="cat-code"><pre>composer require muni-graneros/laravel-muni-ui</pre></div></div>
+                <div><span>2 · Importar en resources/css/app.css</span><div class="cat-code"><pre>@import "tailwindcss";
 @import "../../vendor/muni-graneros/laravel-muni-ui/resources/css/muni-ui.css";
 @source "../../vendor/muni-graneros/laravel-muni-ui/resources/views/**/*.blade.php";</pre></div></div>
-                <div><span>3 · Usar</span><div class="cat-code" style="border:1px solid var(--muni-border);border-radius:var(--muni-radius);"><pre>{!! resaltar('<x-muni::badge tone="ok">Al día</x-muni::badge>') !!}</pre></div></div>
+                <div><span>3 · Usar</span><div class="cat-code"><pre>{!! $inicio !!}</pre></div></div>
             </div>
         </header>
 

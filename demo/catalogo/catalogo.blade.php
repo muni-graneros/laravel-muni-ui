@@ -138,6 +138,8 @@
         .cat-type small{ font-family:var(--muni-font-mono); color:var(--muni-muted); font-size:11.5px; }
         .cat-shape{ display:flex; gap:12px; flex-wrap:wrap; }
         .cat-shape > div{ width:132px; height:84px; display:grid; place-items:center; text-align:center; font-family:var(--muni-font-mono); font-size:11px; color:var(--muni-muted); background:var(--muni-surface); border:1px solid var(--muni-border); }
+        .cat-tema-demo{ --muni-accent:#1d4ed8; --muni-accent-strong:#1e40af; --muni-accent-soft:#eff6ff; --muni-on-accent:#ffffff; --muni-ring:0 0 0 2px var(--muni-surface), 0 0 0 4px var(--muni-accent); }
+        [data-muni-theme="dark"] .cat-tema-demo{ --muni-accent:#60a5fa; --muni-accent-strong:#3b82f6; --muni-accent-soft:#0c1a33; --muni-on-accent:#0b0f14; }
         .cat-empty{ padding:40px 0; color:var(--muni-muted); }
         @media (max-width:900px){
             .cat{ grid-template-columns:1fr; }
@@ -161,6 +163,7 @@
         @endforeach
         <h4>Guías</h4>
         <a href="#fundamentos">fundamentos</a>
+        <a href="#personalizar">personalizar el tema</a>
         <a href="#recetas">recetas de pantalla</a>
         <a href="#solapes">solapamientos</a>
     </nav>
@@ -252,6 +255,36 @@
                     <div class="cat-type">
                         <div><small>--muni-font-sans</small><span style="font-size:26px;font-weight:700;letter-spacing:-.01em;">Patentes comerciales</span><span style="color:var(--muni-muted);">Solicitud ingresada en el mesón de atención.</span></div>
                         <div><small>--muni-font-mono · .muni-num</small><span class="muni-num" style="font-family:var(--muni-font-mono);font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;">76.123.456-7</span><span style="font-family:var(--muni-font-mono);color:var(--muni-muted);">$ 1.284.500 · 25-09-2026</span></div>
+                    </div>
+                </div>
+                <div id="personalizar">
+                    <h3>Personalizar el tema de un sistema</h3>
+                    <p>Un sistema con identidad propia sobreescribe tokens en su <code>app.css</code>, después del <code>@@import</code> del paquete; los componentes no se tocan. Para congelar un tema, <code>&lt;html data-muni-theme="light"&gt;</code>. Ojo: <code>--muni-ring</code> se calcula con el acento donde se declara, así que si cambias el acento más abajo que <code>:root</code>, vuelve a declarar el anillo.</p>
+                    <div class="cat-type">
+                        <div class="cat-tema-demo">
+                            <small>acento azul en este bloque</small>
+                            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                                <x-muni::button size="sm">Guardar</x-muni::button>
+                                <x-muni::checkbox name="demo_tema" checked label="Activo" />
+                                <x-muni::segmented><span class="muni-seg muni-seg--on">Mes</span><span class="muni-seg">Año</span></x-muni::segmented>
+                            </div>
+                            <x-muni::progress :value="60" label="Avance" showValue />
+                        </div>
+                        <div class="cat-code" style="border:1px solid var(--muni-border);border-radius:var(--muni-radius);min-width:0;"><pre tabindex="0">/* resources/css/app.css del sistema */
+body {
+    --muni-accent: #1d4ed8;
+    --muni-accent-strong: #1e40af;
+    --muni-accent-soft: #eff6ff;
+    --muni-on-accent: #ffffff;
+    /* el anillo usa el acento: se redeclara aquí */
+    --muni-ring: 0 0 0 2px var(--muni-surface), 0 0 0 4px var(--muni-accent);
+}
+:is([data-muni-theme="dark"], .dark) body {
+    --muni-accent: #60a5fa;
+    --muni-accent-strong: #3b82f6;
+    --muni-accent-soft: #0c1a33;
+    --muni-on-accent: #0b0f14;
+}</pre></div>
                     </div>
                 </div>
                 <div>

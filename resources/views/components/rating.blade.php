@@ -55,7 +55,9 @@
 
 @once
     <style>
-        .muni-star { background:none; border:none; padding:0 1px; font-size:20px; line-height:1; color:var(--muni-border-2); cursor:pointer; transition:color var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease); }
+        /* Sin marcar: borde fuerte (≥3:1). Los botones miden al menos 24×24 (WCAG 2.5.8); el glifo sigue en 20px. */
+        .muni-star { background:none; border:none; padding:0 1px; font-size:20px; line-height:1; color:var(--muni-border-strong, var(--muni-border-2)); cursor:pointer; transition:color var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease); }
+        button.muni-star { display:inline-flex; align-items:center; justify-content:center; min-width:24px; min-height:24px; }
         button.muni-star:hover { transform:scale(1.15); }
         .muni-star--ro { cursor:default; }
         .muni-star:focus-visible { outline:none; box-shadow:var(--muni-ring); border-radius:4px; }

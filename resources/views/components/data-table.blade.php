@@ -5,14 +5,15 @@
 
 {{-- Tabla densa de datos. El slot son las filas <tr>; usar la clase `muni-row--danger`
      en un <tr> para pintar la franja de estado (la firma: morosidad como banda izquierda,
-     no como badge redondo). Envuelta en un contenedor con scroll horizontal propio. --}}
+     no como badge redondo). Envuelta en un contenedor con scroll horizontal propio.
+     Un encabezado vacío se rotula «Acciones» solo para el lector de pantalla. --}}
 <div style="overflow-x:auto;border:1px solid var(--muni-border);border-radius:var(--muni-radius);background:var(--muni-surface);">
     <table {{ $attributes->merge(['style' => 'width:100%;border-collapse:collapse;font-family:var(--muni-font-sans);font-size:12.5px;']) }}>
         @if (! empty($columns))
             <thead>
                 <tr>
                     @foreach ($columns as $col)
-                        <th style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">{{ $col }}</th>
+                        <th scope="col" style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">@if (trim((string) $col) !== ''){{ $col }}@else<span style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;">Acciones</span>@endif</th>
                     @endforeach
                 </tr>
             </thead>

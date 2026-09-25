@@ -9,7 +9,8 @@
 
 {{-- Menú desplegable (Alpine 3). El slot `trigger` es el botón; el slot por defecto son
      los ítems (usar dropdown-item de muni). Cierra al hacer click fuera, con Escape o al
-     elegir un ítem (evento `muni-dropdown-close`). ↑/↓ recorren los ítems. --}}
+     elegir un ítem (evento `muni-dropdown-close`). ↑/↓ recorren los ítems. También cierra
+     cuando el foco sale del componente con Tab (sin devolverlo). --}}
 <div
     x-data="{
         open: false,
@@ -32,6 +33,7 @@
     @keydown.down="if (! $event.target.closest('input,select,textarea,[contenteditable]')) { $event.preventDefault(); flecha(1) }"
     @keydown.up="if (! $event.target.closest('input,select,textarea,[contenteditable]')) { $event.preventDefault(); flecha(-1) }"
     @muni-dropdown-close="cerrar(true)"
+    @focusout="if (open && $event.relatedTarget && ! $el.contains($event.relatedTarget)) open = false"
     style="position:relative;display:inline-block;"
 >
     <div

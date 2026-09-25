@@ -43,7 +43,8 @@
         .muni-step__marker { position:relative; z-index:1; flex-shrink:0; width:28px; height:28px; border-radius:50%; display:grid; place-items:center; border:2px solid var(--muni-border); background:var(--muni-surface); color:var(--muni-muted); transition:all var(--muni-dur) var(--muni-ease); }
         .muni-step__num { font-family:var(--muni-font-mono); font-size:12px; font-weight:600; }
         .muni-step__body { display:flex; flex-direction:column; min-width:0; padding-top:5px; }
-        .muni-step__label { font-size:12.5px; font-weight:600; color:var(--muni-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        /* La etiqueta se parte en líneas: con nowrap + ellipsis, a 200 % de texto quedaba «Documen…». */
+        .muni-step__label { font-size:12.5px; font-weight:600; color:var(--muni-muted); overflow-wrap:break-word; hyphens:auto; }
         .muni-step__hint { font-size:11px; color:var(--muni-hint); }
         .muni-step--active .muni-step__marker { border-color:var(--muni-accent); color:var(--muni-accent); box-shadow:var(--muni-ring); }
         .muni-step--active .muni-step__label { color:var(--muni-text); }

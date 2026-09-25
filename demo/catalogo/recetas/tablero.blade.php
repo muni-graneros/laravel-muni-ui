@@ -28,7 +28,7 @@
         ]" />
     </x-muni::card>
     <x-muni::card title="Meta anual">
-        <div style="display:flex;gap:20px;align-items:center;">
+        <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:center;">
             <x-muni::ring :value="71" tone="ok" label="Recaudación" />
             <x-muni::timeline :items="[
                 ['title' => 'Cierre de agosto', 'time' => '01 sep', 'tone' => 'ok'],

@@ -24,8 +24,8 @@
     </style>
 </head>
 <body>
-    <div class="muni-err__grid"></div>
-    <div class="muni-err__card">
+    <div class="muni-err__grid" aria-hidden="true"></div>
+    <main class="muni-err__card">
         <div style="font-family:var(--muni-font-mono);font-size:clamp(80px,20vw,140px);font-weight:700;line-height:1;letter-spacing:-.04em;color:var(--muni-accent);text-shadow:var(--muni-glow);">{{ $code }}</div>
         <h1 style="margin:14px 0 0;font-size:22px;font-weight:800;letter-spacing:-.02em;">{{ $title }}</h1>
         <p style="margin:10px 0 26px;font-size:14px;color:var(--muni-muted);line-height:1.6;">{{ $message }}</p>
@@ -37,6 +37,6 @@
             @endisset
         </div>
         <div style="margin-top:34px;font-family:var(--muni-font-mono);font-size:11px;color:var(--muni-hint);letter-spacing:.05em;">{{ $system }}</div>
-    </div>
+    </main>
 </body>
 </html>

@@ -6,7 +6,10 @@
 
 {{-- Calendario de mes (Alpine 3). Navega meses, selecciona un día, escribe el valor
      ISO en un input oculto. Sin dependencias de fechas externas. wire:model / x-model en
-     el componente enlazan `valor` (x-modelable), en formato YYYY-MM-DD. --}}
+     el componente enlazan `valor` (x-modelable), en formato YYYY-MM-DD.
+     Teclado (tabindex móvil: un solo día tabulable): ←/→ día, ↑/↓ semana, Inicio/Fin
+     extremos de la semana, RePág/AvPág mes (con Mayús, año), Enter/Espacio elige.
+     Los días antes de `min` se saltan. --}}
 @php
     // `min` se arma como fecha LOCAL desde sus partes: new Date('YYYY-MM-DD') es UTC y
     // en Chile dejaba elegible el día anterior.
@@ -18,7 +21,9 @@
 <div
     x-data="{
         sel: null,
+        foco: null,
         view: new Date(),
+        hoy: (d => new Date(d.getFullYear(), d.getMonth(), d.getDate()))(new Date()),
         valor: {{ \Illuminate\Support\Js::from($value ?? '') }},
         local(s){ if(!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null; const p = s.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); },
         init(){ const aplicar = v => { const d = this.local(v); this.sel = d; if (d) this.view = new Date(d.getFullYear(), d.getMonth(), 1); };
@@ -37,7 +42,24 @@
             return out;
         },
         move(n){ this.view = new Date(this.view.getFullYear(), this.view.getMonth()+n, 1); },
-        pick(d){ if(this.disabled(d)) return; this.sel = d; this.valor = this.iso(d); },
+        pick(d){ if(this.disabled(d)) return; this.sel = d; this.foco = d; this.valor = this.iso(d); },
+        enVista(d){ return !!d && d.getMonth()===this.view.getMonth() && d.getFullYear()===this.view.getFullYear() && !this.disabled(d); },
+        // Día tabulable: el enfocado, el elegido u hoy si están en el mes visible; si no, el primero habilitado.
+        get objetivo(){ return [this.foco, this.sel, this.hoy].find(d => this.enVista(d)) || this.celdas.find(d => this.enVista(d)) || null; },
+        nombre(d){ return d.getDate()+' de '+this.meses[d.getMonth()]+' de '+d.getFullYear(); },
+        tecla(ev){
+            const b = this.objetivo; if(!b) return;
+            const y=b.getFullYear(), m=b.getMonth(), d=b.getDate(), dow=(b.getDay()+6)%7;
+            const mes = n => new Date(y, m+n, Math.min(d, new Date(y, m+n+1, 0).getDate()));
+            const t = ({ ArrowLeft:()=>new Date(y,m,d-1), ArrowRight:()=>new Date(y,m,d+1), ArrowUp:()=>new Date(y,m,d-7), ArrowDown:()=>new Date(y,m,d+7),
+                Home:()=>new Date(y,m,d-dow), End:()=>new Date(y,m,d+6-dow), PageUp:()=>mes(ev.shiftKey?-12:-1), PageDown:()=>mes(ev.shiftKey?12:1) })[ev.key];
+            if(!t) return;
+            ev.preventDefault();
+            let n = t(); if(this.disabled(n)) n = this.min;
+            this.foco = n;
+            if(!this.enVista(n)) this.view = new Date(n.getFullYear(), n.getMonth(), 1);
+            this.$nextTick(() => { const s=this.iso(n); const e=[...this.$refs.grid.querySelectorAll('button')].find(x => x.dataset.dia===s); e && e.focus(); });
+        },
         disabled(d){ return !!(d && this.min && d < this.min); },
         same(a,b){ return a&&b && a.toDateString()===b.toDateString(); },
         iso(d){ return d ? d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0') : ''; }
@@ -48,15 +70,17 @@
     <input type="hidden" name="{{ $name }}" value="{{ $value }}" :value="valor">
     <div class="muni-cal__head">
         <button type="button" @click="move(-1)" class="muni-cal__nav" aria-label="Mes anterior">‹</button>
-        <span class="muni-cal__title" x-text="titulo"></span>
+        <span class="muni-cal__title" x-text="titulo" aria-live="polite"></span>
         <button type="button" @click="move(1)" class="muni-cal__nav" aria-label="Mes siguiente">›</button>
     </div>
-    <div class="muni-cal__grid">
+    <div class="muni-cal__grid" x-ref="grid" role="group" :aria-label="titulo" @keydown="tecla($event)">
         <template x-for="d in dias" :key="d"><span class="muni-cal__dow" x-text="d"></span></template>
         <template x-for="(c,i) in celdas" :key="i">
             {{-- Las celdas vacías previas al día 1 deben ocupar su columna: con x-if no
                  renderizaban nada y todos los meses empezaban en lunes. --}}
-            <button type="button" class="muni-cal__day" :class="same(c,sel) && 'muni-cal__day--on'" :style="c ? '' : 'visibility:hidden'" :disabled="!c || disabled(c)" @click="c && pick(c)" x-text="c ? c.getDate() : ''"></button>
+            <button type="button" class="muni-cal__day" :class="same(c,sel) && 'muni-cal__day--on'" :style="c ? '' : 'visibility:hidden'" :disabled="!c || disabled(c)" @click="c && pick(c)" x-text="c ? c.getDate() : ''"
+                    :data-dia="c ? iso(c) : null" :aria-label="c ? nombre(c) : null" :aria-pressed="c ? (same(c,sel) ? 'true' : 'false') : null"
+                    :aria-current="same(c,hoy) ? 'date' : null" :tabindex="c && same(c,objetivo) ? 0 : -1" @focus="c && (foco = c)"></button>
         </template>
     </div>
 </div>

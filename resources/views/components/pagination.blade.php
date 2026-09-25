@@ -3,6 +3,7 @@
     'total' => 1, // total de páginas
     'url' => null, // closure fn(int $pagina): string
     'info' => null, // texto a la izquierda, p. ej. «Mostrando 1–20 de 231»
+    'label' => 'Paginación', // nombre accesible del nav; un aria-label explícito manda
 ])
 
 @php
@@ -16,7 +17,7 @@
         ->values();
 @endphp
 
-<nav aria-label="Paginación" {{ $attributes->merge(['style' => 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:16px;font-family:var(--muni-font-sans);font-size:13px;']) }}>
+<nav aria-label="{{ $attributes->get('aria-label', $label) }}" {{ $attributes->except('aria-label')->merge(['style' => 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:16px;font-family:var(--muni-font-sans);font-size:13px;']) }}>
     @if ($current > 1)
         <a href="{{ $link($current - 1) }}" rel="prev" class="muni-page muni-page--nav">‹ Anterior</a>
     @else

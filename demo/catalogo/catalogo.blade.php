@@ -14,6 +14,14 @@
               catch(e){ const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
               btn.textContent = 'Copiado'; setTimeout(() => btn.textContent = 'Copiar', 1400);
           },
+          leer(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); },
+          contraste(a, b){
+              const lum = h => { h = h.replace('#',''); if (h.length === 3) h = [...h].map(c => c + c).join('');
+                  return [0, 2, 4].map(i => parseInt(h.substr(i, 2), 16) / 255).map(c => c <= .03928 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4)
+                      .reduce((s, c, i) => s + c * [.2126, .7152, .0722][i], 0); };
+              if (!/^#[0-9a-f]{3,6}$/i.test(a) || !/^#[0-9a-f]{3,6}$/i.test(b)) return null;
+              const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + .05) / (y + .05);
+          },
           temaIframes(){ document.querySelectorAll('iframe[data-shell]').forEach(f => { try { f.contentDocument.documentElement.setAttribute('data-muni-theme', this.tema); } catch(e){} }); }
       }"
       :data-muni-theme="tema" x-effect="tema; temaIframes()">
@@ -111,6 +119,21 @@
         .cat-mix article{ padding:16px 18px; background:var(--muni-surface); border:1px solid var(--muni-border); border-radius:var(--muni-radius); }
         .cat-mix h3{ margin:0 0 6px; font-size:14px; font-family:var(--muni-font-mono); }
         .cat-mix p{ margin:0; font-size:13px; color:var(--muni-muted); }
+        .cat-fund{ display:grid; gap:28px; }
+        .cat-fund h3{ margin:0 0 10px; font-size:14px; }
+        .cat-fund p{ margin:0 0 12px; color:var(--muni-muted); font-size:13px; max-width:72ch; }
+        .cat-sw{ display:grid; grid-template-columns:repeat(auto-fill,minmax(168px,1fr)); gap:10px; }
+        .cat-sw > div{ display:grid; grid-template-rows:56px auto; border:1px solid var(--muni-border); border-radius:var(--muni-radius); overflow:hidden; background:var(--muni-surface); }
+        .cat-sw__chip{ display:grid; place-items:center; font-weight:700; font-size:15px; border-bottom:1px solid var(--muni-border); }
+        .cat-sw__meta{ padding:8px 10px; display:grid; gap:1px; font-size:11.5px; }
+        .cat-sw__meta code{ font-weight:600; font-size:11.5px; color:var(--muni-text); }
+        .cat-sw__meta span{ font-family:var(--muni-font-mono); color:var(--muni-muted); font-variant-numeric:tabular-nums; }
+        .cat-sw__meta .cat-bad{ color:var(--muni-danger-fg); font-weight:600; }
+        .cat-type{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:10px; }
+        .cat-type > div{ padding:16px 18px; border:1px solid var(--muni-border); border-radius:var(--muni-radius); background:var(--muni-surface); display:grid; gap:6px; }
+        .cat-type small{ font-family:var(--muni-font-mono); color:var(--muni-muted); font-size:11.5px; }
+        .cat-shape{ display:flex; gap:12px; flex-wrap:wrap; }
+        .cat-shape > div{ width:132px; height:84px; display:grid; place-items:center; text-align:center; font-family:var(--muni-font-mono); font-size:11px; color:var(--muni-muted); background:var(--muni-surface); border:1px solid var(--muni-border); }
         .cat-empty{ padding:40px 0; color:var(--muni-muted); }
         @media (max-width:900px){
             .cat{ grid-template-columns:1fr; }
@@ -133,6 +156,7 @@
             @endforeach
         @endforeach
         <h4>Guías</h4>
+        <a href="#fundamentos">fundamentos</a>
         <a href="#recetas">recetas de pantalla</a>
         <a href="#solapes">solapamientos</a>
     </nav>
@@ -163,6 +187,80 @@
                 <div><span>3 · Usar</span><div class="cat-code"><pre>{!! $inicio !!}</pre></div></div>
             </div>
         </header>
+
+        @php
+            $familias = [
+                'Superficies' => ['muni-bg', 'muni-surface', 'muni-surface-2', 'muni-surface-3', 'muni-panel', 'muni-border', 'muni-border-2'],
+                'Texto' => ['muni-text', 'muni-muted', 'muni-hint'],
+                'Acento' => ['muni-accent', 'muni-accent-strong', 'muni-accent-soft', 'muni-on-accent'],
+            ];
+            $esTexto = ['muni-text', 'muni-muted', 'muni-hint', 'muni-accent', 'muni-accent-strong'];
+        @endphp
+        <section x-show="!q" id="fundamentos">
+            <div class="cat-group"><h2>Fundamentos</h2><span>tokens de muni-ui.css</span></div>
+            <div class="cat-fund">
+                <div>
+                    <h3>Identidad institucional</h3>
+                    <p>Los 7 colores del escudo y la franja municipal. No cambian con el tema: el municipio es el mismo en claro y en oscuro.</p>
+                    <div class="cat-sw">
+                        @foreach ($tokens['gob'] as $nombre => $valor)
+                            <div><span class="cat-sw__chip" style="background:var(--{{ $nombre }});"></span>
+                                <span class="cat-sw__meta"><code>--{{ $nombre }}</code><span>{{ $valor }}</span></span></div>
+                        @endforeach
+                    </div>
+                </div>
+                @foreach ($familias as $familia => $nombres)
+                    <div>
+                        <h3>{{ $familia }}</h3>
+                        @if ($familia === 'Texto')<p>El número es el contraste contra <code>--muni-surface</code> en el tema visible. Texto normal pide 4,5 y texto grande o bordes de control, 3.</p>@endif
+                        <div class="cat-sw">
+                            @foreach ($nombres as $nombre)
+                                <div x-data="{ v: '', c: null }" x-effect="tema; $nextTick(() => { v = leer('--{{ $nombre }}'); c = contraste(v, leer('--muni-surface')); })">
+                                    @if (in_array($nombre, $esTexto))
+                                        <span class="cat-sw__chip" style="background:var(--muni-surface);color:var(--{{ $nombre }});">Aa</span>
+                                    @elseif ($nombre === 'muni-on-accent')
+                                        <span class="cat-sw__chip" style="background:var(--muni-accent);color:var(--{{ $nombre }});">Aa</span>
+                                    @else
+                                        <span class="cat-sw__chip" style="background:var(--{{ $nombre }});"></span>
+                                    @endif
+                                    <span class="cat-sw__meta"><code>--{{ $nombre }}</code>
+                                        <span><span x-text="v"></span>@if (in_array($nombre, $esTexto)) · <b x-text="c ? c.toFixed(2) + ':1' : ''" :class="c && c < 4.5 && 'cat-bad'"></b>@endif</span></span>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endforeach
+                <div>
+                    <h3>Estados</h3>
+                    <p>Cada tono trae tres tokens: <code>-fg</code> para texto e íconos, <code>-bg</code> para el fondo y <code>-border</code> para el contorno. Los usan badge, alert, kpi, stat, las franjas de fila y los gráficos.</p>
+                    <div class="cat-sw">
+                        @foreach (['ok' => 'Al día', 'warn' => 'Por vencer', 'danger' => 'Morosa', 'info' => 'En revisión'] as $tono => $texto)
+                            <div x-data="{ c: null }" x-effect="tema; $nextTick(() => c = contraste(leer('--muni-{{ $tono }}-fg'), leer('--muni-{{ $tono }}-bg')))">
+                                <span class="cat-sw__chip" style="background:var(--muni-{{ $tono }}-bg);color:var(--muni-{{ $tono }}-fg);border-bottom-color:var(--muni-{{ $tono }}-border);font-size:13px;">{{ $texto }}</span>
+                                <span class="cat-sw__meta"><code>--muni-{{ $tono }}-*</code><span>fg sobre bg · <b x-text="c ? c.toFixed(2) + ':1' : ''" :class="c && c < 4.5 && 'cat-bad'"></b></span></span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                <div>
+                    <h3>Tipografía</h3>
+                    <p>Cada tema trae su par: DM Sans y DM Mono en claro, IBM Plex Sans y Plex Mono en oscuro. La mono se usa para cifras, RUT y códigos (<code>.muni-num</code>, con dígitos tabulares).</p>
+                    <div class="cat-type">
+                        <div><small>--muni-font-sans</small><span style="font-size:26px;font-weight:700;letter-spacing:-.01em;">Patentes comerciales</span><span style="color:var(--muni-muted);">Solicitud ingresada en el mesón de atención.</span></div>
+                        <div><small>--muni-font-mono · .muni-num</small><span class="muni-num" style="font-family:var(--muni-font-mono);font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;">76.123.456-7</span><span style="font-family:var(--muni-font-mono);color:var(--muni-muted);">$ 1.284.500 · 25-09-2026</span></div>
+                    </div>
+                </div>
+                <div>
+                    <h3>Forma, profundidad y movimiento</h3>
+                    <div class="cat-shape">
+                        @foreach (['radius-sm', 'radius', 'radius-lg'] as $r)<div style="border-radius:var(--muni-{{ $r }});">--muni-{{ $r }}<br>{{ $tokens['light']['muni-'.$r] }}</div>@endforeach
+                        @foreach (['shadow', 'shadow-md', 'shadow-lg'] as $sh)<div style="border-radius:var(--muni-radius);box-shadow:var(--muni-{{ $sh }});border-color:transparent;">--muni-{{ $sh }}</div>@endforeach
+                        <div style="border-radius:var(--muni-radius);box-shadow:var(--muni-ring);">--muni-ring<br>foco visible</div>
+                        <div style="border-radius:var(--muni-radius);">--muni-dur<br>{{ $tokens['light']['muni-dur'] }} · 0 con movimiento reducido</div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         @foreach ($grupos as $grupo => $items)
             <div x-show="{{ collect($items)->map(fn ($c, $n) => 've('.\Illuminate\Support\Js::from(strtolower($n.' '.implode(' ', array_keys($c['subs'])).' '.$c['desc'].' '.implode(' ', array_column($c['meta']['props'], 'nombre')))).')')->implode(' || ') }}">

@@ -4,11 +4,15 @@
 ])
 
 {{-- Entrada de código de un solo uso / MFA (Alpine 3). Autofoco entre casillas, pega
-     un código completo, retrocede con Backspace. El valor va en un input oculto. --}}
+     un código completo, retrocede con Backspace. El valor va en un input oculto, y
+     wire:model / x-model en el componente enlazan el código completo (x-modelable). --}}
 <div
     x-data="{
         digits: Array({{ (int) $length }}).fill(''),
+        value: '',
         get code(){ return this.digits.join(''); },
+        init(){ this.$watch('value', v => { v = String(v ?? '').replace(/\D/g, ''); if (v !== this.code) this.digits = this.digits.map((_, i) => v[i] || ''); });
+                this.$watch('digits', () => { if (this.value !== this.code) this.value = this.code; }); },
         onInput(i, e){
             const v = e.target.value.replace(/\D/g,'');
             if(v.length > 1){ this.paste(v); return; }
@@ -20,6 +24,7 @@
         },
         paste(v){ for(let i=0;i<this.digits.length;i++){ this.digits[i]=''; } v.split('').slice(0,{{ (int) $length }}).forEach((c,i)=>{ this.digits[i]=c; }); this.$nextTick(()=>{ const last=Math.min(v.length,{{ (int) $length }})-1; this.$refs['d'+Math.max(last,0)].focus(); }); }
     }"
+    x-modelable="value"
     {{ $attributes->merge(['style' => 'display:flex;gap:9px;']) }}
 >
     <input type="hidden" name="{{ $name }}" :value="code">

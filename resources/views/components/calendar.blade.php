@@ -1,20 +1,28 @@
 @props([
     'name' => 'fecha', // name del input oculto (valor YYYY-MM-DD)
     'min' => null, // fecha mínima seleccionable, YYYY-MM-DD
+    'value' => null, // fecha inicial, YYYY-MM-DD (con wire:model la pone Livewire)
 ])
 
 {{-- Calendario de mes (Alpine 3). Navega meses, selecciona un día, escribe el valor
-     ISO en un input oculto. Sin dependencias de fechas externas. --}}
+     ISO en un input oculto. Sin dependencias de fechas externas. wire:model / x-model en
+     el componente enlazan `valor` (x-modelable), en formato YYYY-MM-DD. --}}
 @php
     // `min` se arma como fecha LOCAL desde sus partes: new Date('YYYY-MM-DD') es UTC y
     // en Chile dejaba elegible el día anterior.
     if ($min instanceof \DateTimeInterface) { $min = $min->format('Y-m-d'); }
     $min = is_string($min) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $min) ? $min : null;
+    if ($value instanceof \DateTimeInterface) { $value = $value->format('Y-m-d'); }
+    $value = is_string($value) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) ? $value : null;
 @endphp
 <div
     x-data="{
         sel: null,
         view: new Date(),
+        valor: {{ \Illuminate\Support\Js::from($value ?? '') }},
+        local(s){ if(!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null; const p = s.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); },
+        init(){ const aplicar = v => { const d = this.local(v); this.sel = d; if (d) this.view = new Date(d.getFullYear(), d.getMonth(), 1); };
+                aplicar(this.valor); this.$watch('valor', v => { if (v !== this.iso(this.sel)) aplicar(v); }); },
         min: (s => { if(!s) return null; const p = s.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); })({{ \Illuminate\Support\Js::from($min) }}),
         dias: ['L','M','X','J','V','S','D'],
         meses: ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'],
@@ -29,14 +37,15 @@
             return out;
         },
         move(n){ this.view = new Date(this.view.getFullYear(), this.view.getMonth()+n, 1); },
-        pick(d){ if(this.disabled(d)) return; this.sel = d; },
+        pick(d){ if(this.disabled(d)) return; this.sel = d; this.valor = this.iso(d); },
         disabled(d){ return !!(d && this.min && d < this.min); },
         same(a,b){ return a&&b && a.toDateString()===b.toDateString(); },
         iso(d){ return d ? d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0') : ''; }
     }"
+    x-modelable="valor"
     {{ $attributes->merge(['class' => 'muni-cal']) }}
 >
-    <input type="hidden" name="{{ $name }}" :value="iso(sel)">
+    <input type="hidden" name="{{ $name }}" value="{{ $value }}" :value="valor">
     <div class="muni-cal__head">
         <button type="button" @click="move(-1)" class="muni-cal__nav" aria-label="Mes anterior">‹</button>
         <span class="muni-cal__title" x-text="titulo"></span>

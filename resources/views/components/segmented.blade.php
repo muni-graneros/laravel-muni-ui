@@ -2,7 +2,7 @@
     'name' => null, // con name genera radios reales que envían el form
     'options' => [], // mapa valor => etiqueta
     'value' => null, // valor seleccionado
-    'autosubmit' => true, // envía el form GET al cambiar (nunca en forms POST ni con wire:submit/@submit)
+    'autosubmit' => true, // envía el form GET al cambiar (nunca en forms POST, con wire:submit/@submit ni con wire:model/x-model)
 ])
 
 {{-- Control segmentado (toggle de filtro): alternativa moderna al <select> para pocas
@@ -11,6 +11,11 @@
      forms GET sin wire:submit ni @submit; un `id` sirve de prefijo para los ids de los radios. --}}
 @php
     $prefijo = $attributes->get('id') ?: $name;
+    // wire:model / x-model van a cada radio, que es donde vive el valor; con enlace en vivo
+    // no hace falta enviar el form.
+    $modelo = $attributes->filter(fn ($v, $k) => str_starts_with($k, 'wire:model') || str_starts_with($k, 'x-model'));
+    $attributes = $attributes->filter(fn ($v, $k) => ! str_starts_with($k, 'wire:model') && ! str_starts_with($k, 'x-model'));
+    $autosubmit = $autosubmit && $modelo->isEmpty();
     $enviar = "if(this.form && this.form.method==='get' && ![...this.form.attributes].some(a => /^(wire:submit|x-on:submit|@submit)/.test(a.name))) this.form.submit()";
 @endphp
 <div role="group" {{ $attributes->merge(['style' => 'display:inline-flex;padding:3px;gap:2px;background:var(--muni-surface-2);border:1px solid var(--muni-border);border-radius:var(--muni-radius-sm);']) }}>
@@ -18,7 +23,7 @@
         @foreach ($options as $val => $label)
             @php $id = $prefijo.'-'.$loop->index; $active = (string) $value === (string) $val; @endphp
             <label for="{{ $id }}" class="muni-seg {{ $active ? 'muni-seg--on' : '' }}">
-                <input type="radio" id="{{ $id }}" name="{{ $name }}" value="{{ $val }}" @checked($active)
+                <input type="radio" id="{{ $id }}" name="{{ $name }}" value="{{ $val }}" @checked($active) {{ $modelo }}
                        style="position:absolute;opacity:0;width:0;height:0;" @if ($autosubmit) onchange="{{ $enviar }}" @endif>
                 {{ $label }}
             </label>

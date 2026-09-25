@@ -10,6 +10,14 @@
               catch(e){ const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
               btn.textContent = 'Copiado'; setTimeout(() => btn.textContent = 'Copiar', 1400);
           },
+          leer(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); },
+          contraste(a, b){
+              const lum = h => { h = h.replace('#',''); if (h.length === 3) h = [...h].map(c => c + c).join('');
+                  return [0, 2, 4].map(i => parseInt(h.substr(i, 2), 16) / 255).map(c => c <= .03928 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4)
+                      .reduce((s, c, i) => s + c * [.2126, .7152, .0722][i], 0); };
+              if (!/^#[0-9a-f]{3,6}$/i.test(a) || !/^#[0-9a-f]{3,6}$/i.test(b)) return null;
+              const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + .05) / (y + .05);
+          },
           temaIframes(){ document.querySelectorAll('iframe[data-shell]').forEach(f => { try { f.contentDocument.documentElement.setAttribute('data-muni-theme', this.tema); } catch(e){} }); }
       }"
       :data-muni-theme="tema" x-effect="tema; temaIframes()">
@@ -365,6 +373,21 @@ ${r?'Expression: "'+r+`"
         .cat-mix article{ padding:16px 18px; background:var(--muni-surface); border:1px solid var(--muni-border); border-radius:var(--muni-radius); }
         .cat-mix h3{ margin:0 0 6px; font-size:14px; font-family:var(--muni-font-mono); }
         .cat-mix p{ margin:0; font-size:13px; color:var(--muni-muted); }
+        .cat-fund{ display:grid; gap:28px; }
+        .cat-fund h3{ margin:0 0 10px; font-size:14px; }
+        .cat-fund p{ margin:0 0 12px; color:var(--muni-muted); font-size:13px; max-width:72ch; }
+        .cat-sw{ display:grid; grid-template-columns:repeat(auto-fill,minmax(168px,1fr)); gap:10px; }
+        .cat-sw > div{ display:grid; grid-template-rows:56px auto; border:1px solid var(--muni-border); border-radius:var(--muni-radius); overflow:hidden; background:var(--muni-surface); }
+        .cat-sw__chip{ display:grid; place-items:center; font-weight:700; font-size:15px; border-bottom:1px solid var(--muni-border); }
+        .cat-sw__meta{ padding:8px 10px; display:grid; gap:1px; font-size:11.5px; }
+        .cat-sw__meta code{ font-weight:600; font-size:11.5px; color:var(--muni-text); }
+        .cat-sw__meta span{ font-family:var(--muni-font-mono); color:var(--muni-muted); font-variant-numeric:tabular-nums; }
+        .cat-sw__meta .cat-bad{ color:var(--muni-danger-fg); font-weight:600; }
+        .cat-type{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:10px; }
+        .cat-type > div{ padding:16px 18px; border:1px solid var(--muni-border); border-radius:var(--muni-radius); background:var(--muni-surface); display:grid; gap:6px; }
+        .cat-type small{ font-family:var(--muni-font-mono); color:var(--muni-muted); font-size:11.5px; }
+        .cat-shape{ display:flex; gap:12px; flex-wrap:wrap; }
+        .cat-shape > div{ width:132px; height:84px; display:grid; place-items:center; text-align:center; font-family:var(--muni-font-mono); font-size:11px; color:var(--muni-muted); background:var(--muni-surface); border:1px solid var(--muni-border); }
         .cat-empty{ padding:40px 0; color:var(--muni-muted); }
         @media (max-width:900px){
             .cat{ grid-template-columns:1fr; }
@@ -512,6 +535,7 @@ ${r?'Expression: "'+r+`"
                             <a href="#c-auth-shell" x-show="ve('auth-shell reverb-meta documento completo de ingreso o registro a dos columnas.')">auth-shell</a>
                             <a href="#c-error-page" x-show="ve('error-page  página de error 403 · 404 · 500 · 503 con botón de vuelta.')">error-page</a>
                             <h4>Guías</h4>
+        <a href="#fundamentos">fundamentos</a>
         <a href="#recetas">recetas de pantalla</a>
         <a href="#solapes">solapamientos</a>
     </nav>
@@ -554,6 +578,158 @@ ${r?'Expression: "'+r+`"
                 <div><span>3 · Usar</span><div class="cat-code"><pre><span class="tk-x">&lt;x-muni::badge</span> <span class="tk-a">tone</span>=<span class="tk-s">&quot;ok&quot;</span>&gt;Al día<span class="tk-x">&lt;/x-muni::badge</span>&gt;</pre></div></div>
             </div>
         </header>
+
+                <section x-show="!q" id="fundamentos">
+            <div class="cat-group"><h2>Fundamentos</h2><span>tokens de muni-ui.css</span></div>
+            <div class="cat-fund">
+                <div>
+                    <h3>Identidad institucional</h3>
+                    <p>Los 7 colores del escudo y la franja municipal. No cambian con el tema: el municipio es el mismo en claro y en oscuro.</p>
+                    <div class="cat-sw">
+                                                    <div><span class="cat-sw__chip" style="background:var(--muni-gob-lima);"></span>
+                                <span class="cat-sw__meta"><code>--muni-gob-lima</code><span>#adcd60</span></span></div>
+                                                    <div><span class="cat-sw__chip" style="background:var(--muni-gob-verde-dark);"></span>
+                                <span class="cat-sw__meta"><code>--muni-gob-verde-dark</code><span>#7fa33f</span></span></div>
+                                                    <div><span class="cat-sw__chip" style="background:var(--muni-gob-petroleo);"></span>
+                                <span class="cat-sw__meta"><code>--muni-gob-petroleo</code><span>#355a63</span></span></div>
+                                                    <div><span class="cat-sw__chip" style="background:var(--muni-gob-petroleo-dark);"></span>
+                                <span class="cat-sw__meta"><code>--muni-gob-petroleo-dark</code><span>#00404c</span></span></div>
+                                                    <div><span class="cat-sw__chip" style="background:var(--muni-gob-oro);"></span>
+                                <span class="cat-sw__meta"><code>--muni-gob-oro</code><span>#eab02c</span></span></div>
+                                                    <div><span class="cat-sw__chip" style="background:var(--muni-gob-naranja);"></span>
+                                <span class="cat-sw__meta"><code>--muni-gob-naranja</code><span>#c76421</span></span></div>
+                                                    <div><span class="cat-sw__chip" style="background:var(--muni-gob-celeste);"></span>
+                                <span class="cat-sw__meta"><code>--muni-gob-celeste</code><span>#7ccbe1</span></span></div>
+                                                    <div><span class="cat-sw__chip" style="background:var(--muni-gob-carmin);"></span>
+                                <span class="cat-sw__meta"><code>--muni-gob-carmin</code><span>#ca3048</span></span></div>
+                                                    <div><span class="cat-sw__chip" style="background:var(--muni-gob-gris);"></span>
+                                <span class="cat-sw__meta"><code>--muni-gob-gris</code><span>#9c9b9b</span></span></div>
+                                            </div>
+                </div>
+                                    <div>
+                        <h3>Superficies</h3>
+                                                <div class="cat-sw">
+                                                            <div x-data="{ v: '', c: null }" x-effect="tema; $nextTick(() => { v = leer('--muni-bg'); c = contraste(v, leer('--muni-surface')); })">
+                                                                            <span class="cat-sw__chip" style="background:var(--muni-bg);"></span>
+                                                                        <span class="cat-sw__meta"><code>--muni-bg</code>
+                                        <span><span x-text="v"></span></span></span>
+                                </div>
+                                                            <div x-data="{ v: '', c: null }" x-effect="tema; $nextTick(() => { v = leer('--muni-surface'); c = contraste(v, leer('--muni-surface')); })">
+                                                                            <span class="cat-sw__chip" style="background:var(--muni-surface);"></span>
+                                                                        <span class="cat-sw__meta"><code>--muni-surface</code>
+                                        <span><span x-text="v"></span></span></span>
+                                </div>
+                                                            <div x-data="{ v: '', c: null }" x-effect="tema; $nextTick(() => { v = leer('--muni-surface-2'); c = contraste(v, leer('--muni-surface')); })">
+                                                                            <span class="cat-sw__chip" style="background:var(--muni-surface-2);"></span>
+                                                                        <span class="cat-sw__meta"><code>--muni-surface-2</code>
+                                        <span><span x-text="v"></span></span></span>
+                                </div>
+                                                            <div x-data="{ v: '', c: null }" x-effect="tema; $nextTick(() => { v = leer('--muni-surface-3'); c = contraste(v, leer('--muni-surface')); })">
+                                                                            <span class="cat-sw__chip" style="background:var(--muni-surface-3);"></span>
+                                                                        <span class="cat-sw__meta"><code>--muni-surface-3</code>
+                                        <span><span x-text="v"></span></span></span>
+                                </div>
+                                                            <div x-data="{ v: '', c: null }" x-effect="tema; $nextTick(() => { v = leer('--muni-panel'); c = contraste(v, leer('--muni-surface')); })">
+                                                                            <span class="cat-sw__chip" style="background:var(--muni-panel);"></span>
+                                                                        <span class="cat-sw__meta"><code>--muni-panel</code>
+                                        <span><span x-text="v"></span></span></span>
+                                </div>
+                                                            <div x-data="{ v: '', c: null }" x-effect="tema; $nextTick(() => { v = leer('--muni-border'); c = contraste(v, leer('--muni-surface')); })">
+                                                                            <span class="cat-sw__chip" style="background:var(--muni-border);"></span>
+                                                                        <span class="cat-sw__meta"><code>--muni-border</code>
+                                        <span><span x-text="v"></span></span></span>
+                                </div>
+                                                            <div x-data="{ v: '', c: null }" x-effect="tema; $nextTick(() => { v = leer('--muni-border-2'); c = contraste(v, leer('--muni-surface')); })">
+                                                                            <span class="cat-sw__chip" style="background:var(--muni-border-2);"></span>
+                                                                        <span class="cat-sw__meta"><code>--muni-border-2</code>
+                                        <span><span x-text="v"></span></span></span>
+                                </div>
+                                                    </div>
+                    </div>
+                                    <div>
+                        <h3>Texto</h3>
+                        <p>El número es el contraste contra <code>--muni-surface</code> en el tema visible. Texto normal pide 4,5 y texto grande o bordes de control, 3.</p>                        <div class="cat-sw">
+                                                            <div x-data="{ v: '', c: null }" x-effect="tema; $nextTick(() => { v = leer('--muni-text'); c = contraste(v, leer('--muni-surface')); })">
+                                                                            <span class="cat-sw__chip" style="background:var(--muni-surface);color:var(--muni-text);">Aa</span>
+                                                                        <span class="cat-sw__meta"><code>--muni-text</code>
+                                        <span><span x-text="v"></span> · <b x-text="c ? c.toFixed(2) + ':1' : ''" :class="c && c < 4.5 && 'cat-bad'"></b></span></span>
+                                </div>
+                                                            <div x-data="{ v: '', c: null }" x-effect="tema; $nextTick(() => { v = leer('--muni-muted'); c = contraste(v, leer('--muni-surface')); })">
+                                                                            <span class="cat-sw__chip" style="background:var(--muni-surface);color:var(--muni-muted);">Aa</span>
+                                                                        <span class="cat-sw__meta"><code>--muni-muted</code>
+                                        <span><span x-text="v"></span> · <b x-text="c ? c.toFixed(2) + ':1' : ''" :class="c && c < 4.5 && 'cat-bad'"></b></span></span>
+                                </div>
+                                                            <div x-data="{ v: '', c: null }" x-effect="tema; $nextTick(() => { v = leer('--muni-hint'); c = contraste(v, leer('--muni-surface')); })">
+                                                                            <span class="cat-sw__chip" style="background:var(--muni-surface);color:var(--muni-hint);">Aa</span>
+                                                                        <span class="cat-sw__meta"><code>--muni-hint</code>
+                                        <span><span x-text="v"></span> · <b x-text="c ? c.toFixed(2) + ':1' : ''" :class="c && c < 4.5 && 'cat-bad'"></b></span></span>
+                                </div>
+                                                    </div>
+                    </div>
+                                    <div>
+                        <h3>Acento</h3>
+                                                <div class="cat-sw">
+                                                            <div x-data="{ v: '', c: null }" x-effect="tema; $nextTick(() => { v = leer('--muni-accent'); c = contraste(v, leer('--muni-surface')); })">
+                                                                            <span class="cat-sw__chip" style="background:var(--muni-surface);color:var(--muni-accent);">Aa</span>
+                                                                        <span class="cat-sw__meta"><code>--muni-accent</code>
+                                        <span><span x-text="v"></span> · <b x-text="c ? c.toFixed(2) + ':1' : ''" :class="c && c < 4.5 && 'cat-bad'"></b></span></span>
+                                </div>
+                                                            <div x-data="{ v: '', c: null }" x-effect="tema; $nextTick(() => { v = leer('--muni-accent-strong'); c = contraste(v, leer('--muni-surface')); })">
+                                                                            <span class="cat-sw__chip" style="background:var(--muni-surface);color:var(--muni-accent-strong);">Aa</span>
+                                                                        <span class="cat-sw__meta"><code>--muni-accent-strong</code>
+                                        <span><span x-text="v"></span> · <b x-text="c ? c.toFixed(2) + ':1' : ''" :class="c && c < 4.5 && 'cat-bad'"></b></span></span>
+                                </div>
+                                                            <div x-data="{ v: '', c: null }" x-effect="tema; $nextTick(() => { v = leer('--muni-accent-soft'); c = contraste(v, leer('--muni-surface')); })">
+                                                                            <span class="cat-sw__chip" style="background:var(--muni-accent-soft);"></span>
+                                                                        <span class="cat-sw__meta"><code>--muni-accent-soft</code>
+                                        <span><span x-text="v"></span></span></span>
+                                </div>
+                                                            <div x-data="{ v: '', c: null }" x-effect="tema; $nextTick(() => { v = leer('--muni-on-accent'); c = contraste(v, leer('--muni-surface')); })">
+                                                                            <span class="cat-sw__chip" style="background:var(--muni-accent);color:var(--muni-on-accent);">Aa</span>
+                                                                        <span class="cat-sw__meta"><code>--muni-on-accent</code>
+                                        <span><span x-text="v"></span></span></span>
+                                </div>
+                                                    </div>
+                    </div>
+                                <div>
+                    <h3>Estados</h3>
+                    <p>Cada tono trae tres tokens: <code>-fg</code> para texto e íconos, <code>-bg</code> para el fondo y <code>-border</code> para el contorno. Los usan badge, alert, kpi, stat, las franjas de fila y los gráficos.</p>
+                    <div class="cat-sw">
+                                                    <div x-data="{ c: null }" x-effect="tema; $nextTick(() => c = contraste(leer('--muni-ok-fg'), leer('--muni-ok-bg')))">
+                                <span class="cat-sw__chip" style="background:var(--muni-ok-bg);color:var(--muni-ok-fg);border-bottom-color:var(--muni-ok-border);font-size:13px;">Al día</span>
+                                <span class="cat-sw__meta"><code>--muni-ok-*</code><span>fg sobre bg · <b x-text="c ? c.toFixed(2) + ':1' : ''" :class="c && c < 4.5 && 'cat-bad'"></b></span></span>
+                            </div>
+                                                    <div x-data="{ c: null }" x-effect="tema; $nextTick(() => c = contraste(leer('--muni-warn-fg'), leer('--muni-warn-bg')))">
+                                <span class="cat-sw__chip" style="background:var(--muni-warn-bg);color:var(--muni-warn-fg);border-bottom-color:var(--muni-warn-border);font-size:13px;">Por vencer</span>
+                                <span class="cat-sw__meta"><code>--muni-warn-*</code><span>fg sobre bg · <b x-text="c ? c.toFixed(2) + ':1' : ''" :class="c && c < 4.5 && 'cat-bad'"></b></span></span>
+                            </div>
+                                                    <div x-data="{ c: null }" x-effect="tema; $nextTick(() => c = contraste(leer('--muni-danger-fg'), leer('--muni-danger-bg')))">
+                                <span class="cat-sw__chip" style="background:var(--muni-danger-bg);color:var(--muni-danger-fg);border-bottom-color:var(--muni-danger-border);font-size:13px;">Morosa</span>
+                                <span class="cat-sw__meta"><code>--muni-danger-*</code><span>fg sobre bg · <b x-text="c ? c.toFixed(2) + ':1' : ''" :class="c && c < 4.5 && 'cat-bad'"></b></span></span>
+                            </div>
+                                                    <div x-data="{ c: null }" x-effect="tema; $nextTick(() => c = contraste(leer('--muni-info-fg'), leer('--muni-info-bg')))">
+                                <span class="cat-sw__chip" style="background:var(--muni-info-bg);color:var(--muni-info-fg);border-bottom-color:var(--muni-info-border);font-size:13px;">En revisión</span>
+                                <span class="cat-sw__meta"><code>--muni-info-*</code><span>fg sobre bg · <b x-text="c ? c.toFixed(2) + ':1' : ''" :class="c && c < 4.5 && 'cat-bad'"></b></span></span>
+                            </div>
+                                            </div>
+                </div>
+                <div>
+                    <h3>Tipografía</h3>
+                    <p>Cada tema trae su par: DM Sans y DM Mono en claro, IBM Plex Sans y Plex Mono en oscuro. La mono se usa para cifras, RUT y códigos (<code>.muni-num</code>, con dígitos tabulares).</p>
+                    <div class="cat-type">
+                        <div><small>--muni-font-sans</small><span style="font-size:26px;font-weight:700;letter-spacing:-.01em;">Patentes comerciales</span><span style="color:var(--muni-muted);">Solicitud ingresada en el mesón de atención.</span></div>
+                        <div><small>--muni-font-mono · .muni-num</small><span class="muni-num" style="font-family:var(--muni-font-mono);font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;">76.123.456-7</span><span style="font-family:var(--muni-font-mono);color:var(--muni-muted);">$ 1.284.500 · 25-09-2026</span></div>
+                    </div>
+                </div>
+                <div>
+                    <h3>Forma, profundidad y movimiento</h3>
+                    <div class="cat-shape">
+                        <div style="border-radius:var(--muni-radius-sm);">--muni-radius-sm<br>7px</div><div style="border-radius:var(--muni-radius);">--muni-radius<br>10px</div><div style="border-radius:var(--muni-radius-lg);">--muni-radius-lg<br>14px</div>                        <div style="border-radius:var(--muni-radius);box-shadow:var(--muni-shadow);border-color:transparent;">--muni-shadow</div><div style="border-radius:var(--muni-radius);box-shadow:var(--muni-shadow-md);border-color:transparent;">--muni-shadow-md</div><div style="border-radius:var(--muni-radius);box-shadow:var(--muni-shadow-lg);border-color:transparent;">--muni-shadow-lg</div>                        <div style="border-radius:var(--muni-radius);box-shadow:var(--muni-ring);">--muni-ring<br>foco visible</div>
+                        <div style="border-radius:var(--muni-radius);">--muni-dur<br>160ms · 0 con movimiento reducido</div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
                     <div x-show="ve(&#039;gob-bar  barra municipal que va sobre cada subdominio del ecosistema: escudo, municipio, sistema actual y enlace al sitio madre. ya incluye la franja de colores. system home sticky&#039;) || ve(&#039;gob-stripe  franja con los 7 colores oficiales del municipio. para separar la identidad institucional del contenido. height&#039;) || ve(&#039;gob-escudo  escudo oficial. se publica con `vendor:publish --tag=muni-ui-images`. size src&#039;) || ve(&#039;gob-footer  pie institucional con contacto, enlaces del ecosistema y aviso de la ley 21.719. slot `links` para reemplazar los enlaces. system home address phone email&#039;)">
                 <div class="cat-group"><h2>Identidad institucional</h2><span>4</span></div>
@@ -3175,6 +3351,7 @@ ${r?'Expression: "'+r+`"
             set(v, root){ this.value = Math.max(1, Math.min(this.max, v)); this.$nextTick(() => root.querySelectorAll('[role=radio]')[this.value - 1].focus()); } }"
         @keydown.right.prevent="set(Math.round(value) + 1, $el)" @keydown.up.prevent="set(Math.round(value) + 1, $el)"
         @keydown.left.prevent="set(Math.round(value) - 1, $el)" @keydown.down.prevent="set(Math.round(value) - 1, $el)"
+        x-modelable="value"
         role="radiogroup" aria-label="Calificación"
         style="display:inline-flex;align-items:center;gap:3px;"
     >
@@ -3251,6 +3428,77 @@ ${r?'Expression: "'+r+`"
                     <span class="muni-star muni-star--ro " style="--star:var(--muni-warn-fg);" aria-hidden="true">★</span>
             </div>
 
+
+
+<div x-data="{ nota: 2 }" style="display:flex;gap:10px;align-items:center;">
+    <div
+        x-data="{ value: 0, hover: 0, max: 5, readonly: false,
+            set(v, root){ this.value = Math.max(1, Math.min(this.max, v)); this.$nextTick(() => root.querySelectorAll('[role=radio]')[this.value - 1].focus()); } }"
+        @keydown.right.prevent="set(Math.round(value) + 1, $el)" @keydown.up.prevent="set(Math.round(value) + 1, $el)"
+        @keydown.left.prevent="set(Math.round(value) - 1, $el)" @keydown.down.prevent="set(Math.round(value) - 1, $el)"
+        x-modelable="value"
+        role="radiogroup" aria-label="Calidad de la atención"
+        style="display:inline-flex;align-items:center;gap:3px;" x-model="nota"
+    >
+        <input type="hidden" name="atencion" value="0" :value="value">                    <button
+                type="button"
+                role="radio"
+                @click="value = 1" @mouseenter="hover = 1" @mouseleave="hover = 0"
+                aria-checked="false" :aria-checked="Math.round(value) === 1 ? 'true' : 'false'"
+                tabindex="0" :tabindex="(Math.round(value) ? Math.round(value) === 1 : 1 === 1) ? 0 : -1"
+                class="muni-star "
+                :class="{ 'muni-star--on': (hover || value) >= 1 }"
+                style="--star:var(--muni-accent);"
+                aria-label="1 de 5"
+            >★</button>
+                    <button
+                type="button"
+                role="radio"
+                @click="value = 2" @mouseenter="hover = 2" @mouseleave="hover = 0"
+                aria-checked="false" :aria-checked="Math.round(value) === 2 ? 'true' : 'false'"
+                tabindex="-1" :tabindex="(Math.round(value) ? Math.round(value) === 2 : 2 === 1) ? 0 : -1"
+                class="muni-star "
+                :class="{ 'muni-star--on': (hover || value) >= 2 }"
+                style="--star:var(--muni-accent);"
+                aria-label="2 de 5"
+            >★</button>
+                    <button
+                type="button"
+                role="radio"
+                @click="value = 3" @mouseenter="hover = 3" @mouseleave="hover = 0"
+                aria-checked="false" :aria-checked="Math.round(value) === 3 ? 'true' : 'false'"
+                tabindex="-1" :tabindex="(Math.round(value) ? Math.round(value) === 3 : 3 === 1) ? 0 : -1"
+                class="muni-star "
+                :class="{ 'muni-star--on': (hover || value) >= 3 }"
+                style="--star:var(--muni-accent);"
+                aria-label="3 de 5"
+            >★</button>
+                    <button
+                type="button"
+                role="radio"
+                @click="value = 4" @mouseenter="hover = 4" @mouseleave="hover = 0"
+                aria-checked="false" :aria-checked="Math.round(value) === 4 ? 'true' : 'false'"
+                tabindex="-1" :tabindex="(Math.round(value) ? Math.round(value) === 4 : 4 === 1) ? 0 : -1"
+                class="muni-star "
+                :class="{ 'muni-star--on': (hover || value) >= 4 }"
+                style="--star:var(--muni-accent);"
+                aria-label="4 de 5"
+            >★</button>
+                    <button
+                type="button"
+                role="radio"
+                @click="value = 5" @mouseenter="hover = 5" @mouseleave="hover = 0"
+                aria-checked="false" :aria-checked="Math.round(value) === 5 ? 'true' : 'false'"
+                tabindex="-1" :tabindex="(Math.round(value) ? Math.round(value) === 5 : 5 === 1) ? 0 : -1"
+                class="muni-star "
+                :class="{ 'muni-star--on': (hover || value) >= 5 }"
+                style="--star:var(--muni-accent);"
+                aria-label="5 de 5"
+            >★</button>
+            </div>
+
+    <span>Nota: <code x-text="nota"></code></span>
+</div>
 </div>
                         
                         <div class="cat-more">
@@ -3259,7 +3507,13 @@ ${r?'Expression: "'+r+`"
                                 <div class="cat-code">
                                     <button type="button" class="cat-copy" @click="copiar($refs.src_rating, $el)">Copiar</button>
                                     <pre x-ref="src_rating"><span class="tk-x">&lt;x-muni::rating</span> <span class="tk-a">:value</span>=<span class="tk-s">&quot;4&quot;</span> <span class="tk-a">name</span>=<span class="tk-s">&quot;nota&quot;</span> /&gt;
-<span class="tk-x">&lt;x-muni::rating</span> <span class="tk-a">:value</span>=<span class="tk-s">&quot;3&quot;</span> readonly <span class="tk-a">tone</span>=<span class="tk-s">&quot;warn&quot;</span> /&gt;</pre>
+<span class="tk-x">&lt;x-muni::rating</span> <span class="tk-a">:value</span>=<span class="tk-s">&quot;3&quot;</span> readonly <span class="tk-a">tone</span>=<span class="tk-s">&quot;warn&quot;</span> /&gt;
+
+<span class="tk-c">{{-- Enlazado: wire:model=&quot;nota&quot; funciona igual que este x-model --}}</span>
+<span class="tk-t">&lt;div</span> <span class="tk-a">x-data</span>=<span class="tk-s">&quot;{ nota: 2 }&quot;</span> <span class="tk-a">style</span>=<span class="tk-s">&quot;display:flex;gap:10px;align-items:center;&quot;</span>&gt;
+    <span class="tk-x">&lt;x-muni::rating</span> <span class="tk-a">name</span>=<span class="tk-s">&quot;atencion&quot;</span> <span class="tk-a">x-model</span>=<span class="tk-s">&quot;nota&quot;</span> <span class="tk-a">aria-label</span>=<span class="tk-s">&quot;Calidad de la atención&quot;</span> /&gt;
+    <span class="tk-t">&lt;span</span>&gt;Nota: <span class="tk-t">&lt;code</span> <span class="tk-a">x-text</span>=<span class="tk-s">&quot;nota&quot;</span>&gt;<span class="tk-t">&lt;/code</span>&gt;<span class="tk-t">&lt;/span</span>&gt;
+<span class="tk-t">&lt;/div</span>&gt;</pre>
                                 </div>
                             </details>
                             <details>
@@ -3300,7 +3554,7 @@ ${r?'Expression: "'+r+`"
                         </div>
                     </section>
                             </div>
-                    <div x-show="ve(&#039;button  botón o enlace con variantes y tamaños. con `href` renderiza un `\u003Ca\u003E`. variant size href icon type&#039;) || ve(&#039;input  campo de texto con etiqueta, ayuda, error e ícono. label name type error hint icon required&#039;) || ve(&#039;select  lista desplegable nativa con etiqueta, placeholder y error. label name options selected placeholder error hint required&#039;) || ve(&#039;field  etiqueta compacta para un control nativo. es la pieza de `filter-bar`. label name&#039;) || ve(&#039;filter-bar  formulario get de filtros con botón de envío. funciona sin js. action method&#039;) || ve(&#039;segmented  selector de pocas opciones. con `name` usa radios reales y envía el formulario al cambiar. name options value autosubmit&#039;) || ve(&#039;switch  interruptor on\/off con descripción. label name checked description&#039;) || ve(&#039;calendar  calendario de mes que guarda la fecha en un input oculto (yyyy-mm-dd). name min&#039;) || ve(&#039;otp-input  código de verificación dígito a dígito. acepta pegar el código completo. length name&#039;) || ve(&#039;file-dropzone  zona para arrastrar o elegir archivos. name accept label hint multiple&#039;)">
+                    <div x-show="ve(&#039;button  botón o enlace con variantes y tamaños. con `href` renderiza un `\u003Ca\u003E`. variant size href icon type&#039;) || ve(&#039;input  campo de texto con etiqueta, ayuda, error e ícono. label name type error hint icon required&#039;) || ve(&#039;select  lista desplegable nativa con etiqueta, placeholder y error. label name options selected placeholder error hint required&#039;) || ve(&#039;field  etiqueta compacta para un control nativo. es la pieza de `filter-bar`. label name&#039;) || ve(&#039;filter-bar  formulario get de filtros con botón de envío. funciona sin js. action method&#039;) || ve(&#039;segmented  selector de pocas opciones. con `name` usa radios reales y envía el formulario al cambiar. name options value autosubmit&#039;) || ve(&#039;switch  interruptor on\/off con descripción. label name checked description&#039;) || ve(&#039;calendar  calendario de mes que guarda la fecha en un input oculto (yyyy-mm-dd). name min value&#039;) || ve(&#039;otp-input  código de verificación dígito a dígito. acepta pegar el código completo. length name&#039;) || ve(&#039;file-dropzone  zona para arrastrar o elegir archivos. name accept label hint multiple&#039;)">
                 <div class="cat-group"><h2>Formularios</h2><span>10</span></div>
                                                         <section class="cat-item" id="c-button" x-show="ve('button  botón o enlace con variantes y tamaños. con `href` renderiza un `\u003Ca\u003E`. variant size href icon type')">
                         <div class="cat-item__head">
@@ -3795,19 +4049,23 @@ ${r?'Expression: "'+r+`"
 
                                                     <div class="cat-demo cat-demo--fila" data-shot="segmented"><div role="group" style="display:inline-flex;padding:3px;gap:2px;background:var(--muni-surface-2);border:1px solid var(--muni-border);border-radius:var(--muni-radius-sm);">
                                     <label for="periodo-0" class="muni-seg ">
-                <input type="radio" id="periodo-0" name="periodo" value="d"                        style="position:absolute;opacity:0;width:0;height:0;"  onchange="if(this.form &amp;&amp; this.form.method===&#039;get&#039; &amp;&amp; ![...this.form.attributes].some(a =&gt; /^(wire:submit|x-on:submit|@submit)/.test(a.name))) this.form.submit()" >
+                <input type="radio" id="periodo-0" name="periodo" value="d"  
+                       style="position:absolute;opacity:0;width:0;height:0;"  onchange="if(this.form &amp;&amp; this.form.method===&#039;get&#039; &amp;&amp; ![...this.form.attributes].some(a =&gt; /^(wire:submit|x-on:submit|@submit)/.test(a.name))) this.form.submit()" >
                 Hoy
             </label>
                                 <label for="periodo-1" class="muni-seg muni-seg--on">
-                <input type="radio" id="periodo-1" name="periodo" value="s" checked                       style="position:absolute;opacity:0;width:0;height:0;"  onchange="if(this.form &amp;&amp; this.form.method===&#039;get&#039; &amp;&amp; ![...this.form.attributes].some(a =&gt; /^(wire:submit|x-on:submit|@submit)/.test(a.name))) this.form.submit()" >
+                <input type="radio" id="periodo-1" name="periodo" value="s" checked 
+                       style="position:absolute;opacity:0;width:0;height:0;"  onchange="if(this.form &amp;&amp; this.form.method===&#039;get&#039; &amp;&amp; ![...this.form.attributes].some(a =&gt; /^(wire:submit|x-on:submit|@submit)/.test(a.name))) this.form.submit()" >
                 Semana
             </label>
                                 <label for="periodo-2" class="muni-seg ">
-                <input type="radio" id="periodo-2" name="periodo" value="m"                        style="position:absolute;opacity:0;width:0;height:0;"  onchange="if(this.form &amp;&amp; this.form.method===&#039;get&#039; &amp;&amp; ![...this.form.attributes].some(a =&gt; /^(wire:submit|x-on:submit|@submit)/.test(a.name))) this.form.submit()" >
+                <input type="radio" id="periodo-2" name="periodo" value="m"  
+                       style="position:absolute;opacity:0;width:0;height:0;"  onchange="if(this.form &amp;&amp; this.form.method===&#039;get&#039; &amp;&amp; ![...this.form.attributes].some(a =&gt; /^(wire:submit|x-on:submit|@submit)/.test(a.name))) this.form.submit()" >
                 Mes
             </label>
                                 <label for="periodo-3" class="muni-seg ">
-                <input type="radio" id="periodo-3" name="periodo" value="a"                        style="position:absolute;opacity:0;width:0;height:0;"  onchange="if(this.form &amp;&amp; this.form.method===&#039;get&#039; &amp;&amp; ![...this.form.attributes].some(a =&gt; /^(wire:submit|x-on:submit|@submit)/.test(a.name))) this.form.submit()" >
+                <input type="radio" id="periodo-3" name="periodo" value="a"  
+                       style="position:absolute;opacity:0;width:0;height:0;"  onchange="if(this.form &amp;&amp; this.form.method===&#039;get&#039; &amp;&amp; ![...this.form.attributes].some(a =&gt; /^(wire:submit|x-on:submit|@submit)/.test(a.name))) this.form.submit()" >
                 Año
             </label>
             </div>
@@ -3823,6 +4081,24 @@ ${r?'Expression: "'+r+`"
         .muni-seg--on:has(input:not(:checked)) { background:transparent;color:var(--muni-muted);box-shadow:none; }
         .muni-seg.muni-seg:has(input:focus-visible) { box-shadow:var(--muni-ring); }
     </style>
+
+
+<div x-data="{ vista: 'lista' }" style="display:flex;gap:10px;align-items:center;">
+    <div role="group" style="display:inline-flex;padding:3px;gap:2px;background:var(--muni-surface-2);border:1px solid var(--muni-border);border-radius:var(--muni-radius-sm);">
+                                    <label for="vista-0" class="muni-seg muni-seg--on">
+                <input type="radio" id="vista-0" name="vista" value="lista" checked x-model="vista"
+                       style="position:absolute;opacity:0;width:0;height:0;" >
+                Lista
+            </label>
+                                <label for="vista-1" class="muni-seg ">
+                <input type="radio" id="vista-1" name="vista" value="mapa"  x-model="vista"
+                       style="position:absolute;opacity:0;width:0;height:0;" >
+                Mapa
+            </label>
+            </div>
+
+    <span>Vista: <code x-text="vista"></code></span>
+</div>
 </div>
                         
                         <div class="cat-more">
@@ -3831,7 +4107,13 @@ ${r?'Expression: "'+r+`"
                                 <div class="cat-code">
                                     <button type="button" class="cat-copy" @click="copiar($refs.src_segmented, $el)">Copiar</button>
                                     <pre x-ref="src_segmented"><span class="tk-x">&lt;x-muni::segmented</span> <span class="tk-a">name</span>=<span class="tk-s">&quot;periodo&quot;</span> <span class="tk-a">value</span>=<span class="tk-s">&quot;s&quot;</span>
-    <span class="tk-a">:options</span>=<span class="tk-s">&quot;[&#039;d&#039; =&gt; &#039;Hoy&#039;, &#039;s&#039; =&gt; &#039;Semana&#039;, &#039;m&#039; =&gt; &#039;Mes&#039;, &#039;a&#039; =&gt; &#039;Año&#039;]&quot;</span> /&gt;</pre>
+    <span class="tk-a">:options</span>=<span class="tk-s">&quot;[&#039;d&#039; =&gt; &#039;Hoy&#039;, &#039;s&#039; =&gt; &#039;Semana&#039;, &#039;m&#039; =&gt; &#039;Mes&#039;, &#039;a&#039; =&gt; &#039;Año&#039;]&quot;</span> /&gt;
+
+<span class="tk-c">{{-- Enlazado: con wire:model o x-model no envía el form; el valor se actualiza en vivo --}}</span>
+<span class="tk-t">&lt;div</span> <span class="tk-a">x-data</span>=<span class="tk-s">&quot;{ vista: &#039;lista&#039; }&quot;</span> <span class="tk-a">style</span>=<span class="tk-s">&quot;display:flex;gap:10px;align-items:center;&quot;</span>&gt;
+    <span class="tk-x">&lt;x-muni::segmented</span> <span class="tk-a">name</span>=<span class="tk-s">&quot;vista&quot;</span> <span class="tk-a">value</span>=<span class="tk-s">&quot;lista&quot;</span> <span class="tk-a">x-model</span>=<span class="tk-s">&quot;vista&quot;</span> <span class="tk-a">:options</span>=<span class="tk-s">&quot;[&#039;lista&#039; =&gt; &#039;Lista&#039;, &#039;mapa&#039; =&gt; &#039;Mapa&#039;]&quot;</span> /&gt;
+    <span class="tk-t">&lt;span</span>&gt;Vista: <span class="tk-t">&lt;code</span> <span class="tk-a">x-text</span>=<span class="tk-s">&quot;vista&quot;</span>&gt;<span class="tk-t">&lt;/code</span>&gt;<span class="tk-t">&lt;/span</span>&gt;
+<span class="tk-t">&lt;/div</span>&gt;</pre>
                                 </div>
                             </details>
                             <details>
@@ -3858,7 +4140,7 @@ ${r?'Expression: "'+r+`"
                                                                                                             <tr>
                                                             <td>autosubmit</td>
                                                             <td>true</td>
-                                                            <td>envía el form GET al cambiar (nunca en forms POST ni con wire:submit/@submit)</td>
+                                                            <td>envía el form GET al cambiar (nunca en forms POST, con wire:submit/@submit ni con wire:model/x-model)</td>
                                                         </tr>
                                                                                                     </tbody>
                                             </table>
@@ -3950,7 +4232,7 @@ ${r?'Expression: "'+r+`"
                                                                                                                                                                     </details>
                         </div>
                     </section>
-                                                        <section class="cat-item" id="c-calendar" x-show="ve('calendar  calendario de mes que guarda la fecha en un input oculto (yyyy-mm-dd). name min')">
+                                                        <section class="cat-item" id="c-calendar" x-show="ve('calendar  calendario de mes que guarda la fecha en un input oculto (yyyy-mm-dd). name min value')">
                         <div class="cat-item__head">
                             <h3><a href="#c-calendar">calendar</a></h3>
                                                         <span class="cat-tag cat-tag--js" title="Necesita Alpine 3 (viene con Livewire)">Alpine</span>                        </div>
@@ -3960,6 +4242,10 @@ ${r?'Expression: "'+r+`"
     x-data="{
         sel: null,
         view: new Date(),
+        valor: '',
+        local(s){ if(!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null; const p = s.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); },
+        init(){ const aplicar = v => { const d = this.local(v); this.sel = d; if (d) this.view = new Date(d.getFullYear(), d.getMonth(), 1); };
+                aplicar(this.valor); this.$watch('valor', v => { if (v !== this.iso(this.sel)) aplicar(v); }); },
         min: (s => { if(!s) return null; const p = s.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); })('2026-09-10'),
         dias: ['L','M','X','J','V','S','D'],
         meses: ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'],
@@ -3974,14 +4260,15 @@ ${r?'Expression: "'+r+`"
             return out;
         },
         move(n){ this.view = new Date(this.view.getFullYear(), this.view.getMonth()+n, 1); },
-        pick(d){ if(this.disabled(d)) return; this.sel = d; },
+        pick(d){ if(this.disabled(d)) return; this.sel = d; this.valor = this.iso(d); },
         disabled(d){ return !!(d && this.min && d < this.min); },
         same(a,b){ return a&&b && a.toDateString()===b.toDateString(); },
         iso(d){ return d ? d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0') : ''; }
     }"
+    x-modelable="valor"
     class="muni-cal"
 >
-    <input type="hidden" name="fecha_visita" :value="iso(sel)">
+    <input type="hidden" name="fecha_visita" value="" :value="valor">
     <div class="muni-cal__head">
         <button type="button" @click="move(-1)" class="muni-cal__nav" aria-label="Mes anterior">‹</button>
         <span class="muni-cal__title" x-text="titulo"></span>
@@ -4010,6 +4297,81 @@ ${r?'Expression: "'+r+`"
         .muni-cal__day:focus-visible { outline:none; box-shadow:var(--muni-ring); }
         .muni-cal__day--on { background:var(--muni-accent); color:var(--muni-on-accent); font-weight:700; }
     </style>
+
+
+<div x-data="{ fecha: '2026-10-05' }" style="display:grid;gap:8px;">
+    <div
+    x-data="{
+        sel: null,
+        view: new Date(),
+        valor: '',
+        local(s){ if(!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null; const p = s.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); },
+        init(){ const aplicar = v => { const d = this.local(v); this.sel = d; if (d) this.view = new Date(d.getFullYear(), d.getMonth(), 1); };
+                aplicar(this.valor); this.$watch('valor', v => { if (v !== this.iso(this.sel)) aplicar(v); }); },
+        min: (s => { if(!s) return null; const p = s.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); })(null),
+        dias: ['L','M','X','J','V','S','D'],
+        meses: ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'],
+        get titulo(){ return this.meses[this.view.getMonth()] + ' ' + this.view.getFullYear(); },
+        get celdas(){
+            const y=this.view.getFullYear(), m=this.view.getMonth();
+            const first=(new Date(y,m,1).getDay()+6)%7; // lunes=0
+            const days=new Date(y,m+1,0).getDate();
+            const out=[];
+            for(let i=0;i<first;i++) out.push(null);
+            for(let d=1;d<=days;d++) out.push(new Date(y,m,d));
+            return out;
+        },
+        move(n){ this.view = new Date(this.view.getFullYear(), this.view.getMonth()+n, 1); },
+        pick(d){ if(this.disabled(d)) return; this.sel = d; this.valor = this.iso(d); },
+        disabled(d){ return !!(d && this.min && d < this.min); },
+        same(a,b){ return a&&b && a.toDateString()===b.toDateString(); },
+        iso(d){ return d ? d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0') : ''; }
+    }"
+    x-modelable="valor"
+    class="muni-cal" x-model="fecha"
+>
+    <input type="hidden" name="fecha_retiro" value="" :value="valor">
+    <div class="muni-cal__head">
+        <button type="button" @click="move(-1)" class="muni-cal__nav" aria-label="Mes anterior">‹</button>
+        <span class="muni-cal__title" x-text="titulo"></span>
+        <button type="button" @click="move(1)" class="muni-cal__nav" aria-label="Mes siguiente">›</button>
+    </div>
+    <div class="muni-cal__grid">
+        <template x-for="d in dias" :key="d"><span class="muni-cal__dow" x-text="d"></span></template>
+        <template x-for="(c,i) in celdas" :key="i">
+            
+            <button type="button" class="muni-cal__day" :class="same(c,sel) && 'muni-cal__day--on'" :style="c ? '' : 'visibility:hidden'" :disabled="!c || disabled(c)" @click="c && pick(c)" x-text="c ? c.getDate() : ''"></button>
+        </template>
+    </div>
+</div>
+
+    <span>Valor enlazado: <code x-text="fecha || '(vacío)'"></code></span>
+    <button
+     type="button"     class="muni-btn muni-btn--ghost" style="display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:var(--muni-font-sans);font-weight:600;line-height:1;cursor:pointer;border-radius:var(--muni-radius-sm);border:1px solid transparent;text-decoration:none;transition:background var(--muni-dur) var(--muni-ease),border-color var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease);padding:6px 12px;font-size:12.5px;" x-on:click="fecha = '2026-12-24'"
+>
+        Poner 24-12-2026
+</button>
+
+    <style>
+        .muni-btn:focus-visible { outline: none; box-shadow: var(--muni-ring); }
+        .muni-btn:active { transform: translateY(1px); }
+        .muni-btn__icon { display: inline-flex; }
+        .muni-btn__icon svg { width: 15px; height: 15px; }
+
+        .muni-btn--primary { background: var(--muni-accent); color: var(--muni-on-accent); }
+        .muni-btn--primary:hover { background: var(--muni-accent-strong); box-shadow: var(--muni-shadow); }
+
+        .muni-btn--ghost { background: transparent; color: var(--muni-text); border-color: var(--muni-border); }
+        .muni-btn--ghost:hover { background: var(--muni-surface-2); border-color: var(--muni-border-2); }
+
+        .muni-btn--subtle { background: var(--muni-surface-2); color: var(--muni-text); }
+        .muni-btn--subtle:hover { background: var(--muni-surface-3); }
+
+        .muni-btn--danger { background: var(--muni-danger-bg); color: var(--muni-danger-fg); border-color: var(--muni-danger-border); }
+        /* Texto con --muni-surface: >= 4.5:1 sobre --muni-danger-fg en claro, oscuro y panel. */
+        .muni-btn--danger:hover { background: var(--muni-danger-fg); color: var(--muni-surface); }
+    </style>
+</div>
 </div>
                         
                         <div class="cat-more">
@@ -4017,11 +4379,18 @@ ${r?'Expression: "'+r+`"
                                 <summary>Código</summary>
                                 <div class="cat-code">
                                     <button type="button" class="cat-copy" @click="copiar($refs.src_calendar, $el)">Copiar</button>
-                                    <pre x-ref="src_calendar"><span class="tk-x">&lt;x-muni::calendar</span> <span class="tk-a">name</span>=<span class="tk-s">&quot;fecha_visita&quot;</span> <span class="tk-a">min</span>=<span class="tk-s">&quot;2026-09-10&quot;</span> /&gt;</pre>
+                                    <pre x-ref="src_calendar"><span class="tk-x">&lt;x-muni::calendar</span> <span class="tk-a">name</span>=<span class="tk-s">&quot;fecha_visita&quot;</span> <span class="tk-a">min</span>=<span class="tk-s">&quot;2026-09-10&quot;</span> /&gt;
+
+<span class="tk-c">{{-- Enlazado: wire:model=&quot;fecha&quot; funciona igual que este x-model --}}</span>
+<span class="tk-t">&lt;div</span> <span class="tk-a">x-data</span>=<span class="tk-s">&quot;{ fecha: &#039;2026-10-05&#039; }&quot;</span> <span class="tk-a">style</span>=<span class="tk-s">&quot;display:grid;gap:8px;&quot;</span>&gt;
+    <span class="tk-x">&lt;x-muni::calendar</span> <span class="tk-a">name</span>=<span class="tk-s">&quot;fecha_retiro&quot;</span> <span class="tk-a">x-model</span>=<span class="tk-s">&quot;fecha&quot;</span> /&gt;
+    <span class="tk-t">&lt;span</span>&gt;Valor enlazado: <span class="tk-t">&lt;code</span> <span class="tk-a">x-text</span>=<span class="tk-s">&quot;fecha || &#039;(vacío)&#039;&quot;</span>&gt;<span class="tk-t">&lt;/code</span>&gt;<span class="tk-t">&lt;/span</span>&gt;
+    <span class="tk-x">&lt;x-muni::button</span> <span class="tk-a">size</span>=<span class="tk-s">&quot;sm&quot;</span> <span class="tk-a">variant</span>=<span class="tk-s">&quot;ghost&quot;</span> <span class="tk-a">x-on:click</span>=<span class="tk-s">&quot;fecha = &#039;2026-12-24&#039;&quot;</span>&gt;Poner 24-12-2026<span class="tk-x">&lt;/x-muni::button</span>&gt;
+<span class="tk-t">&lt;/div</span>&gt;</pre>
                                 </div>
                             </details>
                             <details>
-                                <summary>Props y slots <span style="font-weight:400;color:var(--muni-hint);">2 props</span></summary>
+                                <summary>Props y slots <span style="font-weight:400;color:var(--muni-hint);">3 props</span></summary>
                                                                                                             <div class="cat-props">
                                             <table>
                                                                                                 <thead><tr><th>Prop</th><th>Por defecto</th><th>Descripción</th></tr></thead>
@@ -4035,6 +4404,11 @@ ${r?'Expression: "'+r+`"
                                                             <td>min</td>
                                                             <td>null</td>
                                                             <td>fecha mínima seleccionable, YYYY-MM-DD</td>
+                                                        </tr>
+                                                                                                            <tr>
+                                                            <td>value</td>
+                                                            <td>null</td>
+                                                            <td>fecha inicial, YYYY-MM-DD (con wire:model la pone Livewire)</td>
                                                         </tr>
                                                                                                     </tbody>
                                             </table>
@@ -4051,7 +4425,10 @@ ${r?'Expression: "'+r+`"
                                                     <div class="cat-demo cat-demo--fila" data-shot="otp-input"><div
     x-data="{
         digits: Array(6).fill(''),
+        value: '',
         get code(){ return this.digits.join(''); },
+        init(){ this.$watch('value', v => { v = String(v ?? '').replace(/\D/g, ''); if (v !== this.code) this.digits = this.digits.map((_, i) => v[i] || ''); });
+                this.$watch('digits', () => { if (this.value !== this.code) this.value = this.code; }); },
         onInput(i, e){
             const v = e.target.value.replace(/\D/g,'');
             if(v.length > 1){ this.paste(v); return; }
@@ -4063,6 +4440,7 @@ ${r?'Expression: "'+r+`"
         },
         paste(v){ for(let i=0;i<this.digits.length;i++){ this.digits[i]=''; } v.split('').slice(0,6).forEach((c,i)=>{ this.digits[i]=c; }); this.$nextTick(()=>{ const last=Math.min(v.length,6)-1; this.$refs['d'+Math.max(last,0)].focus(); }); }
     }"
+    x-modelable="value"
     style="display:flex;gap:9px;"
 >
     <input type="hidden" name="codigo" :value="code">
@@ -4135,6 +4513,100 @@ ${r?'Expression: "'+r+`"
         .muni-otp:focus { outline:none; border-color:var(--muni-accent); box-shadow:var(--muni-ring); }
         @media (max-width:420px){ .muni-otp { width:40px; height:48px; font-size:19px; } }
     </style>
+
+
+<div x-data="{ codigo: '' }" style="display:grid;gap:8px;">
+    <div
+    x-data="{
+        digits: Array(4).fill(''),
+        value: '',
+        get code(){ return this.digits.join(''); },
+        init(){ this.$watch('value', v => { v = String(v ?? '').replace(/\D/g, ''); if (v !== this.code) this.digits = this.digits.map((_, i) => v[i] || ''); });
+                this.$watch('digits', () => { if (this.value !== this.code) this.value = this.code; }); },
+        onInput(i, e){
+            const v = e.target.value.replace(/\D/g,'');
+            if(v.length > 1){ this.paste(v); return; }
+            this.digits[i] = v;
+            if(v && i < 3) this.$refs['d'+(i+1)].focus();
+        },
+        onKey(i, e){
+            if(e.key==='Backspace' && !this.digits[i] && i>0){ this.$refs['d'+(i-1)].focus(); }
+        },
+        paste(v){ for(let i=0;i<this.digits.length;i++){ this.digits[i]=''; } v.split('').slice(0,4).forEach((c,i)=>{ this.digits[i]=c; }); this.$nextTick(()=>{ const last=Math.min(v.length,4)-1; this.$refs['d'+Math.max(last,0)].focus(); }); }
+    }"
+    x-modelable="value"
+    style="display:flex;gap:9px;" x-model="codigo"
+>
+    <input type="hidden" name="pin" :value="code">
+            <input
+            x-ref="d0"
+            x-model="digits[0]"
+            @input="onInput(0, $event)"
+            @keydown="onKey(0, $event)"
+            @paste.prevent="paste(($event.clipboardData||window.clipboardData).getData('text').replace(/\D/g,''))"
+            inputmode="numeric" maxlength="1" autocomplete="one-time-code"
+            class="muni-otp"
+            aria-label="Dígito 1"
+        >
+            <input
+            x-ref="d1"
+            x-model="digits[1]"
+            @input="onInput(1, $event)"
+            @keydown="onKey(1, $event)"
+            @paste.prevent="paste(($event.clipboardData||window.clipboardData).getData('text').replace(/\D/g,''))"
+            inputmode="numeric" maxlength="1" autocomplete="one-time-code"
+            class="muni-otp"
+            aria-label="Dígito 2"
+        >
+            <input
+            x-ref="d2"
+            x-model="digits[2]"
+            @input="onInput(2, $event)"
+            @keydown="onKey(2, $event)"
+            @paste.prevent="paste(($event.clipboardData||window.clipboardData).getData('text').replace(/\D/g,''))"
+            inputmode="numeric" maxlength="1" autocomplete="one-time-code"
+            class="muni-otp"
+            aria-label="Dígito 3"
+        >
+            <input
+            x-ref="d3"
+            x-model="digits[3]"
+            @input="onInput(3, $event)"
+            @keydown="onKey(3, $event)"
+            @paste.prevent="paste(($event.clipboardData||window.clipboardData).getData('text').replace(/\D/g,''))"
+            inputmode="numeric" maxlength="1" autocomplete="one-time-code"
+            class="muni-otp"
+            aria-label="Dígito 4"
+        >
+    </div>
+
+    <span>Código: <code x-text="codigo || '(vacío)'"></code></span>
+    <button
+     type="button"     class="muni-btn muni-btn--ghost" style="display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:var(--muni-font-sans);font-weight:600;line-height:1;cursor:pointer;border-radius:var(--muni-radius-sm);border:1px solid transparent;text-decoration:none;transition:background var(--muni-dur) var(--muni-ease),border-color var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease);padding:6px 12px;font-size:12.5px;" x-on:click="codigo = '2468'"
+>
+        Rellenar 2468
+</button>
+
+    <style>
+        .muni-btn:focus-visible { outline: none; box-shadow: var(--muni-ring); }
+        .muni-btn:active { transform: translateY(1px); }
+        .muni-btn__icon { display: inline-flex; }
+        .muni-btn__icon svg { width: 15px; height: 15px; }
+
+        .muni-btn--primary { background: var(--muni-accent); color: var(--muni-on-accent); }
+        .muni-btn--primary:hover { background: var(--muni-accent-strong); box-shadow: var(--muni-shadow); }
+
+        .muni-btn--ghost { background: transparent; color: var(--muni-text); border-color: var(--muni-border); }
+        .muni-btn--ghost:hover { background: var(--muni-surface-2); border-color: var(--muni-border-2); }
+
+        .muni-btn--subtle { background: var(--muni-surface-2); color: var(--muni-text); }
+        .muni-btn--subtle:hover { background: var(--muni-surface-3); }
+
+        .muni-btn--danger { background: var(--muni-danger-bg); color: var(--muni-danger-fg); border-color: var(--muni-danger-border); }
+        /* Texto con --muni-surface: >= 4.5:1 sobre --muni-danger-fg en claro, oscuro y panel. */
+        .muni-btn--danger:hover { background: var(--muni-danger-fg); color: var(--muni-surface); }
+    </style>
+</div>
 </div>
                         
                         <div class="cat-more">
@@ -4142,7 +4614,14 @@ ${r?'Expression: "'+r+`"
                                 <summary>Código</summary>
                                 <div class="cat-code">
                                     <button type="button" class="cat-copy" @click="copiar($refs.src_otp_input, $el)">Copiar</button>
-                                    <pre x-ref="src_otp_input"><span class="tk-x">&lt;x-muni::otp-input</span> <span class="tk-a">:length</span>=<span class="tk-s">&quot;6&quot;</span> <span class="tk-a">name</span>=<span class="tk-s">&quot;codigo&quot;</span> /&gt;</pre>
+                                    <pre x-ref="src_otp_input"><span class="tk-x">&lt;x-muni::otp-input</span> <span class="tk-a">:length</span>=<span class="tk-s">&quot;6&quot;</span> <span class="tk-a">name</span>=<span class="tk-s">&quot;codigo&quot;</span> /&gt;
+
+<span class="tk-c">{{-- Enlazado: wire:model=&quot;codigo&quot; funciona igual que este x-model --}}</span>
+<span class="tk-t">&lt;div</span> <span class="tk-a">x-data</span>=<span class="tk-s">&quot;{ codigo: &#039;&#039; }&quot;</span> <span class="tk-a">style</span>=<span class="tk-s">&quot;display:grid;gap:8px;&quot;</span>&gt;
+    <span class="tk-x">&lt;x-muni::otp-input</span> <span class="tk-a">:length</span>=<span class="tk-s">&quot;4&quot;</span> <span class="tk-a">name</span>=<span class="tk-s">&quot;pin&quot;</span> <span class="tk-a">x-model</span>=<span class="tk-s">&quot;codigo&quot;</span> /&gt;
+    <span class="tk-t">&lt;span</span>&gt;Código: <span class="tk-t">&lt;code</span> <span class="tk-a">x-text</span>=<span class="tk-s">&quot;codigo || &#039;(vacío)&#039;&quot;</span>&gt;<span class="tk-t">&lt;/code</span>&gt;<span class="tk-t">&lt;/span</span>&gt;
+    <span class="tk-x">&lt;x-muni::button</span> <span class="tk-a">size</span>=<span class="tk-s">&quot;sm&quot;</span> <span class="tk-a">variant</span>=<span class="tk-s">&quot;ghost&quot;</span> <span class="tk-a">x-on:click</span>=<span class="tk-s">&quot;codigo = &#039;2468&#039;&quot;</span>&gt;Rellenar 2468<span class="tk-x">&lt;/x-muni::button</span>&gt;
+<span class="tk-t">&lt;/div</span>&gt;</pre>
                                 </div>
                             </details>
                             <details>
@@ -4182,20 +4661,21 @@ ${r?'Expression: "'+r+`"
             let list = dt.files;
             
             if(!this.multiple && list.length > 1){ const t = new DataTransfer(); t.items.add(list[0]); list = t.files; }
-            this.$refs.input.files = list; this.pick(list);
+            this.$refs.input.files = list; this.$refs.input.dispatchEvent(new Event('change', { bubbles: true }));
         }
     }"
     @dragover.prevent="over=true" @dragleave.prevent="over=false" @drop.prevent="drop($event)"
     
 >
     <label class="muni-dz" :class="over && 'muni-dz--over'">
-        <input x-ref="input" type="file" name="cedula" accept="image/*,application/pdf"                @change="pick($event.target.files)" style="position:absolute;inset:0;opacity:0;cursor:pointer;">
+        <input x-ref="input" type="file" name="cedula" accept="image/*,application/pdf"  
+               @change="pick($event.target.files)" style="position:absolute;inset:0;opacity:0;cursor:pointer;">
         <span class="muni-dz__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="24" height="24"><path d="M12 16V4m0 0L8 8m4-4l4 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round"/></svg>
         </span>
         <span class="muni-dz__label" x-show="!files.length">Arrastra un archivo o haz clic para subir</span>
         <span class="muni-dz__hint" x-show="!files.length">PDF o imagen de la cédula, hasta 10 MB</span>
-        <template x-for="f in files" :key="f.name">
+        <template x-for="(f, i) in files" :key="i">
             <span class="muni-dz__file"><span x-text="f.name"></span><span class="muni-dz__size mono" x-text="f.size + ' MB'"></span></span>
         </template>
     </label>
@@ -7326,15 +7806,18 @@ ${r?&#039;Expression: &quot;&#039;+r+`&quot;
             <span style="font-family:var(--muni-font-sans);font-size:11px;font-weight:600;color:var(--muni-muted);text-transform:uppercase;letter-spacing:.03em;">Estado</span>
         <div role="group" style="display:inline-flex;padding:3px;gap:2px;background:var(--muni-surface-2);border:1px solid var(--muni-border);border-radius:var(--muni-radius-sm);">
                                     <label for="estado-0" class="muni-seg muni-seg--on">
-                <input type="radio" id="estado-0" name="estado" value="" checked                       style="position:absolute;opacity:0;width:0;height:0;"  onchange="if(this.form &amp;&amp; this.form.method===&#039;get&#039; &amp;&amp; ![...this.form.attributes].some(a =&gt; /^(wire:submit|x-on:submit|@submit)/.test(a.name))) this.form.submit()" >
+                <input type="radio" id="estado-0" name="estado" value="" checked 
+                       style="position:absolute;opacity:0;width:0;height:0;"  onchange="if(this.form &amp;&amp; this.form.method===&#039;get&#039; &amp;&amp; ![...this.form.attributes].some(a =&gt; /^(wire:submit|x-on:submit|@submit)/.test(a.name))) this.form.submit()" >
                 Todas
             </label>
                                 <label for="estado-1" class="muni-seg ">
-                <input type="radio" id="estado-1" name="estado" value="morosa"                        style="position:absolute;opacity:0;width:0;height:0;"  onchange="if(this.form &amp;&amp; this.form.method===&#039;get&#039; &amp;&amp; ![...this.form.attributes].some(a =&gt; /^(wire:submit|x-on:submit|@submit)/.test(a.name))) this.form.submit()" >
+                <input type="radio" id="estado-1" name="estado" value="morosa"  
+                       style="position:absolute;opacity:0;width:0;height:0;"  onchange="if(this.form &amp;&amp; this.form.method===&#039;get&#039; &amp;&amp; ![...this.form.attributes].some(a =&gt; /^(wire:submit|x-on:submit|@submit)/.test(a.name))) this.form.submit()" >
                 Morosas
             </label>
                                 <label for="estado-2" class="muni-seg ">
-                <input type="radio" id="estado-2" name="estado" value="al-dia"                        style="position:absolute;opacity:0;width:0;height:0;"  onchange="if(this.form &amp;&amp; this.form.method===&#039;get&#039; &amp;&amp; ![...this.form.attributes].some(a =&gt; /^(wire:submit|x-on:submit|@submit)/.test(a.name))) this.form.submit()" >
+                <input type="radio" id="estado-2" name="estado" value="al-dia"  
+                       style="position:absolute;opacity:0;width:0;height:0;"  onchange="if(this.form &amp;&amp; this.form.method===&#039;get&#039; &amp;&amp; ![...this.form.attributes].some(a =&gt; /^(wire:submit|x-on:submit|@submit)/.test(a.name))) this.form.submit()" >
                 Al día
             </label>
             </div>
@@ -8443,20 +8926,21 @@ ${r?&#039;Expression: &quot;&#039;+r+`&quot;
             let list = dt.files;
             
             if(!this.multiple && list.length > 1){ const t = new DataTransfer(); t.items.add(list[0]); list = t.files; }
-            this.$refs.input.files = list; this.pick(list);
+            this.$refs.input.files = list; this.$refs.input.dispatchEvent(new Event('change', { bubbles: true }));
         }
     }"
     @dragover.prevent="over=true" @dragleave.prevent="over=false" @drop.prevent="drop($event)"
     
 >
     <label class="muni-dz" :class="over && 'muni-dz--over'">
-        <input x-ref="input" type="file" name="documento" accept="image/*,application/pdf"                @change="pick($event.target.files)" style="position:absolute;inset:0;opacity:0;cursor:pointer;">
+        <input x-ref="input" type="file" name="documento" accept="image/*,application/pdf"  
+               @change="pick($event.target.files)" style="position:absolute;inset:0;opacity:0;cursor:pointer;">
         <span class="muni-dz__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="24" height="24"><path d="M12 16V4m0 0L8 8m4-4l4 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round"/></svg>
         </span>
         <span class="muni-dz__label" x-show="!files.length">Arrastra un archivo o haz clic para subir</span>
         <span class="muni-dz__hint" x-show="!files.length">PDF o imagen, hasta 10 MB</span>
-        <template x-for="f in files" :key="f.name">
+        <template x-for="(f, i) in files" :key="i">
             <span class="muni-dz__file"><span x-text="f.name"></span><span class="muni-dz__size mono" x-text="f.size + ' MB'"></span></span>
         </template>
     </label>
@@ -8535,6 +9019,10 @@ ${r?&#039;Expression: &quot;&#039;+r+`&quot;
     x-data="{
         sel: null,
         view: new Date(),
+        valor: '',
+        local(s){ if(!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null; const p = s.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); },
+        init(){ const aplicar = v => { const d = this.local(v); this.sel = d; if (d) this.view = new Date(d.getFullYear(), d.getMonth(), 1); };
+                aplicar(this.valor); this.$watch('valor', v => { if (v !== this.iso(this.sel)) aplicar(v); }); },
         min: (s => { if(!s) return null; const p = s.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); })('2026-09-28'),
         dias: ['L','M','X','J','V','S','D'],
         meses: ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'],
@@ -8549,14 +9037,15 @@ ${r?&#039;Expression: &quot;&#039;+r+`&quot;
             return out;
         },
         move(n){ this.view = new Date(this.view.getFullYear(), this.view.getMonth()+n, 1); },
-        pick(d){ if(this.disabled(d)) return; this.sel = d; },
+        pick(d){ if(this.disabled(d)) return; this.sel = d; this.valor = this.iso(d); },
         disabled(d){ return !!(d && this.min && d < this.min); },
         same(a,b){ return a&&b && a.toDateString()===b.toDateString(); },
         iso(d){ return d ? d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0') : ''; }
     }"
+    x-modelable="valor"
     class="muni-cal"
 >
-    <input type="hidden" name="fecha" :value="iso(sel)">
+    <input type="hidden" name="fecha" value="" :value="valor">
     <div class="muni-cal__head">
         <button type="button" @click="move(-1)" class="muni-cal__nav" aria-label="Mes anterior">‹</button>
         <span class="muni-cal__title" x-text="titulo"></span>
@@ -8704,7 +9193,10 @@ ${r?&#039;Expression: &quot;&#039;+r+`&quot;
     <div
     x-data="{
         digits: Array(6).fill(''),
+        value: '',
         get code(){ return this.digits.join(''); },
+        init(){ this.$watch('value', v => { v = String(v ?? '').replace(/\D/g, ''); if (v !== this.code) this.digits = this.digits.map((_, i) => v[i] || ''); });
+                this.$watch('digits', () => { if (this.value !== this.code) this.value = this.code; }); },
         onInput(i, e){
             const v = e.target.value.replace(/\D/g,'');
             if(v.length > 1){ this.paste(v); return; }
@@ -8716,6 +9208,7 @@ ${r?&#039;Expression: &quot;&#039;+r+`&quot;
         },
         paste(v){ for(let i=0;i<this.digits.length;i++){ this.digits[i]=''; } v.split('').slice(0,6).forEach((c,i)=>{ this.digits[i]=c; }); this.$nextTick(()=>{ const last=Math.min(v.length,6)-1; this.$refs['d'+Math.max(last,0)].focus(); }); }
     }"
+    x-modelable="value"
     style="display:flex;gap:9px;"
 >
     <input type="hidden" name="codigo" :value="code">

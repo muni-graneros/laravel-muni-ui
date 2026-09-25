@@ -16,7 +16,8 @@
 
 {{-- Solo lectura: una imagen con nombre («4 de 5»), sin foco ni hover. Interactivo:
      radiogroup de botones con role=radio para el lector de pantalla; flechas ←/→ cambian el valor.
-     Las estrellas marcadas se pintan desde el servidor, así se ven sin JS. --}}
+     Las estrellas marcadas se pintan desde el servidor, así se ven sin JS.
+     wire:model / x-model en el componente enlazan `value` (x-modelable). --}}
 @if ($readonly)
     <div role="img" aria-label="{{ $attributes->get('aria-label', 'Calificación: '.$texto) }}"
          {{ $attributes->except('aria-label')->merge(['style' => 'display:inline-flex;align-items:center;gap:3px;']) }}>
@@ -31,6 +32,7 @@
             set(v, root){ this.value = Math.max(1, Math.min(this.max, v)); this.$nextTick(() => root.querySelectorAll('[role=radio]')[this.value - 1].focus()); } }"
         @keydown.right.prevent="set(Math.round(value) + 1, $el)" @keydown.up.prevent="set(Math.round(value) + 1, $el)"
         @keydown.left.prevent="set(Math.round(value) - 1, $el)" @keydown.down.prevent="set(Math.round(value) - 1, $el)"
+        x-modelable="value"
         role="radiogroup" aria-label="{{ $attributes->get('aria-label', 'Calificación') }}"
         {{ $attributes->except('aria-label')->merge(['style' => 'display:inline-flex;align-items:center;gap:3px;']) }}
     >

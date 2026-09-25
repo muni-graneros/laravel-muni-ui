@@ -69,3 +69,19 @@ it('renderiza cada receta del catálogo sin errores', function (string $archivo)
 
     expect(view()->file($archivo)->render())->not->toContain('<x-muni::');
 })->with(fn () => glob(catalogoDir().'/recetas/*.blade.php'));
+
+/*
+ * muni-ui.css declara cada tema más de una vez: el oscuro para la preferencia del
+ * OS y para los activadores explícitos (.dark, data-theme, data-muni-theme), y el
+ * claro en :root y en el override data-muni-theme="light". Si una copia cambia y la
+ * otra no, el mismo sistema se ve distinto según cómo se activó el tema, y nadie lo
+ * nota en la máquina donde se hizo el cambio.
+ */
+it('mantiene idénticas las copias de cada tema en muni-ui.css', function () {
+    $t = tokens_css(file_get_contents(__DIR__.'/../resources/css/muni-ui.css'));
+    $invariantes = ['muni-radius', 'muni-radius-lg', 'muni-radius-sm', 'muni-ease', 'muni-dur'];
+
+    expect($t['dark_os'])->toBe($t['dark'])
+        ->and($t['light_override'])->toBe(array_diff_key($t['light'], array_flip($invariantes)))
+        ->and(array_keys($t['dark']))->toEqualCanonicalizing(array_keys($t['light_override']));
+});

@@ -118,5 +118,35 @@ function catalogo_datos(Factory $view, string $root): array
     // Armado por partes: Blade compila la etiqueta de componente aunque esté dentro de un string.
     $inicio = resaltar('<'.'x-muni::badge tone="ok">Al día</'.'x-muni::badge>');
 
-    return compact('grupos', 'recetas', 'total', 'inicio');
+    $tokens = tokens_css(file_get_contents($root.'/resources/css/muni-ui.css'));
+
+    return compact('grupos', 'recetas', 'total', 'inicio', 'tokens');
+}
+
+/**
+ * Los bloques de tokens de muni-ui.css, por tema. El tema oscuro se declara dos
+ * veces (preferencia del OS y activadores explícitos) y el claro otras dos (:root y
+ * el override data-muni-theme="light"); tests/CatalogoTest.php exige que cada par
+ * sea idéntico.
+ *
+ * @return array{gob: array<string,string>, light: array<string,string>, light_override: array<string,string>, dark_os: array<string,string>, dark: array<string,string>}
+ */
+function tokens_css(string $css): array
+{
+    $bloque = function (string $selectorRegex) use ($css): array {
+        if (! preg_match('/'.$selectorRegex.'\s*\{(.*?)\n\s*\}/s', $css, $m)) {
+            return [];
+        }
+        preg_match_all('/--(muni-[\w-]+)\s*:\s*([^;]+);/', $m[1], $t);
+
+        return array_combine($t[1], array_map('trim', $t[2]));
+    };
+
+    return [
+        'gob' => $bloque(':root(?=\s*\{\s*--muni-gob)'),
+        'light' => $bloque(':root(?=\s*\{\s*--muni-bg)'),
+        'light_override' => $bloque('\n\[data-muni-theme="light"\]'),
+        'dark_os' => $bloque(':root:not\(\[data-muni-theme="light"\]\):not\(\[data-theme="light"\]\):not\(\.light\)'),
+        'dark' => $bloque('\.dark'),
+    ];
 }

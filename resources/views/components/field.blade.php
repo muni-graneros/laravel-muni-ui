@@ -1,6 +1,6 @@
 @props([
-    'label' => null,
-    'name' => null,
+    'label' => null, // etiqueta sobre el control
+    'name' => null, // reservado; el control del slot lleva su propio name
 ])
 
 {{-- Envoltura de campo para la filter-bar: label + control (input/select en el slot). --}}

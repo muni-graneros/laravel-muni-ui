@@ -1,9 +1,9 @@
 @props([
-    'variant' => 'primary',
-    'size' => 'md',
-    'href' => null,
-    'icon' => null,
-    'type' => 'button',
+    'variant' => 'primary', // primary | ghost | subtle | danger
+    'size' => 'md', // sm | md | lg
+    'href' => null, // si se indica, renderiza un <a>
+    'icon' => null, // SVG a la izquierda del texto
+    'type' => 'button', // type del <button> (button | submit | reset)
 ])
 
 @php

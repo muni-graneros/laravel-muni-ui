@@ -1,7 +1,7 @@
 @props([
-    'title',
-    'subtitle' => null,
-    'eyebrow' => null,
+    'title', // título de la página (h1)
+    'subtitle' => null, // texto bajo el título
+    'eyebrow' => null, // rótulo chico sobre el título
 ])
 
 <div {{ $attributes->merge(['style' => 'display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px;']) }}>

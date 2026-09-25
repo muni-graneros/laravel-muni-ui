@@ -1,5 +1,5 @@
 @props([
-    'position' => 'bottom-right',
+    'position' => 'bottom-right', // bottom-right | bottom-left | top-right | top-left
 ])
 
 @php

@@ -1,9 +1,9 @@
 @props([
-    'system' => null,
-    'home' => 'https://www.municipalidadgraneros.cl/',
-    'address' => 'Av. Bernardo O\'Higgins 630, Graneros, Región de O\'Higgins',
-    'phone' => '+56 72 249 1000',
-    'email' => 'contacto@municipalidadgraneros.cl',
+    'system' => null, // nombre del sistema bajo el municipio
+    'home' => 'https://www.municipalidadgraneros.cl/', // URL del sitio municipal
+    'address' => 'Av. Bernardo O\'Higgins 630, Graneros, Región de O\'Higgins', // dirección de contacto
+    'phone' => '+56 72 249 1000', // teléfono de contacto
+    'email' => 'contacto@municipalidadgraneros.cl', // correo de contacto
 ])
 
 {{-- Footer institucional compartido por los subdominios del ecosistema. Cierra la página

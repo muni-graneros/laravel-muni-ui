@@ -1,11 +1,11 @@
 @props([
-    'value',
-    'label',
-    'tone' => 'neutral',
-    'delta' => null,
-    'deltaDir' => null,
-    'spark' => null,
-    'hint' => null,
+    'value', // cifra principal (ya formateada)
+    'label', // qué mide
+    'tone' => 'neutral', // neutral | ok | warn | danger | info
+    'delta' => null, // variación, p. ej. «+12%»
+    'deltaDir' => null, // up | down
+    'spark' => null, // serie de números para la sparkline
+    'hint' => null, // texto chico bajo la etiqueta
 ])
 
 @php

@@ -1,8 +1,8 @@
 @props([
-    'label' => null,
-    'name' => null,
-    'checked' => false,
-    'description' => null,
+    'label' => null, // etiqueta
+    'name' => null, // name del input
+    'checked' => false, // estado inicial
+    'description' => null, // texto de ayuda bajo la etiqueta
 ])
 
 @php $id = $name ? 'muni-'.$name : 'muni-'.uniqid(); @endphp

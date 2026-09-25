@@ -1,6 +1,6 @@
 @props([
-    'name' => 'fecha',
-    'min' => null,
+    'name' => 'fecha', // name del input oculto (valor YYYY-MM-DD)
+    'min' => null, // fecha mínima seleccionable, YYYY-MM-DD
 ])
 
 {{-- Calendario de mes (Alpine 3). Navega meses, selecciona un día, escribe el valor

@@ -1,7 +1,7 @@
 @props([
-    'steps' => [],
-    'current' => 0,
-    'orientation' => 'horizontal',
+    'steps' => [], // lista de strings o de ['label' => , 'hint' => ?]
+    'current' => 0, // índice del paso activo (desde 0)
+    'orientation' => 'horizontal', // horizontal | vertical
 ])
 
 @php

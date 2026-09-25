@@ -1,8 +1,8 @@
 @props([
-    'current' => 1,
-    'total' => 1,
-    'url' => null,
-    'info' => null,
+    'current' => 1, // página actual (desde 1)
+    'total' => 1, // total de páginas
+    'url' => null, // closure fn(int $pagina): string
+    'info' => null, // texto a la izquierda, p. ej. «Mostrando 1–20 de 231»
 ])
 
 @php

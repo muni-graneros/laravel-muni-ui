@@ -1,9 +1,9 @@
 @props([
-    'value' => 0,
-    'max' => 100,
-    'tone' => 'accent',
-    'label' => null,
-    'showValue' => false,
+    'value' => 0, // valor actual
+    'max' => 100, // valor máximo
+    'tone' => 'accent', // accent | ok | warn | danger | info
+    'label' => null, // etiqueta sobre la barra
+    'showValue' => false, // muestra el porcentaje
 ])
 
 @php

@@ -1,10 +1,10 @@
 @props([
-    'theme' => 'dark',
-    'code' => '404',
-    'title' => 'Página no encontrada',
-    'message' => 'La página que buscas no existe o fue movida.',
-    'home' => '/',
-    'system' => 'Municipalidad de Graneros',
+    'theme' => 'dark', // light | dark
+    'code' => '404', // 403 | 404 | 500 | 503 u otro
+    'title' => 'Página no encontrada', // título del error
+    'message' => 'La página que buscas no existe o fue movida.', // explicación para el usuario
+    'home' => '/', // URL del botón «Volver al inicio»
+    'system' => 'Municipalidad de Graneros', // nombre del sistema
 ])
 
 <!DOCTYPE html>

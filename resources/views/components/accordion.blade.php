@@ -1,7 +1,7 @@
 @props([
-    'items' => [],
-    'multiple' => false,
-    'default' => null,
+    'items' => [], // lista de ['title' => , 'content' => ]
+    'multiple' => false, // permite varios paneles abiertos a la vez
+    'default' => null, // índice abierto al cargar (null = todos cerrados)
 ])
 
 @php

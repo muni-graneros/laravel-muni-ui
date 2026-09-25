@@ -1,7 +1,7 @@
 @props([
-    'tone' => 'info',
-    'title' => null,
-    'icon' => null,
+    'tone' => 'info', // ok | warn | danger | info
+    'title' => null, // título en negrita (opcional)
+    'icon' => null, // SVG propio; reemplaza el ícono por defecto
 ])
 
 @php

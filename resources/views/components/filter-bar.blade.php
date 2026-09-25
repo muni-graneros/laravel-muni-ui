@@ -1,6 +1,6 @@
 @props([
-    'action' => null,
-    'method' => 'get',
+    'action' => null, // URL del formulario
+    'method' => 'get', // get | post
 ])
 
 {{-- Barra de filtros GET: los valores quedan en la URL para que las descargas

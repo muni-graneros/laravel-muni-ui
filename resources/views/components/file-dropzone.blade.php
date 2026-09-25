@@ -1,9 +1,9 @@
 @props([
-    'name' => 'file',
-    'accept' => 'image/*,application/pdf',
-    'label' => 'Arrastra un archivo o haz clic para subir',
-    'hint' => 'PDF o imagen, hasta 10 MB',
-    'multiple' => false,
+    'name' => 'file', // name del <input type=file>
+    'accept' => 'image/*,application/pdf', // tipos aceptados
+    'label' => 'Arrastra un archivo o haz clic para subir', // texto principal
+    'hint' => 'PDF o imagen, hasta 10 MB', // texto secundario (formatos, tamaño)
+    'multiple' => false, // permite varios archivos
 ])
 
 {{-- Zona de carga de archivos (Alpine 3). Drag & drop + preview del nombre. El input real

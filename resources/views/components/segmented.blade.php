@@ -1,7 +1,7 @@
 @props([
-    'name' => null,
-    'options' => [],
-    'value' => null,
+    'name' => null, // con name genera radios reales que envían el form
+    'options' => [], // mapa valor => etiqueta
+    'value' => null, // valor seleccionado
 ])
 
 {{-- Control segmentado (toggle de filtro): alternativa moderna al <select> para pocas

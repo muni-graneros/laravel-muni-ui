@@ -1,5 +1,5 @@
 @props([
-    'width' => '240px',
+    'width' => '240px', // ancho en escritorio
 ])
 
 {{-- Barra lateral de navegación para dashboards. En móvil se colapsa (toggle con el

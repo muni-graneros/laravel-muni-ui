@@ -1,9 +1,9 @@
 @props([
-    'segments' => [],
-    'size' => 150,
-    'thickness' => 18,
-    'total' => null,
-    'centerLabel' => null,
+    'segments' => [], // lista de ['label' => , 'value' => , 'tone' => ? | 'color' => ?]
+    'size' => 150, // diámetro en px
+    'thickness' => 18, // grosor del anillo (unidades del viewBox 100)
+    'total' => null, // total de referencia; por defecto la suma
+    'centerLabel' => null, // texto grande al centro
 ])
 
 @php

@@ -1,6 +1,6 @@
 @props([
-    'align' => 'end',
-    'width' => '220px',
+    'align' => 'end', // start | end, respecto del disparador
+    'width' => '220px', // ancho del menú
 ])
 
 @php

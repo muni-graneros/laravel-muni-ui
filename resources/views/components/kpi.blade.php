@@ -1,8 +1,8 @@
 @props([
-    'value',
-    'label',
-    'tone' => 'neutral',
-    'hint' => null,
+    'value', // cifra principal (ya formateada)
+    'label', // qué mide
+    'tone' => 'neutral', // neutral | ok | warn | danger | info
+    'hint' => null, // texto chico bajo la etiqueta
 ])
 
 @php

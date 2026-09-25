@@ -1,10 +1,10 @@
 @props([
-    'theme' => 'light',
-    'title' => null,
-    'system' => 'Panel',
-    'subtitle' => null,
-    'status' => 'online',
-    'user' => null,
+    'theme' => 'light', // light | dark
+    'title' => null, // <title> del documento; por defecto usa system
+    'system' => 'Panel', // nombre del sistema en la barra superior
+    'subtitle' => null, // línea secundaria bajo el nombre
+    'status' => 'online', // online | degraded | offline
+    'user' => null, // nombre del usuario (avatar arriba a la derecha)
 ])
 
 <!DOCTYPE html>

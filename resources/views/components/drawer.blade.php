@@ -1,7 +1,7 @@
 @props([
-    'title' => null,
-    'side' => 'right',
-    'width' => '400px',
+    'title' => null, // título del panel
+    'side' => 'right', // right | left
+    'width' => '400px', // ancho del panel (máx. 92vw)
 ])
 
 @php $isRight = $side !== 'left'; @endphp

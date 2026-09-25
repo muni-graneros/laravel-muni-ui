@@ -1,9 +1,9 @@
 @props([
-    'value' => 0,
-    'max' => 5,
-    'readonly' => false,
-    'name' => null,
-    'tone' => 'accent',
+    'value' => 0, // valor inicial
+    'max' => 5, // cantidad de estrellas
+    'readonly' => false, // solo lectura
+    'name' => null, // name del input oculto
+    'tone' => 'accent', // accent | ok | warn
 ])
 
 @php

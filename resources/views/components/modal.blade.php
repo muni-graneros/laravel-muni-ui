@@ -1,6 +1,6 @@
 @props([
-    'title' => null,
-    'maxWidth' => '480px',
+    'title' => null, // título del diálogo
+    'maxWidth' => '480px', // ancho máximo del panel
 ])
 
 {{-- Modal accesible (Alpine 3). El slot `trigger` abre; Escape / click en el fondo /

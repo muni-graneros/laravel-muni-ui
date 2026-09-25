@@ -1,7 +1,7 @@
 @props([
-    'items' => [],
-    'placeholder' => 'Buscar o ir a…',
-    'hotkey' => 'k',
+    'items' => [], // lista de ['label' => , 'url' => , 'group' => ?, 'hint' => ?]
+    'placeholder' => 'Buscar o ir a…', // texto del buscador
+    'hotkey' => 'k', // tecla que abre con ⌘/Ctrl
 ])
 
 @php

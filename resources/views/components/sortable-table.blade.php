@@ -1,8 +1,8 @@
 @props([
-    'columns' => [],
-    'rows' => [],
-    'empty' => 'Sin resultados.',
-    'searchable' => false,
+    'columns' => [], // lista de ['key' => , 'label' => , 'align' => ?, 'mono' => ?, 'sortable' => ?]
+    'rows' => [], // filas asociativas por key; '_tone' => 'danger' pinta la franja
+    'empty' => 'Sin resultados.', // texto sin resultados
+    'searchable' => false, // agrega un buscador sobre la tabla
 ])
 
 @php

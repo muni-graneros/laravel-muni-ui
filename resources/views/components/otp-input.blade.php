@@ -1,6 +1,6 @@
 @props([
-    'length' => 6,
-    'name' => 'code',
+    'length' => 6, // cantidad de dígitos
+    'name' => 'code', // name del input oculto con el código completo
 ])
 
 {{-- Entrada de código de un solo uso / MFA (Alpine 3). Autofoco entre casillas, pega

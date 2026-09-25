@@ -1,5 +1,5 @@
 @props([
-    'items' => [],
+    'items' => [], // lista de ['title' => , 'time' => ?, 'description' => ?, 'tone' => ?]
 ])
 
 @php

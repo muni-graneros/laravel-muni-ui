@@ -1,9 +1,9 @@
 @props([
-    'theme' => 'light',
-    'title' => 'Ingresar',
-    'system' => 'Municipalidad de Graneros',
-    'subtitle' => null,
-    'logo' => null,
+    'theme' => 'light', // light | dark
+    'title' => 'Ingresar', // título del formulario y del documento
+    'system' => 'Municipalidad de Graneros', // nombre mostrado en la columna lateral
+    'subtitle' => null, // texto bajo el título
+    'logo' => null, // HTML del logo, p. ej. el componente gob-escudo
 ])
 
 <!DOCTYPE html>

@@ -1,12 +1,12 @@
 @props([
-    'label' => null,
-    'name' => null,
-    'options' => [],
-    'selected' => null,
-    'placeholder' => null,
-    'error' => null,
-    'hint' => null,
-    'required' => false,
+    'label' => null, // etiqueta
+    'name' => null, // name e id del select
+    'options' => [], // mapa valor => etiqueta
+    'selected' => null, // valor seleccionado
+    'placeholder' => null, // primera opción vacía
+    'error' => null, // mensaje de error
+    'hint' => null, // ayuda bajo el campo
+    'required' => false, // marca el campo como obligatorio
 ])
 
 @php $id = $name ? 'muni-'.$name : 'muni-'.uniqid(); @endphp

@@ -1,5 +1,5 @@
 @props([
-    'items' => [],
+    'items' => [], // lista de ['label' => , 'url' => ?]; el último es la página actual
 ])
 
 {{-- $items: array de ['label'=>, 'url'=>?]. El último es la página actual (sin url). --}}

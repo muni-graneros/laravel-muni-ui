@@ -1,11 +1,11 @@
 @props([
-    'label' => null,
-    'name' => null,
-    'type' => 'text',
-    'error' => null,
-    'hint' => null,
-    'icon' => null,
-    'required' => false,
+    'label' => null, // etiqueta
+    'name' => null, // name e id del input
+    'type' => 'text', // type del input
+    'error' => null, // mensaje de error (pinta el borde en rojo)
+    'hint' => null, // ayuda bajo el campo
+    'icon' => null, // SVG dentro del campo, a la izquierda
+    'required' => false, // marca el campo como obligatorio
 ])
 
 @php $id = $name ? 'muni-'.$name : 'muni-'.uniqid(); @endphp

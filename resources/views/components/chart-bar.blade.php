@@ -1,8 +1,8 @@
 @props([
-    'data' => [],
-    'height' => 160,
-    'tone' => 'accent',
-    'labels' => true,
+    'data' => [], // lista de ['label' => , 'value' => , 'tone' => ?] o de números
+    'height' => 160, // alto del área de barras, en px
+    'tone' => 'accent', // accent | ok | warn | danger | info
+    'labels' => true, // muestra las etiquetas bajo las barras
 ])
 
 @php

@@ -1,7 +1,7 @@
 @props([
-    'href' => null,
-    'icon' => null,
-    'tone' => 'default',
+    'href' => null, // si se indica, renderiza un <a>
+    'icon' => null, // SVG a la izquierda
+    'tone' => 'default', // default | danger
 ])
 
 @php

@@ -1,5 +1,5 @@
 @props([
-    'index',
+    'index', // índice de la pestaña a la que pertenece (desde 0)
 ])
 
 {{-- Panel de una pestaña. `index` debe coincidir con la posición de su etiqueta en

@@ -1,7 +1,7 @@
 @props([
-    'title' => null,
-    'subtitle' => null,
-    'flush' => false,
+    'title' => null, // título del encabezado
+    'subtitle' => null, // texto bajo el título
+    'flush' => false, // sin padding interno (tablas, listas)
 ])
 
 <section

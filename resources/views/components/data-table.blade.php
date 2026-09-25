@@ -1,6 +1,6 @@
 @props([
-    'columns' => [],
-    'empty' => 'Sin resultados para este filtro.',
+    'columns' => [], // encabezados de columna
+    'empty' => 'Sin resultados para este filtro.', // texto cuando el slot no trae filas
 ])
 
 {{-- Tabla densa de datos. El slot son las filas <tr>; usar la clase `muni-row--danger`

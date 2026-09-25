@@ -1,6 +1,6 @@
 @props([
-    'tabs' => [],
-    'default' => 0,
+    'tabs' => [], // etiquetas de las pestañas
+    'default' => 0, // índice activo al cargar
 ])
 
 {{-- Pestañas (Alpine 3). `tabs` es un array de etiquetas; los paneles van en el slot como

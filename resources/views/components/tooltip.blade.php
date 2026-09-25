@@ -1,6 +1,6 @@
 @props([
-    'text' => '',
-    'placement' => 'top',
+    'text' => '', // texto del tooltip
+    'placement' => 'top', // top | bottom | left | right
 ])
 
 @php

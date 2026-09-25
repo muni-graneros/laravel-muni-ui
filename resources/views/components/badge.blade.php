@@ -1,6 +1,6 @@
 @props([
-    'tone' => 'neutral',
-    'dot' => true,
+    'tone' => 'neutral', // neutral | ok | warn | danger | info
+    'dot' => true, // muestra el punto de color a la izquierda
 ])
 
 @php

@@ -26,7 +26,7 @@
         @keydown.home.prevent="ir(0)"
         @keydown.end.prevent="ir(count - 1)"
     >
-        @foreach ($tabs as $i => $label)
+        @foreach (collect($tabs)->values() as $i => $label)
             <button
                 type="button"
                 role="tab"

@@ -145,3 +145,10 @@ it('los toasts se muestran con x-show para que la transición ocurra', function 
     expect($html)->toContain('x-show="item.shown"')
         ->toContain('--muni-dur');
 });
+
+it('tabs acepta etiquetas con claves de texto sin escribir la clave en JS', function () {
+    $html = Blade::render('<x-muni::tabs :tabs="[\'datos\' => \'Datos\', \'docs\' => \'Documentos\']"><x-muni::tab-panel :index="0">a</x-muni::tab-panel><x-muni::tab-panel :index="1">b</x-muni::tab-panel></x-muni::tabs>');
+
+    expect($html)->toContain('@click="active = 1"')
+        ->and($html)->not->toContain('active = docs');
+});

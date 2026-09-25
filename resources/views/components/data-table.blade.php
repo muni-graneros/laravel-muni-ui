@@ -7,7 +7,7 @@
      en un <tr> para pintar la franja de estado (la firma: morosidad como banda izquierda,
      no como badge redondo). Envuelta en un contenedor con scroll horizontal propio.
      Un encabezado vacío se rotula «Acciones» solo para el lector de pantalla. --}}
-<div style="overflow-x:auto;border:1px solid var(--muni-border);border-radius:var(--muni-radius);background:var(--muni-surface);">
+<div style="position:relative;overflow-x:auto;border:1px solid var(--muni-border);border-radius:var(--muni-radius);background:var(--muni-surface);">
     <table {{ $attributes->merge(['style' => 'width:100%;border-collapse:collapse;font-family:var(--muni-font-sans);font-size:12.5px;']) }}>
         @if (! empty($columns))
             <thead>

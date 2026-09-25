@@ -34,3 +34,49 @@ jobs:
 
       - name: Pest
         run: ./vendor/bin/pest
+
+  catalogo:
+    name: Catálogo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Credenciales del paquete privado
+        env:
+          COMPOSER_GH_TOKEN: ${{ secrets.COMPOSER_GH_TOKEN }}
+        run: |
+          if [ -n "${COMPOSER_GH_TOKEN:-}" ]; then
+            composer config --global --auth github-oauth.github.com "$COMPOSER_GH_TOKEN"
+          fi
+
+      - run: composer install --no-progress --prefer-dist
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: demo/catalogo/package-lock.json
+
+      - name: Herramientas del catálogo
+        working-directory: demo/catalogo
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      # demo/catalogo.html es la documentación que se comparte: si un componente
+      # cambió y nadie lo regeneró, el catálogo muestra algo que ya no existe.
+      - name: El catálogo está al día
+        run: |
+          php demo/catalogo/build.php demo/catalogo/node_modules/alpinejs/dist/cdn.min.js
+          git diff --exit-code --stat demo/catalogo.html || {
+            echo "::error file=demo/catalogo.html::El catálogo no está al día. Corre: cd demo/catalogo && npm run construir, y commitea demo/catalogo.html."
+            exit 1
+          }
+
+      - name: Errores de JS, móvil y accesibilidad (axe)
+        run: node demo/catalogo/verificar.mjs

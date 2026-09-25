@@ -218,7 +218,7 @@ izquierdo (banda de libro mayor), y los RUT/cifras usan `.muni-num` (mono tabula
 Todas self-contained (Alpine inline, sin CDN).
 
 **Componentes y sistema**
-- `catalogo.html` — **la documentación de referencia**: los 53 componentes renderizados con Blade real en ambos temas, cada uno con su código copiable y su tabla de props y slots, más 6 recetas de pantalla completa. Se regenera con `composer install && php demo/catalogo/build.php <ruta a alpinejs/dist/cdn.min.js>`.
+- `catalogo.html` — **la documentación de referencia**: los 53 componentes renderizados con Blade real en ambos temas, cada uno con su código copiable y su tabla de props y slots, más 6 recetas de pantalla completa. Se regenera con `cd demo/catalogo && npm ci && npm run construir` (después de `composer install`), y `npm run verificar` lo abre en Chromium y revisa errores de JS, scroll en móvil y accesibilidad con axe. CI corre las dos cosas y falla si `demo/catalogo.html` no está al día.
   Para documentar un componente nuevo: describe cada prop con un comentario en su `@props` (`'tone' => 'ok', // ok | warn | danger`), agrega su ejemplo en `demo/catalogo/ejemplos/` y regístralo en `demo/catalogo/componentes.php`. `tests/CatalogoTest.php` falla si falta cualquiera de las tres cosas.
 - `index.html` — panel de datos en ambos temas · `interactive.html` — modal/dropdown/tabs/toasts
 - `showcase.html` — sala de control cívica con consola viva · `templates.html` — galería de pantallas (landing, login, paneles por rol, error)

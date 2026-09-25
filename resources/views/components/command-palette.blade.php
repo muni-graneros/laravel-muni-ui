@@ -38,7 +38,7 @@
         }
     }"
     x-id="['muni-cp']"
-    @keydown.window="if((($event.metaKey||$event.ctrlKey) && $event.key==={{ \Illuminate\Support\Js::from($hotkey) }})){ $event.preventDefault(); show(); }"
+    @keydown.window="if(!$event.defaultPrevented && ($event.metaKey||$event.ctrlKey) && $event.key.toLowerCase()==={{ \Illuminate\Support\Js::from(strtolower($hotkey)) }}){ $event.preventDefault(); show(); }"
     @keydown.escape.window="if(open) open=false"
     {{ $attributes }}
 >

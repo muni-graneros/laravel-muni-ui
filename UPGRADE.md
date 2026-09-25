@@ -45,6 +45,13 @@ revisa el contraste en la sección «Fundamentos» del catálogo.
   Antes eran iguales a los activos.
 - **La dona** (`chart-donut`) ya no se recorta en los bordes.
 - **stepper** en móvil muestra solo la etiqueta del paso actual.
+- **Tonos:** todos los componentes comparten el mismo mapa (`Muni\Ui\Tono`). Un tono que
+  antes un componente no conocía y pintaba con su color por defecto ahora se pinta como
+  corresponde: `tone="neutral"` en chart-bar, progress, ring y timeline sale en color de
+  texto (antes, acento); `tone="accent"` en kpi y stat sale en acento (antes, texto).
+- **Dentro de paneles Filament**, badge, alert, el acento suave y los `gob-*` ahora tienen
+  sus colores: el tema del panel no definía esos tokens y se veían sin fondo. Hay que
+  volver a publicar el tema (`--tag=muni-ui-filament --force`).
 
 ## 3. Comportamiento que cambia
 

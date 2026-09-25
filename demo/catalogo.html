@@ -788,8 +788,8 @@ ${r?'Expression: "'+r+`"
         .muni-btn--danger:not(:disabled,[aria-disabled=true]):hover { background: var(--muni-danger-fg); color: var(--muni-surface); }
     </style>
                                 <div style="display:flex;flex-direction:column;gap:4px;">
-    <label for="muni-demo_tema-1" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-family:var(--muni-font-sans);">
-        <input type="checkbox" id="muni-demo_tema-1" value="1"  name="demo_tema"  checked                               class="muni-check">
+    <label for="muni-demo_tema-c4ca4238" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-family:var(--muni-font-sans);">
+        <input type="checkbox" id="muni-demo_tema-c4ca4238" value="1"  name="demo_tema"  checked                               class="muni-check">
         <span style="display:flex;flex-direction:column;gap:2px;min-width:0;">
             <span style="font-size:13.5px;color:var(--muni-text);line-height:1.35;">Activo</span>
                                 </span>
@@ -2307,6 +2307,7 @@ body {
                                     </tr>
             </thead>
                 <tbody class="muni-data-body">
+            
                             <tr data-muni-row><td class="muni-num">2026-0412</td><td><span
     style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;font-family:var(--muni-font-mono);font-size:11px;font-weight:600;line-height:1;letter-spacing:.02em;border-radius:999px;color:var(--muni-info-fg);background:var(--muni-info-bg);border:1px solid var(--muni-info-border);"
 >
@@ -3020,6 +3021,7 @@ body {
                                     </tr>
             </thead>
                 <tbody class="muni-data-body">
+            
                             <tr data-muni-row>
         <td>Almacén Don Pepe</td>
         <td class="muni-num">76.123.456-7</td>
@@ -3085,6 +3087,7 @@ body {
                                     </tr>
             </thead>
                 <tbody class="muni-data-body">
+            
                             <tr data-muni-row><td>Almacén Don Pepe</td><td class="muni-num" style="text-align:right;">$0</td><td><span
     style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;font-family:var(--muni-font-mono);font-size:11px;font-weight:600;line-height:1;letter-spacing:.02em;border-radius:999px;color:var(--muni-ok-fg);background:var(--muni-ok-bg);border:1px solid var(--muni-ok-border);"
 >
@@ -3695,7 +3698,7 @@ body {
                                                         <span class="cat-tag cat-tag--js" title="Necesita Alpine 3 (viene con Livewire)">Alpine</span>                        </div>
                         <p class="cat-desc">Estrellas para evaluar una atención, editable o de solo lectura.</p>
                                                     <ul class="cat-notes">
-                                <li><code>wire:model=&quot;nota&quot;</code> enlaza el valor. Con <code>readonly</code> es una imagen con nombre («4 de 5»), sin foco.</li>                            </ul>
+                                <li><code>wire:model</code> o <code>wire:model.live</code> enlazan el valor (no <code>.blur</code>). Con <code>readonly</code> es una imagen con nombre («4 de 5»), sin foco.</li>                            </ul>
                         
                                                     <div class="cat-demo cat-demo--fila" data-shot="rating"><div
         x-data="{ value: 4, hover: 0, max: 5, readonly: false,
@@ -4627,7 +4630,7 @@ body {
                                                         <span class="cat-tag cat-tag--js" title="Necesita Alpine 3 (viene con Livewire)">Alpine</span>                        </div>
                         <p class="cat-desc">Calendario de mes que guarda la fecha en un input oculto (YYYY-MM-DD).</p>
                                                     <ul class="cat-notes">
-                                <li><code>wire:model=&quot;fecha&quot;</code> enlaza el valor <code>YYYY-MM-DD</code> en ambos sentidos.</li><li><code>min</code> y <code>value</code> aceptan string <code>YYYY-MM-DD</code> o un Carbon.</li>                            </ul>
+                                <li><code>wire:model</code> o <code>wire:model.live</code> enlazan el valor <code>YYYY-MM-DD</code> en ambos sentidos. <code>.blur</code> y <code>.change</code> no aplican: el enlace vive en el contenedor, no en un input.</li><li><code>min</code> y <code>value</code> aceptan string <code>YYYY-MM-DD</code> o un Carbon.</li>                            </ul>
                         
                                                     <div class="cat-demo cat-demo--fila" data-shot="calendar"><div
     x-data="{
@@ -4638,7 +4641,11 @@ body {
         valor: '',
         local(s){ if(!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null; const p = s.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); },
         init(){ const aplicar = v => { const d = this.local(v); this.sel = d; if (d) this.view = new Date(d.getFullYear(), d.getMonth(), 1); };
-                aplicar(this.valor); this.$watch('valor', v => { if (v !== this.iso(this.sel)) aplicar(v); }); },
+                aplicar(this.valor);
+                // Sin fecha elegida y con un min en un mes futuro, se abre en ese mes: si no,
+                // todos los días visibles quedan deshabilitados y ninguno recibe el foco.
+                if (!this.sel && this.min && this.min > new Date(this.view.getFullYear(), this.view.getMonth() + 1, 0)) this.view = new Date(this.min.getFullYear(), this.min.getMonth(), 1);
+                this.$watch('valor', v => { if (v !== this.iso(this.sel)) aplicar(v); }); },
         min: (s => { if(!s) return null; const p = s.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); })('2026-09-10'),
         dias: ['L','M','X','J','V','S','D'],
         meses: ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'],
@@ -4721,7 +4728,11 @@ body {
         valor: '',
         local(s){ if(!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null; const p = s.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); },
         init(){ const aplicar = v => { const d = this.local(v); this.sel = d; if (d) this.view = new Date(d.getFullYear(), d.getMonth(), 1); };
-                aplicar(this.valor); this.$watch('valor', v => { if (v !== this.iso(this.sel)) aplicar(v); }); },
+                aplicar(this.valor);
+                // Sin fecha elegida y con un min en un mes futuro, se abre en ese mes: si no,
+                // todos los días visibles quedan deshabilitados y ninguno recibe el foco.
+                if (!this.sel && this.min && this.min > new Date(this.view.getFullYear(), this.view.getMonth() + 1, 0)) this.view = new Date(this.min.getFullYear(), this.min.getMonth(), 1);
+                this.$watch('valor', v => { if (v !== this.iso(this.sel)) aplicar(v); }); },
         min: (s => { if(!s) return null; const p = s.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); })(null),
         dias: ['L','M','X','J','V','S','D'],
         meses: ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'],
@@ -4859,7 +4870,7 @@ body {
                                                         <span class="cat-tag cat-tag--js" title="Necesita Alpine 3 (viene con Livewire)">Alpine</span>                        </div>
                         <p class="cat-desc">Código de verificación dígito a dígito. Acepta pegar el código completo.</p>
                                                     <ul class="cat-notes">
-                                <li><code>wire:model=&quot;codigo&quot;</code> enlaza el código completo. Pegar el código llena todas las casillas.</li>                            </ul>
+                                <li><code>wire:model</code> o <code>wire:model.live</code> enlazan el código completo (no <code>.blur</code>). Pegar el código llena todas las casillas.</li>                            </ul>
                         
                                                     <div class="cat-demo cat-demo--fila" data-shot="otp-input"><div
     x-data="{
@@ -5097,14 +5108,15 @@ body {
                                                     <ul class="cat-notes">
                                 <li><code>wire:model</code> va directo al <code>&lt;textarea&gt;</code>; el contenido inicial va en el slot.</li><li>Con <code>maxlength</code> muestra «n / máx» mientras se escribe (con Alpine); sin JS, el navegador igual corta en el máximo.</li>                            </ul>
                         
-                                                    <div class="cat-demo cat-demo--columna" data-shot="textarea"><div style="display:flex;flex-direction:column;gap:6px;"  x-data="{ n: 0 }" x-init="n = $refs.campo.value.length" >
+                                                    <div class="cat-demo cat-demo--columna" data-shot="textarea"><div style="display:flex;flex-direction:column;gap:6px;"  x-data="{ n: 0 }" >
             <label for="muni-observaciones" style="font-family:var(--muni-font-sans);font-size:12.5px;font-weight:600;color:var(--muni-text);">
             Observaciones        </label>
     
     <textarea
         id="muni-observaciones"
         rows="3"
-         name="observaciones"                  maxlength="280" x-ref="campo" @input="n = $el.value.length"                  aria-describedby="muni-observaciones-ayuda"         class="muni-textarea" style="width:100%;padding:10px 12px;resize:vertical;min-height:72px;line-height:1.5;font-family:var(--muni-font-sans);font-size:13.5px;color:var(--muni-text);background:var(--muni-surface);border:1px solid var(--muni-border-strong, var(--muni-border));border-radius:var(--muni-radius-sm);transition:border-color var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease);"
+         name="observaciones"                 
+         maxlength="280" x-effect="n = String($el._x_model ? ($el._x_model.get() ?? '') : $el.value).length" @input="n = $el.value.length"                  aria-describedby="muni-observaciones-ayuda"         class="muni-textarea" style="width:100%;padding:10px 12px;resize:vertical;min-height:72px;line-height:1.5;font-family:var(--muni-font-sans);font-size:13.5px;color:var(--muni-text);background:var(--muni-surface);border:1px solid var(--muni-border-strong, var(--muni-border));border-radius:var(--muni-radius-sm);transition:border-color var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease);"
     ></textarea>
 
             <div style="display:flex;justify-content:space-between;gap:12px;font-size:11.5px;">
@@ -5125,7 +5137,8 @@ body {
     <textarea
         id="muni-fundamento"
         rows="4"
-         name="fundamento"          required                  aria-invalid="true"          aria-describedby="muni-fundamento-ayuda"         class="muni-textarea" style="width:100%;padding:10px 12px;resize:vertical;min-height:72px;line-height:1.5;font-family:var(--muni-font-sans);font-size:13.5px;color:var(--muni-text);background:var(--muni-surface);border:1px solid var(--muni-danger-border);border-radius:var(--muni-radius-sm);transition:border-color var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease);"
+         name="fundamento"          required         
+                 aria-invalid="true"          aria-describedby="muni-fundamento-ayuda"         class="muni-textarea" style="width:100%;padding:10px 12px;resize:vertical;min-height:72px;line-height:1.5;font-family:var(--muni-font-sans);font-size:13.5px;color:var(--muni-text);background:var(--muni-surface);border:1px solid var(--muni-danger-border);border-radius:var(--muni-radius-sm);transition:border-color var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease);"
     >La solicitud no</textarea>
 
             <div style="display:flex;justify-content:space-between;gap:12px;font-size:11.5px;">
@@ -5205,11 +5218,11 @@ body {
                                 <li><code>wire:model</code> va directo al input; la marca se pinta con <code>:checked</code>, también sin JS.</li><li>Varias casillas con el mismo <code>name</code> terminado en <code>[]</code> envían un arreglo.</li>                            </ul>
                         
                                                     <div class="cat-demo cat-demo--columna" data-shot="checkbox"><div style="display:flex;flex-direction:column;gap:4px;">
-    <label for="muni-acepta-1" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-family:var(--muni-font-sans);">
-        <input type="checkbox" id="muni-acepta-1" value="1"  name="acepta"                   aria-describedby="muni-acepta-1-ayuda"                class="muni-check">
+    <label for="muni-acepta-c4ca4238" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-family:var(--muni-font-sans);">
+        <input type="checkbox" id="muni-acepta-c4ca4238" value="1"  name="acepta"                   aria-describedby="muni-acepta-c4ca4238-ayuda"                class="muni-check">
         <span style="display:flex;flex-direction:column;gap:2px;min-width:0;">
             <span style="font-size:13.5px;color:var(--muni-text);line-height:1.35;">Acepto el tratamiento de mis datos personales</span>
-            <span id="muni-acepta-1-ayuda" style="font-size:12px;color:var(--muni-muted);">Conforme a la Ley 21.719. Puedes revocarlo en cualquier momento.</span>                    </span>
+            <span id="muni-acepta-c4ca4238-ayuda" style="font-size:12px;color:var(--muni-muted);">Conforme a la Ley 21.719. Puedes revocarlo en cualquier momento.</span>                    </span>
     </label>
 </div>
 
@@ -5227,8 +5240,8 @@ body {
     </style>
 
 <div style="display:flex;flex-direction:column;gap:4px;">
-    <label for="muni-notificar-1" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-family:var(--muni-font-sans);">
-        <input type="checkbox" id="muni-notificar-1" value="1"  name="notificar"  checked                               class="muni-check">
+    <label for="muni-notificar-c4ca4238" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-family:var(--muni-font-sans);">
+        <input type="checkbox" id="muni-notificar-c4ca4238" value="1"  name="notificar"  checked                               class="muni-check">
         <span style="display:flex;flex-direction:column;gap:2px;min-width:0;">
             <span style="font-size:13.5px;color:var(--muni-text);line-height:1.35;">Avisarme por correo cuando cambie el estado</span>
                                 </span>
@@ -5237,11 +5250,11 @@ body {
 
 
 <div style="display:flex;flex-direction:column;gap:4px;">
-    <label for="muni-declara-1" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-family:var(--muni-font-sans);">
-        <input type="checkbox" id="muni-declara-1" value="1"  name="declara"                  aria-invalid="true"   aria-describedby="muni-declara-1-ayuda"                class="muni-check">
+    <label for="muni-declara-c4ca4238" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-family:var(--muni-font-sans);">
+        <input type="checkbox" id="muni-declara-c4ca4238" value="1"  name="declara"                  aria-invalid="true"   aria-describedby="muni-declara-c4ca4238-ayuda"                class="muni-check">
         <span style="display:flex;flex-direction:column;gap:2px;min-width:0;">
             <span style="font-size:13.5px;color:var(--muni-text);line-height:1.35;">Declaro que la información es verdadera</span>
-                        <span id="muni-declara-1-ayuda" style="font-size:11.5px;color:var(--muni-danger-fg);">Debes aceptar la declaración para enviar la solicitud.</span>        </span>
+                        <span id="muni-declara-c4ca4238-ayuda" style="font-size:11.5px;color:var(--muni-danger-fg);">Debes aceptar la declaración para enviar la solicitud.</span>        </span>
     </label>
 </div>
 
@@ -5737,9 +5750,9 @@ body {
                                                         <span class="cat-tag" title="Blade puro: funciona sin JavaScript">Sin JS</span>                        </div>
                         <p class="cat-desc">Indicador de carga para acciones que tardan: guardar, buscar, subir un archivo.</p>
                                                     <ul class="cat-notes">
-                                <li>Con Livewire, <code>wire:loading</code> y <code>wire:target</code> van directo en el componente y lo muestran solo mientras corre la acción.</li><li>Se anuncia como <code>role=status</code> con su <code>label</code>; con movimiento reducido gira más lento en vez de detenerse.</li><li>Para reservar el espacio de contenido que aún no llega, skeleton.</li>                            </ul>
+                                <li>Con Livewire, <code>wire:loading.inline-flex</code> y <code>wire:target</code> van directo en el componente y lo muestran solo mientras corre la acción.</li><li>Su <code>label</code> queda para el lector de pantalla; dentro de un botón no se anuncia solo, así que el botón debe decir qué hace. Con movimiento reducido gira más lento en vez de detenerse.</li><li>Para reservar el espacio de contenido que aún no llega, skeleton.</li>                            </ul>
                         
-                                                    <div class="cat-demo cat-demo--fila" data-shot="spinner"><span role="status" class="muni-spinner-wrap" style="display:inline-flex;align-items:center;gap:8px;vertical-align:middle;font-family:var(--muni-font-sans);font-size:13px;color:var(--muni-muted);">
+                                                    <div class="cat-demo cat-demo--fila" data-shot="spinner"><span role="status" class="muni-spinner-wrap" style="font-family:var(--muni-font-sans);font-size:13px;color:var(--muni-muted);">
     <svg class="muni-spinner" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" style="color:var(--muni-accent);">
         <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="3" opacity=".2"/>
         <path d="M21 12a9 9 0 00-9-9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
@@ -5748,12 +5761,12 @@ body {
     </span>
 
     <style>
-        .muni-spinner-wrap { position:relative; }
+        .muni-spinner-wrap { position:relative; display:inline-flex; align-items:center; gap:8px; vertical-align:middle; }
         .muni-spinner { flex-shrink:0; animation:muni-spin .75s linear infinite; }
         @keyframes muni-spin { to { transform:rotate(360deg); } }
         @media (prefers-reduced-motion:reduce) { .muni-spinner { animation:muni-spin 1.6s linear infinite !important; } }
     </style>
-<span role="status" class="muni-spinner-wrap" style="display:inline-flex;align-items:center;gap:8px;vertical-align:middle;font-family:var(--muni-font-sans);font-size:13px;color:var(--muni-muted);">
+<span role="status" class="muni-spinner-wrap" style="font-family:var(--muni-font-sans);font-size:13px;color:var(--muni-muted);">
     <svg class="muni-spinner" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="color:var(--muni-accent);">
         <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="3" opacity=".2"/>
         <path d="M21 12a9 9 0 00-9-9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
@@ -5761,7 +5774,7 @@ body {
             <span style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;">Cargando…</span>
     </span>
 
-<span role="status" class="muni-spinner-wrap" style="display:inline-flex;align-items:center;gap:8px;vertical-align:middle;font-family:var(--muni-font-sans);font-size:13px;color:var(--muni-muted);">
+<span role="status" class="muni-spinner-wrap" style="font-family:var(--muni-font-sans);font-size:13px;color:var(--muni-muted);">
     <svg class="muni-spinner" viewBox="0 0 24 24" width="32" height="32" aria-hidden="true" style="color:var(--muni-text);">
         <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="3" opacity=".2"/>
         <path d="M21 12a9 9 0 00-9-9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
@@ -5769,7 +5782,7 @@ body {
             <span style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;">Cargando…</span>
     </span>
 
-<span role="status" class="muni-spinner-wrap" style="display:inline-flex;align-items:center;gap:8px;vertical-align:middle;font-family:var(--muni-font-sans);font-size:13px;color:var(--muni-muted);">
+<span role="status" class="muni-spinner-wrap" style="font-family:var(--muni-font-sans);font-size:13px;color:var(--muni-muted);">
     <svg class="muni-spinner" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="color:var(--muni-accent);">
         <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="3" opacity=".2"/>
         <path d="M21 12a9 9 0 00-9-9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
@@ -5782,7 +5795,7 @@ body {
 <button
      type="button"     class="muni-btn muni-btn--primary" style="display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:var(--muni-font-sans);font-weight:600;line-height:1;cursor:pointer;border-radius:var(--muni-radius-sm);border:1px solid transparent;text-decoration:none;transition:background var(--muni-dur) var(--muni-ease),border-color var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease);padding:9px 16px;font-size:13.5px;" wire:click="guardar" wire:loading.attr="disabled"
 >
-        <span role="status" class="muni-spinner-wrap" style="display:inline-flex;align-items:center;gap:8px;vertical-align:middle;font-family:var(--muni-font-sans);font-size:13px;color:var(--muni-muted);" wire:loading="" wire:target="guardar">
+        <span role="status" class="muni-spinner-wrap" style="font-family:var(--muni-font-sans);font-size:13px;color:var(--muni-muted);" wire:loading.inline-flex="" wire:target="guardar">
     <svg class="muni-spinner" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" style="color:var(--muni-text);">
         <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="3" opacity=".2"/>
         <path d="M21 12a9 9 0 00-9-9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
@@ -5830,7 +5843,7 @@ body {
 
 <span class="tk-c">{{-- Con Livewire: aparece solo mientras corre guardar() --}}</span>
 <span class="tk-x">&lt;x-muni::button</span> <span class="tk-a">wire:click</span>=<span class="tk-s">&quot;guardar&quot;</span> <span class="tk-a">wire:loading.attr</span>=<span class="tk-s">&quot;disabled&quot;</span>&gt;
-    <span class="tk-x">&lt;x-muni::spinner</span> <span class="tk-a">size</span>=<span class="tk-s">&quot;sm&quot;</span> <span class="tk-a">tone</span>=<span class="tk-s">&quot;neutral&quot;</span> wire:loading <span class="tk-a">wire:target</span>=<span class="tk-s">&quot;guardar&quot;</span> <span class="tk-a">label</span>=<span class="tk-s">&quot;Guardando&quot;</span> /&gt;
+    <span class="tk-x">&lt;x-muni::spinner</span> <span class="tk-a">size</span>=<span class="tk-s">&quot;sm&quot;</span> <span class="tk-a">tone</span>=<span class="tk-s">&quot;neutral&quot;</span> wire:loading.inline-flex <span class="tk-a">wire:target</span>=<span class="tk-s">&quot;guardar&quot;</span> <span class="tk-a">label</span>=<span class="tk-s">&quot;Guardando&quot;</span> /&gt;
     Guardar
 <span class="tk-x">&lt;/x-muni::button</span>&gt;</pre>
                                 </div>
@@ -6831,7 +6844,7 @@ body {
         }
     }"
     x-id="['muni-cp']"
-    @keydown.window="if((($event.metaKey||$event.ctrlKey) && $event.key==='k')){ $event.preventDefault(); show(); }"
+    @keydown.window="if(!$event.defaultPrevented && ($event.metaKey||$event.ctrlKey) && $event.key.toLowerCase()==='k'){ $event.preventDefault(); show(); }"
     @keydown.escape.window="if(open) open=false"
     
 >
@@ -7324,6 +7337,7 @@ ${r?&#039;Expression: &quot;&#039;+r+`&quot;
                                     &lt;/tr&gt;
             &lt;/thead&gt;
                 &lt;tbody class=&quot;muni-data-body&quot;&gt;
+            
                             &lt;tr data-muni-row&gt;&lt;td&gt;Almacén Don Pepe&lt;/td&gt;&lt;td class=&quot;muni-num&quot;&gt;76.123.456-7&lt;/td&gt;&lt;td&gt;&lt;span
     style=&quot;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;font-family:var(--muni-font-mono);font-size:11px;font-weight:600;line-height:1;letter-spacing:.02em;border-radius:999px;color:var(--muni-ok-fg);background:var(--muni-ok-bg);border:1px solid var(--muni-ok-border);&quot;
 &gt;
@@ -8932,6 +8946,7 @@ ${r?&#039;Expression: &quot;&#039;+r+`&quot;
                                     </tr>
             </thead>
                 <tbody class="muni-data-body">
+            
                             <tr data-muni-row>
         <td>Almacén Don Pepe</td><td class="muni-num">76.123.456-7</td><td>Minimarket</td>
         <td><span
@@ -10118,14 +10133,15 @@ ${r?&#039;Expression: &quot;&#039;+r+`&quot;
         .muni-radio:focus-visible { outline:none; box-shadow:var(--muni-ring); }
         .muni-radio:disabled { opacity:.5; cursor:not-allowed; }
     </style>
-            <div style="display:flex;flex-direction:column;gap:6px;"  x-data="{ n: 0 }" x-init="n = $refs.campo.value.length" >
+            <div style="display:flex;flex-direction:column;gap:6px;"  x-data="{ n: 0 }" >
             <label for="muni-observaciones" style="font-family:var(--muni-font-sans);font-size:12.5px;font-weight:600;color:var(--muni-text);">
             Observaciones (opcional)        </label>
     
     <textarea
         id="muni-observaciones"
         rows="2"
-         name="observaciones"                  maxlength="280" x-ref="campo" @input="n = $el.value.length"                         class="muni-textarea" style="width:100%;padding:10px 12px;resize:vertical;min-height:72px;line-height:1.5;font-family:var(--muni-font-sans);font-size:13.5px;color:var(--muni-text);background:var(--muni-surface);border:1px solid var(--muni-border-strong, var(--muni-border));border-radius:var(--muni-radius-sm);transition:border-color var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease);"
+         name="observaciones"                 
+         maxlength="280" x-effect="n = String($el._x_model ? ($el._x_model.get() ?? '') : $el.value).length" @input="n = $el.value.length"                         class="muni-textarea" style="width:100%;padding:10px 12px;resize:vertical;min-height:72px;line-height:1.5;font-family:var(--muni-font-sans);font-size:13.5px;color:var(--muni-text);background:var(--muni-surface);border:1px solid var(--muni-border-strong, var(--muni-border));border-radius:var(--muni-radius-sm);transition:border-color var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease);"
     ></textarea>
 
             <div style="display:flex;justify-content:space-between;gap:12px;font-size:11.5px;">
@@ -10139,8 +10155,8 @@ ${r?&#039;Expression: &quot;&#039;+r+`&quot;
         .muni-textarea:disabled { background: var(--muni-surface-2); color: var(--muni-muted); cursor: not-allowed; }
     </style>
             <div style="display:flex;flex-direction:column;gap:4px;">
-    <label for="muni-declara-1" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-family:var(--muni-font-sans);">
-        <input type="checkbox" id="muni-declara-1" value="1"  name="declara"                                 class="muni-check">
+    <label for="muni-declara-c4ca4238" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-family:var(--muni-font-sans);">
+        <input type="checkbox" id="muni-declara-c4ca4238" value="1"  name="declara"                                 class="muni-check">
         <span style="display:flex;flex-direction:column;gap:2px;min-width:0;">
             <span style="font-size:13.5px;color:var(--muni-text);line-height:1.35;">Declaro que la información entregada es verdadera</span>
                                 </span>
@@ -10218,7 +10234,11 @@ ${r?&#039;Expression: &quot;&#039;+r+`&quot;
         valor: '',
         local(s){ if(!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null; const p = s.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); },
         init(){ const aplicar = v => { const d = this.local(v); this.sel = d; if (d) this.view = new Date(d.getFullYear(), d.getMonth(), 1); };
-                aplicar(this.valor); this.$watch('valor', v => { if (v !== this.iso(this.sel)) aplicar(v); }); },
+                aplicar(this.valor);
+                // Sin fecha elegida y con un min en un mes futuro, se abre en ese mes: si no,
+                // todos los días visibles quedan deshabilitados y ninguno recibe el foco.
+                if (!this.sel && this.min && this.min > new Date(this.view.getFullYear(), this.view.getMonth() + 1, 0)) this.view = new Date(this.min.getFullYear(), this.min.getMonth(), 1);
+                this.$watch('valor', v => { if (v !== this.iso(this.sel)) aplicar(v); }); },
         min: (s => { if(!s) return null; const p = s.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); })('2026-09-28'),
         dias: ['L','M','X','J','V','S','D'],
         meses: ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'],
@@ -10676,7 +10696,7 @@ ${r?&#039;Expression: &quot;&#039;+r+`&quot;
         }
     }"
     x-id="['muni-cp']"
-    @keydown.window="if((($event.metaKey||$event.ctrlKey) && $event.key==='k')){ $event.preventDefault(); show(); }"
+    @keydown.window="if(!$event.defaultPrevented && ($event.metaKey||$event.ctrlKey) && $event.key.toLowerCase()==='k'){ $event.preventDefault(); show(); }"
     @keydown.escape.window="if(open) open=false"
     
 >

@@ -6,7 +6,7 @@
 ])
 
 @php
-    $accent = \Muni\Ui\Tono::color($tone, 'neutral');
+    $accent = \Muni\Ui\Tono::color($tone === 'muted' ? 'neutral' : $tone, 'neutral');
 @endphp
 
 <div

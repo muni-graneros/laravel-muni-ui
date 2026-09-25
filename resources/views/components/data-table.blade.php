@@ -40,7 +40,9 @@
             </thead>
         @endif
         <tbody class="muni-data-body">
-            @if (trim($slot) !== '')
+            {{-- Livewire rodea cada @foreach/@if con comentarios de morph: un slot sin filas
+                 no queda vacío. Se ignoran los comentarios para decidir si hay filas. --}}
+            @if (trim(preg_replace('/<!--.*?-->/s', '', (string) $slot)) !== '')
                 {{ $slot }}
             @else
                 <tr>

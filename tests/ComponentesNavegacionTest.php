@@ -131,7 +131,7 @@ it('la paleta escapa hotkey y placeholder y rotula el buscador', function () {
         BLADE);
 
     expect($html)->not->toContain("==='''")
-        ->toContain("\$event.key==='\\u0027'")
+        ->toContain("\$event.key.toLowerCase()==='\\u0027'")
         ->not->toContain(':placeholder=')
         ->toContain('aria-label="Busca &#039;algo&#039;')
         ->toContain(':key="i"')

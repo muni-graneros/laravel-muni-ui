@@ -5,16 +5,19 @@
     'tone' => 'accent', // accent | neutral | ok | warn | danger | info
 ])
 
-{{-- Indicador de carga. Con Livewire: wire:loading y wire:target van directo en el
-     componente (p. ej. wire:loading wire:target="guardar"). Anuncia su texto como
-     role=status. Con movimiento reducido gira más lento en vez de detenerse: un
-     indicador quieto parece colgado. --}}
+{{-- Indicador de carga. Con Livewire: wire:loading.inline-flex y wire:target van
+     directo en el componente (p. ej. wire:loading.inline-flex wire:target="guardar").
+     El display vive en la clase y no en style: así la regla de Livewire que oculta
+     [wire:loading] gana mientras no hay petición. El texto queda para el lector de
+     pantalla; dentro de un botón no se anuncia solo (el botón ya dice qué hace).
+     Con movimiento reducido gira más lento en vez de detenerse: un indicador quieto
+     parece colgado. --}}
 @php
     $px = ['sm' => 14, 'md' => 20, 'lg' => 32][$size] ?? 20;
     $color = \Muni\Ui\Tono::color($tone);
 @endphp
 
-<span role="status" {{ $attributes->merge(['class' => 'muni-spinner-wrap', 'style' => 'display:inline-flex;align-items:center;gap:8px;vertical-align:middle;font-family:var(--muni-font-sans);font-size:13px;color:var(--muni-muted);']) }}>
+<span role="status" {{ $attributes->merge(['class' => 'muni-spinner-wrap', 'style' => 'font-family:var(--muni-font-sans);font-size:13px;color:var(--muni-muted);']) }}>
     <svg class="muni-spinner" viewBox="0 0 24 24" width="{{ $px }}" height="{{ $px }}" aria-hidden="true" style="color:{{ $color }};">
         <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="3" opacity=".2"/>
         <path d="M21 12a9 9 0 00-9-9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
@@ -28,7 +31,7 @@
 
 @once
     <style>
-        .muni-spinner-wrap { position:relative; }
+        .muni-spinner-wrap { position:relative; display:inline-flex; align-items:center; gap:8px; vertical-align:middle; }
         .muni-spinner { flex-shrink:0; animation:muni-spin .75s linear infinite; }
         @keyframes muni-spin { to { transform:rotate(360deg); } }
         @media (prefers-reduced-motion:reduce) { .muni-spinner { animation:muni-spin 1.6s linear infinite !important; } }

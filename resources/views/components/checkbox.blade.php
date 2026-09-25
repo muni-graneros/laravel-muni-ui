@@ -10,15 +10,19 @@
 {{-- Casilla nativa con la marca pintada en CSS (:checked), así se ve igual sin JS y
      con wire:model, que va directo al input. Para on/off de una preferencia, switch. --}}
 @php
-    $id = $attributes->get('id') ?: ($name ? 'muni-'.$name.'-'.\Illuminate\Support\Str::slug((string) $value) : 'muni-'.uniqid());
+    // Hash del valor y no slug: «Sí» y «si», o «+» y «-», darían el mismo id y un label
+    // marcaría la casilla de otro.
+    $id = $attributes->get('id') ?: ($name ? 'muni-'.$name.'-'.substr(md5((string) $value), 0, 8) : 'muni-'.uniqid());
     $attributes = $attributes->except('id');
     $ayuda = ($error || $description) ? $id.'-ayuda' : null;
+    $describe = trim($attributes->get('aria-describedby', '').' '.$ayuda) ?: null;
+    $attributes = $attributes->except('aria-describedby');
 @endphp
 
 <div style="display:flex;flex-direction:column;gap:4px;">
     <label for="{{ $id }}" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-family:var(--muni-font-sans);">
         <input type="checkbox" id="{{ $id }}" value="{{ $value }}" @if ($name) name="{{ $name }}" @endif @checked($checked)
-               @if ($error) aria-invalid="true" @endif @if ($ayuda) aria-describedby="{{ $ayuda }}" @endif
+               @if ($error) aria-invalid="true" @endif @if ($describe) aria-describedby="{{ $describe }}" @endif
                {{ $attributes->merge(['class' => 'muni-check']) }}>
         <span style="display:flex;flex-direction:column;gap:2px;min-width:0;">
             <span style="font-size:13.5px;color:var(--muni-text);line-height:1.35;">{{ $label ?? $slot }}</span>

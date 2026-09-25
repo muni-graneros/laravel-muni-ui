@@ -181,3 +181,23 @@ it('los tokens de estado cambian en modo oscuro', function () {
         );
     }
 });
+
+/*
+ * Dentro de un panel Filament no se carga muni-ui.css: los componentes leen los
+ * tokens que define este puente. Faltaban 21 (fondos de badge y alert, acento
+ * suave, paleta institucional…) y esos componentes se veían sin fondo en el panel.
+ * Este candado exige que TODO token que lee un componente sin valor de respaldo
+ * exista aquí.
+ */
+it('el puente de Filament define todos los tokens que leen los componentes', function () {
+    $usados = [];
+    foreach (glob(__DIR__.'/../resources/views/components/*.blade.php') as $archivo) {
+        preg_match_all('/var\((--muni-[a-z0-9-]+)\)/', file_get_contents($archivo), $m);
+        array_push($usados, ...$m[1]);
+    }
+    $tema = bloqueDelTema(':root{');
+    $faltan = array_values(array_filter(array_unique($usados), fn ($t) => ! str_contains($tema, $t.':')));
+    sort($faltan);
+
+    expect($faltan)->toBe([]);
+});

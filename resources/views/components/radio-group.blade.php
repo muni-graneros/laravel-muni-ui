@@ -16,9 +16,11 @@
     $modelo = $attributes->filter(fn ($v, $k) => str_starts_with($k, 'wire:model') || str_starts_with($k, 'x-model'));
     $attributes = $attributes->filter(fn ($v, $k) => $k !== 'id' && ! str_starts_with($k, 'wire:model') && ! str_starts_with($k, 'x-model'));
     $ayuda = ($error || $hint) ? $prefijo.'-ayuda' : null;
+    $describe = trim($attributes->get('aria-describedby', '').' '.$ayuda) ?: null;
+    $attributes = $attributes->except('aria-describedby');
 @endphp
 
-<fieldset @if ($ayuda) aria-describedby="{{ $ayuda }}" @endif
+<fieldset @if ($describe) aria-describedby="{{ $describe }}" @endif
     {{ $attributes->merge(['class' => 'muni-radios', 'style' => 'margin:0;padding:0;border:0;min-width:0;display:flex;flex-direction:column;gap:8px;font-family:var(--muni-font-sans);']) }}>
     @if ($label)
         <legend style="padding:0;margin-bottom:8px;font-size:12.5px;font-weight:600;color:var(--muni-text);">

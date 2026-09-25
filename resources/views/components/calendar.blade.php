@@ -27,7 +27,11 @@
         valor: {{ \Illuminate\Support\Js::from($value ?? '') }},
         local(s){ if(!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null; const p = s.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); },
         init(){ const aplicar = v => { const d = this.local(v); this.sel = d; if (d) this.view = new Date(d.getFullYear(), d.getMonth(), 1); };
-                aplicar(this.valor); this.$watch('valor', v => { if (v !== this.iso(this.sel)) aplicar(v); }); },
+                aplicar(this.valor);
+                // Sin fecha elegida y con un min en un mes futuro, se abre en ese mes: si no,
+                // todos los días visibles quedan deshabilitados y ninguno recibe el foco.
+                if (!this.sel && this.min && this.min > new Date(this.view.getFullYear(), this.view.getMonth() + 1, 0)) this.view = new Date(this.min.getFullYear(), this.min.getMonth(), 1);
+                this.$watch('valor', v => { if (v !== this.iso(this.sel)) aplicar(v); }); },
         min: (s => { if(!s) return null; const p = s.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); })({{ \Illuminate\Support\Js::from($min) }}),
         dias: ['L','M','X','J','V','S','D'],
         meses: ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'],

@@ -39,6 +39,10 @@ async function paso(que, fn) {
     }
 }
 
+await paso('spinner oculto sin petición', async () => {
+    if (await page.locator('#cargando').isVisible()) fallas.push('spinner con wire:loading visible sin ninguna petición en curso');
+});
+
 // Del componente al servidor
 await paso('calendar', async () => {
     await page.locator('.muni-cal button[aria-label="12 de octubre de 2026"]').click();
@@ -105,6 +109,8 @@ await paso('servidor → componentes', async () => {
     if (nota !== '4 de 5') fallas.push(`servidor → rating: marca «${nota}»`);
     if (!(await page.locator('input[name=vista][value=mapa]').isChecked())) fallas.push('servidor → segmented: «mapa» no quedó marcado');
     if (!(await page.getByRole('radio', { name: 'Oposición' }).isChecked())) fallas.push('servidor → radio-group: «Oposición» no quedó marcado');
+    const contador = await page.locator('textarea[name=obs]').locator('xpath=..').locator('[x-text]').innerText();
+    if (contador !== '12 / 50') fallas.push(`servidor → textarea: el contador dice «${contador}», se esperaba «12 / 50»`);
 });
 
 await browser.close();
@@ -112,4 +118,4 @@ if (fallas.length) {
     console.error(fallas.join('\n'));
     process.exit(1);
 }
-console.log('Livewire de punta a punta: 11 controles llevan su valor al servidor y reflejan lo que devuelve.');
+console.log('Livewire de punta a punta: 12 controles llevan su valor al servidor y reflejan lo que devuelve.');

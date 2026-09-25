@@ -33,6 +33,7 @@ class Formulario extends Component
         $this->nota = 4;
         $this->vista = 'mapa';
         $this->tipo = 'oposicion';
+        $this->obs = 'Del servidor';
     }
 
     public function ordenarPor(string $clave): void

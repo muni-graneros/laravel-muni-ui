@@ -9,7 +9,7 @@
 ])
 
 @php
-    $accent = \Muni\Ui\Tono::color($tone, 'neutral');
+    $accent = \Muni\Ui\Tono::color($tone === 'muted' ? 'neutral' : $tone, 'neutral');
 
     // Sparkline: array de números → path SVG normalizado en un viewbox 100x28.
     $sparkPath = null;

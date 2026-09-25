@@ -19,7 +19,7 @@
     $max = $maxlength ? (int) $maxlength : null;
 @endphp
 
-<div style="display:flex;flex-direction:column;gap:6px;" @if ($max) x-data="{ n: 0 }" x-init="n = $refs.campo.value.length" @endif>
+<div style="display:flex;flex-direction:column;gap:6px;" @if ($max) x-data="{ n: 0 }" @endif>
     @if ($label)
         <label for="{{ $id }}" style="font-family:var(--muni-font-sans);font-size:12.5px;font-weight:600;color:var(--muni-text);">
             {{ $label }}@if ($required)<span style="color:var(--muni-danger-fg);margin-left:2px;">*</span>@endif
@@ -31,7 +31,9 @@
         rows="{{ (int) $rows }}"
         @if ($name) name="{{ $name }}" @endif
         @if ($required) required @endif
-        @if ($max) maxlength="{{ $max }}" x-ref="campo" @input="n = $el.value.length" @endif
+        {{-- x-effect corre después de x-model/wire:model y vuelve a correr cuando el valor
+             cambia desde afuera (p. ej. el servidor lo reinicia): el contador no queda atrás. --}}
+        @if ($max) maxlength="{{ $max }}" x-effect="n = String($el._x_model ? ($el._x_model.get() ?? '') : $el.value).length" @input="n = $el.value.length" @endif
         @if ($error) aria-invalid="true" @endif
         @if ($describe) aria-describedby="{{ $describe }}" @endif
         {{ $attributes->merge([

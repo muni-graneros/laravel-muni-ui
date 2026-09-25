@@ -59,3 +59,36 @@ it('spinner se anuncia como status y deja wire:loading en su raíz', function ()
     expect($html)->toMatch('/<span role="status"[^>]*wire:loading/')
         ->and($html)->toContain('Guardando');
 });
+
+it('checkbox da ids distintos a valores que un slug confundiría', function () {
+    $html = Blade::render('<x-muni::checkbox name="r[]" value="Sí" label="A" /><x-muni::checkbox name="r[]" value="si" label="B" /><x-muni::checkbox name="r[]" value="+" label="C" /><x-muni::checkbox name="r[]" value="-" label="D" />');
+
+    preg_match_all('/<input type="checkbox" id="([^"]+)"/', $html, $m);
+    expect(count(array_unique($m[1])))->toBe(4);
+});
+
+it('checkbox y radio-group suman el aria-describedby del host al suyo', function () {
+    expect(Blade::render('<x-muni::checkbox name="a" label="A" description="Ayuda" aria-describedby="extra" />'))
+        ->toMatch('/aria-describedby="extra muni-a-[0-9a-f]{8}-ayuda"/')
+        ->and(Blade::render('<x-muni::radio-group name="t" hint="Ayuda" aria-describedby="extra" :options="[\'a\' => \'A\']" />'))
+        ->toContain('aria-describedby="extra t-ayuda"');
+});
+
+it('spinner deja el display en la clase para que wire:loading lo oculte', function () {
+    expect(Blade::render('<x-muni::spinner wire:loading />'))->not->toMatch('/<span role="status"[^>]*style="[^"]*display:/');
+});
+
+it('data-table muestra el vacío aunque Livewire deje comentarios de morph en el slot', function () {
+    $html = Blade::render('<x-muni::data-table :columns="[\'A\']" empty="Nada por aquí"><!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]--></x-muni::data-table>');
+
+    expect($html)->toContain('Nada por aquí');
+});
+
+it('command-palette abre solo una paleta por atajo aunque haya dos en la página', function () {
+    expect(Blade::render('<x-muni::command-palette :items="[]" />'))->toContain('!$event.defaultPrevented');
+});
+
+it('kpi y stat con tone muted escriben la cifra en color de texto, no en gris de borde', function () {
+    expect(Blade::render('<x-muni::kpi value="1" label="x" tone="muted" />'))->toContain('color:var(--muni-text)')
+        ->and(Blade::render('<x-muni::kpi value="1" label="x" tone="muted" />'))->not->toContain('var(--muni-border-2)');
+});

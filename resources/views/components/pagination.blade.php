@@ -8,7 +8,8 @@
 @php
     // $url debe ser un closure/callable fn($pagina) => string, o null (solo muestra estado).
     $link = is_callable($url) ? $url : fn ($p) => '#';
-    $current = (int) $current; $total = max((int) $total, 1);
+    // En el borde, Anterior/Siguiente son un span: un enlace a # seguía recibiendo foco.
+    $total = max((int) $total, 1); $current = max(1, min((int) $current, $total));
     // Ventana de páginas: 1 … (actual-1, actual, actual+1) … total
     $pages = collect(range(1, $total))
         ->filter(fn ($p) => $p === 1 || $p === $total || abs($p - $current) <= 1)
@@ -16,8 +17,11 @@
 @endphp
 
 <nav aria-label="Paginación" {{ $attributes->merge(['style' => 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:16px;font-family:var(--muni-font-sans);font-size:13px;']) }}>
-    <a href="{{ $current > 1 ? $link($current - 1) : '#' }}" @if($current <= 1) aria-disabled="true" @endif
-       class="muni-page muni-page--nav" style="{{ $current <= 1 ? 'opacity:.4;pointer-events:none;' : '' }}">‹ Anterior</a>
+    @if ($current > 1)
+        <a href="{{ $link($current - 1) }}" rel="prev" class="muni-page muni-page--nav">‹ Anterior</a>
+    @else
+        <span aria-disabled="true" class="muni-page muni-page--nav muni-page--disabled">‹ Anterior</span>
+    @endif
 
     @php $prev = 0; @endphp
     @foreach ($pages as $p)
@@ -30,8 +34,11 @@
         @php $prev = $p; @endphp
     @endforeach
 
-    <a href="{{ $current < $total ? $link($current + 1) : '#' }}" @if($current >= $total) aria-disabled="true" @endif
-       class="muni-page muni-page--nav" style="{{ $current >= $total ? 'opacity:.4;pointer-events:none;' : '' }}">Siguiente ›</a>
+    @if ($current < $total)
+        <a href="{{ $link($current + 1) }}" rel="next" class="muni-page muni-page--nav">Siguiente ›</a>
+    @else
+        <span aria-disabled="true" class="muni-page muni-page--nav muni-page--disabled">Siguiente ›</span>
+    @endif
 
     @if ($info)<span style="margin-left:auto;color:var(--muni-muted);font-size:12px;">{{ $info }}</span>@endif
 </nav>
@@ -45,5 +52,6 @@
         .muni-page:focus-visible { outline:none;box-shadow:var(--muni-ring); }
         .muni-page--current { background:var(--muni-accent);color:var(--muni-on-accent);font-weight:600; }
         .muni-page--nav { color:var(--muni-text);font-weight:500; }
+        .muni-page--disabled, .muni-page--disabled:hover { opacity:.4;background:transparent;color:var(--muni-text);cursor:default; }
     </style>
 @endonce

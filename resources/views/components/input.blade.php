@@ -8,7 +8,11 @@
     'required' => false, // marca el campo como obligatorio
 ])
 
-@php $id = $name ? 'muni-'.$name : 'muni-'.uniqid(); @endphp
+@php
+    // Un `id` explícito gana: dos campos con el mismo name en la página no chocan.
+    $id = $attributes->get('id') ?: ($name ? 'muni-'.$name : 'muni-'.uniqid());
+    $attributes = $attributes->except('id');
+@endphp
 
 <div style="display:flex;flex-direction:column;gap:6px;">
     @if ($label)

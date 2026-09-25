@@ -5,11 +5,17 @@
 
 {{-- Calendario de mes (Alpine 3). Navega meses, selecciona un día, escribe el valor
      ISO en un input oculto. Sin dependencias de fechas externas. --}}
+@php
+    // `min` se arma como fecha LOCAL desde sus partes: new Date('YYYY-MM-DD') es UTC y
+    // en Chile dejaba elegible el día anterior.
+    if ($min instanceof \DateTimeInterface) { $min = $min->format('Y-m-d'); }
+    $min = is_string($min) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $min) ? $min : null;
+@endphp
 <div
     x-data="{
         sel: null,
         view: new Date(),
-        min: {{ $min ? "new Date('".$min."')" : 'null' }},
+        min: (s => { if(!s) return null; const p = s.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); })({{ \Illuminate\Support\Js::from($min) }}),
         dias: ['L','M','X','J','V','S','D'],
         meses: ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'],
         get titulo(){ return this.meses[this.view.getMonth()] + ' ' + this.view.getFullYear(); },
@@ -24,7 +30,7 @@
         },
         move(n){ this.view = new Date(this.view.getFullYear(), this.view.getMonth()+n, 1); },
         pick(d){ if(this.disabled(d)) return; this.sel = d; },
-        disabled(d){ return this.min && d < this.min.setHours(0,0,0,0) && d < this.min; },
+        disabled(d){ return !!(d && this.min && d < this.min); },
         same(a,b){ return a&&b && a.toDateString()===b.toDateString(); },
         iso(d){ return d ? d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0') : ''; }
     }"
@@ -41,7 +47,7 @@
         <template x-for="(c,i) in celdas" :key="i">
             {{-- Las celdas vacías previas al día 1 deben ocupar su columna: con x-if no
                  renderizaban nada y todos los meses empezaban en lunes. --}}
-            <button type="button" class="muni-cal__day" :class="same(c,sel) && 'muni-cal__day--on'" :style="c ? '' : 'visibility:hidden'" :disabled="!c" @click="c && pick(c)" x-text="c ? c.getDate() : ''"></button>
+            <button type="button" class="muni-cal__day" :class="same(c,sel) && 'muni-cal__day--on'" :style="c ? '' : 'visibility:hidden'" :disabled="!c || disabled(c)" @click="c && pick(c)" x-text="c ? c.getDate() : ''"></button>
         </template>
     </div>
 </div>
@@ -51,12 +57,13 @@
         .muni-cal { display:inline-block; padding:14px; background:var(--muni-surface); border:1px solid var(--muni-border); border-radius:var(--muni-radius); box-shadow:var(--muni-shadow); font-family:var(--muni-font-sans); width:280px; }
         .muni-cal__head { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
         .muni-cal__title { font-size:13.5px; font-weight:700; text-transform:capitalize; }
-        .muni-cal__nav { width:30px; height:30px; border:1px solid var(--muni-border); background:var(--muni-surface); color:var(--muni-text); border-radius:var(--muni-radius-sm); cursor:pointer; font-size:16px; transition:.15s; }
+        .muni-cal__nav { width:30px; height:30px; border:1px solid var(--muni-border); background:var(--muni-surface); color:var(--muni-text); border-radius:var(--muni-radius-sm); cursor:pointer; font-size:16px; transition:border-color var(--muni-dur) var(--muni-ease),color var(--muni-dur) var(--muni-ease); }
         .muni-cal__nav:hover { border-color:var(--muni-accent); color:var(--muni-accent); }
         .muni-cal__grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
         .muni-cal__dow { text-align:center; font-family:var(--muni-font-mono); font-size:10.5px; font-weight:600; color:var(--muni-hint); padding-bottom:6px; }
         .muni-cal__day { aspect-ratio:1; border:none; background:transparent; color:var(--muni-text); border-radius:var(--muni-radius-sm); font-family:var(--muni-font-mono); font-size:12.5px; cursor:pointer; transition:background var(--muni-dur) var(--muni-ease); }
-        .muni-cal__day:hover { background:var(--muni-surface-2); }
+        .muni-cal__day:hover:not(:disabled) { background:var(--muni-surface-2); }
+        .muni-cal__day:disabled { color:var(--muni-hint); opacity:.45; cursor:not-allowed; }
         .muni-cal__day:focus-visible { outline:none; box-shadow:var(--muni-ring); }
         .muni-cal__day--on { background:var(--muni-accent); color:var(--muni-on-accent); font-weight:700; }
     </style>

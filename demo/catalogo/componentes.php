@@ -25,7 +25,7 @@ return [
         'tabs' => ['desc' => 'Pestañas con paneles. Flechas ←/→ mueven entre pestañas.', 'vista' => 'columna', 'incluye' => ['tab-panel']],
         'stepper' => ['desc' => 'Pasos de un trámite. Los anteriores al actual quedan marcados como hechos.', 'vista' => 'columna'],
         'pagination' => ['desc' => 'Paginación numerada con texto de resumen. `url` recibe el número de página y devuelve el enlace.', 'vista' => 'columna'],
-        'accordion' => ['desc' => 'Preguntas o secciones plegables. Uno abierto a la vez, o varios con `multiple`.', 'vista' => 'columna'],
+        'accordion' => ['desc' => 'Preguntas o secciones plegables. Uno abierto a la vez, o varios con `multiple`.', 'vista' => 'columna', 'incluye' => ['accordion-item']],
         'card' => ['desc' => 'Contenedor con título y acciones. `flush` quita el padding para meter tablas o listas de borde a borde.', 'vista' => 'lienzo'],
     ],
     'Datos y métricas' => [

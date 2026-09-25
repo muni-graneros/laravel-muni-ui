@@ -8,6 +8,7 @@
 ])
 
 @php
+    $value = (float) $value; $max = (float) $max;
     $pct = $max > 0 ? max(0, min(100, $value / $max * 100)) : 0;
     $r = 42;
     $circ = 2 * M_PI * $r;
@@ -24,7 +25,7 @@
             <circle cx="50" cy="50" r="{{ $r }}" fill="none" stroke="var(--muni-surface-3)" stroke-width="8"/>
             <circle cx="50" cy="50" r="{{ $r }}" fill="none" stroke="{{ $color }}" stroke-width="8" stroke-linecap="round"
                     stroke-dasharray="{{ $circ }}" stroke-dashoffset="{{ $offset }}"
-                    style="transition:stroke-dashoffset .8s var(--muni-ease);"/>
+                    style="transition:stroke-dashoffset calc(var(--muni-dur) * 5) var(--muni-ease);"/>
         </svg>
         @if ($showValue)
             <div style="position:absolute;inset:0;display:grid;place-items:center;">

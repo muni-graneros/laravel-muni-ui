@@ -5,8 +5,8 @@
 ])
 
 <section
-    class="muni-card"
     {{ $attributes->merge([
+        'class' => 'muni-card',
         'style' => 'background:var(--muni-surface);border:1px solid var(--muni-border);'
             .'border-radius:var(--muni-radius-lg);box-shadow:var(--muni-shadow);overflow:hidden;'
             .'transition:box-shadow var(--muni-dur) var(--muni-ease);',

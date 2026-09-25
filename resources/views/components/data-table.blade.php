@@ -17,7 +17,7 @@
                 </tr>
             </thead>
         @endif
-        <tbody>
+        <tbody class="muni-data-body">
             @if (trim($slot) !== '')
                 {{ $slot }}
             @else

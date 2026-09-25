@@ -2,18 +2,24 @@
     'name' => null, // con name genera radios reales que envían el form
     'options' => [], // mapa valor => etiqueta
     'value' => null, // valor seleccionado
+    'autosubmit' => true, // envía el form GET al cambiar (nunca en forms POST ni con wire:submit/@submit)
 ])
 
 {{-- Control segmentado (toggle de filtro): alternativa moderna al <select> para pocas
      opciones. Con `name` genera radios reales (funciona sin JS, submit del form nativo);
-     sin `name` es puramente visual/enlaces (usar el slot). --}}
+     sin `name` es puramente visual/enlaces (usar el slot). El auto-envío solo corre en
+     forms GET sin wire:submit ni @submit; un `id` sirve de prefijo para los ids de los radios. --}}
+@php
+    $prefijo = $attributes->get('id') ?: $name;
+    $enviar = "if(this.form && this.form.method==='get' && ![...this.form.attributes].some(a => /^(wire:submit|x-on:submit|@submit)/.test(a.name))) this.form.submit()";
+@endphp
 <div role="group" {{ $attributes->merge(['style' => 'display:inline-flex;padding:3px;gap:2px;background:var(--muni-surface-2);border:1px solid var(--muni-border);border-radius:var(--muni-radius-sm);']) }}>
     @if (! empty($options) && $name)
         @foreach ($options as $val => $label)
-            @php $id = $name.'-'.$loop->index; $active = (string) $value === (string) $val; @endphp
+            @php $id = $prefijo.'-'.$loop->index; $active = (string) $value === (string) $val; @endphp
             <label for="{{ $id }}" class="muni-seg {{ $active ? 'muni-seg--on' : '' }}">
                 <input type="radio" id="{{ $id }}" name="{{ $name }}" value="{{ $val }}" @checked($active)
-                       style="position:absolute;opacity:0;width:0;height:0;" onchange="this.form && this.form.submit()">
+                       style="position:absolute;opacity:0;width:0;height:0;" @if ($autosubmit) onchange="{{ $enviar }}" @endif>
                 {{ $label }}
             </label>
         @endforeach
@@ -29,7 +35,9 @@
             border-radius:calc(var(--muni-radius-sm) - 2px);cursor:pointer;white-space:nowrap;
             transition:background var(--muni-dur) var(--muni-ease),color var(--muni-dur) var(--muni-ease); }
         .muni-seg:hover { color:var(--muni-text); }
-        .muni-seg:has(input:focus-visible) { box-shadow:var(--muni-ring); }
-        .muni-seg--on { background:var(--muni-surface);color:var(--muni-text);box-shadow:var(--muni-shadow); }
+        /* El resaltado sigue al radio marcado aunque el form no se envíe; --on queda para el slot. */
+        .muni-seg--on, .muni-seg:has(input:checked) { background:var(--muni-surface);color:var(--muni-text);box-shadow:var(--muni-shadow); }
+        .muni-seg--on:has(input:not(:checked)) { background:transparent;color:var(--muni-muted);box-shadow:none; }
+        .muni-seg.muni-seg:has(input:focus-visible) { box-shadow:var(--muni-ring); }
     </style>
 @endonce

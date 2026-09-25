@@ -45,6 +45,7 @@
         .muni-btn--subtle:hover { background: var(--muni-surface-3); }
 
         .muni-btn--danger { background: var(--muni-danger-bg); color: var(--muni-danger-fg); border-color: var(--muni-danger-border); }
-        .muni-btn--danger:hover { background: var(--muni-danger-fg); color: #fff; }
+        /* Texto con --muni-surface: >= 4.5:1 sobre --muni-danger-fg en claro, oscuro y panel. */
+        .muni-btn--danger:hover { background: var(--muni-danger-fg); color: var(--muni-surface); }
     </style>
 @endonce

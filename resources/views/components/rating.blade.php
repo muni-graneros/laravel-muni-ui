@@ -8,33 +8,54 @@
 
 @php
     $color = ['accent' => 'var(--muni-accent)', 'warn' => 'var(--muni-warn-fg)', 'ok' => 'var(--muni-ok-fg)'][$tone] ?? 'var(--muni-accent)';
+    $max = max(1, (int) $max);
+    $value = max(0, min($max, (float) $value));
+    $sel = (int) round($value);
+    $texto = rtrim(rtrim(number_format($value, 1, ',', ''), '0'), ',').' de '.$max;
 @endphp
 
-<div
-    x-data="{ value: {{ (float) $value }}, hover: 0, readonly: {{ $readonly ? 'true' : 'false' }} }"
-    {{ $attributes->merge(['style' => 'display:inline-flex;align-items:center;gap:3px;']) }}
-    role="radiogroup"
->
-    @if ($name)<input type="hidden" name="{{ $name }}" :value="value">@endif
-    @for ($i = 1; $i <= (int) $max; $i++)
-        <button
-            type="button"
-            @if (! $readonly)
+{{-- Solo lectura: una imagen con nombre («4 de 5»), sin foco ni hover. Interactivo:
+     radiogroup de botones con role=radio para el lector de pantalla; flechas ←/→ cambian el valor.
+     Las estrellas marcadas se pintan desde el servidor, así se ven sin JS. --}}
+@if ($readonly)
+    <div role="img" aria-label="{{ $attributes->get('aria-label', 'Calificación: '.$texto) }}"
+         {{ $attributes->except('aria-label')->merge(['style' => 'display:inline-flex;align-items:center;gap:3px;']) }}>
+        @if ($name)<input type="hidden" name="{{ $name }}" value="{{ $value }}">@endif
+        @for ($i = 1; $i <= $max; $i++)
+            <span class="muni-star muni-star--ro {{ $value >= $i ? 'muni-star--on' : '' }}" style="--star:{{ $color }};" aria-hidden="true">★</span>
+        @endfor
+    </div>
+@else
+    <div
+        x-data="{ value: {{ \Illuminate\Support\Js::from($value) }}, hover: 0, max: {{ $max }}, readonly: false,
+            set(v, root){ this.value = Math.max(1, Math.min(this.max, v)); this.$nextTick(() => root.querySelectorAll('[role=radio]')[this.value - 1].focus()); } }"
+        @keydown.right.prevent="set(Math.round(value) + 1, $el)" @keydown.up.prevent="set(Math.round(value) + 1, $el)"
+        @keydown.left.prevent="set(Math.round(value) - 1, $el)" @keydown.down.prevent="set(Math.round(value) - 1, $el)"
+        role="radiogroup" aria-label="{{ $attributes->get('aria-label', 'Calificación') }}"
+        {{ $attributes->except('aria-label')->merge(['style' => 'display:inline-flex;align-items:center;gap:3px;']) }}
+    >
+        @if ($name)<input type="hidden" name="{{ $name }}" value="{{ $value }}" :value="value">@endif
+        @for ($i = 1; $i <= $max; $i++)
+            <button
+                type="button"
+                role="radio"
                 @click="value = {{ $i }}" @mouseenter="hover = {{ $i }}" @mouseleave="hover = 0"
-            @endif
-            :aria-checked="value >= {{ $i }}"
-            class="muni-star"
-            :class="(hover || value) >= {{ $i }} && 'muni-star--on'"
-            style="--star:{{ $color }};{{ $readonly ? 'cursor:default;' : '' }}"
-            aria-label="{{ $i }} de {{ $max }}"
-        >★</button>
-    @endfor
-</div>
+                aria-checked="{{ $sel === $i ? 'true' : 'false' }}" :aria-checked="Math.round(value) === {{ $i }} ? 'true' : 'false'"
+                tabindex="{{ ($sel ? $sel === $i : $i === 1) ? '0' : '-1' }}" :tabindex="(Math.round(value) ? Math.round(value) === {{ $i }} : {{ $i }} === 1) ? 0 : -1"
+                class="muni-star {{ $value >= $i ? 'muni-star--on' : '' }}"
+                :class="{ 'muni-star--on': (hover || value) >= {{ $i }} }"
+                style="--star:{{ $color }};"
+                aria-label="{{ $i }} de {{ $max }}"
+            >★</button>
+        @endfor
+    </div>
+@endif
 
 @once
     <style>
         .muni-star { background:none; border:none; padding:0 1px; font-size:20px; line-height:1; color:var(--muni-border-2); cursor:pointer; transition:color var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease); }
-        .muni-star:hover { transform:scale(1.15); }
+        button.muni-star:hover { transform:scale(1.15); }
+        .muni-star--ro { cursor:default; }
         .muni-star:focus-visible { outline:none; box-shadow:var(--muni-ring); border-radius:4px; }
         .muni-star--on { color:var(--star); text-shadow:var(--muni-glow); }
     </style>

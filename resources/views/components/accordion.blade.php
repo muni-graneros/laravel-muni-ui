@@ -1,29 +1,44 @@
 @props([
     'items' => [], // lista de ['title' => , 'content' => ]
     'multiple' => false, // permite varios paneles abiertos a la vez
-    'default' => null, // índice abierto al cargar (null = todos cerrados)
+    'default' => null, // índice (o clave de items) abierto al cargar (null = todos cerrados)
 ])
 
 @php
-    // $items: array de ['title'=>, 'content'=>] o usar el slot con <x-muni::accordion-item>.
+    // $items: array de ['title'=>, 'content'=>] (claves numéricas o de texto), o paneles
+    // accordion-item en el slot. Los paneles se identifican por su posición (desde 0).
+    // El panel abierto al cargar se pinta visible desde el servidor (sin x-cloak).
+    $abierto = null;
+    if ($default !== null) {
+        $claves = array_keys($items);
+        $abierto = is_int($default) || ctype_digit((string) $default)
+            ? (int) $default
+            : array_search($default, $claves, true);
+        if ($abierto === false) { $abierto = null; }
+    }
 @endphp
 
 <div
-    x-data="{ open: {{ $default !== null ? (int) $default : 'null' }}, multiple: {{ $multiple ? 'true' : 'false' }}, opened: [],
+    x-data="{ open: {{ \Illuminate\Support\Js::from($multiple ? null : $abierto) }}, multiple: {{ $multiple ? 'true' : 'false' }},
+        opened: {{ \Illuminate\Support\Js::from($multiple && $abierto !== null ? [$abierto] : []) }}, _n: 0,
         toggle(i){ if(this.multiple){ this.opened = this.opened.includes(i) ? this.opened.filter(x=>x!==i) : [...this.opened, i]; } else { this.open = this.open===i ? null : i; } },
         isOpen(i){ return this.multiple ? this.opened.includes(i) : this.open===i; } }"
     {{ $attributes->merge(['class' => 'muni-acc']) }}
 >
     @if (! empty($items))
-        @foreach ($items as $i => $item)
-            <div class="muni-acc__item">
-                <button type="button" class="muni-acc__head" @click="toggle({{ $i }})" :aria-expanded="isOpen({{ $i }})">
+        @foreach ($items as $item)
+            @php $i = $loop->index; $ini = $i === $abierto; @endphp
+            <div class="muni-acc__item" x-id="['muni-acc']">
+                <button type="button" class="muni-acc__head" @click="toggle({{ $i }})"
+                        aria-expanded="{{ $ini ? 'true' : 'false' }}" :aria-expanded="isOpen({{ $i }}) ? 'true' : 'false'"
+                        :id="$id('muni-acc') + '-h'" :aria-controls="$id('muni-acc')">
                     <span>{{ $item['title'] ?? '' }}</span>
-                    <span class="muni-acc__chevron" :class="isOpen({{ $i }}) && 'muni-acc__chevron--open'">
-                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" width="15" height="15"><path d="M4 6l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="muni-acc__chevron {{ $ini ? 'muni-acc__chevron--open' : '' }}" :class="{ 'muni-acc__chevron--open': isOpen({{ $i }}) }">
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" width="15" height="15" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </span>
                 </button>
-                <div class="muni-acc__panel" x-show="isOpen({{ $i }})" x-cloak
+                <div class="muni-acc__panel" role="region" x-show="isOpen({{ $i }})" @unless ($ini) x-cloak @endunless
+                     :id="$id('muni-acc')" :aria-labelledby="$id('muni-acc') + '-h'"
                      x-transition:enter="muni-acc-enter" x-transition:enter-start="muni-acc-0" x-transition:enter-end="muni-acc-1">
                     <div class="muni-acc__body">{{ $item['content'] ?? '' }}</div>
                 </div>

@@ -7,12 +7,17 @@
 
 @php
     // $data: array de ['label'=>, 'value'=>, 'tone'=>?] o de números.
+    // Sin 'label' o 'value' no truena; los negativos se dibujan en 0 (el alto no puede ser < 0).
     $norm = [];
-    foreach ($data as $d) {
-        $norm[] = is_array($d) ? $d : ['label' => '', 'value' => $d];
+    foreach ($data ?? [] as $d) {
+        $d = is_array($d) ? $d : ['value' => $d];
+        $d['label'] = $d['label'] ?? '';
+        $d['value'] = $d['value'] ?? 0;
+        $d['alto'] = max(0, (float) $d['value']);
+        $norm[] = $d;
     }
     $max = 0;
-    foreach ($norm as $d) { $max = max($max, (float) $d['value']); }
+    foreach ($norm as $d) { $max = max($max, $d['alto']); }
     $max = $max ?: 1;
     $toneColor = [
         'accent' => 'var(--muni-accent)', 'ok' => 'var(--muni-ok-fg)', 'warn' => 'var(--muni-warn-fg)',
@@ -20,11 +25,11 @@
     ];
 @endphp
 
-<div {{ $attributes->merge(['class' => 'muni-chartbar']) }} style="display:flex;flex-direction:column;">
+<div {{ $attributes->merge(['class' => 'muni-chartbar', 'style' => 'display:flex;flex-direction:column;']) }}>
     <div style="display:flex;align-items:flex-end;gap:8px;height:{{ $height }}px;padding-top:8px;">
         @foreach ($norm as $d)
             @php
-                $h = round((float) $d['value'] / $max * 100, 1);
+                $h = round($d['alto'] / $max * 100, 1);
                 $c = $toneColor[$d['tone'] ?? $tone] ?? 'var(--muni-accent)';
             @endphp
             <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;min-width:0;" title="{{ $d['label'] }}: {{ $d['value'] }}">
@@ -44,7 +49,7 @@
 
 @once
     <style>
-        .muni-chartbar__bar { width:100%; max-width:38px; border-radius:5px 5px 0 0; transition:height .6s var(--muni-ease); }
+        .muni-chartbar__bar { width:100%; max-width:38px; border-radius:5px 5px 0 0; transition:height calc(var(--muni-dur) * 4) var(--muni-ease); }
         .muni-chartbar__val { font-family:var(--muni-font-mono); font-variant-numeric:tabular-nums; font-size:11px; font-weight:600; color:var(--muni-muted); margin-bottom:5px; }
     </style>
 @endonce

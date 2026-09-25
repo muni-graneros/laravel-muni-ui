@@ -18,7 +18,7 @@
         onKey(i, e){
             if(e.key==='Backspace' && !this.digits[i] && i>0){ this.$refs['d'+(i-1)].focus(); }
         },
-        paste(v){ v.split('').slice(0,{{ (int) $length }}).forEach((c,i)=>{ this.digits[i]=c; }); this.$nextTick(()=>{ const last=Math.min(v.length,{{ (int) $length }})-1; this.$refs['d'+Math.max(last,0)].focus(); }); }
+        paste(v){ for(let i=0;i<this.digits.length;i++){ this.digits[i]=''; } v.split('').slice(0,{{ (int) $length }}).forEach((c,i)=>{ this.digits[i]=c; }); this.$nextTick(()=>{ const last=Math.min(v.length,{{ (int) $length }})-1; this.$refs['d'+Math.max(last,0)].focus(); }); }
     }"
     {{ $attributes->merge(['style' => 'display:flex;gap:9px;']) }}
 >

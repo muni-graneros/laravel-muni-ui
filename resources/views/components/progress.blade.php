@@ -7,7 +7,8 @@
 ])
 
 @php
-    $pct = $max > 0 ? max(0, min(100, round($value / $max * 100))) : 0;
+    $value = (float) $value; $max = (float) $max;
+    $pct = $max > 0 ? (int) max(0, min(100, round($value / $max * 100))) : 0;
     $color = [
         'accent' => 'var(--muni-accent)', 'ok' => 'var(--muni-ok-fg)',
         'warn' => 'var(--muni-warn-fg)', 'danger' => 'var(--muni-danger-fg)', 'info' => 'var(--muni-info-fg)',
@@ -32,6 +33,6 @@
     <div role="progressbar" aria-valuenow="{{ $pct }}" aria-valuemin="0" aria-valuemax="100"
          aria-label="{{ $attributes->get('aria-label', $label ?: 'Progreso') }}"
          style="height:7px;border-radius:999px;background:var(--muni-surface-3);overflow:hidden;">
-        <div style="height:100%;width:{{ $pct }}%;border-radius:999px;background:{{ $color }};transition:width .5s var(--muni-ease);"></div>
+        <div style="height:100%;width:{{ $pct }}%;border-radius:999px;background:{{ $color }};transition:width calc(var(--muni-dur) * 3) var(--muni-ease);"></div>
     </div>
 </div>

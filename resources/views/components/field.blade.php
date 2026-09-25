@@ -17,7 +17,7 @@
     <style>
         :where(.muni-field) > :where(input:not([type=checkbox],[type=radio],[type=hidden]), select, textarea) {
             min-width: 0; padding: 8px 11px; font-family: var(--muni-font-sans); font-size: 13.5px; color: var(--muni-text);
-            background: var(--muni-surface); border: 1px solid var(--muni-border); border-radius: var(--muni-radius-sm);
+            background: var(--muni-surface); border: 1px solid var(--muni-border-strong, var(--muni-border)); border-radius: var(--muni-radius-sm);
             transition: border-color var(--muni-dur) var(--muni-ease), box-shadow var(--muni-dur) var(--muni-ease);
         }
         :where(.muni-field) > :where(input, select, textarea)::placeholder { color: var(--muni-hint); }

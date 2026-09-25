@@ -45,7 +45,7 @@
 @once
     <style>
         .muni-otp { width:46px; height:54px; text-align:center; font-family:var(--muni-font-mono); font-size:22px; font-weight:700; color:var(--muni-text);
-            background:var(--muni-surface); border:1px solid var(--muni-border); border-radius:var(--muni-radius-sm);
+            background:var(--muni-surface); border:1px solid var(--muni-border-strong, var(--muni-border)); border-radius:var(--muni-radius-sm);
             transition:border-color var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease); }
         .muni-otp:focus { outline:none; border-color:var(--muni-accent); box-shadow:var(--muni-ring); }
         @media (max-width:420px){ .muni-otp { width:40px; height:48px; font-size:19px; } }

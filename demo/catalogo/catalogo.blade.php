@@ -91,8 +91,9 @@
         .cat-more summary::before{ content:"›"; font-size:15px; line-height:1; transition:transform var(--muni-dur) var(--muni-ease); }
         .cat-more details[open] summary::before{ transform:rotate(90deg); }
         .cat-more summary:hover{ color:var(--muni-text); }
-        .cat-more summary:focus-visible{ outline:none; box-shadow:inset var(--muni-ring); }
+        .cat-more summary:focus-visible{ outline:none; box-shadow:var(--muni-ring-inset); }
         .cat-code{ position:relative; border-top:1px solid var(--muni-border); background:var(--muni-surface-2); }
+        .cat-code pre:focus-visible{ outline:none; box-shadow:var(--muni-ring-inset); }
         .cat-code pre{ margin:0; padding:16px 18px; overflow-x:auto; font-size:12.5px; line-height:1.6; tab-size:4; }
         .cat-copy{ position:absolute; top:8px; right:8px; padding:4px 10px; font:600 11.5px var(--muni-font-sans); color:var(--muni-muted); background:var(--muni-surface); border:1px solid var(--muni-border); border-radius:6px; cursor:pointer; }
         .cat-copy:hover{ color:var(--muni-text); border-color:var(--muni-border-2); }
@@ -193,7 +194,7 @@
 
         @php
             $familias = [
-                'Superficies' => ['muni-bg', 'muni-surface', 'muni-surface-2', 'muni-surface-3', 'muni-panel', 'muni-border', 'muni-border-2'],
+                'Superficies' => ['muni-bg', 'muni-surface', 'muni-surface-2', 'muni-surface-3', 'muni-panel', 'muni-border', 'muni-border-2', 'muni-border-strong'],
                 'Texto' => ['muni-text', 'muni-muted', 'muni-hint'],
                 'Acento' => ['muni-accent', 'muni-accent-strong', 'muni-accent-soft', 'muni-on-accent'],
             ];
@@ -299,7 +300,7 @@
                                 <summary>Código</summary>
                                 <div class="cat-code">
                                     <button type="button" class="cat-copy" @click="copiar($refs.src_{{ str_replace('-', '_', $nombre) }}, $el)">Copiar</button>
-                                    <pre x-ref="src_{{ str_replace('-', '_', $nombre) }}">{!! $c['codigo'] !!}</pre>
+                                    <pre tabindex="0" x-ref="src_{{ str_replace('-', '_', $nombre) }}">{!! $c['codigo'] !!}</pre>
                                 </div>
                             </details>
                             <details>
@@ -352,7 +353,7 @@
                             <summary>Código</summary>
                             <div class="cat-code">
                                 <button type="button" class="cat-copy" @click="copiar($refs.receta_{{ $slug }}, $el)">Copiar</button>
-                                <pre x-ref="receta_{{ $slug }}">{!! $r['codigo'] !!}</pre>
+                                <pre tabindex="0" x-ref="receta_{{ $slug }}">{!! $r['codigo'] !!}</pre>
                             </div>
                         </details>
                     </div>

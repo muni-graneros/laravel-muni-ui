@@ -5,6 +5,10 @@
      - "light" → linaje `.om` (discapacidad): institucional sereno, teal.
      - "dark"  → linaje `.fc` (feria): terminal de datos, alto contraste.
    Valores VERBATIM de los CSS de producción (feria.css / discapacidad.css).
+   Excepción, medida con axe y WCAG 2.2 AA: --muni-hint, --muni-warn-fg (claro),
+   --muni-muted y --muni-danger-fg (oscuro) se oscurecieron/aclararon lo justo para
+   llegar a 4,5:1; --muni-ring es un anillo sólido (el halo translúcido quedaba en
+   1,5:1) y --muni-border-strong da a los controles un borde de 3:1.
 
    DARK MODE UNIVERSAL — se activa con CUALQUIERA de estos mecanismos, para ser
    compatible con todo el ecosistema a la vez:
@@ -50,9 +54,10 @@
 
     --muni-text: #1a1d24;
     --muni-muted: #5a6070;
-    --muni-hint: #6b7280;
+    --muni-hint: #656c79;
     --muni-border: #e0e3ea;
     --muni-border-2: #c8ccd6;
+    --muni-border-strong: #7d88a0;
 
     --muni-accent: #0f766e;
     --muni-accent-strong: #115e59;
@@ -62,9 +67,9 @@
     --muni-ok-fg: #0f7a5a;
     --muni-ok-bg: #e2f5ee;
     --muni-ok-border: #0f7a5a;
-    --muni-warn-fg: #c47a10;
+    --muni-warn-fg: #9c610d;
     --muni-warn-bg: #fef3dc;
-    --muni-warn-border: #c47a10;
+    --muni-warn-border: #9c610d;
     --muni-danger-fg: #b03030;
     --muni-danger-bg: #fdeaea;
     --muni-danger-border: #b03030;
@@ -79,7 +84,8 @@
     --muni-shadow-md: 0 4px 16px rgba(16, 24, 40, 0.10);
     --muni-shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.14);
 
-    --muni-ring: 0 0 0 3px color-mix(in srgb, var(--muni-accent) 30%, transparent);
+    --muni-ring: 0 0 0 2px var(--muni-surface), 0 0 0 4px var(--muni-accent);
+    --muni-ring-inset: inset 0 0 0 2px var(--muni-accent);
     --muni-ease: cubic-bezier(0.22, 1, 0.36, 1);
     --muni-dur: 160ms;
 
@@ -102,10 +108,11 @@
         --muni-surface-3: #1c2333;
         --muni-panel: #1c2333;
         --muni-text: #e2e8f4;
-        --muni-muted: #7a8ba8;
-        --muni-hint: #4a5a74;
+        --muni-muted: #7e8fac;
+        --muni-hint: #788ba9;
         --muni-border: #2a3347;
         --muni-border-2: #3a4560;
+        --muni-border-strong: #566891;
         --muni-accent: #f59e0b;
         --muni-accent-strong: #d97706;
         --muni-accent-soft: #2d1d00;
@@ -116,7 +123,7 @@
         --muni-warn-fg: #f59e0b;
         --muni-warn-bg: #2d1d00;
         --muni-warn-border: #92400e;
-        --muni-danger-fg: #ef4444;
+        --muni-danger-fg: #ef4949;
         --muni-danger-bg: #2d0d0d;
         --muni-danger-border: #991b1b;
         --muni-info-fg: #3b82f6;
@@ -125,7 +132,8 @@
         --muni-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.35);
         --muni-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
         --muni-shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.55);
-        --muni-ring: 0 0 0 3px color-mix(in srgb, var(--muni-accent) 35%, transparent);
+        --muni-ring: 0 0 0 2px var(--muni-surface), 0 0 0 4px var(--muni-accent);
+        --muni-ring-inset: inset 0 0 0 2px var(--muni-accent);
         --muni-font-sans: 'IBM Plex Sans', system-ui, sans-serif;
         --muni-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
         --muni-topbar-h: 52px;
@@ -145,10 +153,11 @@
     --muni-surface-3: #1c2333;
     --muni-panel: #1c2333;
     --muni-text: #e2e8f4;
-    --muni-muted: #7a8ba8;
-    --muni-hint: #4a5a74;
+    --muni-muted: #7e8fac;
+    --muni-hint: #788ba9;
     --muni-border: #2a3347;
     --muni-border-2: #3a4560;
+    --muni-border-strong: #566891;
     --muni-accent: #f59e0b;
     --muni-accent-strong: #d97706;
     --muni-accent-soft: #2d1d00;
@@ -159,7 +168,7 @@
     --muni-warn-fg: #f59e0b;
     --muni-warn-bg: #2d1d00;
     --muni-warn-border: #92400e;
-    --muni-danger-fg: #ef4444;
+    --muni-danger-fg: #ef4949;
     --muni-danger-bg: #2d0d0d;
     --muni-danger-border: #991b1b;
     --muni-info-fg: #3b82f6;
@@ -168,7 +177,8 @@
     --muni-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.35);
     --muni-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
     --muni-shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.55);
-    --muni-ring: 0 0 0 3px color-mix(in srgb, var(--muni-accent) 35%, transparent);
+    --muni-ring: 0 0 0 2px var(--muni-surface), 0 0 0 4px var(--muni-accent);
+    --muni-ring-inset: inset 0 0 0 2px var(--muni-accent);
     --muni-font-sans: 'IBM Plex Sans', system-ui, sans-serif;
     --muni-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
     --muni-topbar-h: 52px;
@@ -186,9 +196,10 @@
     --muni-panel: #ffffff;
     --muni-text: #1a1d24;
     --muni-muted: #5a6070;
-    --muni-hint: #6b7280;
+    --muni-hint: #656c79;
     --muni-border: #e0e3ea;
     --muni-border-2: #c8ccd6;
+    --muni-border-strong: #7d88a0;
     --muni-accent: #0f766e;
     --muni-accent-strong: #115e59;
     --muni-accent-soft: #f0fdfa;
@@ -196,9 +207,9 @@
     --muni-ok-fg: #0f7a5a;
     --muni-ok-bg: #e2f5ee;
     --muni-ok-border: #0f7a5a;
-    --muni-warn-fg: #c47a10;
+    --muni-warn-fg: #9c610d;
     --muni-warn-bg: #fef3dc;
-    --muni-warn-border: #c47a10;
+    --muni-warn-border: #9c610d;
     --muni-danger-fg: #b03030;
     --muni-danger-bg: #fdeaea;
     --muni-danger-border: #b03030;
@@ -208,7 +219,8 @@
     --muni-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 2px 8px rgba(16, 24, 40, 0.06);
     --muni-shadow-md: 0 4px 16px rgba(16, 24, 40, 0.10);
     --muni-shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.14);
-    --muni-ring: 0 0 0 3px color-mix(in srgb, var(--muni-accent) 30%, transparent);
+    --muni-ring: 0 0 0 2px var(--muni-surface), 0 0 0 4px var(--muni-accent);
+    --muni-ring-inset: inset 0 0 0 2px var(--muni-accent);
     --muni-font-sans: 'DM Sans', system-ui, sans-serif;
     --muni-font-mono: 'DM Mono', ui-monospace, monospace;
     --muni-topbar-h: 56px;

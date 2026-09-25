@@ -80,3 +80,8 @@ jobs:
 
       - name: Errores de JS, móvil y accesibilidad (axe)
         run: node demo/catalogo/verificar.mjs
+
+      # Foco de modales, teclado de calendario y tabs, enlace x-model/wire:model, orden
+      # de tablas, avisos: lo que Pest no ve porque ocurre en el navegador.
+      - name: Interacciones de los componentes
+        run: node demo/catalogo/interacciones.mjs

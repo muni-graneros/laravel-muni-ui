@@ -167,3 +167,20 @@ it('sortable-table renderiza encabezados y filas en el servidor para verse sin J
         ->and($html)->toContain('>Ana &lt;b&gt;</td>')
         ->and($html)->toMatch('/<tr x-show="false" class="muni-st__danger">/');
 });
+
+it('data-table ordena por enlace con aria-sort en la columna actual', function () {
+    $html = Blade::render('<x-muni::data-table sort="razon" direction="asc" :sortUrl="fn ($c, $d) => \'?orden=\'.$c.\'&dir=\'.$d" :columns="[[\'label\' => \'Razón\', \'sort\' => \'razon\'], [\'label\' => \'Deuda\', \'sort\' => \'deuda\'], \'Estado\']"><tr><td>x</td></tr></x-muni::data-table>');
+
+    expect($html)->toContain('aria-sort="ascending"')
+        ->and($html)->toContain('href="?orden=razon&amp;dir=desc"')
+        ->and($html)->toContain('aria-sort="none"')
+        ->and($html)->toContain('href="?orden=deuda&amp;dir=asc"')
+        ->and(substr_count($html, 'aria-sort'))->toBe(2);
+});
+
+it('data-table ordena con un método Livewire y acepta columnas como strings', function () {
+    $html = Blade::render('<x-muni::data-table wireSort="ordenarPor" :columns="[[\'label\' => \'RUT\', \'sort\' => \'rut\'], \'Nombre\']"><tr><td>x</td></tr></x-muni::data-table>');
+
+    expect($html)->toContain("wire:click=\"ordenarPor('rut')\"")
+        ->and($html)->toContain('Nombre');
+});

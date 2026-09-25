@@ -2207,10 +2207,10 @@ ${r?'Expression: "'+r+`"
                     </header>
         <div style=""><div style="position:relative;overflow-x:auto;border:1px solid var(--muni-border);border-radius:var(--muni-radius);background:var(--muni-surface);">
     <table style="width:100%;border-collapse:collapse;font-family:var(--muni-font-sans);font-size:12.5px;">
-                    <thead>
+                            <thead>
                 <tr>
-                                            <th scope="col" style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">Folio</th>
-                                            <th scope="col" style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">Estado</th>
+                                                                    <th scope="col"  style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">Folio</th>
+                                                                    <th scope="col"  style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">Estado</th>
                                     </tr>
             </thead>
                 <tbody class="muni-data-body">
@@ -2240,6 +2240,10 @@ ${r?'Expression: "'+r+`"
         [data-muni-row].muni-row--danger td:first-child { box-shadow: inset 3px 0 0 var(--muni-danger-fg); }
         [data-muni-row].muni-row--danger td:first-child { color: var(--muni-danger-fg); font-weight: 600; }
         .muni-num { font-family: var(--muni-font-mono); font-variant-numeric: tabular-nums; }
+        .muni-dt__sort { display:inline-flex; align-items:center; gap:5px; padding:0; border:0; background:none; font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit; text-decoration:none; cursor:pointer; border-radius:4px; }
+        .muni-dt__sort:hover { color:var(--muni-text); }
+        .muni-dt__sort:focus-visible { outline:none; box-shadow:var(--muni-ring); }
+        .muni-dt__arrow { font-family:var(--muni-font-mono); font-size:11px; opacity:.4; }
     </style></div>
 </section>
 
@@ -2295,7 +2299,7 @@ ${r?'Expression: "'+r+`"
                         </div>
                     </section>
                             </div>
-                    <div x-show="ve(&#039;kpi  cifra con etiqueta y franja de tono. para resumir un filtro sobre una tabla. value label tone hint&#039;) || ve(&#039;stat  cifra con variación y sparkline. para tableros donde importa la tendencia. value label tone delta deltadir spark hint&#039;) || ve(&#039;chart-bar  barras en html\/css, sin js ni librerías. cada barra puede llevar su propio tono. data height tone labels&#039;) || ve(&#039;chart-donut  dona svg con leyenda. Útil para repartir un total en 2–5 partes. segments size thickness total centerlabel&#039;) || ve(&#039;ring  avance circular hacia una meta. value max size tone label showvalue&#039;) || ve(&#039;progress  avance lineal con etiqueta y porcentaje. value max tone label showvalue&#039;) || ve(&#039;data-table  tabla densa renderizada en servidor. las filas van en el slot; `muni-row--danger` pinta la franja de libro mayor y `muni-num` alinea cifras. columns empty&#039;) || ve(&#039;sortable-table  tabla con orden por columna y búsqueda en el navegador. para listados cortos que ya están en memoria. columns rows empty searchable&#039;) || ve(&#039;description-list  ficha de datos etiqueta: valor, como una lista de definición real. para el detalle de una persona, patente o solicitud. items columns empty&#039;) || ve(&#039;timeline  bitácora vertical de eventos con tono por hito. items&#039;) || ve(&#039;badge  estado corto dentro de tablas y fichas. tone dot&#039;) || ve(&#039;avatar  iniciales o foto de una persona. name src size tone&#039;) || ve(&#039;rating  estrellas para evaluar una atención, editable o de solo lectura. value max readonly name tone&#039;)">
+                    <div x-show="ve(&#039;kpi  cifra con etiqueta y franja de tono. para resumir un filtro sobre una tabla. value label tone hint&#039;) || ve(&#039;stat  cifra con variación y sparkline. para tableros donde importa la tendencia. value label tone delta deltadir spark hint&#039;) || ve(&#039;chart-bar  barras en html\/css, sin js ni librerías. cada barra puede llevar su propio tono. data height tone labels&#039;) || ve(&#039;chart-donut  dona svg con leyenda. Útil para repartir un total en 2–5 partes. segments size thickness total centerlabel&#039;) || ve(&#039;ring  avance circular hacia una meta. value max size tone label showvalue&#039;) || ve(&#039;progress  avance lineal con etiqueta y porcentaje. value max tone label showvalue&#039;) || ve(&#039;data-table  tabla densa renderizada en servidor. las filas van en el slot; `muni-row--danger` pinta la franja de libro mayor y `muni-num` alinea cifras. columns empty sort direction sorturl wiresort caption&#039;) || ve(&#039;sortable-table  tabla con orden por columna y búsqueda en el navegador. para listados cortos que ya están en memoria. columns rows empty searchable&#039;) || ve(&#039;description-list  ficha de datos etiqueta: valor, como una lista de definición real. para el detalle de una persona, patente o solicitud. items columns empty&#039;) || ve(&#039;timeline  bitácora vertical de eventos con tono por hito. items&#039;) || ve(&#039;badge  estado corto dentro de tablas y fichas. tone dot&#039;) || ve(&#039;avatar  iniciales o foto de una persona. name src size tone&#039;) || ve(&#039;rating  estrellas para evaluar una atención, editable o de solo lectura. value max readonly name tone&#039;)">
                 <div class="cat-group"><h2>Datos y métricas</h2><span>13</span></div>
                                                         <section class="cat-item" id="c-kpi" x-show="ve('kpi  cifra con etiqueta y franja de tono. para resumir un filtro sobre una tabla. value label tone hint')">
                         <div class="cat-item__head">
@@ -2904,7 +2908,7 @@ ${r?'Expression: "'+r+`"
                                                                                                                                                                     </details>
                         </div>
                     </section>
-                                                        <section class="cat-item" id="c-data-table" x-show="ve('data-table  tabla densa renderizada en servidor. las filas van en el slot; `muni-row--danger` pinta la franja de libro mayor y `muni-num` alinea cifras. columns empty')">
+                                                        <section class="cat-item" id="c-data-table" x-show="ve('data-table  tabla densa renderizada en servidor. las filas van en el slot; `muni-row--danger` pinta la franja de libro mayor y `muni-num` alinea cifras. columns empty sort direction sorturl wiresort caption')">
                         <div class="cat-item__head">
                             <h3><a href="#c-data-table">data-table</a></h3>
                                                         <span class="cat-tag" title="Blade puro: funciona sin JavaScript">Sin JS</span>                        </div>
@@ -2914,12 +2918,12 @@ ${r?'Expression: "'+r+`"
                         
                                                     <div class="cat-demo cat-demo--columna" data-shot="data-table"><div style="position:relative;overflow-x:auto;border:1px solid var(--muni-border);border-radius:var(--muni-radius);background:var(--muni-surface);">
     <table style="width:100%;border-collapse:collapse;font-family:var(--muni-font-sans);font-size:12.5px;">
-                    <thead>
+                            <thead>
                 <tr>
-                                            <th scope="col" style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">Razón social</th>
-                                            <th scope="col" style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">RUT</th>
-                                            <th scope="col" style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">Giro</th>
-                                            <th scope="col" style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">Estado</th>
+                                                                    <th scope="col"  style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">Razón social</th>
+                                                                    <th scope="col"  style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">RUT</th>
+                                                                    <th scope="col"  style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">Giro</th>
+                                                                    <th scope="col"  style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">Estado</th>
                                     </tr>
             </thead>
                 <tbody class="muni-data-body">
@@ -2971,7 +2975,42 @@ ${r?'Expression: "'+r+`"
         [data-muni-row].muni-row--danger td:first-child { box-shadow: inset 3px 0 0 var(--muni-danger-fg); }
         [data-muni-row].muni-row--danger td:first-child { color: var(--muni-danger-fg); font-weight: 600; }
         .muni-num { font-family: var(--muni-font-mono); font-variant-numeric: tabular-nums; }
+        .muni-dt__sort { display:inline-flex; align-items:center; gap:5px; padding:0; border:0; background:none; font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit; text-decoration:none; cursor:pointer; border-radius:4px; }
+        .muni-dt__sort:hover { color:var(--muni-text); }
+        .muni-dt__sort:focus-visible { outline:none; box-shadow:var(--muni-ring); }
+        .muni-dt__arrow { font-family:var(--muni-font-mono); font-size:11px; opacity:.4; }
     </style>
+
+
+<div style="position:relative;overflow-x:auto;border:1px solid var(--muni-border);border-radius:var(--muni-radius);background:var(--muni-surface);">
+    <table style="width:100%;border-collapse:collapse;font-family:var(--muni-font-sans);font-size:12.5px;">
+        <caption style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;">Patentes ordenadas por razón social</caption>                    <thead>
+                <tr>
+                                                                    <th scope="col"  aria-sort="ascending"  style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-text);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);"><a href="?orden=razon&amp;dir=desc" class="muni-dt__sort">Razón social<span aria-hidden="true" class="muni-dt__arrow" style="opacity:1;">↑</span></a></th>
+                                                                    <th scope="col"  aria-sort="none"  style="text-align:right;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);"><a href="?orden=deuda&amp;dir=asc" class="muni-dt__sort">Deuda<span aria-hidden="true" class="muni-dt__arrow" style="">↕</span></a></th>
+                                                                    <th scope="col"  style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">Estado</th>
+                                    </tr>
+            </thead>
+                <tbody class="muni-data-body">
+                            <tr data-muni-row><td>Almacén Don Pepe</td><td class="muni-num" style="text-align:right;">$0</td><td><span
+    style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;font-family:var(--muni-font-mono);font-size:11px;font-weight:600;line-height:1;letter-spacing:.02em;border-radius:999px;color:var(--muni-ok-fg);background:var(--muni-ok-bg);border:1px solid var(--muni-ok-border);"
+>
+            <span aria-hidden="true" style="width:6px;height:6px;border-radius:50%;background:var(--muni-ok-fg);box-shadow:var(--muni-glow);"></span>
+        Al día
+</span>
+</td></tr>
+    <tr data-muni-row class="muni-row--danger"><td>Ferretería El Clavo</td><td class="muni-num" style="text-align:right;">$184.500</td><td><span
+    style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;font-family:var(--muni-font-mono);font-size:11px;font-weight:600;line-height:1;letter-spacing:.02em;border-radius:999px;color:var(--muni-danger-fg);background:var(--muni-danger-bg);border:1px solid var(--muni-danger-border);"
+>
+            <span aria-hidden="true" style="width:6px;height:6px;border-radius:50%;background:var(--muni-danger-fg);box-shadow:var(--muni-glow);"></span>
+        Morosa
+</span>
+</td></tr>
+                    </tbody>
+    </table>
+</div>
+
+
 </div>
                         
                         <div class="cat-more">
@@ -2998,11 +3037,25 @@ ${r?'Expression: "'+r+`"
         <span class="tk-t">&lt;td</span>&gt;Panadería<span class="tk-t">&lt;/td</span>&gt;
         <span class="tk-t">&lt;td</span>&gt;<span class="tk-x">&lt;x-muni::badge</span> <span class="tk-a">tone</span>=<span class="tk-s">&quot;warn&quot;</span>&gt;Por vencer<span class="tk-x">&lt;/x-muni::badge</span>&gt;<span class="tk-t">&lt;/td</span>&gt;
     <span class="tk-t">&lt;/tr</span>&gt;
+<span class="tk-x">&lt;/x-muni::data-table</span>&gt;
+
+<span class="tk-c">{{-- Orden en el servidor. Con el paginador de Laravel:
+     :sortUrl=&quot;fn ($clave, $dir) =&gt; request()-&gt;fullUrlWithQuery([&#039;orden&#039; =&gt; $clave, &#039;dir&#039; =&gt; $dir])&quot;
+     Con Livewire: wireSort=&quot;ordenarPor&quot; (recibe la clave). --}}</span>
+<span class="tk-x">&lt;x-muni::data-table</span> <span class="tk-a">caption</span>=<span class="tk-s">&quot;Patentes ordenadas por razón social&quot;</span> <span class="tk-a">sort</span>=<span class="tk-s">&quot;razon&quot;</span> <span class="tk-a">direction</span>=<span class="tk-s">&quot;asc&quot;</span>
+    <span class="tk-a">:sortUrl</span>=<span class="tk-s">&quot;fn ($clave, $dir) =&gt; &#039;?orden=&#039;.$clave.&#039;&amp;dir=&#039;.$dir&quot;</span>
+    <span class="tk-a">:columns</span>=<span class="tk-s">&quot;[
+        [&#039;label&#039; =&gt; &#039;Razón social&#039;, &#039;sort&#039; =&gt; &#039;razon&#039;],
+        [&#039;label&#039; =&gt; &#039;Deuda&#039;, &#039;sort&#039; =&gt; &#039;deuda&#039;, &#039;align&#039; =&gt; &#039;right&#039;],
+        &#039;Estado&#039;,
+    ]&quot;</span>&gt;
+    <span class="tk-t">&lt;tr</span> data-muni-row&gt;<span class="tk-t">&lt;td</span>&gt;Almacén Don Pepe<span class="tk-t">&lt;/td</span>&gt;<span class="tk-t">&lt;td</span> <span class="tk-a">class</span>=<span class="tk-s">&quot;muni-num&quot;</span> <span class="tk-a">style</span>=<span class="tk-s">&quot;text-align:right;&quot;</span>&gt;$0<span class="tk-t">&lt;/td</span>&gt;<span class="tk-t">&lt;td</span>&gt;<span class="tk-x">&lt;x-muni::badge</span> <span class="tk-a">tone</span>=<span class="tk-s">&quot;ok&quot;</span>&gt;Al día<span class="tk-x">&lt;/x-muni::badge</span>&gt;<span class="tk-t">&lt;/td</span>&gt;<span class="tk-t">&lt;/tr</span>&gt;
+    <span class="tk-t">&lt;tr</span> data-muni-row <span class="tk-a">class</span>=<span class="tk-s">&quot;muni-row--danger&quot;</span>&gt;<span class="tk-t">&lt;td</span>&gt;Ferretería El Clavo<span class="tk-t">&lt;/td</span>&gt;<span class="tk-t">&lt;td</span> <span class="tk-a">class</span>=<span class="tk-s">&quot;muni-num&quot;</span> <span class="tk-a">style</span>=<span class="tk-s">&quot;text-align:right;&quot;</span>&gt;$184.500<span class="tk-t">&lt;/td</span>&gt;<span class="tk-t">&lt;td</span>&gt;<span class="tk-x">&lt;x-muni::badge</span> <span class="tk-a">tone</span>=<span class="tk-s">&quot;danger&quot;</span>&gt;Morosa<span class="tk-x">&lt;/x-muni::badge</span>&gt;<span class="tk-t">&lt;/td</span>&gt;<span class="tk-t">&lt;/tr</span>&gt;
 <span class="tk-x">&lt;/x-muni::data-table</span>&gt;</pre>
                                 </div>
                             </details>
                             <details>
-                                <summary>Props y slots <span style="font-weight:400;color:var(--muni-hint);">2 props</span></summary>
+                                <summary>Props y slots <span style="font-weight:400;color:var(--muni-hint);">7 props</span></summary>
                                                                                                             <div class="cat-props">
                                             <table>
                                                                                                 <thead><tr><th>Prop</th><th>Por defecto</th><th>Descripción</th></tr></thead>
@@ -3010,12 +3063,37 @@ ${r?'Expression: "'+r+`"
                                                                                                             <tr>
                                                             <td>columns</td>
                                                             <td>[]</td>
-                                                            <td>encabezados de columna</td>
+                                                            <td>encabezados: strings, o [&#039;label&#039; =&gt; , &#039;sort&#039; =&gt; clave?, &#039;align&#039; =&gt; ?]</td>
                                                         </tr>
                                                                                                             <tr>
                                                             <td>empty</td>
                                                             <td>&#039;Sin resultados para este filtro.&#039;</td>
                                                             <td>texto cuando el slot no trae filas</td>
+                                                        </tr>
+                                                                                                            <tr>
+                                                            <td>sort</td>
+                                                            <td>null</td>
+                                                            <td>clave por la que está ordenada la tabla ahora</td>
+                                                        </tr>
+                                                                                                            <tr>
+                                                            <td>direction</td>
+                                                            <td>&#039;asc&#039;</td>
+                                                            <td>asc | desc, sentido del orden actual</td>
+                                                        </tr>
+                                                                                                            <tr>
+                                                            <td>sortUrl</td>
+                                                            <td>null</td>
+                                                            <td>closure fn(string $clave, string $dir): string, orden por enlace (query string)</td>
+                                                        </tr>
+                                                                                                            <tr>
+                                                            <td>wireSort</td>
+                                                            <td>null</td>
+                                                            <td>método Livewire que recibe la clave, orden sin recargar</td>
+                                                        </tr>
+                                                                                                            <tr>
+                                                            <td>caption</td>
+                                                            <td>null</td>
+                                                            <td>nombre de la tabla para el lector de pantalla</td>
                                                         </tr>
                                                                                                     </tbody>
                                             </table>
@@ -7145,11 +7223,11 @@ ${r?&#039;Expression: &quot;&#039;+r+`&quot;
     &lt;/div&gt;
     &lt;div style=&quot;position:relative;overflow-x:auto;border:1px solid var(--muni-border);border-radius:var(--muni-radius);background:var(--muni-surface);&quot;&gt;
     &lt;table style=&quot;width:100%;border-collapse:collapse;font-family:var(--muni-font-sans);font-size:12.5px;&quot;&gt;
-                    &lt;thead&gt;
+                            &lt;thead&gt;
                 &lt;tr&gt;
-                                            &lt;th scope=&quot;col&quot; style=&quot;text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);&quot;&gt;Razón social&lt;/th&gt;
-                                            &lt;th scope=&quot;col&quot; style=&quot;text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);&quot;&gt;RUT&lt;/th&gt;
-                                            &lt;th scope=&quot;col&quot; style=&quot;text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);&quot;&gt;Estado&lt;/th&gt;
+                                                                    &lt;th scope=&quot;col&quot;  style=&quot;text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);&quot;&gt;Razón social&lt;/th&gt;
+                                                                    &lt;th scope=&quot;col&quot;  style=&quot;text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);&quot;&gt;RUT&lt;/th&gt;
+                                                                    &lt;th scope=&quot;col&quot;  style=&quot;text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);&quot;&gt;Estado&lt;/th&gt;
                                     &lt;/tr&gt;
             &lt;/thead&gt;
                 &lt;tbody class=&quot;muni-data-body&quot;&gt;
@@ -7179,6 +7257,10 @@ ${r?&#039;Expression: &quot;&#039;+r+`&quot;
         [data-muni-row].muni-row--danger td:first-child { box-shadow: inset 3px 0 0 var(--muni-danger-fg); }
         [data-muni-row].muni-row--danger td:first-child { color: var(--muni-danger-fg); font-weight: 600; }
         .muni-num { font-family: var(--muni-font-mono); font-variant-numeric: tabular-nums; }
+        .muni-dt__sort { display:inline-flex; align-items:center; gap:5px; padding:0; border:0; background:none; font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit; text-decoration:none; cursor:pointer; border-radius:4px; }
+        .muni-dt__sort:hover { color:var(--muni-text); }
+        .muni-dt__sort:focus-visible { outline:none; box-shadow:var(--muni-ring); }
+        .muni-dt__arrow { font-family:var(--muni-font-mono); font-size:11px; opacity:.4; }
     &lt;/style&gt;
     &lt;/main&gt;
 &lt;/body&gt;
@@ -8747,13 +8829,13 @@ ${r?&#039;Expression: &quot;&#039;+r+`&quot;
 
 <div style="position:relative;overflow-x:auto;border:1px solid var(--muni-border);border-radius:var(--muni-radius);background:var(--muni-surface);">
     <table style="width:100%;border-collapse:collapse;font-family:var(--muni-font-sans);font-size:12.5px;">
-                    <thead>
+                            <thead>
                 <tr>
-                                            <th scope="col" style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">Razón social</th>
-                                            <th scope="col" style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">RUT</th>
-                                            <th scope="col" style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">Giro</th>
-                                            <th scope="col" style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">Estado</th>
-                                            <th scope="col" style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);"><span style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;">Acciones</span></th>
+                                                                    <th scope="col"  style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">Razón social</th>
+                                                                    <th scope="col"  style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">RUT</th>
+                                                                    <th scope="col"  style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">Giro</th>
+                                                                    <th scope="col"  style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);">Estado</th>
+                                                                    <th scope="col"  style="text-align:left;white-space:nowrap;padding:9px 12px;font-family:var(--muni-font-sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muni-muted);background:var(--muni-surface-2);border-bottom:1px solid var(--muni-border);"><span style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;">Acciones</span></th>
                                     </tr>
             </thead>
                 <tbody class="muni-data-body">
@@ -8881,6 +8963,10 @@ ${r?&#039;Expression: &quot;&#039;+r+`&quot;
         [data-muni-row].muni-row--danger td:first-child { box-shadow: inset 3px 0 0 var(--muni-danger-fg); }
         [data-muni-row].muni-row--danger td:first-child { color: var(--muni-danger-fg); font-weight: 600; }
         .muni-num { font-family: var(--muni-font-mono); font-variant-numeric: tabular-nums; }
+        .muni-dt__sort { display:inline-flex; align-items:center; gap:5px; padding:0; border:0; background:none; font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit; text-decoration:none; cursor:pointer; border-radius:4px; }
+        .muni-dt__sort:hover { color:var(--muni-text); }
+        .muni-dt__sort:focus-visible { outline:none; box-shadow:var(--muni-ring); }
+        .muni-dt__arrow { font-family:var(--muni-font-mono); font-size:11px; opacity:.4; }
     </style>
 
 <nav aria-label="Paginación" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:16px;font-family:var(--muni-font-sans);font-size:13px;">

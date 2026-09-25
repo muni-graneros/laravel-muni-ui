@@ -92,6 +92,8 @@ php artisan vendor:publish --tag=muni-ui-css   # → resources/css/vendor/muni-u
 
 ### Al ACTUALIZAR el paquete en un sistema
 
+Qué cambia en cada versión y qué revisar en el sistema: [UPGRADE.md](UPGRADE.md).
+
 Subir la versión **no aplica nada por sí solo**: el tema de Filament y el escudo son
 artefactos ya copiados a `public/vendor/muni-ui/`, y ahí se quedan hasta que se los vuelva
 a publicar. Un sistema puede estar en la última versión y seguir sirviendo el CSS viejo,
@@ -153,7 +155,7 @@ cacheado en el proceso.
 | `<x-muni::segmented>` | `name`, `options` (array), `value` — radios reales sin JS; o slot |
 | `<x-muni::filter-bar>` | `action`, `method`; slots `submitLabel`, `actions` |
 | `<x-muni::field>` | `label`; el control (input/select) va en el slot |
-| `<x-muni::data-table>` | `columns` (array), `empty`; el slot son los `<tr data-muni-row>` |
+| `<x-muni::data-table>` | `columns` (strings o `['label','sort','align']`), `empty`, `sort`, `direction`, `sortUrl`/`wireSort` (orden en servidor), `caption` |
 | `<x-muni::pagination>` | `current`, `total`, `url` (closure fn(\$p)), `info` |
 
 ### Interactivos (requieren Alpine 3)
@@ -188,6 +190,11 @@ cacheado en el proceso.
 |-----------|-------------------|
 | `<x-muni::input>` | `label`, `name`, `type`, `error`, `hint`, `icon`, `required` |
 | `<x-muni::select>` | `label`, `name`, `options`, `selected`, `placeholder`, `error` |
+| `<x-muni::textarea>` | `label`, `name`, `rows`, `error`, `hint`, `maxlength` (contador) |
+| `<x-muni::checkbox>` | `label` (o slot), `name`, `value`, `checked`, `description`, `error` |
+| `<x-muni::radio-group>` | `label` (legend), `name`, `options`, `value`, `inline`, `error` |
+| `<x-muni::description-list>` | `items` (etiqueta => valor), `columns` — ficha de datos |
+| `<x-muni::spinner>` | `size`, `label`, `showLabel`, `tone` — con `wire:loading` |
 | `<x-muni::switch>` | `label`, `name`, `checked`, `description` (Alpine) |
 | `<x-muni::sidebar>` | `width`; slot con `<x-muni::nav-section>` + `<x-muni::nav-item>` (colapsa en móvil) |
 | `<x-muni::nav-item>` | `href`, `icon`, `active`, `badge` |

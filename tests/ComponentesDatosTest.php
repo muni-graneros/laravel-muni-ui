@@ -157,7 +157,7 @@ it('la red de reduced-motion solo toca clases muni-, no utilidades del host como
     $css = file_get_contents(__DIR__.'/../resources/css/muni-ui.css');
 
     expect($css)->not->toContain('[class*="muni-"]')
-        ->and($css)->toContain('[class^="muni-"], [class*=" muni-"]');
+        ->and($css)->toContain('[class^="muni-"]:not(.muni-spinner), [class*=" muni-"]:not(.muni-spinner)');
 });
 
 it('sortable-table renderiza encabezados y filas en el servidor para verse sin JS', function () {

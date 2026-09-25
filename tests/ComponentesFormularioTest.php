@@ -52,3 +52,10 @@ it('description-list arma pares dt/dd y muestra un guion en valores vacíos', fu
         ->and($html)->toContain('class="muni-num"')
         ->and($html)->toContain('—');
 });
+
+it('spinner se anuncia como status y deja wire:loading en su raíz', function () {
+    $html = Blade::render('<x-muni::spinner wire:loading wire:target="guardar" label="Guardando" />');
+
+    expect($html)->toMatch('/<span role="status"[^>]*wire:loading/')
+        ->and($html)->toContain('Guardando');
+});

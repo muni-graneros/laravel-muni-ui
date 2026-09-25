@@ -233,7 +233,8 @@
     /* Red de seguridad para duraciones literales dentro de los componentes: solo
        elementos muni-* (y sus pseudo), nunca la página del host. 0.01ms y no 0 para
        que sigan llegando transitionend/animationend a quien los espere. */
-    [class^="muni-"], [class*=" muni-"],
+    /* muni-spinner queda fuera: un indicador de carga quieto parece colgado; gira lento. */
+    [class^="muni-"]:not(.muni-spinner), [class*=" muni-"]:not(.muni-spinner),
     [class^="muni-"]::before, [class*=" muni-"]::before,
     [class^="muni-"]::after, [class*=" muni-"]::after {
         transition-duration: 0.01ms !important;

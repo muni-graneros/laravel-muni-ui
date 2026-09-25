@@ -262,7 +262,8 @@
     /* Red de seguridad para duraciones literales dentro de los componentes: solo
        elementos muni-* (y sus pseudo), nunca la página del host. 0.01ms y no 0 para
        que sigan llegando transitionend/animationend a quien los espere. */
-    [class^="muni-"], [class*=" muni-"],
+    /* muni-spinner queda fuera: un indicador de carga quieto parece colgado; gira lento. */
+    [class^="muni-"]:not(.muni-spinner), [class*=" muni-"]:not(.muni-spinner),
     [class^="muni-"]::before, [class*=" muni-"]::before,
     [class^="muni-"]::after, [class*=" muni-"]::after {
         transition-duration: 0.01ms !important;
@@ -541,6 +542,7 @@ ${r?'Expression: "'+r+`"
                                 <h4>Avisos y estados</h4>
                             <a href="#c-alert" x-show="ve('alert  mensaje destacado en la página: éxito, advertencia, error o información.')">alert</a>
                             <a href="#c-empty-state" x-show="ve('empty-state  qué mostrar cuando no hay resultados, con una acción para salir de ahí.')">empty-state</a>
+                            <a href="#c-spinner" x-show="ve('spinner  indicador de carga para acciones que tardan: guardar, buscar, subir un archivo.')">spinner</a>
                             <a href="#c-skeleton" x-show="ve('skeleton  bloques de carga con brillo animado (se detiene con reducción de movimiento).')">skeleton</a>
                             <a href="#c-tooltip" x-show="ve('tooltip  texto breve al pasar el cursor o enfocar con teclado.')">tooltip</a>
                             <a href="#c-toast-host" x-show="ve('toast-host  avisos flotantes. se coloca una vez por layout y se disparan con el evento `muni-toast`.')">toast-host</a>
@@ -585,7 +587,7 @@ ${r?'Expression: "'+r+`"
             <h1>Componentes de la Municipalidad de Graneros</h1>
             <p>Lo que comparten licencias, discapacidad, feria, seguridad, credenciales, control de acceso y el sitio web. Cada ejemplo está renderizado con el Blade del paquete, y el código que se muestra es el archivo exacto que lo produce.</p>
             <div class="cat-facts">
-                <div><b>58</b>componentes</div>
+                <div><b>59</b>componentes</div>
                 <div><b>6</b>recetas de pantalla</div>
                 <div><b>2</b>temas: claro (discapacidad) y oscuro (feria)</div>
                 <div><b>0</b>dependencias JS además de Alpine</div>
@@ -5375,8 +5377,8 @@ ${r?'Expression: "'+r+`"
                         </div>
                     </section>
                             </div>
-                    <div x-show="ve(&#039;alert  mensaje destacado en la página: éxito, advertencia, error o información. tone title icon&#039;) || ve(&#039;empty-state  qué mostrar cuando no hay resultados, con una acción para salir de ahí. title description icon&#039;) || ve(&#039;skeleton  bloques de carga con brillo animado (se detiene con reducción de movimiento). width height rounded&#039;) || ve(&#039;tooltip  texto breve al pasar el cursor o enfocar con teclado. text placement&#039;) || ve(&#039;toast-host  avisos flotantes. se coloca una vez por layout y se disparan con el evento `muni-toast`. position&#039;)">
-                <div class="cat-group"><h2>Avisos y estados</h2><span>5</span></div>
+                    <div x-show="ve(&#039;alert  mensaje destacado en la página: éxito, advertencia, error o información. tone title icon&#039;) || ve(&#039;empty-state  qué mostrar cuando no hay resultados, con una acción para salir de ahí. title description icon&#039;) || ve(&#039;spinner  indicador de carga para acciones que tardan: guardar, buscar, subir un archivo. size label showlabel tone&#039;) || ve(&#039;skeleton  bloques de carga con brillo animado (se detiene con reducción de movimiento). width height rounded&#039;) || ve(&#039;tooltip  texto breve al pasar el cursor o enfocar con teclado. text placement&#039;) || ve(&#039;toast-host  avisos flotantes. se coloca una vez por layout y se disparan con el evento `muni-toast`. position&#039;)">
+                <div class="cat-group"><h2>Avisos y estados</h2><span>6</span></div>
                                                         <section class="cat-item" id="c-alert" x-show="ve('alert  mensaje destacado en la página: éxito, advertencia, error o información. tone title icon')">
                         <div class="cat-item__head">
                             <h3><a href="#c-alert">alert</a></h3>
@@ -5556,6 +5558,142 @@ ${r?'Expression: "'+r+`"
                                                                                                                 <div class="cat-slots"><span>Slots de <code>x-muni::empty-state</code>:</span>
                                             <code>x-slot:actions</code>                                        </div>
                                                                                                                                 </details>
+                        </div>
+                    </section>
+                                                        <section class="cat-item" id="c-spinner" x-show="ve('spinner  indicador de carga para acciones que tardan: guardar, buscar, subir un archivo. size label showlabel tone')">
+                        <div class="cat-item__head">
+                            <h3><a href="#c-spinner">spinner</a></h3>
+                                                        <span class="cat-tag" title="Blade puro: funciona sin JavaScript">Sin JS</span>                        </div>
+                        <p class="cat-desc">Indicador de carga para acciones que tardan: guardar, buscar, subir un archivo.</p>
+                                                    <ul class="cat-notes">
+                                <li>Con Livewire, <code>wire:loading</code> y <code>wire:target</code> van directo en el componente y lo muestran solo mientras corre la acción.</li><li>Se anuncia como <code>role=status</code> con su <code>label</code>; con movimiento reducido gira más lento en vez de detenerse.</li><li>Para reservar el espacio de contenido que aún no llega, skeleton.</li>                            </ul>
+                        
+                                                    <div class="cat-demo cat-demo--fila" data-shot="spinner"><span role="status" class="muni-spinner-wrap" style="display:inline-flex;align-items:center;gap:8px;vertical-align:middle;font-family:var(--muni-font-sans);font-size:13px;color:var(--muni-muted);">
+    <svg class="muni-spinner" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" style="color:var(--muni-accent);">
+        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="3" opacity=".2"/>
+        <path d="M21 12a9 9 0 00-9-9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+            <span style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;">Cargando…</span>
+    </span>
+
+    <style>
+        .muni-spinner-wrap { position:relative; }
+        .muni-spinner { flex-shrink:0; animation:muni-spin .75s linear infinite; }
+        @keyframes muni-spin { to { transform:rotate(360deg); } }
+        @media (prefers-reduced-motion:reduce) { .muni-spinner { animation:muni-spin 1.6s linear infinite !important; } }
+    </style>
+<span role="status" class="muni-spinner-wrap" style="display:inline-flex;align-items:center;gap:8px;vertical-align:middle;font-family:var(--muni-font-sans);font-size:13px;color:var(--muni-muted);">
+    <svg class="muni-spinner" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="color:var(--muni-accent);">
+        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="3" opacity=".2"/>
+        <path d="M21 12a9 9 0 00-9-9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+            <span style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;">Cargando…</span>
+    </span>
+
+<span role="status" class="muni-spinner-wrap" style="display:inline-flex;align-items:center;gap:8px;vertical-align:middle;font-family:var(--muni-font-sans);font-size:13px;color:var(--muni-muted);">
+    <svg class="muni-spinner" viewBox="0 0 24 24" width="32" height="32" aria-hidden="true" style="color:var(--muni-text);">
+        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="3" opacity=".2"/>
+        <path d="M21 12a9 9 0 00-9-9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+            <span style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;">Cargando…</span>
+    </span>
+
+<span role="status" class="muni-spinner-wrap" style="display:inline-flex;align-items:center;gap:8px;vertical-align:middle;font-family:var(--muni-font-sans);font-size:13px;color:var(--muni-muted);">
+    <svg class="muni-spinner" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="color:var(--muni-accent);">
+        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="3" opacity=".2"/>
+        <path d="M21 12a9 9 0 00-9-9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+            <span>Buscando en el padrón…</span>
+    </span>
+
+
+
+<button
+     type="button"     class="muni-btn muni-btn--primary" style="display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:var(--muni-font-sans);font-weight:600;line-height:1;cursor:pointer;border-radius:var(--muni-radius-sm);border:1px solid transparent;text-decoration:none;transition:background var(--muni-dur) var(--muni-ease),border-color var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease);padding:9px 16px;font-size:13.5px;" wire:click="guardar" wire:loading.attr="disabled"
+>
+        <span role="status" class="muni-spinner-wrap" style="display:inline-flex;align-items:center;gap:8px;vertical-align:middle;font-family:var(--muni-font-sans);font-size:13px;color:var(--muni-muted);" wire:loading="" wire:target="guardar">
+    <svg class="muni-spinner" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" style="color:var(--muni-text);">
+        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="3" opacity=".2"/>
+        <path d="M21 12a9 9 0 00-9-9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+            <span style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;">Guardando</span>
+    </span>
+
+    Guardar
+</button>
+
+    <style>
+        .muni-btn:focus-visible { outline: none; box-shadow: var(--muni-ring); }
+        .muni-btn:not(:disabled,[aria-disabled=true]):active { transform: translateY(1px); }
+        /* Deshabilitado (también wire:loading.attr="disabled") y en curso: Livewire marca con
+           data-loading el elemento que disparó la petición. */
+        .muni-btn:disabled, .muni-btn[aria-disabled=true] { opacity: .55; cursor: not-allowed; }
+        .muni-btn[data-loading] { cursor: progress; opacity: .7; }
+        .muni-btn__icon { display: inline-flex; }
+        .muni-btn__icon svg { width: 15px; height: 15px; }
+
+        .muni-btn--primary { background: var(--muni-accent); color: var(--muni-on-accent); }
+        .muni-btn--primary:not(:disabled,[aria-disabled=true]):hover { background: var(--muni-accent-strong); box-shadow: var(--muni-shadow); }
+
+        .muni-btn--ghost { background: transparent; color: var(--muni-text); border-color: var(--muni-border); }
+        .muni-btn--ghost:not(:disabled,[aria-disabled=true]):hover { background: var(--muni-surface-2); border-color: var(--muni-border-2); }
+
+        .muni-btn--subtle { background: var(--muni-surface-2); color: var(--muni-text); }
+        .muni-btn--subtle:not(:disabled,[aria-disabled=true]):hover { background: var(--muni-surface-3); }
+
+        .muni-btn--danger { background: var(--muni-danger-bg); color: var(--muni-danger-fg); border-color: var(--muni-danger-border); }
+        /* Texto con --muni-surface: >= 4.5:1 sobre --muni-danger-fg en claro, oscuro y panel. */
+        .muni-btn--danger:not(:disabled,[aria-disabled=true]):hover { background: var(--muni-danger-fg); color: var(--muni-surface); }
+    </style>
+</div>
+                        
+                        <div class="cat-more">
+                            <details>
+                                <summary>Código</summary>
+                                <div class="cat-code">
+                                    <button type="button" class="cat-copy" @click="copiar($refs.src_spinner, $el)">Copiar</button>
+                                    <pre tabindex="0" x-ref="src_spinner"><span class="tk-x">&lt;x-muni::spinner</span> <span class="tk-a">size</span>=<span class="tk-s">&quot;sm&quot;</span> /&gt;
+<span class="tk-x">&lt;x-muni::spinner</span> /&gt;
+<span class="tk-x">&lt;x-muni::spinner</span> <span class="tk-a">size</span>=<span class="tk-s">&quot;lg&quot;</span> <span class="tk-a">tone</span>=<span class="tk-s">&quot;neutral&quot;</span> /&gt;
+<span class="tk-x">&lt;x-muni::spinner</span> showLabel <span class="tk-a">label</span>=<span class="tk-s">&quot;Buscando en el padrón…&quot;</span> /&gt;
+
+<span class="tk-c">{{-- Con Livewire: aparece solo mientras corre guardar() --}}</span>
+<span class="tk-x">&lt;x-muni::button</span> <span class="tk-a">wire:click</span>=<span class="tk-s">&quot;guardar&quot;</span> <span class="tk-a">wire:loading.attr</span>=<span class="tk-s">&quot;disabled&quot;</span>&gt;
+    <span class="tk-x">&lt;x-muni::spinner</span> <span class="tk-a">size</span>=<span class="tk-s">&quot;sm&quot;</span> <span class="tk-a">tone</span>=<span class="tk-s">&quot;neutral&quot;</span> wire:loading <span class="tk-a">wire:target</span>=<span class="tk-s">&quot;guardar&quot;</span> <span class="tk-a">label</span>=<span class="tk-s">&quot;Guardando&quot;</span> /&gt;
+    Guardar
+<span class="tk-x">&lt;/x-muni::button</span>&gt;</pre>
+                                </div>
+                            </details>
+                            <details>
+                                <summary>Props y slots <span style="font-weight:400;color:var(--muni-hint);">4 props</span></summary>
+                                                                                                            <div class="cat-props">
+                                            <table>
+                                                                                                <thead><tr><th>Prop</th><th>Por defecto</th><th>Descripción</th></tr></thead>
+                                                <tbody>
+                                                                                                            <tr>
+                                                            <td>size</td>
+                                                            <td>&#039;md&#039;</td>
+                                                            <td>sm | md | lg</td>
+                                                        </tr>
+                                                                                                            <tr>
+                                                            <td>label</td>
+                                                            <td>&#039;Cargando…&#039;</td>
+                                                            <td>texto para el lector de pantalla (y visible con showLabel)</td>
+                                                        </tr>
+                                                                                                            <tr>
+                                                            <td>showLabel</td>
+                                                            <td>false</td>
+                                                            <td>muestra el texto junto al indicador</td>
+                                                        </tr>
+                                                                                                            <tr>
+                                                            <td>tone</td>
+                                                            <td>&#039;accent&#039;</td>
+                                                            <td>accent | neutral | ok | warn | danger | info</td>
+                                                        </tr>
+                                                                                                    </tbody>
+                                            </table>
+                                        </div>
+                                                                                                                                                                    </details>
                         </div>
                     </section>
                                                         <section class="cat-item" id="c-skeleton" x-show="ve('skeleton  bloques de carga con brillo animado (se detiene con reducción de movimiento). width height rounded')">
@@ -6903,7 +7041,8 @@ ${r?'Expression: "'+r+`"
     /* Red de seguridad para duraciones literales dentro de los componentes: solo
        elementos muni-* (y sus pseudo), nunca la página del host. 0.01ms y no 0 para
        que sigan llegando transitionend/animationend a quien los espere. */
-    [class^=&quot;muni-&quot;], [class*=&quot; muni-&quot;],
+    /* muni-spinner queda fuera: un indicador de carga quieto parece colgado; gira lento. */
+    [class^=&quot;muni-&quot;]:not(.muni-spinner), [class*=&quot; muni-&quot;]:not(.muni-spinner),
     [class^=&quot;muni-&quot;]::before, [class*=&quot; muni-&quot;]::before,
     [class^=&quot;muni-&quot;]::after, [class*=&quot; muni-&quot;]::after {
         transition-duration: 0.01ms !important;
@@ -7363,7 +7502,8 @@ ${r?&#039;Expression: &quot;&#039;+r+`&quot;
     /* Red de seguridad para duraciones literales dentro de los componentes: solo
        elementos muni-* (y sus pseudo), nunca la página del host. 0.01ms y no 0 para
        que sigan llegando transitionend/animationend a quien los espere. */
-    [class^=&quot;muni-&quot;], [class*=&quot; muni-&quot;],
+    /* muni-spinner queda fuera: un indicador de carga quieto parece colgado; gira lento. */
+    [class^=&quot;muni-&quot;]:not(.muni-spinner), [class*=&quot; muni-&quot;]:not(.muni-spinner),
     [class^=&quot;muni-&quot;]::before, [class*=&quot; muni-&quot;]::before,
     [class^=&quot;muni-&quot;]::after, [class*=&quot; muni-&quot;]::after {
         transition-duration: 0.01ms !important;
@@ -7860,7 +8000,8 @@ ${r?&#039;Expression: &quot;&#039;+r+`&quot;
     /* Red de seguridad para duraciones literales dentro de los componentes: solo
        elementos muni-* (y sus pseudo), nunca la página del host. 0.01ms y no 0 para
        que sigan llegando transitionend/animationend a quien los espere. */
-    [class^=&quot;muni-&quot;], [class*=&quot; muni-&quot;],
+    /* muni-spinner queda fuera: un indicador de carga quieto parece colgado; gira lento. */
+    [class^=&quot;muni-&quot;]:not(.muni-spinner), [class*=&quot; muni-&quot;]:not(.muni-spinner),
     [class^=&quot;muni-&quot;]::before, [class*=&quot; muni-&quot;]::before,
     [class^=&quot;muni-&quot;]::after, [class*=&quot; muni-&quot;]::after {
         transition-duration: 0.01ms !important;
@@ -8304,7 +8445,8 @@ ${r?&#039;Expression: &quot;&#039;+r+`&quot;
     /* Red de seguridad para duraciones literales dentro de los componentes: solo
        elementos muni-* (y sus pseudo), nunca la página del host. 0.01ms y no 0 para
        que sigan llegando transitionend/animationend a quien los espere. */
-    [class^=&quot;muni-&quot;], [class*=&quot; muni-&quot;],
+    /* muni-spinner queda fuera: un indicador de carga quieto parece colgado; gira lento. */
+    [class^=&quot;muni-&quot;]:not(.muni-spinner), [class*=&quot; muni-&quot;]:not(.muni-spinner),
     [class^=&quot;muni-&quot;]::before, [class*=&quot; muni-&quot;]::before,
     [class^=&quot;muni-&quot;]::after, [class*=&quot; muni-&quot;]::after {
         transition-duration: 0.01ms !important;

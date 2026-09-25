@@ -62,6 +62,7 @@ return [
     'Avisos y estados' => [
         'alert' => ['desc' => 'Mensaje destacado en la página: éxito, advertencia, error o información.', 'vista' => 'columna', 'notas' => ['Para mensajes que deben quedarse en la página. Para confirmar una acción que ya ocurrió, usa un toast.']],
         'empty-state' => ['desc' => 'Qué mostrar cuando no hay resultados, con una acción para salir de ahí.', 'vista' => 'columna'],
+        'spinner' => ['desc' => 'Indicador de carga para acciones que tardan: guardar, buscar, subir un archivo.', 'notas' => ['Con Livewire, `wire:loading` y `wire:target` van directo en el componente y lo muestran solo mientras corre la acción.', 'Se anuncia como `role=status` con su `label`; con movimiento reducido gira más lento en vez de detenerse.', 'Para reservar el espacio de contenido que aún no llega, skeleton.']],
         'skeleton' => ['desc' => 'Bloques de carga con brillo animado (se detiene con reducción de movimiento).', 'vista' => 'columna'],
         'tooltip' => ['desc' => 'Texto breve al pasar el cursor o enfocar con teclado.', 'vista' => 'aire'],
         'toast-host' => ['desc' => 'Avisos flotantes. Se coloca una vez por layout y se disparan con el evento `muni-toast`.', 'eventos' => ["muni-toast (escucha): { tone, title?, message }"], 'notas' => ['Desde Livewire: `$this->dispatch(\'muni-toast\', tone: \'ok\', message: \'Guardado\');`.', '`duration` en ms (por defecto 4500).']],

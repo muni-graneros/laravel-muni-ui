@@ -8,10 +8,6 @@
 
 @php
     // $segments: array de ['label'=>, 'value'=>, 'tone'=>? o 'color'=>?]
-    $toneColor = [
-        'accent' => 'var(--muni-accent)', 'ok' => 'var(--muni-ok-fg)', 'warn' => 'var(--muni-warn-fg)',
-        'danger' => 'var(--muni-danger-fg)', 'info' => 'var(--muni-info-fg)', 'muted' => 'var(--muni-border-2)',
-    ];
     // Valores ausentes cuentan 0 y los negativos se recortan a 0 (un arco no puede medir menos).
     $sum = 0;
     foreach ($segments as $s) { $sum += max(0, (float) ($s['value'] ?? 0)); }
@@ -27,7 +23,7 @@
         $frac = max(0, (float) ($s['value'] ?? 0)) / $sum;
         // Con un `total` menor que la suma, los arcos se detienen al completar la vuelta.
         $len = min($circ * $frac, $circ - $offset);
-        $color = $s['color'] ?? ($toneColor[$s['tone'] ?? 'accent'] ?? 'var(--muni-accent)');
+        $color = $s['color'] ?? \Muni\Ui\Tono::color($s['tone'] ?? 'accent');
         $arcs[] = ['len' => $len, 'gap' => $circ - $len, 'off' => -$offset, 'color' => $color, 'label' => $s['label'] ?? '', 'value' => $s['value'] ?? 0];
         $offset += $len;
     }

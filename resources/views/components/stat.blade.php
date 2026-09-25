@@ -9,10 +9,7 @@
 ])
 
 @php
-    $accent = [
-        'neutral' => 'var(--muni-text)', 'ok' => 'var(--muni-ok-fg)',
-        'warn' => 'var(--muni-warn-fg)', 'danger' => 'var(--muni-danger-fg)', 'info' => 'var(--muni-info-fg)',
-    ][$tone] ?? 'var(--muni-text)';
+    $accent = \Muni\Ui\Tono::color($tone, 'neutral');
 
     // Sparkline: array de números → path SVG normalizado en un viewbox 100x28.
     $sparkPath = null;

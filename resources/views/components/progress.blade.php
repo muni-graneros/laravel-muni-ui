@@ -9,10 +9,7 @@
 @php
     $value = (float) $value; $max = (float) $max;
     $pct = $max > 0 ? (int) max(0, min(100, round($value / $max * 100))) : 0;
-    $color = [
-        'accent' => 'var(--muni-accent)', 'ok' => 'var(--muni-ok-fg)',
-        'warn' => 'var(--muni-warn-fg)', 'danger' => 'var(--muni-danger-fg)', 'info' => 'var(--muni-info-fg)',
-    ][$tone] ?? 'var(--muni-accent)';
+    $color = \Muni\Ui\Tono::color($tone);
 @endphp
 
 <div {{ $attributes }}>

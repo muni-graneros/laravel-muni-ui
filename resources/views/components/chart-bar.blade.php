@@ -19,10 +19,6 @@
     $max = 0;
     foreach ($norm as $d) { $max = max($max, $d['alto']); }
     $max = $max ?: 1;
-    $toneColor = [
-        'accent' => 'var(--muni-accent)', 'ok' => 'var(--muni-ok-fg)', 'warn' => 'var(--muni-warn-fg)',
-        'danger' => 'var(--muni-danger-fg)', 'info' => 'var(--muni-info-fg)',
-    ];
 @endphp
 
 <div {{ $attributes->merge(['class' => 'muni-chartbar', 'style' => 'display:flex;flex-direction:column;']) }}>
@@ -30,7 +26,7 @@
         @foreach ($norm as $d)
             @php
                 $h = round($d['alto'] / $max * 100, 1);
-                $c = $toneColor[$d['tone'] ?? $tone] ?? 'var(--muni-accent)';
+                $c = \Muni\Ui\Tono::color($d['tone'] ?? $tone);
             @endphp
             <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;min-width:0;" title="{{ $d['label'] }}: {{ $d['value'] }}">
                 <span class="muni-chartbar__val">{{ $d['value'] }}</span>

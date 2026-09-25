@@ -13,10 +13,7 @@
     $r = 42;
     $circ = 2 * M_PI * $r;
     $offset = $circ * (1 - $pct / 100);
-    $color = [
-        'accent' => 'var(--muni-accent)', 'ok' => 'var(--muni-ok-fg)', 'warn' => 'var(--muni-warn-fg)',
-        'danger' => 'var(--muni-danger-fg)', 'info' => 'var(--muni-info-fg)',
-    ][$tone] ?? 'var(--muni-accent)';
+    $color = \Muni\Ui\Tono::color($tone);
 @endphp
 
 <div {{ $attributes->merge(['style' => "display:inline-flex;flex-direction:column;align-items:center;gap:8px;"]) }}>

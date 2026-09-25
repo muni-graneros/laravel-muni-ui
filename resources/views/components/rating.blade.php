@@ -7,7 +7,7 @@
 ])
 
 @php
-    $color = ['accent' => 'var(--muni-accent)', 'warn' => 'var(--muni-warn-fg)', 'ok' => 'var(--muni-ok-fg)'][$tone] ?? 'var(--muni-accent)';
+    $color = \Muni\Ui\Tono::color($tone);
     $max = max(1, (int) $max);
     $value = max(0, min($max, (float) $value));
     $sel = (int) round($value);

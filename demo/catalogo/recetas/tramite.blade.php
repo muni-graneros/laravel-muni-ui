@@ -13,6 +13,12 @@
                 :options="['cedula' => 'Cédula de identidad', 'compin' => 'Resolución COMPIN', 'residencia' => 'Certificado de residencia']" />
             <x-muni::file-dropzone name="documento" />
             <x-muni::progress :value="2" :max="3" label="Documentos cargados (2 de 3)" />
+            <x-muni::radio-group label="¿Cómo quieres recibir la credencial?" name="entrega" value="retiro" :options="[
+                'retiro' => ['label' => 'Retiro en el mesón', 'description' => 'De lunes a viernes, 8:30 a 14:00.'],
+                'correo' => ['label' => 'Por correo', 'description' => 'Llega en 5 a 7 días hábiles.'],
+            ]" />
+            <x-muni::textarea label="Observaciones (opcional)" name="observaciones" rows="2" maxlength="280" />
+            <x-muni::checkbox name="declara" label="Declaro que la información entregada es verdadera" />
             <div style="display:flex;justify-content:space-between;gap:8px;">
                 <x-muni::button variant="ghost">Volver</x-muni::button>
                 <x-muni::button type="submit">Continuar</x-muni::button>

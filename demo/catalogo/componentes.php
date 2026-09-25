@@ -38,6 +38,7 @@ return [
         'progress' => ['desc' => 'Avance lineal con etiqueta y porcentaje.', 'vista' => 'columna'],
         'data-table' => ['desc' => 'Tabla densa renderizada en servidor. Las filas van en el slot; `muni-row--danger` pinta la franja de libro mayor y `muni-num` alinea cifras.', 'vista' => 'columna', 'notas' => ['Las filas se renderizan en servidor y funcionan sin JS; para cientos de filas, pagina en servidor con pagination.', '`muni-num` alinea RUT y montos con dígitos tabulares.']],
         'sortable-table' => ['desc' => 'Tabla con orden por columna y búsqueda en el navegador. Para listados cortos que ya están en memoria.', 'vista' => 'columna', 'notas' => ['Ordena y filtra en el navegador: úsala para listas cortas ya cargadas. Necesita Alpine para mostrar las filas.', 'Entiende montos (`$1.234.567`), RUT y fechas `dd-mm-aaaa`.']],
+        'description-list' => ['desc' => 'Ficha de datos etiqueta: valor, como una lista de definición real. Para el detalle de una persona, patente o solicitud.', 'vista' => 'columna', 'notas' => ['`mono` alinea RUT, folios y montos; un valor vacío muestra «—».', 'En móvil siempre es una columna.']],
         'timeline' => ['desc' => 'Bitácora vertical de eventos con tono por hito.', 'vista' => 'columna'],
         'badge' => ['desc' => 'Estado corto dentro de tablas y fichas.'],
         'avatar' => ['desc' => 'Iniciales o foto de una persona.'],
@@ -53,6 +54,9 @@ return [
         'switch' => ['desc' => 'Interruptor on/off con descripción.', 'vista' => 'columna', 'notas' => ['Es un checkbox real: `wire:model` va directo al input y el aspecto sigue a `:checked`, también sin JS.']],
         'calendar' => ['desc' => 'Calendario de mes que guarda la fecha en un input oculto (YYYY-MM-DD).', 'notas' => ['`wire:model="fecha"` enlaza el valor `YYYY-MM-DD` en ambos sentidos.', '`min` y `value` aceptan string `YYYY-MM-DD` o un Carbon.']],
         'otp-input' => ['desc' => 'Código de verificación dígito a dígito. Acepta pegar el código completo.', 'notas' => ['`wire:model="codigo"` enlaza el código completo. Pegar el código llena todas las casillas.']],
+        'textarea' => ['desc' => 'Texto largo con etiqueta, ayuda, error y contador opcional de caracteres.', 'vista' => 'columna', 'notas' => ['`wire:model` va directo al `<textarea>`; el contenido inicial va en el slot.', 'Con `maxlength` muestra «n / máx» mientras se escribe (con Alpine); sin JS, el navegador igual corta en el máximo.']],
+        'checkbox' => ['desc' => 'Casilla para aceptar o marcar algo. Para una preferencia on/off, switch.', 'vista' => 'columna', 'notas' => ['`wire:model` va directo al input; la marca se pinta con `:checked`, también sin JS.', 'Varias casillas con el mismo `name` terminado en `[]` envían un arreglo.']],
+        'radio-group' => ['desc' => 'Pregunta con una sola respuesta, en un fieldset con legend. Admite una descripción por opción.', 'vista' => 'columna', 'notas' => ['`wire:model` / `x-model` se reenvían a cada radio.', 'Para 2–4 opciones cortas que filtran una vista, segmented.']],
         'file-dropzone' => ['desc' => 'Zona para arrastrar o elegir archivos.', 'vista' => 'columna', 'notas' => ['`wire:model` va al input de archivo: Livewire sube tanto lo elegido como lo arrastrado.']],
     ],
     'Avisos y estados' => [

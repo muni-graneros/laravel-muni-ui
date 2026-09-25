@@ -21,7 +21,12 @@
             ]" />
         </x-muni::tab-panel>
         <x-muni::tab-panel :index="1">
-            <p>Giro: ferretería. Dirección: Av. Libertador 1450, Graneros.</p>
+            <x-muni::description-list style="margin-top:12px;" :items="[
+                'Giro' => 'Ferretería',
+                'Dirección' => 'Av. Libertador 1450, Graneros',
+                'Patente desde' => ['value' => '14-03-2019', 'mono' => true],
+                'Cuotas impagas' => ['value' => '1', 'mono' => true],
+            ]" />
         </x-muni::tab-panel>
     </x-muni::tabs>
 

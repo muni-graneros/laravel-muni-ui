@@ -13,7 +13,7 @@ return [
     'ficha' => [
         'titulo' => 'Ficha sin salir del listado',
         'para' => 'Abrir el detalle de una fila al costado y confirmar acciones que no se pueden deshacer.',
-        'usa' => ['drawer', 'avatar', 'badge', 'tabs', 'timeline', 'modal', 'toast-host'],
+        'usa' => ['drawer', 'avatar', 'badge', 'tabs', 'timeline', 'description-list', 'modal', 'toast-host'],
     ],
     'tablero' => [
         'titulo' => 'Tablero de resumen',
@@ -23,7 +23,7 @@ return [
     'tramite' => [
         'titulo' => 'Trámite en pasos',
         'para' => 'Solicitudes ciudadanas: credencial de discapacidad, ARCOP, licencias.',
-        'usa' => ['stepper', 'card', 'alert', 'input', 'select', 'calendar', 'file-dropzone', 'progress', 'accordion', 'button'],
+        'usa' => ['stepper', 'card', 'alert', 'select', 'file-dropzone', 'progress', 'radio-group', 'textarea', 'checkbox', 'calendar', 'accordion', 'button'],
     ],
     'acceso' => [
         'titulo' => 'Verificación en dos pasos',

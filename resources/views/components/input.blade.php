@@ -12,6 +12,11 @@
     // Un `id` explícito gana: dos campos con el mismo name en la página no chocan.
     $id = $attributes->get('id') ?: ($name ? 'muni-'.$name : 'muni-'.uniqid());
     $attributes = $attributes->except('id');
+    // La ayuda o el error se anuncian al entrar al campo (aria-describedby), sumados a
+    // los que ya traiga el host.
+    $ayuda = ($error || $hint) ? $id.'-ayuda' : null;
+    $describe = trim($attributes->get('aria-describedby', '').' '.$ayuda) ?: null;
+    $attributes = $attributes->except('aria-describedby');
 @endphp
 
 <div style="display:flex;flex-direction:column;gap:6px;">
@@ -31,6 +36,7 @@
             @if ($name) name="{{ $name }}" @endif
             @if ($required) required @endif
             @if ($error) aria-invalid="true" @endif
+            @if ($describe) aria-describedby="{{ $describe }}" @endif
             {{ $attributes->merge([
                 'class' => 'muni-input',
                 'style' => 'width:100%;padding:10px 12px;'.($icon ? 'padding-left:36px;' : '')
@@ -42,9 +48,9 @@
     </div>
 
     @if ($error)
-        <span style="font-size:11.5px;color:var(--muni-danger-fg);">{{ $error }}</span>
+        <span id="{{ $ayuda }}" style="font-size:11.5px;color:var(--muni-danger-fg);">{{ $error }}</span>
     @elseif ($hint)
-        <span style="font-size:11.5px;color:var(--muni-hint);">{{ $hint }}</span>
+        <span id="{{ $ayuda }}" style="font-size:11.5px;color:var(--muni-hint);">{{ $hint }}</span>
     @endif
 </div>
 

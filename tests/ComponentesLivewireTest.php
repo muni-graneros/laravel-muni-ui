@@ -46,3 +46,12 @@ it('segmented con autosubmit="siempre" también envía forms POST', function () 
     expect(Blade::render('<x-muni::segmented name="e" autosubmit="siempre" :options="[\'a\' => \'A\']" />'))->not->toContain("method===")
         ->and(Blade::render('<x-muni::segmented name="e" :options="[\'a\' => \'A\']" />'))->toContain("method===");
 });
+
+it('textarea, checkbox y radio-group llevan wire:model al control real', function () {
+    expect(Blade::render('<x-muni::textarea name="obs" wire:model.blur="obs" />'))->toMatch('/<textarea[^>]*wire:model\.blur="obs"/')
+        ->and(Blade::render('<x-muni::checkbox name="acepta" wire:model="acepta" label="Acepto" />'))->toMatch('/<input type="checkbox"[^>]*wire:model="acepta"/');
+
+    $radios = Blade::render('<x-muni::radio-group name="tipo" wire:model="tipo" :options="[\'a\' => \'A\', \'b\' => \'B\']" />');
+    expect(substr_count($radios, 'wire:model="tipo"'))->toBe(2)
+        ->and($radios)->not->toMatch('/<fieldset[^>]*wire:model/');
+});

@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "construir": "php build.php node_modules/alpinejs/dist/cdn.min.js",
-    "verificar": "node verificar.mjs && node interacciones.mjs"
+    "verificar": "node verificar.mjs && node interacciones.mjs",
+    "livewire": "node livewire.mjs"
   },
   "devDependencies": {
     "alpinejs": "3.17.4",

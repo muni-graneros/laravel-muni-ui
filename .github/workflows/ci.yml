@@ -85,3 +85,11 @@ jobs:
       # de tablas, avisos: lo que Pest no ve porque ocurre en el navegador.
       - name: Interacciones de los componentes
         run: node demo/catalogo/interacciones.mjs
+
+      # wire:model de punta a punta con Livewire real (workbench/): cada control lleva
+      # su valor al servidor y refleja lo que el servidor devuelve.
+      - name: Livewire de punta a punta
+        run: |
+          vendor/bin/testbench serve --port=8765 > /tmp/serve.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf -o /dev/null http://127.0.0.1:8765/formulario && break; sleep 1; done
+          node demo/catalogo/livewire.mjs || { cat /tmp/serve.log; exit 1; }

@@ -4,3 +4,7 @@
 <x-muni::button variant="danger" icon='<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h12M8 6V4h4v2M6 6l1 11h6l1-11" stroke-linejoin="round"/></svg>'>Dar de baja</x-muni::button>
 <x-muni::button size="sm">Pequeño</x-muni::button>
 <x-muni::button size="lg" href="/tramites">Enlace grande</x-muni::button>
+
+{{-- Deshabilitado. Con Livewire: wire:loading.attr="disabled" mientras corre la acción --}}
+<x-muni::button disabled>Guardando…</x-muni::button>
+<x-muni::button variant="ghost" href="/tramites" disabled>Enlace no disponible</x-muni::button>

@@ -10,10 +10,11 @@
     // El panel abierto al cargar se pinta visible desde el servidor (sin x-cloak).
     $abierto = null;
     if ($default !== null) {
-        $claves = array_keys($items);
-        $abierto = is_int($default) || ctype_digit((string) $default)
-            ? (int) $default
-            : array_search($default, $claves, true);
+        // Con `items`, `default` es una CLAVE (como siempre): tras un ->filter() las claves
+        // no son correlativas y 3 no es la cuarta posición. Con el slot, es la posición.
+        $abierto = ! empty($items)
+            ? array_search((string) $default, array_map('strval', array_keys($items)), true)
+            : (ctype_digit((string) $default) ? (int) $default : false);
         if ($abierto === false) { $abierto = null; }
     }
 @endphp

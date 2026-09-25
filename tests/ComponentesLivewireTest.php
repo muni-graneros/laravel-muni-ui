@@ -41,3 +41,8 @@ it('calendar parte con la fecha de value y descarta formatos inválidos', functi
     expect(Blade::render('<x-muni::calendar name="f" value="2026-10-05" />'))->toContain('value="2026-10-05"')
         ->and(Blade::render('<x-muni::calendar name="f" value="05/10/2026" />'))->toContain('value=""');
 });
+
+it('segmented con autosubmit="siempre" también envía forms POST', function () {
+    expect(Blade::render('<x-muni::segmented name="e" autosubmit="siempre" :options="[\'a\' => \'A\']" />'))->not->toContain("method===")
+        ->and(Blade::render('<x-muni::segmented name="e" :options="[\'a\' => \'A\']" />'))->toContain("method===");
+});

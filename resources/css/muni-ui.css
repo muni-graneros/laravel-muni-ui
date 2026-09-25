@@ -221,9 +221,9 @@
     /* Red de seguridad para duraciones literales dentro de los componentes: solo
        elementos muni-* (y sus pseudo), nunca la página del host. 0.01ms y no 0 para
        que sigan llegando transitionend/animationend a quien los espere. */
-    [class*="muni-"],
-    [class*="muni-"]::before,
-    [class*="muni-"]::after {
+    [class^="muni-"], [class*=" muni-"],
+    [class^="muni-"]::before, [class*=" muni-"]::before,
+    [class^="muni-"]::after, [class*=" muni-"]::after {
         transition-duration: 0.01ms !important;
         transition-delay: 0s !important;
         animation-duration: 0.01ms !important;

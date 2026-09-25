@@ -68,6 +68,9 @@
         .cat-tag--js{ color:var(--muni-info-fg); border-color:color-mix(in srgb,var(--muni-info-fg) 35%,transparent); }
         .cat-desc{ margin:0; color:var(--muni-muted); max-width:78ch; }
         .cat-desc code, .cat-note code, .cat-props code{ font-size:12px; background:var(--muni-surface-2); padding:1px 5px; border-radius:4px; }
+        .cat-notes{ margin:0; padding:0 0 0 18px; display:grid; gap:3px; font-size:13px; color:var(--muni-muted); max-width:82ch; }
+        .cat-notes li::marker{ color:var(--muni-accent); }
+        .cat-notes code{ font-size:12px; background:var(--muni-surface-2); padding:1px 5px; border-radius:4px; }
         .cat-demo{ padding:24px; background:var(--muni-surface); border:1px solid var(--muni-border); border-radius:var(--muni-radius-lg); display:flex; flex-wrap:wrap; gap:14px; align-items:center; }
         .cat-demo > *{ min-width:0; max-width:100%; }
         .cat-demo--columna{ flex-direction:column; align-items:stretch; }
@@ -277,6 +280,11 @@
                             @if ($tieneJs)<span class="cat-tag cat-tag--js" title="Necesita Alpine 3 (viene con Livewire)">Alpine</span>@else<span class="cat-tag" title="Blade puro: funciona sin JavaScript">Sin JS</span>@endif
                         </div>
                         <p class="cat-desc">{!! preg_replace('/`([^`]+)`/', '<code>$1</code>', e($c['desc'])) !!}</p>
+                        @if (! empty($c['notas']))
+                            <ul class="cat-notes">
+                                @foreach ($c['notas'] as $nota)<li>{!! preg_replace('/`([^`]+)`/', '<code>$1</code>', e($nota)) !!}</li>@endforeach
+                            </ul>
+                        @endif
 
                         @if ($c['vista'] === 'iframe')
                             <div class="cat-demo cat-demo--iframe">

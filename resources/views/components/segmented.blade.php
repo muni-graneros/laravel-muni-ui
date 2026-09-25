@@ -2,7 +2,7 @@
     'name' => null, // con name genera radios reales que envían el form
     'options' => [], // mapa valor => etiqueta
     'value' => null, // valor seleccionado
-    'autosubmit' => true, // envía el form GET al cambiar (nunca en forms POST, con wire:submit/@submit ni con wire:model/x-model)
+    'autosubmit' => true, // true: envía el form GET al cambiar · 'siempre': también POST · false: nunca (nunca con wire:submit/@submit ni wire:model/x-model)
 ])
 
 {{-- Control segmentado (toggle de filtro): alternativa moderna al <select> para pocas
@@ -15,8 +15,9 @@
     // no hace falta enviar el form.
     $modelo = $attributes->filter(fn ($v, $k) => str_starts_with($k, 'wire:model') || str_starts_with($k, 'x-model'));
     $attributes = $attributes->filter(fn ($v, $k) => ! str_starts_with($k, 'wire:model') && ! str_starts_with($k, 'x-model'));
+    $soloGet = $autosubmit !== 'siempre';
     $autosubmit = $autosubmit && $modelo->isEmpty();
-    $enviar = "if(this.form && this.form.method==='get' && ![...this.form.attributes].some(a => /^(wire:submit|x-on:submit|@submit)/.test(a.name))) this.form.submit()";
+    $enviar = "if(this.form".($soloGet ? " && this.form.method==='get'" : '')." && ![...this.form.attributes].some(a => /^(wire:submit|x-on:submit|@submit)/.test(a.name))) this.form.submit()";
 @endphp
 <div role="group" {{ $attributes->merge(['style' => 'display:inline-flex;padding:3px;gap:2px;background:var(--muni-surface-2);border:1px solid var(--muni-border);border-radius:var(--muni-radius-sm);']) }}>
     @if (! empty($options) && $name)

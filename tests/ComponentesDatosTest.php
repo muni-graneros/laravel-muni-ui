@@ -145,3 +145,17 @@ it('segmented no se auto-envía si se pide y usa el id como prefijo', function (
 it('data-table marca el tbody con muni-data-body', function () {
     expect(Blade::render('<x-muni::data-table :columns="[\'A\']" />'))->toContain('<tbody class="muni-data-body">');
 });
+
+it('accordion abre por clave aunque las claves de items no sean correlativas', function () {
+    // Lo típico tras ->filter()->all(): claves 1 y 3. default=3 es la clave, no la posición.
+    $html = Blade::render('<x-muni::accordion :default="3" :items="[1 => [\'title\' => \'A\', \'content\' => \'a\'], 3 => [\'title\' => \'B\', \'content\' => \'b\']]" />');
+
+    expect($html)->toContain('open: 1,');
+});
+
+it('la red de reduced-motion solo toca clases muni-, no utilidades del host como text-muni-accent', function () {
+    $css = file_get_contents(__DIR__.'/../resources/css/muni-ui.css');
+
+    expect($css)->not->toContain('[class*="muni-"]')
+        ->and($css)->toContain('[class^="muni-"], [class*=" muni-"]');
+});

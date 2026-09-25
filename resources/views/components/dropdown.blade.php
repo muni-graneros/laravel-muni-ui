@@ -28,8 +28,9 @@
     }"
     x-id="['muni-dd']"
     @keydown.escape.window="if (open) cerrar($el.contains(document.activeElement))"
-    @keydown.down.prevent="flecha(1)"
-    @keydown.up.prevent="flecha(-1)"
+    {{-- Las flechas se dejan en paz dentro de campos: en un input o select del menú mueven el cursor o la opción. --}}
+    @keydown.down="if (! $event.target.closest('input,select,textarea,[contenteditable]')) { $event.preventDefault(); flecha(1) }"
+    @keydown.up="if (! $event.target.closest('input,select,textarea,[contenteditable]')) { $event.preventDefault(); flecha(-1) }"
     @muni-dropdown-close="cerrar(true)"
     style="position:relative;display:inline-block;"
 >

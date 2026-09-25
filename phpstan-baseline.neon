@@ -1,0 +1,7 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Call to an undefined method Muni\\Shared\\Privacidad\\Contratos\\BuscaTitulares\:\:comoSeBusca\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Filament/Privacidad/SolicitudResource.php

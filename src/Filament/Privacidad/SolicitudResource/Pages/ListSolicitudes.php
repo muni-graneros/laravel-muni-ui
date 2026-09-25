@@ -2,9 +2,9 @@
 
 namespace Muni\Ui\Filament\Privacidad\SolicitudResource\Pages;
 
-use Muni\Ui\Filament\Privacidad\SolicitudResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Muni\Ui\Filament\Privacidad\SolicitudResource;
 
 class ListSolicitudes extends ListRecords
 {

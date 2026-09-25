@@ -15,5 +15,5 @@ it('el observador documenta por qué el script se carga con data-navigate-once',
 it('el observador se vuelve a enganchar tras cada navegación de Livewire', function () {
     $js = file_get_contents(__DIR__.'/../resources/js/filepond-video.js');
 
-    expect($js)->toContain("livewire:navigated");
+    expect($js)->toContain('livewire:navigated');
 });

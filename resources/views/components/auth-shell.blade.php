@@ -1,16 +1,22 @@
 @props([
-    'theme' => 'light', // light | dark
-    'title' => 'Ingresar', // título del formulario y del documento
-    'system' => 'Municipalidad de Graneros', // nombre mostrado en la columna lateral
-    'subtitle' => null, // texto bajo el título
-    'logo' => null, // HTML del logo, p. ej. el componente gob-escudo
+    'theme' => null,
+    'title' => 'Ingresar',
+    'system' => 'Municipalidad de Graneros',
+    'subtitle' => null,
+    'logo' => null,
 ])
 
+{{-- `theme` sin valor = seguir al sistema operativo; la <meta name="color-scheme">
+     sigue al mismo prop. Ver app-shell. --}}
 <!DOCTYPE html>
-<html lang="es" data-muni-theme="{{ $theme }}">
+<html lang="es" @if ($theme) data-muni-theme="{{ $theme }}" @endif>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="{{ $theme === 'dark' ? 'dark' : ($theme === 'light' ? 'light' : 'light dark') }}">
+    {{-- La meta va FUERA del <title>: dentro es RCDATA, o sea texto, así que
+         el marcado se vería en la pestaña y la <meta> no existiría como
+         elemento (echo.js se quedaba sin clave y el tiempo real, apagado). --}}
     <x-muni::reverb-meta />
     <title>{{ $title }} · {{ $system }}</title>
     {{ $head ?? '' }}
@@ -28,10 +34,15 @@
     </style>
 </head>
 <body>
+    {{-- Primer elemento del documento: `position:fixed` lo deja fuera de la
+         grilla del body, así que no ocupa una columna. --}}
+    <x-muni::skip-link />
+
     <aside class="muni-auth-aside">
         <div style="position:relative;display:flex;align-items:center;gap:11px;">
-            <div style="height:40px;display:flex;align-items:center;padding:5px 12px;background:#fff;border-radius:var(--muni-radius-sm);">
-                @if ($logo){{ $logo }}@else<span style="font-family:var(--muni-font-mono);font-weight:700;color:#0b0f14;">GRA</span>@endif
+            {{-- Placa del escudo con token de dos ramas: ver topbar. --}}
+            <div style="height:40px;display:flex;align-items:center;padding:5px 12px;background:var(--muni-logo-plate, var(--muni-surface));border-radius:var(--muni-radius-sm);">
+                @if ($logo){{ $logo }}@else<span style="font-family:var(--muni-font-mono);font-weight:700;color:var(--muni-logo-plate-fg, var(--muni-text));">GRA</span>@endif
             </div>
             <div><div style="font-weight:700;font-size:14px;">{{ $system }}</div><div style="font-size:12px;color:var(--muni-muted);">Ecosistema municipal</div></div>
         </div>
@@ -46,7 +57,8 @@
         <div style="position:relative;font-size:11.5px;color:var(--muni-hint);">© {{ date('Y') }} {{ $system }}</div>
     </aside>
 
-    <main class="muni-auth-main">
+    {{-- `tabindex="-1"`: sin él el salto mueve el scroll pero no el punto de lectura. --}}
+    <main id="muni-contenido" tabindex="-1" class="muni-auth-main">
         <div class="muni-auth-card">
             <div style="margin-bottom:24px;">
                 <h1 style="margin:0;font-size:23px;font-weight:800;letter-spacing:-.02em;">{{ $title }}</h1>

@@ -1,0 +1,6683 @@
+{
+  "$schema": "https://muni-graneros.github.io/laravel-muni-ui/registry.schema.json",
+  "name": "laravel-muni-ui",
+  "homepage": "https://github.com/muni-graneros/laravel-muni-ui",
+  "baseVersion": "0.18.0",
+  "namespace": "muni",
+  "usage": "Los componentes se usan como <x-muni::NOMBRE>. No requieren registro manual: el service provider del paquete declara el namespace.",
+  "rules": [
+    "Nunca escribir un color literal ni una clase de Tailwind de color dentro de una vista: usar los componentes y los tokens --muni-*.",
+    "Toda regla de color clara necesita contraparte oscura, o debe salir de un token con ambas ramas.",
+    "El indicador de foco es un outline con var(--muni-focus), no una box-shadow: dentro de Filament la sombra se pierde.",
+    "El movimiento usa var(--muni-dur), que baja a 0ms con prefers-reduced-motion.",
+    "Los componentes deben funcionar en Livewire 3 y 4: nada de @island, wire:show, wire:sort ni #[Transition].",
+    "Antes de cerrar una pantalla: npm run a11y:vitrina, que mide los componentes reales en claro y oscuro. npm run a11y suma las demos, que hoy arrastran deuda conocida."
+  ],
+  "components": [
+    {
+      "name": "accordion",
+      "tag": "<x-muni::accordion>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/accordion.blade.php",
+      "description": "Componente accordion del sistema de diseño municipal",
+      "props": [
+        {
+          "name": "items",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "multiple",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "default",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-cloak",
+          "x-data",
+          "x-muni",
+          "x-show",
+          "x-transition"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-radius",
+        "--muni-ring",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::accordion></x-muni::accordion>"
+    },
+    {
+      "name": "agenda-horas",
+      "tag": "<x-muni::agenda-horas>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/agenda-horas.blade.php",
+      "description": "Agenda de horas (Alpine 3 core, sin plugins)",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "default": "agenda",
+          "required": false
+        },
+        {
+          "name": "mes",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "franjas",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "dias",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "value",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "franja",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Agenda de horas",
+          "required": false
+        },
+        {
+          "name": "accion",
+          "type": "string",
+          "default": "Reservar",
+          "required": false
+        },
+        {
+          "name": "mesUrl",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "mesEvento",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "operacion",
+          "type": "string",
+          "default": "reservar",
+          "required": false
+        },
+        {
+          "name": "error",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "franja",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "acciones",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "mesIso",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-model",
+          "x-modelable",
+          "x-ref",
+          "x-text"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-accent-strong",
+        "--muni-border",
+        "--muni-border-2",
+        "--muni-danger-bg",
+        "--muni-danger-border",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-hint",
+        "--muni-muted",
+        "--muni-ok-bg",
+        "--muni-ok-border",
+        "--muni-ok-fg",
+        "--muni-on-accent",
+        "--muni-radius",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-shadow",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-surface-3",
+        "--muni-text",
+        "--muni-warn-bg",
+        "--muni-warn-border",
+        "--muni-warn-fg"
+      ],
+      "example": "<x-muni::agenda-horas name=\"agenda\" />"
+    },
+    {
+      "name": "ajustes-cuenta",
+      "tag": "<x-muni::ajustes-cuenta>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/ajustes-cuenta.blade.php",
+      "description": "La pantalla de «Mi cuenta»:",
+      "props": [
+        {
+          "name": "id",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Secciones de mi cuenta",
+          "required": false
+        },
+        {
+          "name": "default",
+          "type": "int",
+          "default": "0",
+          "required": false
+        },
+        {
+          "name": "perfilLabel",
+          "type": "string",
+          "default": "Perfil",
+          "required": false
+        },
+        {
+          "name": "seguridadLabel",
+          "type": "string",
+          "default": "Seguridad",
+          "required": false
+        },
+        {
+          "name": "preferenciasLabel",
+          "type": "string",
+          "default": "Preferencias",
+          "required": false
+        },
+        {
+          "name": "peligroLabel",
+          "type": "string",
+          "default": "Zona de peligro",
+          "required": false
+        },
+        {
+          "name": "sessions",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "sessionsAction",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "sessionsTitle",
+          "type": "string",
+          "default": "Sesiones activas",
+          "required": false
+        },
+        {
+          "name": "sessionsDescription",
+          "type": "string",
+          "default": "Los dispositivos donde tu cuenta está abierta ahora.",
+          "required": false
+        },
+        {
+          "name": "sessionsEmpty",
+          "type": "string",
+          "default": "No hay otras sesiones abiertas.",
+          "required": false
+        },
+        {
+          "name": "currentLabel",
+          "type": "string",
+          "default": "Este equipo",
+          "required": false
+        },
+        {
+          "name": "closeLabel",
+          "type": "string",
+          "default": "Cerrar sesión",
+          "required": false
+        },
+        {
+          "name": "closeExplanation",
+          "type": "string",
+          "default": "El dispositivo tendrá que volver a ingresar. La sesión queda invalidada en el servidor.",
+          "required": false
+        },
+        {
+          "name": "dangerAction",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "dangerWord",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "dangerTitle",
+          "type": "string",
+          "default": "Zona de peligro",
+          "required": false
+        },
+        {
+          "name": "dangerDescription",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "dangerLabel",
+          "type": "string",
+          "default": "Eliminar mi cuenta",
+          "required": false
+        },
+        {
+          "name": "dangerName",
+          "type": "string",
+          "default": "confirmacion",
+          "required": false
+        },
+        {
+          "name": "dangerMethod",
+          "type": "string",
+          "default": "post",
+          "required": false
+        },
+        {
+          "name": "dangerHint",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "peligro",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "perfil",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "preferencias",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "seguridad",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-bind",
+          "x-cloak",
+          "x-data",
+          "x-model",
+          "x-muni",
+          "x-on",
+          "x-ref",
+          "x-slot",
+          "x-text"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-ok-bg",
+        "--muni-ok-border",
+        "--muni-ok-fg",
+        "--muni-ring",
+        "--muni-text"
+      ],
+      "example": "<x-muni::ajustes-cuenta label=\"Secciones de mi cuenta\"></x-muni::ajustes-cuenta>"
+    },
+    {
+      "name": "alert",
+      "tag": "<x-muni::alert>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/alert.blade.php",
+      "description": "Recuadro de aviso fijo en uno de cuatro tonos (ok, warn, danger, info), con título opcional y un glifo propio por tono",
+      "props": [
+        {
+          "name": "tone",
+          "type": "string",
+          "default": "info",
+          "required": false
+        },
+        {
+          "name": "title",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "icon",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "role",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "icon",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-danger-bg",
+        "--muni-danger-border",
+        "--muni-danger-fg",
+        "--muni-font-sans",
+        "--muni-info-bg",
+        "--muni-info-border",
+        "--muni-info-fg",
+        "--muni-ok-bg",
+        "--muni-ok-border",
+        "--muni-ok-fg",
+        "--muni-radius",
+        "--muni-text",
+        "--muni-warn-bg",
+        "--muni-warn-border",
+        "--muni-warn-fg"
+      ],
+      "example": "<x-muni::alert tone=\"info\"></x-muni::alert>"
+    },
+    {
+      "name": "announcer",
+      "tag": "<x-muni::announcer>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/announcer.blade.php",
+      "description": "La región viva COMPARTIDA de la página (WCAG 2.2 AA 4.1.3, Mensajes de estado)",
+      "props": [
+        {
+          "name": "message",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "assertive",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "clearAfter",
+          "type": "int",
+          "default": "5000",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-muni",
+          "x-ref"
+        ],
+        "plugins": []
+      },
+      "tokens": [],
+      "example": "<x-muni::announcer />"
+    },
+    {
+      "name": "app-shell",
+      "tag": "<x-muni::app-shell>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/app-shell.blade.php",
+      "description": "`theme` sin valor = seguir al sistema operativo (el media query de muni-ui.css decide)",
+      "props": [
+        {
+          "name": "theme",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "title",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "system",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "subtitle",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "default": "online",
+          "required": false
+        },
+        {
+          "name": "maxWidth",
+          "type": "string",
+          "default": "1200px",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "head",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "title",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "topbar",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-bg",
+        "--muni-font-sans",
+        "--muni-text",
+        "--muni-topbar-h"
+      ],
+      "example": "<x-muni::app-shell></x-muni::app-shell>"
+    },
+    {
+      "name": "asistente",
+      "tag": "<x-muni::asistente>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/asistente.blade.php",
+      "description": "El trámite largo partido en pasos navegables:",
+      "props": [
+        {
+          "name": "steps",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "current",
+          "type": "int",
+          "default": "0",
+          "required": false
+        },
+        {
+          "name": "title",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "subtitle",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "stepTitle",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "stepSubtitle",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "level",
+          "type": "int",
+          "default": "2",
+          "required": false
+        },
+        {
+          "name": "action",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "method",
+          "type": "string",
+          "default": "post",
+          "required": false
+        },
+        {
+          "name": "enctype",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "csrf",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        },
+        {
+          "name": "errors",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "errorIds",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "errorSummary",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        },
+        {
+          "name": "errorFocus",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        },
+        {
+          "name": "prevLabel",
+          "type": "string",
+          "default": "Anterior",
+          "required": false
+        },
+        {
+          "name": "nextLabel",
+          "type": "string",
+          "default": "Siguiente",
+          "required": false
+        },
+        {
+          "name": "skipLabel",
+          "type": "string",
+          "default": "Omitir este paso",
+          "required": false
+        },
+        {
+          "name": "submitLabel",
+          "type": "string",
+          "default": "Enviar solicitud",
+          "required": false
+        },
+        {
+          "name": "prevHref",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "skippable",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "actionName",
+          "type": "string",
+          "default": "_accion",
+          "required": false
+        },
+        {
+          "name": "stepName",
+          "type": "string",
+          "default": "_paso",
+          "required": false
+        },
+        {
+          "name": "navName",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "showStepper",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        },
+        {
+          "name": "focusStep",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        },
+        {
+          "name": "prevAttrs",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "nextAttrs",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "skipAttrs",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "acciones",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-init",
+          "x-muni",
+          "x-on",
+          "x-show"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-accent-strong",
+        "--muni-border",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-field-border",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-on-accent",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-surface-3",
+        "--muni-text",
+        "--muni-topbar-h"
+      ],
+      "example": "<x-muni::asistente></x-muni::asistente>"
+    },
+    {
+      "name": "auth-shell",
+      "tag": "<x-muni::auth-shell>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/auth-shell.blade.php",
+      "description": "`theme` sin valor = seguir al sistema operativo; la <meta name=\"color-scheme\"> sigue al mismo prop",
+      "props": [
+        {
+          "name": "theme",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "default": "Ingresar",
+          "required": false
+        },
+        {
+          "name": "system",
+          "type": "string",
+          "default": "Municipalidad de Graneros",
+          "required": false
+        },
+        {
+          "name": "subtitle",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "logo",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "aside",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "head",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-bg",
+        "--muni-border",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-hint",
+        "--muni-logo-plate",
+        "--muni-logo-plate-fg",
+        "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-surface",
+        "--muni-text"
+      ],
+      "example": "<x-muni::auth-shell title=\"Ingresar\"></x-muni::auth-shell>"
+    },
+    {
+      "name": "avatar",
+      "tag": "<x-muni::avatar>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/avatar.blade.php",
+      "description": "Componente avatar del sistema de diseño municipal",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "default": "",
+          "required": false
+        },
+        {
+          "name": "src",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "size",
+          "type": "string",
+          "default": "md",
+          "required": false
+        },
+        {
+          "name": "tone",
+          "type": "string",
+          "default": "accent",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-accent-soft",
+        "--muni-border",
+        "--muni-font-sans",
+        "--muni-surface-3",
+        "--muni-text"
+      ],
+      "example": "<x-muni::avatar />"
+    },
+    {
+      "name": "badge",
+      "tag": "<x-muni::badge>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/badge.blade.php",
+      "description": "Componente badge del sistema de diseño municipal",
+      "props": [
+        {
+          "name": "tone",
+          "type": "string",
+          "default": "neutral",
+          "required": false
+        },
+        {
+          "name": "dot",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-border",
+        "--muni-danger-bg",
+        "--muni-danger-border",
+        "--muni-danger-fg",
+        "--muni-font-mono",
+        "--muni-glow",
+        "--muni-info-bg",
+        "--muni-info-border",
+        "--muni-info-fg",
+        "--muni-muted",
+        "--muni-ok-bg",
+        "--muni-ok-border",
+        "--muni-ok-fg",
+        "--muni-surface-3",
+        "--muni-warn-bg",
+        "--muni-warn-border",
+        "--muni-warn-fg"
+      ],
+      "example": "<x-muni::badge tone=\"neutral\"></x-muni::badge>"
+    },
+    {
+      "name": "breadcrumb",
+      "tag": "<x-muni::breadcrumb>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/breadcrumb.blade.php",
+      "description": "MIGAS DE RUTA (WCAG 2.2 AA · patrón «breadcrumb» de la APG)",
+      "props": [
+        {
+          "name": "items",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-hint",
+        "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::breadcrumb />"
+    },
+    {
+      "name": "bulk-bar",
+      "tag": "<x-muni::bulk-bar>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/bulk-bar.blade.php",
+      "description": "BARRA DE ACCIONES EN LOTE",
+      "props": [
+        {
+          "name": "for",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Acciones sobre la selección",
+          "required": false
+        },
+        {
+          "name": "countSingular",
+          "type": "string",
+          "default": "1 fila seleccionada",
+          "required": false
+        },
+        {
+          "name": "countPlural",
+          "type": "string",
+          "default": ":n filas seleccionadas",
+          "required": false
+        },
+        {
+          "name": "clearLabel",
+          "type": "string",
+          "default": "Quitar selección",
+          "required": false
+        },
+        {
+          "name": "emptyAnnounce",
+          "type": "string",
+          "default": "Sin filas seleccionadas.",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-model",
+          "x-muni",
+          "x-show",
+          "x-text"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-border-2",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-radius",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::bulk-bar label=\"Acciones sobre la selección\"></x-muni::bulk-bar>"
+    },
+    {
+      "name": "busy-region",
+      "tag": "<x-muni::busy-region>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/busy-region.blade.php",
+      "description": "LA REGIÓN QUE DICE QUE ALGO ESTÁ EN CURSO, EN TEXTO, Y DICE CUÁNDO TERMINÓ",
+      "props": [
+        {
+          "name": "target",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "loading",
+          "type": "string",
+          "default": "Cargando…",
+          "required": false
+        },
+        {
+          "name": "status",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "delay",
+          "type": "string",
+          "default": "long",
+          "required": false
+        },
+        {
+          "name": "busy",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-filament",
+          "x-for",
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-field-border",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-shadow-md",
+        "--muni-surface",
+        "--muni-text"
+      ],
+      "example": "<x-muni::busy-region loading=\"Cargando…\"></x-muni::busy-region>"
+    },
+    {
+      "name": "button",
+      "tag": "<x-muni::button>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/button.blade.php",
+      "description": "Componente button del sistema de diseño municipal",
+      "props": [
+        {
+          "name": "variant",
+          "type": "string",
+          "default": "primary",
+          "required": false
+        },
+        {
+          "name": "size",
+          "type": "string",
+          "default": "md",
+          "required": false
+        },
+        {
+          "name": "href",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "icon",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "default": "button",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-accent-strong",
+        "--muni-border",
+        "--muni-border-2",
+        "--muni-danger-bg",
+        "--muni-danger-border",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-on-accent",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-shadow",
+        "--muni-surface-2",
+        "--muni-surface-3",
+        "--muni-text"
+      ],
+      "example": "<x-muni::button variant=\"primary\" size=\"md\"></x-muni::button>"
+    },
+    {
+      "name": "calendar",
+      "tag": "<x-muni::calendar>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/calendar.blade.php",
+      "description": "Calendario de mes (Alpine 3 core)",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "default": "fecha",
+          "required": false
+        },
+        {
+          "name": "min",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "value",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-for",
+          "x-if",
+          "x-model",
+          "x-modelable",
+          "x-muni",
+          "x-ref",
+          "x-text"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-accent-strong",
+        "--muni-border",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-hint",
+        "--muni-on-accent",
+        "--muni-radius",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-shadow",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::calendar name=\"fecha\" />"
+    },
+    {
+      "name": "card",
+      "tag": "<x-muni::card>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/card.blade.php",
+      "description": "Componente card del sistema de diseño municipal",
+      "props": [
+        {
+          "name": "title",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "subtitle",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "flush",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "actions",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-border",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-radius-lg",
+        "--muni-shadow",
+        "--muni-shadow-md",
+        "--muni-surface",
+        "--muni-text"
+      ],
+      "example": "<x-muni::card></x-muni::card>"
+    },
+    {
+      "name": "chart-bar",
+      "tag": "<x-muni::chart-bar>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/chart-bar.blade.php",
+      "description": "Componente chart-bar del sistema de diseño municipal",
+      "props": [
+        {
+          "name": "data",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "height",
+          "type": "int",
+          "default": "160",
+          "required": false
+        },
+        {
+          "name": "tone",
+          "type": "string",
+          "default": "accent",
+          "required": false
+        },
+        {
+          "name": "labels",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-dur-slow",
+        "--muni-ease",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-info-fg",
+        "--muni-muted",
+        "--muni-ok-fg",
+        "--muni-warn-fg"
+      ],
+      "example": "<x-muni::chart-bar />"
+    },
+    {
+      "name": "chart-donut",
+      "tag": "<x-muni::chart-donut>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/chart-donut.blade.php",
+      "description": "El dibujo va oculto al lector:",
+      "props": [
+        {
+          "name": "segments",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "size",
+          "type": "int",
+          "default": "150",
+          "required": false
+        },
+        {
+          "name": "thickness",
+          "type": "int",
+          "default": "18",
+          "required": false
+        },
+        {
+          "name": "total",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "centerLabel",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border-2",
+        "--muni-danger-fg",
+        "--muni-dur-slow",
+        "--muni-ease",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-glow",
+        "--muni-info-fg",
+        "--muni-muted",
+        "--muni-ok-fg",
+        "--muni-surface-3",
+        "--muni-text",
+        "--muni-warn-fg"
+      ],
+      "example": "<x-muni::chart-donut />"
+    },
+    {
+      "name": "checkbox-group",
+      "tag": "<x-muni::checkbox-group>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/checkbox-group.blade.php",
+      "description": "Un grupo de casillas NO es la suma de sus casillas:",
+      "props": [
+        {
+          "name": "name",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "legend",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "options",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "selected",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "hint",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "error",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "required",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "requiredText",
+          "type": "string",
+          "default": "obligatorio",
+          "required": false
+        },
+        {
+          "name": "requiredTextVisible",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-danger-bg",
+        "--muni-danger-fg",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-hint",
+        "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-text"
+      ],
+      "example": "<x-muni::checkbox-group :name=\"$name\" :legend=\"$legend\"></x-muni::checkbox-group>"
+    },
+    {
+      "name": "checkbox",
+      "tag": "<x-muni::checkbox>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/checkbox.blade.php",
+      "description": "Es un <input type=\"checkbox\"> REAL, no un <div role=\"checkbox\">:",
+      "props": [
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "name",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "checked",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "description",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "error",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "required",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "requiredText",
+          "type": "string",
+          "default": "obligatorio",
+          "required": false
+        },
+        {
+          "name": "requiredTextVisible",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "default": "1",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-model"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-border-2",
+        "--muni-danger-bg",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-field-border",
+        "--muni-field-border-error",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-on-accent",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::checkbox />"
+    },
+    {
+      "name": "combobox",
+      "tag": "<x-muni::combobox>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/combobox.blade.php",
+      "description": "El id elegido:",
+      "props": [
+        {
+          "name": "name",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "options",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "value",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "selectedLabel",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "search",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "model",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "searchModel",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "default": "Escribe para buscar…",
+          "required": false
+        },
+        {
+          "name": "listLabel",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "emptyText",
+          "type": "string",
+          "default": "Sin resultados.",
+          "required": false
+        },
+        {
+          "name": "clearLabel",
+          "type": "string",
+          "default": "Limpiar la búsqueda",
+          "required": false
+        },
+        {
+          "name": "hint",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "error",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "required",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "requiredText",
+          "type": "string",
+          "default": "obligatorio",
+          "required": false
+        },
+        {
+          "name": "requiredTextVisible",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "loading",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "selectedLabel",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-cloak",
+          "x-data",
+          "x-ref",
+          "x-show",
+          "x-transition"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-accent-soft",
+        "--muni-border",
+        "--muni-combo-ancla",
+        "--muni-danger-bg",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-field-border",
+        "--muni-field-border-error",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-hint",
+        "--muni-muted",
+        "--muni-overlay-border",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-shadow-lg",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::combobox :name=\"$name\" />"
+    },
+    {
+      "name": "command-palette",
+      "tag": "<x-muni::command-palette>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/command-palette.blade.php",
+      "description": "Paleta de comandos (⌘K / Ctrl+K)",
+      "props": [
+        {
+          "name": "items",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "default": "Buscar o ir a…",
+          "required": false
+        },
+        {
+          "name": "hotkey",
+          "type": "string",
+          "default": "k",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "trigger",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-cloak",
+          "x-data",
+          "x-for",
+          "x-if",
+          "x-model",
+          "x-ref",
+          "x-show",
+          "x-teleport",
+          "x-text",
+          "x-transition",
+          "x-trap"
+        ],
+        "plugins": [
+          "focus"
+        ]
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-border-2",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-glow",
+        "--muni-gob-petroleo-dark",
+        "--muni-muted",
+        "--muni-overlay-border",
+        "--muni-radius-lg",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-scrim",
+        "--muni-shadow-lg",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::command-palette placeholder=\"Buscar o ir a…\" />"
+    },
+    {
+      "name": "dashboard-shell",
+      "tag": "<x-muni::dashboard-shell>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/dashboard-shell.blade.php",
+      "description": "`theme` sin valor = seguir al sistema operativo; la <meta name=\"color-scheme\"> sigue al mismo prop",
+      "props": [
+        {
+          "name": "theme",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "title",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "system",
+          "type": "string",
+          "default": "Panel",
+          "required": false
+        },
+        {
+          "name": "subtitle",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "default": "online",
+          "required": false
+        },
+        {
+          "name": "user",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "head",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "sidebar",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "title",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "topbar",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-cloak",
+          "x-data",
+          "x-init",
+          "x-muni",
+          "x-show",
+          "x-teleport",
+          "x-trap"
+        ],
+        "plugins": [
+          "focus"
+        ]
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-bg",
+        "--muni-border",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text",
+        "--muni-topbar-h"
+      ],
+      "example": "<x-muni::dashboard-shell></x-muni::dashboard-shell>"
+    },
+    {
+      "name": "data-table",
+      "tag": "<x-muni::data-table>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/data-table.blade.php",
+      "description": "Tabla densa de datos",
+      "props": [
+        {
+          "name": "columns",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "empty",
+          "type": "string",
+          "default": "Sin resultados para este filtro.",
+          "required": false
+        },
+        {
+          "name": "caption",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "stickyHeader",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "stickyColumn",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "maxHeight",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "density",
+          "type": "string",
+          "default": "normal",
+          "required": false
+        },
+        {
+          "name": "densidad",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "selectable",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "selectionLabel",
+          "type": "string",
+          "default": "Seleccionar todas las filas de esta página",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "caption",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "label",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-effect",
+          "x-model"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-danger-fg",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-radius",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text",
+        "--muni-topbar-h"
+      ],
+      "example": "<x-muni::data-table empty=\"Sin resultados para este filtro.\"></x-muni::data-table>"
+    },
+    {
+      "name": "date-input",
+      "tag": "<x-muni::date-input>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/date-input.blade.php",
+      "description": "Los dos extremos son UN dato:",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Fecha",
+          "required": false
+        },
+        {
+          "name": "name",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "value",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "min",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "max",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "error",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "hint",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "required",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "range",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "legend",
+          "type": "string",
+          "default": "Periodo",
+          "required": false
+        },
+        {
+          "name": "fromName",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "toName",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "fromLabel",
+          "type": "string",
+          "default": "Desde",
+          "required": false
+        },
+        {
+          "name": "toLabel",
+          "type": "string",
+          "default": "Hasta",
+          "required": false
+        },
+        {
+          "name": "fromValue",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "toValue",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "fromError",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "toError",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "fromModel",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "toModel",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "modelModifier",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "fromName",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "hint",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "toName",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-bind",
+          "x-data",
+          "x-model",
+          "x-muni",
+          "x-on",
+          "x-ref",
+          "x-show",
+          "x-text"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-danger-fg",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-text"
+      ],
+      "example": "<x-muni::date-input label=\"Fecha\" />"
+    },
+    {
+      "name": "description-item",
+      "tag": "<x-muni::description-item>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/description-item.blade.php",
+      "description": "UN PAR DE LA FICHA",
+      "props": [
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "mono",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "empty",
+          "type": "string",
+          "default": "Sin dato",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-muted"
+      ],
+      "example": "<x-muni::description-item :label=\"$label\"></x-muni::description-item>"
+    },
+    {
+      "name": "description-list",
+      "tag": "<x-muni::description-list>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/description-list.blade.php",
+      "description": "LISTA DE PARES DATO-VALOR — el bloque de datos de una ficha con la semántica que le corresponde:",
+      "props": [
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "stacked",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "label",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-border",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-text"
+      ],
+      "example": "<x-muni::description-list></x-muni::description-list>"
+    },
+    {
+      "name": "diff-campos",
+      "tag": "<x-muni::diff-campos>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/diff-campos.blade.php",
+      "description": "Tabla antes/después por campo:",
+      "props": [
+        {
+          "name": "changes",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "caption",
+          "type": "string",
+          "default": "Cambios por campo",
+          "required": false
+        },
+        {
+          "name": "empty",
+          "type": "string",
+          "default": "Sin cambios registrados.",
+          "required": false
+        },
+        {
+          "name": "fieldHeading",
+          "type": "string",
+          "default": "Campo",
+          "required": false
+        },
+        {
+          "name": "stateHeading",
+          "type": "string",
+          "default": "Estado",
+          "required": false
+        },
+        {
+          "name": "beforeHeading",
+          "type": "string",
+          "default": "Antes",
+          "required": false
+        },
+        {
+          "name": "afterHeading",
+          "type": "string",
+          "default": "Después",
+          "required": false
+        },
+        {
+          "name": "nilLabel",
+          "type": "string",
+          "default": "sin valor",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-border",
+        "--muni-border-2",
+        "--muni-danger-bg",
+        "--muni-danger-border",
+        "--muni-danger-fg",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-info-bg",
+        "--muni-info-border",
+        "--muni-info-fg",
+        "--muni-muted",
+        "--muni-ok-bg",
+        "--muni-ok-border",
+        "--muni-ok-fg",
+        "--muni-radius",
+        "--muni-radius-sm",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-surface-3",
+        "--muni-text"
+      ],
+      "example": "<x-muni::diff-campos caption=\"Cambios por campo\"></x-muni::diff-campos>"
+    },
+    {
+      "name": "drawer",
+      "tag": "<x-muni::drawer>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/drawer.blade.php",
+      "description": "Panel lateral deslizante (Alpine 3 + plugin Focus, ya presente en el bundle de Livewire de los paneles)",
+      "props": [
+        {
+          "name": "title",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "side",
+          "type": "string",
+          "default": "right",
+          "required": false
+        },
+        {
+          "name": "width",
+          "type": "string",
+          "default": "400px",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "footer",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "trigger",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-cloak",
+          "x-data",
+          "x-muni",
+          "x-show",
+          "x-teleport",
+          "x-transition",
+          "x-trap"
+        ],
+        "plugins": [
+          "focus"
+        ]
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-gob-petroleo-dark",
+        "--muni-muted",
+        "--muni-overlay-border",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-scrim",
+        "--muni-shadow-lg",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-surface-3",
+        "--muni-text"
+      ],
+      "example": "<x-muni::drawer side=\"right\"></x-muni::drawer>"
+    },
+    {
+      "name": "dropdown-item",
+      "tag": "<x-muni::dropdown-item>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/dropdown-item.blade.php",
+      "description": "ROVING TABINDEX:",
+      "props": [
+        {
+          "name": "href",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "icon",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "tone",
+          "type": "string",
+          "default": "default",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::dropdown-item></x-muni::dropdown-item>"
+    },
+    {
+      "name": "dropdown",
+      "tag": "<x-muni::dropdown>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/dropdown.blade.php",
+      "description": "Menú desplegable (Alpine 3)",
+      "props": [
+        {
+          "name": "align",
+          "type": "string",
+          "default": "end",
+          "required": false
+        },
+        {
+          "name": "width",
+          "type": "string",
+          "default": "220px",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Abrir menú",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "trigger",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-bind",
+          "x-cloak",
+          "x-data",
+          "x-effect",
+          "x-muni",
+          "x-ref",
+          "x-show",
+          "x-transition",
+          "x-trap"
+        ],
+        "plugins": [
+          "focus"
+        ]
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-overlay-border",
+        "--muni-radius",
+        "--muni-radius-sm",
+        "--muni-shadow-lg",
+        "--muni-surface",
+        "--muni-text"
+      ],
+      "example": "<x-muni::dropdown align=\"end\" width=\"220px\"></x-muni::dropdown>"
+    },
+    {
+      "name": "empty-state",
+      "tag": "<x-muni::empty-state>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/empty-state.blade.php",
+      "description": "Dos vacíos que para el funcionario son opuestos:",
+      "props": [
+        {
+          "name": "title",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "description",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "icon",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "mode",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "filter",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "actionHref",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "actionLabel",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "announce",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "actions",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "actionLabel",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "icon",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "title",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-field-border",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::empty-state></x-muni::empty-state>"
+    },
+    {
+      "name": "error-page",
+      "tag": "<x-muni::error-page>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/error-page.blade.php",
+      "description": "Componente error-page del sistema de diseño municipal",
+      "props": [
+        {
+          "name": "theme",
+          "type": "string",
+          "default": "dark",
+          "required": false
+        },
+        {
+          "name": "code",
+          "type": "string",
+          "default": "404",
+          "required": false
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "default": "Página no encontrada",
+          "required": false
+        },
+        {
+          "name": "message",
+          "type": "string",
+          "default": "La página que buscas no existe o fue movida.",
+          "required": false
+        },
+        {
+          "name": "home",
+          "type": "string",
+          "default": "/",
+          "required": false
+        },
+        {
+          "name": "system",
+          "type": "string",
+          "default": "Municipalidad de Graneros",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "actions",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "head",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-bg",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-glow",
+        "--muni-hint",
+        "--muni-muted",
+        "--muni-text"
+      ],
+      "example": "<x-muni::error-page theme=\"dark\" code=\"404\" />"
+    },
+    {
+      "name": "error-summary",
+      "tag": "<x-muni::error-summary>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/error-summary.blade.php",
+      "description": "El resumen que aparece tras un envío fallido:",
+      "props": [
+        {
+          "name": "errors",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "title",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "prefix",
+          "type": "string",
+          "default": "muni-",
+          "required": false
+        },
+        {
+          "name": "ids",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "level",
+          "type": "int",
+          "default": "2",
+          "required": false
+        },
+        {
+          "name": "focus",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-init",
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-danger-bg",
+        "--muni-danger-border",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-radius",
+        "--muni-radius-sm",
+        "--muni-text"
+      ],
+      "example": "<x-muni::error-summary />"
+    },
+    {
+      "name": "field",
+      "tag": "<x-muni::field>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/field.blade.php",
+      "description": "Envoltura de campo para la filter-bar:",
+      "props": [
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "name",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-font-sans",
+        "--muni-muted"
+      ],
+      "example": "<x-muni::field></x-muni::field>"
+    },
+    {
+      "name": "file-dropzone",
+      "tag": "<x-muni::file-dropzone>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/file-dropzone.blade.php",
+      "description": "Zona de carga de archivos (Alpine 3 core)",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "default": "file",
+          "required": false
+        },
+        {
+          "name": "accept",
+          "type": "string",
+          "default": "image/*,application/pdf",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Arrastra un archivo o haz clic para subir",
+          "required": false
+        },
+        {
+          "name": "hint",
+          "type": "string",
+          "default": "PDF o imagen, hasta 10 MB",
+          "required": false
+        },
+        {
+          "name": "multiple",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "maxMb",
+          "type": "int",
+          "default": "10",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-for",
+          "x-ref",
+          "x-show",
+          "x-text"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-accent-soft",
+        "--muni-border",
+        "--muni-border-2",
+        "--muni-danger-bg",
+        "--muni-danger-border",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-hint",
+        "--muni-muted",
+        "--muni-radius",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::file-dropzone name=\"file\" accept=\"image/*,application/pdf\" />"
+    },
+    {
+      "name": "filter-bar",
+      "tag": "<x-muni::filter-bar>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/filter-bar.blade.php",
+      "description": "Barra de filtros GET:",
+      "props": [
+        {
+          "name": "action",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "method",
+          "type": "string",
+          "default": "get",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "actions",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "submitLabel",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-font-sans",
+        "--muni-on-accent",
+        "--muni-radius",
+        "--muni-radius-sm",
+        "--muni-surface-2"
+      ],
+      "example": "<x-muni::filter-bar method=\"get\"></x-muni::filter-bar>"
+    },
+    {
+      "name": "formulario-seccion",
+      "tag": "<x-muni::formulario-seccion>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/formulario-seccion.blade.php",
+      "description": "Una sección de `<x-muni::formulario-tramite>`:",
+      "props": [
+        {
+          "name": "legend",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "description",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "columns",
+          "type": "int",
+          "default": "2",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-border",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-radius",
+        "--muni-surface",
+        "--muni-text"
+      ],
+      "example": "<x-muni::formulario-seccion></x-muni::formulario-seccion>"
+    },
+    {
+      "name": "formulario-tramite",
+      "tag": "<x-muni::formulario-tramite>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/formulario-tramite.blade.php",
+      "description": "El trámite que el funcionario ingresa con los papeles en la mano:",
+      "props": [
+        {
+          "name": "title",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "subtitle",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "action",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "method",
+          "type": "string",
+          "default": "post",
+          "required": false
+        },
+        {
+          "name": "enctype",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "csrf",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        },
+        {
+          "name": "level",
+          "type": "int",
+          "default": "2",
+          "required": false
+        },
+        {
+          "name": "errors",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "errorIds",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "errorSummary",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        },
+        {
+          "name": "errorFocus",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        },
+        {
+          "name": "requiredNote",
+          "type": "string",
+          "default": "Los campos marcados con * son obligatorios.",
+          "required": false
+        },
+        {
+          "name": "requisitos",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "requisitosTitle",
+          "type": "string",
+          "default": "Requisitos para ingresar",
+          "required": false
+        },
+        {
+          "name": "requisitosNote",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "pendingLabel",
+          "type": "string",
+          "default": "Falta",
+          "required": false
+        },
+        {
+          "name": "doneLabel",
+          "type": "string",
+          "default": "Listo",
+          "required": false
+        },
+        {
+          "name": "submitLabel",
+          "type": "string",
+          "default": "Ingresar solicitud",
+          "required": false
+        },
+        {
+          "name": "cancelHref",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "cancelLabel",
+          "type": "string",
+          "default": "Cancelar",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "acciones",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-effect",
+          "x-muni",
+          "x-on",
+          "x-text"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-accent-strong",
+        "--muni-border",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-field-border",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-hint",
+        "--muni-muted",
+        "--muni-ok-fg",
+        "--muni-on-accent",
+        "--muni-radius",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text",
+        "--muni-topbar-h",
+        "--muni-warn-fg"
+      ],
+      "example": "<x-muni::formulario-tramite></x-muni::formulario-tramite>"
+    },
+    {
+      "name": "gob-bar",
+      "tag": "<x-muni::gob-bar>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/gob-bar.blade.php",
+      "description": "Barra institucional de gobierno",
+      "props": [
+        {
+          "name": "system",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "home",
+          "type": "string",
+          "default": "'https:",
+          "required": false
+        },
+        {
+          "name": "sticky",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-font-sans",
+        "--muni-gob-petroleo-dark"
+      ],
+      "example": "<x-muni::gob-bar home=\"'https:\"></x-muni::gob-bar>"
+    },
+    {
+      "name": "gob-escudo",
+      "tag": "<x-muni::gob-escudo>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/gob-escudo.blade.php",
+      "description": "Componente gob-escudo del sistema de diseño municipal",
+      "props": [
+        {
+          "name": "size",
+          "type": "int",
+          "default": "40",
+          "required": false
+        },
+        {
+          "name": "src",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "src",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [],
+      "example": "<x-muni::gob-escudo />"
+    },
+    {
+      "name": "gob-footer",
+      "tag": "<x-muni::gob-footer>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/gob-footer.blade.php",
+      "description": "Footer institucional compartido por los subdominios del ecosistema",
+      "props": [
+        {
+          "name": "system",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "home",
+          "type": "string",
+          "default": "'https:",
+          "required": false
+        },
+        {
+          "name": "address",
+          "type": "string",
+          "default": "Av. Bernardo O\\'Higgins 630, Graneros, Región de O\\'Higgins",
+          "required": false
+        },
+        {
+          "name": "phone",
+          "type": "string",
+          "default": "+56 72 249 1000",
+          "required": false
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "default": "contacto@municipalidadgraneros.cl",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "links",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-gob-lima",
+        "--muni-gob-petroleo-dark"
+      ],
+      "example": "<x-muni::gob-footer home=\"'https:\" />"
+    },
+    {
+      "name": "gob-stripe",
+      "tag": "<x-muni::gob-stripe>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/gob-stripe.blade.php",
+      "description": "Franja institucional de la Municipalidad de Graneros:",
+      "props": [
+        {
+          "name": "height",
+          "type": "string",
+          "default": "5px",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-gob-carmin",
+        "--muni-gob-celeste",
+        "--muni-gob-gris",
+        "--muni-gob-lima",
+        "--muni-gob-naranja",
+        "--muni-gob-oro",
+        "--muni-gob-petroleo"
+      ],
+      "example": "<x-muni::gob-stripe height=\"5px\" />"
+    },
+    {
+      "name": "hoja",
+      "tag": "<x-muni::hoja>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/hoja.blade.php",
+      "description": "HOJA TAMAÑO CARTA lista para imprimir o exportar a PDF desde el navegador",
+      "props": [
+        {
+          "name": "id",
+          "type": "string",
+          "default": "muni-hoja",
+          "required": false
+        },
+        {
+          "name": "organization",
+          "type": "string",
+          "default": "Municipalidad de Graneros",
+          "required": false
+        },
+        {
+          "name": "unit",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "type",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "folio",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "folioLabel",
+          "type": "string",
+          "default": "Folio",
+          "required": false
+        },
+        {
+          "name": "date",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "verification",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "crest",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        },
+        {
+          "name": "crestSrc",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "printable",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        },
+        {
+          "name": "printLabel",
+          "type": "string",
+          "default": "Imprimir",
+          "required": false
+        },
+        {
+          "name": "level",
+          "type": "int",
+          "default": "2",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "emisor",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "titular",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "firma",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "actions",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "folio",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "type",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "verification",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-accent-strong",
+        "--muni-border",
+        "--muni-border-2",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-on-accent",
+        "--muni-radius",
+        "--muni-radius-sm",
+        "--muni-shadow",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::hoja id=\"muni-hoja\" organization=\"Municipalidad de Graneros\"></x-muni::hoja>"
+    },
+    {
+      "name": "input-password",
+      "tag": "<x-muni::input-password>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/input-password.blade.php",
+      "description": "El alternador de visibilidad de la clave (Alpine 3 core, sin plugins)",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Contraseña",
+          "required": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "default": "password",
+          "required": false
+        },
+        {
+          "name": "autocomplete",
+          "type": "string",
+          "default": "current-password",
+          "required": false
+        },
+        {
+          "name": "error",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "hint",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "required",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "showLabel",
+          "type": "string",
+          "default": "Mostrar contraseña",
+          "required": false
+        },
+        {
+          "name": "hideLabel",
+          "type": "string",
+          "default": "Ocultar contraseña",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-bind",
+          "x-cloak",
+          "x-data",
+          "x-muni",
+          "x-on",
+          "x-ref",
+          "x-show"
+        ],
+        "plugins": [
+          "persist"
+        ]
+      },
+      "tokens": [
+        "--muni-border",
+        "--muni-border-2",
+        "--muni-field-border"
+      ],
+      "example": "<x-muni::input-password label=\"Contraseña\" name=\"password\" />"
+    },
+    {
+      "name": "input",
+      "tag": "<x-muni::input>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/input.blade.php",
+      "description": "La ayuda y el error CONVIVEN, cada uno con su id:",
+      "props": [
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "name",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "default": "text",
+          "required": false
+        },
+        {
+          "name": "error",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "hint",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "icon",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "required",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "requiredText",
+          "type": "string",
+          "default": "obligatorio",
+          "required": false
+        },
+        {
+          "name": "requiredTextVisible",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-danger-bg",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-field-border",
+        "--muni-field-border-error",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-hint",
+        "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::input />"
+    },
+    {
+      "name": "kpi",
+      "tag": "<x-muni::kpi>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/kpi.blade.php",
+      "description": "Franja de acento a la izquierda:",
+      "props": [
+        {
+          "name": "value",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "tone",
+          "type": "string",
+          "default": "neutral",
+          "required": false
+        },
+        {
+          "name": "hint",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-border",
+        "--muni-danger-fg",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-hint",
+        "--muni-info-fg",
+        "--muni-muted",
+        "--muni-ok-fg",
+        "--muni-radius",
+        "--muni-shadow",
+        "--muni-surface",
+        "--muni-text",
+        "--muni-warn-fg"
+      ],
+      "example": "<x-muni::kpi :value=\"$value\" :label=\"$label\" />"
+    },
+    {
+      "name": "modal",
+      "tag": "<x-muni::modal>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/modal.blade.php",
+      "description": "Modal accesible (Alpine 3 + plugin Focus, ya presente en el bundle de Livewire de los paneles)",
+      "props": [
+        {
+          "name": "title",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "maxWidth",
+          "type": "string",
+          "default": "480px",
+          "required": false
+        },
+        {
+          "name": "role",
+          "type": "string",
+          "default": "dialog",
+          "required": false
+        },
+        {
+          "name": "dismissable",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        },
+        {
+          "name": "describedby",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "initialFocus",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "cancelLabel",
+          "type": "string",
+          "default": "Cancelar",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "footer",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "trigger",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-cloak",
+          "x-data",
+          "x-effect",
+          "x-init",
+          "x-muni",
+          "x-on",
+          "x-show",
+          "x-teleport",
+          "x-transition",
+          "x-trap"
+        ],
+        "plugins": [
+          "focus"
+        ]
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-gob-petroleo-dark",
+        "--muni-muted",
+        "--muni-overlay-border",
+        "--muni-radius-lg",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-scrim",
+        "--muni-shadow-lg",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-surface-3",
+        "--muni-text"
+      ],
+      "example": "<x-muni::modal maxWidth=\"480px\"></x-muni::modal>"
+    },
+    {
+      "name": "nav-grupo",
+      "tag": "<x-muni::nav-grupo>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/nav-grupo.blade.php",
+      "description": "Grupo plegable de ítems de menú",
+      "props": [
+        {
+          "name": "titulo",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "abierto",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "icono",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::nav-grupo :titulo=\"$titulo\"></x-muni::nav-grupo>"
+    },
+    {
+      "name": "nav-item",
+      "tag": "<x-muni::nav-item>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/nav-item.blade.php",
+      "description": "Componente nav-item del sistema de diseño municipal",
+      "props": [
+        {
+          "name": "href",
+          "type": "string",
+          "default": "#",
+          "required": false
+        },
+        {
+          "name": "icon",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "active",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "badge",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-accent-soft",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-on-accent",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface-2",
+        "--muni-surface-3",
+        "--muni-text"
+      ],
+      "example": "<x-muni::nav-item href=\"#\"></x-muni::nav-item>"
+    },
+    {
+      "name": "nav-menu",
+      "tag": "<x-muni::nav-menu>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/nav-menu.blade.php",
+      "description": "El menú lateral completo, pintado desde un árbol de configuración",
+      "props": [
+        {
+          "name": "items",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "actual",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Navegación principal",
+          "required": false
+        },
+        {
+          "name": "nivel",
+          "type": "int",
+          "default": "0",
+          "required": false
+        },
+        {
+          "name": "prefijo",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-hint",
+        "--muni-muted",
+        "--muni-on-accent",
+        "--muni-surface-3"
+      ],
+      "example": "<x-muni::nav-menu :items=\"$items\" />"
+    },
+    {
+      "name": "nav-section",
+      "tag": "<x-muni::nav-section>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/nav-section.blade.php",
+      "description": "Componente nav-section del sistema de diseño municipal",
+      "props": [
+        {
+          "name": "title",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-font-mono",
+        "--muni-hint"
+      ],
+      "example": "<x-muni::nav-section></x-muni::nav-section>"
+    },
+    {
+      "name": "otp-input",
+      "tag": "<x-muni::otp-input>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/otp-input.blade.php",
+      "description": "Entrada de código de un solo uso / MFA (Alpine 3)",
+      "props": [
+        {
+          "name": "length",
+          "type": "int",
+          "default": "6",
+          "required": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "default": "code",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-model",
+          "x-ref"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface",
+        "--muni-text"
+      ],
+      "example": "<x-muni::otp-input name=\"code\" />"
+    },
+    {
+      "name": "page-header",
+      "tag": "<x-muni::page-header>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/page-header.blade.php",
+      "description": "CABECERA DE PÁGINA — el único `<h1>` de la pantalla, con la ruta encima y las acciones a la derecha",
+      "props": [
+        {
+          "name": "title",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "subtitle",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "eyebrow",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "actions",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "migas",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-text"
+      ],
+      "example": "<x-muni::page-header :title=\"$title\" />"
+    },
+    {
+      "name": "pagination",
+      "tag": "<x-muni::pagination>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/pagination.blade.php",
+      "description": "Un extremo inerte NO es un enlace",
+      "props": [
+        {
+          "name": "current",
+          "type": "int",
+          "default": "1",
+          "required": false
+        },
+        {
+          "name": "total",
+          "type": "int",
+          "default": "1",
+          "required": false
+        },
+        {
+          "name": "url",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "info",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "paginator",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-hint",
+        "--muni-muted",
+        "--muni-on-accent",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::pagination />"
+    },
+    {
+      "name": "pantalla-bloqueo",
+      "tag": "<x-muni::pantalla-bloqueo>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/pantalla-bloqueo.blade.php",
+      "description": "La raíz teleportada es la que atrapa, y no el diálogo:",
+      "props": [
+        {
+          "name": "nombre",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "cargo",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "avatar",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "modo",
+          "type": "string",
+          "default": "capa",
+          "required": false
+        },
+        {
+          "name": "abierto",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "inactividad",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "accion",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "campo",
+          "type": "string",
+          "default": "password",
+          "required": false
+        },
+        {
+          "name": "etiqueta",
+          "type": "string",
+          "default": "Contraseña",
+          "required": false
+        },
+        {
+          "name": "error",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "titulo",
+          "type": "string",
+          "default": "Pantalla bloqueada",
+          "required": false
+        },
+        {
+          "name": "mensaje",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "entrar",
+          "type": "string",
+          "default": "Entrar",
+          "required": false
+        },
+        {
+          "name": "otroUrl",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "otroRotulo",
+          "type": "string",
+          "default": "Entrar como otro usuario",
+          "required": false
+        },
+        {
+          "name": "otroMetodo",
+          "type": "string",
+          "default": "post",
+          "required": false
+        },
+        {
+          "name": "autofoco",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-cloak",
+          "x-data",
+          "x-init",
+          "x-muni",
+          "x-show",
+          "x-teleport",
+          "x-text",
+          "x-transition",
+          "x-trap"
+        ],
+        "plugins": [
+          "focus"
+        ]
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-accent-strong",
+        "--muni-bg",
+        "--muni-border",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-field-border",
+        "--muni-field-border-error",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-on-accent",
+        "--muni-overlay-border",
+        "--muni-radius-lg",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-shadow-lg",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::pantalla-bloqueo :nombre=\"$nombre\" />"
+    },
+    {
+      "name": "pantalla-resultado",
+      "tag": "<x-muni::pantalla-resultado>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/pantalla-resultado.blade.php",
+      "description": "El cierre de un trámite:",
+      "props": [
+        {
+          "name": "title",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "message",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "folio",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "folioLabel",
+          "type": "string",
+          "default": "Folio",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
+          "type": "string",
+          "default": "Copiar folio",
+          "required": false
+        },
+        {
+          "name": "tone",
+          "type": "string",
+          "default": "ok",
+          "required": false
+        },
+        {
+          "name": "printHref",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "printLabel",
+          "type": "string",
+          "default": "Imprimir comprobante",
+          "required": false
+        },
+        {
+          "name": "exitHref",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "exitLabel",
+          "type": "string",
+          "default": "Volver al inicio",
+          "required": false
+        },
+        {
+          "name": "autofocus",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-cloak",
+          "x-data",
+          "x-ref",
+          "x-text"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-accent-strong",
+        "--muni-border",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-field-border",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-on-accent",
+        "--muni-radius",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::pantalla-resultado></x-muni::pantalla-resultado>"
+    },
+    {
+      "name": "pii",
+      "tag": "<x-muni::pii>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/pii.blade.php",
+      "description": "LA RAÍZ",
+      "props": [
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "masked",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "name",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "revealed",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "showLabel",
+          "type": "string",
+          "default": "Mostrar",
+          "required": false
+        },
+        {
+          "name": "hideLabel",
+          "type": "string",
+          "default": "Ocultar",
+          "required": false
+        },
+        {
+          "name": "pendingLabel",
+          "type": "string",
+          "default": "Solicitando el dato…",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "masked",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "name",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-bind",
+          "x-cloak",
+          "x-data",
+          "x-muni",
+          "x-on",
+          "x-show"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-field-border",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-text"
+      ],
+      "example": "<x-muni::pii :label=\"$label\"></x-muni::pii>"
+    },
+    {
+      "name": "plantilla-pantalla",
+      "tag": "<x-muni::plantilla-pantalla>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/plantilla-pantalla.blade.php",
+      "description": "EL PUNTO DE PARTIDA DE TODA PANTALLA NUEVA — armazón, salto al contenido, migas, un solo <h1>, región de mensajes, contenido y pie, en una sola etiqueta",
+      "props": [
+        {
+          "name": "title",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "armazon",
+          "type": "string",
+          "default": "dashboard",
+          "required": false
+        },
+        {
+          "name": "system",
+          "type": "string",
+          "default": "Municipalidad de Graneros",
+          "required": false
+        },
+        {
+          "name": "systemSubtitle",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "documentTitle",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "subtitle",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "eyebrow",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "migas",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "aviso",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "avisoTone",
+          "type": "string",
+          "default": "info",
+          "required": false
+        },
+        {
+          "name": "avisoTitle",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "theme",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "default": "online",
+          "required": false
+        },
+        {
+          "name": "user",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "announcer",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "actions",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "head",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "pie",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "sidebar",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "topbar",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-dynamic-component",
+          "x-muni",
+          "x-slot"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-text",
+        "--muni-topbar-h"
+      ],
+      "example": "<x-muni::plantilla-pantalla :title=\"$title\" armazon=\"dashboard\"></x-muni::plantilla-pantalla>"
+    },
+    {
+      "name": "popover",
+      "tag": "<x-muni::popover>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/popover.blade.php",
+      "description": "PANEL FLOTANTE anclado a un disparador, con contenido y controles dentro, que NO bloquea la página",
+      "props": [
+        {
+          "name": "id",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Filtros",
+          "required": false
+        },
+        {
+          "name": "align",
+          "type": "string",
+          "default": "end",
+          "required": false
+        },
+        {
+          "name": "width",
+          "type": "string",
+          "default": "320px",
+          "required": false
+        },
+        {
+          "name": "closeLabel",
+          "type": "string",
+          "default": "Cerrar",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "trigger",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "id",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-bind",
+          "x-data",
+          "x-init",
+          "x-on",
+          "x-ref",
+          "x-show"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-border-2",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-overlay-border",
+        "--muni-pop-sonda",
+        "--muni-radius-lg",
+        "--muni-radius-sm",
+        "--muni-shadow-lg",
+        "--muni-surface",
+        "--muni-surface-3",
+        "--muni-text"
+      ],
+      "example": "<x-muni::popover label=\"Filtros\"></x-muni::popover>"
+    },
+    {
+      "name": "progress",
+      "tag": "<x-muni::progress>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/progress.blade.php",
+      "description": "El nombre accesible es obligatorio:",
+      "props": [
+        {
+          "name": "value",
+          "type": "int",
+          "default": "0",
+          "required": false
+        },
+        {
+          "name": "max",
+          "type": "int",
+          "default": "100",
+          "required": false
+        },
+        {
+          "name": "tone",
+          "type": "string",
+          "default": "accent",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "showValue",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-dur-slow",
+        "--muni-ease",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-info-fg",
+        "--muni-muted",
+        "--muni-ok-fg",
+        "--muni-surface-3",
+        "--muni-text",
+        "--muni-warn-fg"
+      ],
+      "example": "<x-muni::progress />"
+    },
+    {
+      "name": "rating",
+      "tag": "<x-muni::rating>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/rating.blade.php",
+      "description": "Componente rating del sistema de diseño municipal",
+      "props": [
+        {
+          "name": "value",
+          "type": "int",
+          "default": "0",
+          "required": false
+        },
+        {
+          "name": "max",
+          "type": "int",
+          "default": "5",
+          "required": false
+        },
+        {
+          "name": "readonly",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "name",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "tone",
+          "type": "string",
+          "default": "accent",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border-2",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-glow",
+        "--muni-ok-fg",
+        "--muni-ring",
+        "--muni-warn-fg"
+      ],
+      "example": "<x-muni::rating />"
+    },
+    {
+      "name": "record-item",
+      "tag": "<x-muni::record-item>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/record-item.blade.php",
+      "description": "UNA FICHA DE LA LISTA",
+      "props": [
+        {
+          "name": "href",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "tone",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "toneLabel",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "folio",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "folioLabel",
+          "type": "string",
+          "default": "Folio",
+          "required": false
+        },
+        {
+          "name": "navegar",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "title",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "actions",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "meta",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni",
+          "x-slot"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border-2",
+        "--muni-danger-fg",
+        "--muni-info-fg",
+        "--muni-ok-fg",
+        "--muni-warn-fg"
+      ],
+      "example": "<x-muni::record-item></x-muni::record-item>"
+    },
+    {
+      "name": "record-list",
+      "tag": "<x-muni::record-list>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/record-list.blade.php",
+      "description": "LOS MISMOS REGISTROS COMO LISTA DE FICHAS, cuando la tabla no cabe:",
+      "props": [
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni",
+          "x-slot"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-accent-strong",
+        "--muni-border",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-hint",
+        "--muni-muted",
+        "--muni-radius",
+        "--muni-radius-sm",
+        "--muni-shadow",
+        "--muni-shadow-md",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-surface-3",
+        "--muni-text",
+        "--muni-topbar-h"
+      ],
+      "example": "<x-muni::record-list></x-muni::record-list>"
+    },
+    {
+      "name": "reverb-meta",
+      "tag": "<x-muni::reverb-meta>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/reverb-meta.blade.php",
+      "description": "Datos de conexión de Reverb para el navegador, en RUNTIME",
+      "props": [],
+      "slots": [],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [],
+      "example": "<x-muni::reverb-meta />"
+    },
+    {
+      "name": "ring",
+      "tag": "<x-muni::ring>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/ring.blade.php",
+      "description": "El rol va en el contenedor del arco y NO en la raíz, y la geometría no es la de progress:",
+      "props": [
+        {
+          "name": "value",
+          "type": "int",
+          "default": "0",
+          "required": false
+        },
+        {
+          "name": "max",
+          "type": "int",
+          "default": "100",
+          "required": false
+        },
+        {
+          "name": "size",
+          "type": "int",
+          "default": "96",
+          "required": false
+        },
+        {
+          "name": "tone",
+          "type": "string",
+          "default": "accent",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "showValue",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-dur-slow",
+        "--muni-ease",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-info-fg",
+        "--muni-muted",
+        "--muni-ok-fg",
+        "--muni-surface-3",
+        "--muni-warn-fg"
+      ],
+      "example": "<x-muni::ring />"
+    },
+    {
+      "name": "rut-input",
+      "tag": "<x-muni::rut-input>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/rut-input.blade.php",
+      "description": "El veredicto del dígito verificador",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "default": "RUT",
+          "required": false
+        },
+        {
+          "name": "name",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "value",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "error",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "hint",
+          "type": "string",
+          "default": "Formato 12.345.678-9. El dígito verificador puede ser la letra K.",
+          "required": false
+        },
+        {
+          "name": "required",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-bind",
+          "x-data",
+          "x-model",
+          "x-muni",
+          "x-on",
+          "x-ref",
+          "x-show",
+          "x-text"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-danger-fg",
+        "--muni-field-border",
+        "--muni-field-border-error",
+        "--muni-font-mono",
+        "--muni-font-sans"
+      ],
+      "example": "<x-muni::rut-input label=\"RUT\" />"
+    },
+    {
+      "name": "segmented",
+      "tag": "<x-muni::segmented>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/segmented.blade.php",
+      "description": "Control segmentado (toggle de filtro):",
+      "props": [
+        {
+          "name": "name",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "options",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "value",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "submitLabel",
+          "type": "string",
+          "default": "Aplicar",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-on",
+          "x-show"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-border-2",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-shadow",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::segmented></x-muni::segmented>"
+    },
+    {
+      "name": "select",
+      "tag": "<x-muni::select>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/select.blade.php",
+      "description": "La ayuda y el error CONVIVEN, cada uno con su id, y los dos van encadenados en aria-describedby",
+      "props": [
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "name",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "options",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "selected",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "placeholder",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "error",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "hint",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "required",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "requiredText",
+          "type": "string",
+          "default": "obligatorio",
+          "required": false
+        },
+        {
+          "name": "requiredTextVisible",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-danger-bg",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-field-border",
+        "--muni-field-border-error",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-hint",
+        "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface",
+        "--muni-text"
+      ],
+      "example": "<x-muni::select></x-muni::select>"
+    },
+    {
+      "name": "selector-tema",
+      "tag": "<x-muni::selector-tema>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/selector-tema.blade.php",
+      "description": "Selector de tema:",
+      "props": [
+        {
+          "name": "action",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "value",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "default": "muni-tema",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Tema",
+          "required": false
+        },
+        {
+          "name": "hint",
+          "type": "string",
+          "default": "Con «Sistema» se sigue la preferencia del equipo.",
+          "required": false
+        },
+        {
+          "name": "submitLabel",
+          "type": "string",
+          "default": "Guardar",
+          "required": false
+        },
+        {
+          "name": "enabled",
+          "type": "bool",
+          "default": "true",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-muni",
+          "x-on",
+          "x-text"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border-2",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-shadow",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::selector-tema :action=\"$action\" />"
+    },
+    {
+      "name": "sesion-guardia",
+      "tag": "<x-muni::sesion-guardia>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/sesion-guardia.blade.php",
+      "description": "Guardia de sesión (Alpine 3 core + plugin Focus, que viaja en el bundle de Livewire)",
+      "props": [
+        {
+          "name": "expiraEn",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "renovarUrl",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "salirUrl",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "ingresarUrl",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "avisarA",
+          "type": "int",
+          "default": "300",
+          "required": false
+        },
+        {
+          "name": "dialogoA",
+          "type": "int",
+          "default": "60",
+          "required": false
+        },
+        {
+          "name": "ahora",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "duracion",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-cloak",
+          "x-data",
+          "x-ref",
+          "x-show",
+          "x-teleport",
+          "x-text",
+          "x-trap"
+        ],
+        "plugins": [
+          "focus"
+        ]
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-accent-strong",
+        "--muni-bg",
+        "--muni-border",
+        "--muni-border-2",
+        "--muni-danger-bg",
+        "--muni-danger-border",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-on-accent",
+        "--muni-overlay-border",
+        "--muni-radius",
+        "--muni-radius-lg",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-shadow-lg",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text",
+        "--muni-warn-fg"
+      ],
+      "example": "<x-muni::sesion-guardia :expiraEn=\"$expiraEn\" />"
+    },
+    {
+      "name": "sidebar",
+      "tag": "<x-muni::sidebar>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/sidebar.blade.php",
+      "description": "Barra lateral de navegación para dashboards",
+      "props": [
+        {
+          "name": "width",
+          "type": "string",
+          "default": "240px",
+          "required": false
+        },
+        {
+          "name": "breakpoint",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Navegación principal",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-muni",
+          "x-trap"
+        ],
+        "plugins": [
+          "focus"
+        ]
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-overlay-border",
+        "--muni-shadow-lg",
+        "--muni-surface"
+      ],
+      "example": "<x-muni::sidebar width=\"240px\"></x-muni::sidebar>"
+    },
+    {
+      "name": "skeleton",
+      "tag": "<x-muni::skeleton>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/skeleton.blade.php",
+      "description": "Componente skeleton del sistema de diseño municipal",
+      "props": [
+        {
+          "name": "width",
+          "type": "string",
+          "default": "100%",
+          "required": false
+        },
+        {
+          "name": "height",
+          "type": "string",
+          "default": "14px",
+          "required": false
+        },
+        {
+          "name": "rounded",
+          "type": "string",
+          "default": "var(--muni-radius-sm)",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-radius-sm",
+        "--muni-surface-3",
+        "--muni-text"
+      ],
+      "example": "<x-muni::skeleton width=\"100%\" height=\"14px\" />"
+    },
+    {
+      "name": "skip-link",
+      "tag": "<x-muni::skip-link>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/skip-link.blade.php",
+      "description": "ENLACE DE SALTO AL CONTENIDO (WCAG 2.2 nivel A, 2.4.1 «Evitar bloques»)",
+      "props": [
+        {
+          "name": "target",
+          "type": "string",
+          "default": "#muni-contenido",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-radius-sm",
+        "--muni-shadow-md",
+        "--muni-surface",
+        "--muni-text",
+        "--muni-topbar-h"
+      ],
+      "example": "<x-muni::skip-link target=\"#muni-contenido\"></x-muni::skip-link>"
+    },
+    {
+      "name": "sortable-table",
+      "tag": "<x-muni::sortable-table>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/sortable-table.blade.php",
+      "description": "Acotado al contenedor y NUNCA en `.window`:",
+      "props": [
+        {
+          "name": "columns",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "rows",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "empty",
+          "type": "string",
+          "default": "Sin resultados.",
+          "required": false
+        },
+        {
+          "name": "searchable",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "caption",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "selectable",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "rowKey",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "selectionScope",
+          "type": "string",
+          "default": "page",
+          "required": false
+        },
+        {
+          "name": "selectionTotal",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "selectionName",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "densidad",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "bulk",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "caption",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "rowKey",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-cloak",
+          "x-data",
+          "x-effect",
+          "x-for",
+          "x-if",
+          "x-model",
+          "x-show",
+          "x-text"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-field-border",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-radius",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-surface-3",
+        "--muni-text"
+      ],
+      "example": "<x-muni::sortable-table />"
+    },
+    {
+      "name": "spinner",
+      "tag": "<x-muni::spinner>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/spinner.blade.php",
+      "description": "EL DIBUJO de una carga en curso",
+      "props": [
+        {
+          "name": "size",
+          "type": "string",
+          "default": "20px",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-dur"
+      ],
+      "example": "<x-muni::spinner size=\"20px\" />"
+    },
+    {
+      "name": "stat",
+      "tag": "<x-muni::stat>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/stat.blade.php",
+      "description": "`role=\"group\"` + `aria-labelledby` atan la cifra a su rótulo sin tocar el DOM (un <dl> con un solo par no aporta más y rompía la compatibilidad de los hosts que ya estilizan `.muni-stat`)",
+      "props": [
+        {
+          "name": "value",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "tone",
+          "type": "string",
+          "default": "neutral",
+          "required": false
+        },
+        {
+          "name": "delta",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "deltaDir",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "spark",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "hint",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-border",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-font-mono",
+        "--muni-hint",
+        "--muni-info-fg",
+        "--muni-muted",
+        "--muni-ok-fg",
+        "--muni-radius",
+        "--muni-shadow",
+        "--muni-shadow-md",
+        "--muni-surface",
+        "--muni-text",
+        "--muni-warn-fg"
+      ],
+      "example": "<x-muni::stat :value=\"$value\" :label=\"$label\" />"
+    },
+    {
+      "name": "stepper",
+      "tag": "<x-muni::stepper>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/stepper.blade.php",
+      "description": "El indicador de pasos de un trámite",
+      "props": [
+        {
+          "name": "steps",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "current",
+          "type": "int",
+          "default": "0",
+          "required": false
+        },
+        {
+          "name": "orientation",
+          "type": "string",
+          "default": "horizontal",
+          "required": false
+        },
+        {
+          "name": "navName",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-border-2",
+        "--muni-danger-bg",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-hint",
+        "--muni-muted",
+        "--muni-on-accent",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::stepper />"
+    },
+    {
+      "name": "switch",
+      "tag": "<x-muni::switch>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/switch.blade.php",
+      "description": "El mensaje va FUERA del <label>:",
+      "props": [
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "name",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "checked",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "description",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "error",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-model"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-danger-bg",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-field-border",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface",
+        "--muni-surface-3",
+        "--muni-text"
+      ],
+      "example": "<x-muni::switch />"
+    },
+    {
+      "name": "tab-panel",
+      "tag": "<x-muni::tab-panel>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/tab-panel.blade.php",
+      "description": "El grupo se lee del padre con @aware",
+      "props": [
+        {
+          "name": "index",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-cloak",
+          "x-muni",
+          "x-show",
+          "x-transition"
+        ],
+        "plugins": []
+      },
+      "tokens": [],
+      "example": "<x-muni::tab-panel :index=\"$index\"></x-muni::tab-panel>"
+    },
+    {
+      "name": "table-header",
+      "tag": "<x-muni::table-header>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/table-header.blade.php",
+      "description": "La franja entre el <h1> de la pantalla y la tabla:",
+      "props": [
+        {
+          "name": "title",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "level",
+          "type": "int",
+          "default": "2",
+          "required": false
+        },
+        {
+          "name": "total",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "filtered",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "unit",
+          "type": "string",
+          "default": "resultados",
+          "required": false
+        },
+        {
+          "name": "countLabel",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "actions",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "filters",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "search",
+          "description": "Slot con nombre opcional"
+        },
+        {
+          "name": "totalCount",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-border",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-text"
+      ],
+      "example": "<x-muni::table-header></x-muni::table-header>"
+    },
+    {
+      "name": "tabs-ruta",
+      "tag": "<x-muni::tabs-ruta>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/tabs-ruta.blade.php",
+      "description": "SOLAPAS DE RUTA — la regla en una línea:",
+      "props": [
+        {
+          "name": "items",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "actual",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Secciones",
+          "required": false
+        },
+        {
+          "name": "navegar",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni",
+          "x-show"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-on-accent",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface-2",
+        "--muni-surface-3",
+        "--muni-text",
+        "--muni-topbar-h"
+      ],
+      "example": "<x-muni::tabs-ruta></x-muni::tabs-ruta>"
+    },
+    {
+      "name": "tabs",
+      "tag": "<x-muni::tabs>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/tabs.blade.php",
+      "description": "Pestañas (Alpine 3 core, patrón «tabs» de las WAI-ARIA APG)",
+      "props": [
+        {
+          "name": "tabs",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "default",
+          "type": "int",
+          "default": "0",
+          "required": false
+        },
+        {
+          "name": "id",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "activation",
+          "type": "string",
+          "default": "auto",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-muni",
+          "x-ref"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-text"
+      ],
+      "example": "<x-muni::tabs></x-muni::tabs>"
+    },
+    {
+      "name": "textarea",
+      "tag": "<x-muni::textarea>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/textarea.blade.php",
+      "description": "El crecimiento con el contenido es MEJORA, no requisito:",
+      "props": [
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "name",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "error",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "hint",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "required",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "requiredText",
+          "type": "string",
+          "default": "obligatorio",
+          "required": false
+        },
+        {
+          "name": "requiredTextVisible",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "rows",
+          "type": "int",
+          "default": "4",
+          "required": false
+        },
+        {
+          "name": "maxlength",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-init",
+          "x-on",
+          "x-ref",
+          "x-text"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-danger-bg",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-field-border",
+        "--muni-field-border-error",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-hint",
+        "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-text"
+      ],
+      "example": "<x-muni::textarea></x-muni::textarea>"
+    },
+    {
+      "name": "timeline",
+      "tag": "<x-muni::timeline>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/timeline.blade.php",
+      "description": "Línea de tiempo = bitácora auditable",
+      "props": [
+        {
+          "name": "items",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": false,
+        "directives": [],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-accent-strong",
+        "--muni-border",
+        "--muni-border-2",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-glow",
+        "--muni-hint",
+        "--muni-info-fg",
+        "--muni-muted",
+        "--muni-ok-fg",
+        "--muni-radius-sm",
+        "--muni-surface",
+        "--muni-surface-2",
+        "--muni-surface-3",
+        "--muni-text",
+        "--muni-warn-fg"
+      ],
+      "example": "<x-muni::timeline />"
+    },
+    {
+      "name": "toast-host",
+      "tag": "<x-muni::toast-host>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/toast-host.blade.php",
+      "description": "La pila de avisos flotantes de las vistas públicas Blade, con dos regiones vivas propias y autocierre ajustable",
+      "props": [
+        {
+          "name": "position",
+          "type": "string",
+          "default": "bottom-right",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-data",
+          "x-for",
+          "x-if",
+          "x-muni",
+          "x-ref",
+          "x-text",
+          "x-transition"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-border",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-hint",
+        "--muni-info-fg",
+        "--muni-muted",
+        "--muni-ok-fg",
+        "--muni-overlay-border",
+        "--muni-radius",
+        "--muni-radius-sm",
+        "--muni-shadow-lg",
+        "--muni-surface",
+        "--muni-text",
+        "--muni-warn-fg"
+      ],
+      "example": "<x-muni::toast-host position=\"bottom-right\" />"
+    },
+    {
+      "name": "tooltip",
+      "tag": "<x-muni::tooltip>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/tooltip.blade.php",
+      "description": "Ayuda breve de un control (Alpine 3 core)",
+      "props": [
+        {
+          "name": "text",
+          "type": "string",
+          "default": "",
+          "required": false
+        },
+        {
+          "name": "placement",
+          "type": "string",
+          "default": "top",
+          "required": false
+        },
+        {
+          "name": "describe",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "as",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-cloak",
+          "x-data",
+          "x-muni",
+          "x-ref",
+          "x-show",
+          "x-transition"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-font-sans",
+        "--muni-on-accent",
+        "--muni-radius-sm",
+        "--muni-shadow-md",
+        "--muni-text",
+        "--muni-tt"
+      ],
+      "example": "<x-muni::tooltip placement=\"top\"></x-muni::tooltip>"
+    },
+    {
+      "name": "topbar",
+      "tag": "<x-muni::topbar>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/topbar.blade.php",
+      "description": "Placa del escudo:",
+      "props": [
+        {
+          "name": "system",
+          "type": "mixed",
+          "default": null,
+          "required": true
+        },
+        {
+          "name": "subtitle",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "default": "online",
+          "required": false
+        },
+        {
+          "name": "statusLabel",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "logo",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        },
+        {
+          "name": "statusLabel",
+          "description": "Slot con nombre opcional"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-muni"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-border",
+        "--muni-font-mono",
+        "--muni-font-sans",
+        "--muni-logo-plate",
+        "--muni-logo-plate-fg",
+        "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-surface",
+        "--muni-text",
+        "--muni-topbar-h"
+      ],
+      "example": "<x-muni::topbar :system=\"$system\"></x-muni::topbar>"
+    }
+  ]
+}

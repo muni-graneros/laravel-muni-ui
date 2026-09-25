@@ -5,7 +5,6 @@ use Filament\Panel;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 use Muni\Ui\Filament\MuniPanel;
-use Muni\Ui\Tests\Fixtures\PanelDePruebaProvider;
 
 // Lo que este repo YA tiene en producción en cuatro paneles y hasta hoy no
 // tenía ni una prueba. Va primero a propósito: un arnés que no puede probar lo

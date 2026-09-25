@@ -31,6 +31,7 @@ use Muni\Shared\Privacidad\Ciclo\SeparacionDeFunciones;
 use Muni\Shared\Privacidad\Contratos\BuscaTitulares;
 use Muni\Shared\Privacidad\Contratos\PropagaSupresion;
 use Muni\Shared\Privacidad\Contratos\TitularDeDatos;
+use Muni\Shared\Privacidad\DiscoEvidenciaNoConfigurado;
 use Muni\Shared\Privacidad\EstadoDeSolicitud;
 use Muni\Shared\Privacidad\ExportacionDeDatos;
 use Muni\Shared\Privacidad\Modelos\Solicitud;
@@ -198,10 +199,19 @@ class SolicitudResource extends Resource
                     FileUpload::make('acreditacion_path')
                         ->label('Documento que acredita la representación')
                         ->helperText('Obligatorio cuando no viene el propio titular.')
-                        ->disk((string) config('privacidad.disco_evidencia'))
+                        ->disk(self::discoEvidencia())
                         ->directory('acreditaciones')
-                        ->acceptedFileTypes(['application/pdf', 'image/*'])
-                        ->openable()
+                        // Explícito aunque Filament ya lo infiera: si el disco
+                        // no resolviera, este es el candado que lo manda a
+                        // `local` y no a `public`.
+                        ->visibility('private')
+                        // Lista cerrada. `image/*` dejaba pasar SVG, que es XML
+                        // con scripts: abierto en el origen del panel corre con
+                        // la sesión (y el MFA) del funcionario ya superados.
+                        ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/webp'])
+                        ->maxSize(10240)
+                        // Solo descarga, nunca abrir en el navegador: es la
+                        // otra mitad del mismo candado.
                         ->downloadable()
                         ->visible(fn (Get $get): bool => self::exigeAcreditacion($get('solicitante')))
                         ->required(fn (Get $get): bool => self::exigeAcreditacion($get('solicitante')))
@@ -223,6 +233,40 @@ class SolicitudResource extends Resource
                         ->columnSpanFull(),
                 ]),
         ]);
+    }
+
+    /**
+     * El disco donde se guarda el documento de acreditación, o truena.
+     *
+     * Antes era `->disk((string) config('privacidad.disco_evidencia'))`, y con
+     * la clave en blanco eso NO tronaba: `(string) null` es `''`, `filled('')`
+     * es falso para Filament, y el campo caía en silencio a
+     * `filament.default_filesystem_disk` —el `FILESYSTEM_DISK` del adoptante,
+     * que en más de uno es `public`—. La clave la fusiona muni-shared como
+     * `env('PRIVACIDAD_DISCO_EVIDENCIA')` sin default, así que «no configurado»
+     * es lo normal en un sistema que recién monta el panel. El documento es un
+     * dato personal (Ley 21.719): antes que guardarlo donde no corresponde, el
+     * formulario no se arma. Mismo criterio y misma excepción que
+     * `Bitacora::resolverDisco()` en muni-shared, que cierra el otro extremo
+     * (la supresión) del mismo disco; `trim` porque `PRIVACIDAD_DISCO_EVIDENCIA=`
+     * presente y vacía da `''`, y `??` no lo atrapa.
+     *
+     * @throws DiscoEvidenciaNoConfigurado
+     */
+    private static function discoEvidencia(): string
+    {
+        $disco = trim((string) config('privacidad.disco_evidencia'));
+
+        if ($disco === '') {
+            throw new DiscoEvidenciaNoConfigurado(
+                'privacidad.disco_evidencia está en blanco: el documento que acredita la representación '
+                .'es un dato personal (Ley 21.719) y no puede caer al disco por defecto de Filament. '
+                .'Declarar PRIVACIDAD_DISCO_EVIDENCIA con el disco privado donde este sistema guarda '
+                .'la evidencia antes de recibir solicitudes.',
+            );
+        }
+
+        return $disco;
     }
 
     /**

@@ -1,15 +1,17 @@
 @props([
-    'value' => 0, // valor actual
-    'max' => 100, // valor máximo
-    'tone' => 'accent', // accent | ok | warn | danger | info
-    'label' => null, // etiqueta sobre la barra
-    'showValue' => false, // muestra el porcentaje
+    'value' => 0,
+    'max' => 100,
+    'tone' => 'accent',
+    'label' => null,
+    'showValue' => false,
 ])
 
 @php
-    $value = (float) $value; $max = (float) $max;
-    $pct = $max > 0 ? (int) max(0, min(100, round($value / $max * 100))) : 0;
-    $color = \Muni\Ui\Tono::color($tone);
+    $pct = $max > 0 ? max(0, min(100, round($value / $max * 100))) : 0;
+    $color = [
+        'accent' => 'var(--muni-accent)', 'ok' => 'var(--muni-ok-fg)',
+        'warn' => 'var(--muni-warn-fg)', 'danger' => 'var(--muni-danger-fg)', 'info' => 'var(--muni-info-fg)',
+    ][$tone] ?? 'var(--muni-accent)';
 @endphp
 
 <div {{ $attributes }}>
@@ -30,6 +32,19 @@
     <div role="progressbar" aria-valuenow="{{ $pct }}" aria-valuemin="0" aria-valuemax="100"
          aria-label="{{ $attributes->get('aria-label', $label ?: 'Progreso') }}"
          style="height:7px;border-radius:999px;background:var(--muni-surface-3);overflow:hidden;">
-        <div style="height:100%;width:{{ $pct }}%;border-radius:999px;background:{{ $color }};transition:width calc(var(--muni-dur) * 3) var(--muni-ease);"></div>
+        <div class="muni-progress__relleno" style="height:100%;width:{{ $pct }}%;border-radius:999px;background:{{ $color }};transition:width var(--muni-dur-slow, 600ms) var(--muni-ease);"></div>
     </div>
 </div>
+
+{{--
+    La barra recorre un trayecto: dura --muni-dur-slow (600 ms), no --muni-dur
+    (160 ms), y no una duración fija, que ignoraba prefers-reduced-motion
+    (DESIGN §6). La guardia local cubre el panel Filament, donde --muni-dur no
+    baja, y una hoja publicada vieja sin el token, que cae en el respaldo.
+--}}
+@once
+    <style>
+        /* Con !important: la transición va en el style del relleno. */
+        @media (prefers-reduced-motion:reduce) { .muni-progress__relleno { transition:none !important; } }
+    </style>
+@endonce

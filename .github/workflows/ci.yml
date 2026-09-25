@@ -38,6 +38,16 @@ jobs:
       - name: PHPStan (nivel 8)
         run: ./vendor/bin/phpstan analyse --memory-limit=1G --no-progress
 
+      # Los bancos de navegador que genera Pest (pantalla-bloqueo, selector-tema,
+      # plantilla-pantalla…) embeben Alpine y el plugin Focus desde node_modules:
+      # sin ellos las pruebas fallan con «corre `npm install`».
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
       - name: Pest
         run: ./vendor/bin/pest
 

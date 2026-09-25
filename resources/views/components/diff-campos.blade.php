@@ -14,10 +14,10 @@
     'caption' => 'Cambios por campo',
     /* Qué decir cuando no hay ni un cambio que mostrar. */
     'empty' => 'Sin cambios registrados.',
-    'fieldHeading' => 'Campo',
-    'stateHeading' => 'Estado',
-    'beforeHeading' => 'Antes',
-    'afterHeading' => 'Después',
+    'fieldHeading' => 'Campo', // encabezado de la columna de campo
+    'stateHeading' => 'Estado', // encabezado de la columna de estado
+    'beforeHeading' => 'Antes', // encabezado de la columna «antes»
+    'afterHeading' => 'Después', // encabezado de la columna «después»
     /* Texto del hueco: lo que se lee cuando un lado del cambio no tiene valor. */
     'nilLabel' => 'sin valor',
 ])

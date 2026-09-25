@@ -78,7 +78,7 @@ jobs:
       # cambió y nadie lo regeneró, el catálogo muestra algo que ya no existe.
       - name: El catálogo está al día
         run: |
-          php demo/catalogo/build.php demo/catalogo/node_modules/alpinejs/dist/cdn.min.js
+          php demo/catalogo/build.php demo/catalogo/node_modules/@alpinejs/focus/dist/cdn.min.js demo/catalogo/node_modules/alpinejs/dist/cdn.min.js
           git diff --exit-code --stat demo/catalogo.html || {
             echo "::error file=demo/catalogo.html::El catálogo no está al día. Corre: cd demo/catalogo && npm run construir, y commitea demo/catalogo.html."
             exit 1

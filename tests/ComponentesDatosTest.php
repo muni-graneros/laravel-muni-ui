@@ -57,12 +57,12 @@ it('pagination acota la página actual y no deja enlaces muertos enfocables', fu
 
     expect($html)->toContain('aria-current="page">3<')
         ->and($html)->toContain('href="/p/2"')
-        ->and($html)->toMatch('/<span aria-disabled="true"[^>]*>Siguiente/')
+        ->and($html)->toMatch('/<span [^>]*aria-disabled="true"[^>]*>Siguiente/')
         ->and($html)->not->toContain('href="#"');
 
     expect(Blade::render('<x-muni::pagination :current="0" :total="0" />'))
         ->toContain('aria-current="page">1<')
-        ->toMatch('/<span aria-disabled="true"[^>]*>‹ Anterior/');
+        ->toMatch('/<span [^>]*aria-disabled="true"[^>]*>‹ Anterior/');
 });
 
 it('filter-bar emite el token CSRF cuando no es GET', function () {
@@ -117,10 +117,11 @@ it('escapa hacia Alpine los valores con apóstrofo', function () {
     $dz = Blade::render('<x-muni::file-dropzone label="Sube l\'archivo" />');
     expect($dz)->toContain('Sube l&#039;archivo')->and($dz)->not->toContain("'Sube l'archivo'");
 
+    // calendar lleva `min` por data-min, ya validado: nunca dentro de la cadena de x-data.
     $cal = Blade::render('<x-muni::calendar min="2026-09-10" />');
-    expect($cal)->toContain("('2026-09-10')")->and($cal)->not->toContain("new Date('2026");
+    expect($cal)->toContain('data-min="2026-09-10"')->and($cal)->not->toContain("new Date('2026");
 
-    expect(Blade::render('<x-muni::calendar min="x\'); alert(1); (\'" />'))->toContain('(null)');
+    expect(Blade::render('<x-muni::calendar min="x\'); alert(1); (\'" />'))->not->toContain('data-min')->not->toContain('alert(1)');
 });
 
 it('rating pinta las estrellas desde el servidor y en solo lectura no es interactivo', function () {
@@ -153,11 +154,13 @@ it('accordion abre por clave aunque las claves de items no sean correlativas', f
     expect($html)->toContain('open: 1,');
 });
 
-it('la red de reduced-motion solo toca clases muni-, no utilidades del host como text-muni-accent', function () {
-    $css = file_get_contents(__DIR__.'/../resources/css/muni-ui.css');
-
-    expect($css)->not->toContain('[class*="muni-"]')
-        ->and($css)->toContain('[class^="muni-"]:not(.muni-spinner), [class*=" muni-"]:not(.muni-spinner)');
+/*
+ * El movimiento reducido va por tokens (DESIGN §6, MovimientoReducidoEnPanelTest).
+ * Una red por atributo `[class*="muni-"]` alcanzaría también utilidades del host
+ * como `text-muni-accent` y les apagaría la transición.
+ */
+it('muni-ui.css no apaga transiciones con un selector por subcadena de clase', function () {
+    expect(file_get_contents(__DIR__.'/../resources/css/muni-ui.css'))->not->toContain('[class*="muni-"]');
 });
 
 it('sortable-table renderiza encabezados y filas en el servidor para verse sin JS', function () {
@@ -165,7 +168,7 @@ it('sortable-table renderiza encabezados y filas en el servidor para verse sin J
 
     expect($html)->toContain('>Nombre</th>')
         ->and($html)->toContain('>Ana &lt;b&gt;</td>')
-        ->and($html)->toMatch('/<tr x-show="false" class="muni-st__danger">/');
+        ->and($html)->toMatch('/<tr x-init="\$el.remove\(\)" class="muni-st__danger">/');
 });
 
 it('data-table ordena por enlace con aria-sort en la columna actual', function () {

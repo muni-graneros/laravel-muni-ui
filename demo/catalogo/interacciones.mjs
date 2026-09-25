@@ -52,13 +52,13 @@ await prueba('modal: foco adentro, Tab atrapado, Escape devuelve el foco', async
     await abrir.click();
     await page.waitForTimeout(250);
     igual(await dentro(page, '[role=dialog]'), true, 'foco dentro del diálogo al abrir');
-    igual(await page.evaluate(() => document.body.style.overflow), 'hidden', 'scroll bloqueado');
+    igual(await page.evaluate(() => document.documentElement.style.overflow || document.body.style.overflow), 'hidden', 'scroll bloqueado');
     for (let i = 0; i < 6; i++) await page.keyboard.press('Tab');
     igual(await dentro(page, '[role=dialog]'), true, 'foco sigue dentro tras 6 Tab');
     await page.keyboard.press('Escape');
     await page.waitForTimeout(250);
     igual(await foco(page), 'Dar de baja', 'foco vuelve al botón que abrió');
-    igual(await page.evaluate(() => document.body.style.overflow), '', 'scroll liberado');
+    igual(await page.evaluate(() => document.documentElement.style.overflow || document.body.style.overflow), '', 'scroll liberado');
 });
 
 await prueba('drawer: el botón del pie con open = false cierra', async (page) => {
@@ -80,10 +80,10 @@ await prueba('modal dentro de drawer: Escape cierra de a uno', async (page) => {
     await page.keyboard.press('Escape');
     await page.waitForTimeout(700);
     igual(await page.locator('[role=dialog]:visible').count(), 1, 'queda el drawer');
-    igual(await page.evaluate(() => document.body.style.overflow), 'hidden', 'scroll sigue bloqueado');
+    igual(await page.evaluate(() => document.documentElement.style.overflow || document.body.style.overflow), 'hidden', 'scroll sigue bloqueado');
     await page.keyboard.press('Escape');
     await page.waitForTimeout(700);
-    igual(await page.evaluate(() => document.body.style.overflow), '', 'scroll liberado al cerrar todo');
+    igual(await page.evaluate(() => document.documentElement.style.overflow || document.body.style.overflow), '', 'scroll liberado al cerrar todo');
 });
 
 await prueba('dropdown: flechas recorren, Escape vuelve al botón, Tab afuera cierra', async (page) => {
@@ -115,17 +115,16 @@ await prueba('tabs: las flechas mueven el foco y el panel', async (page) => {
     igual(await t.getByRole('tabpanel').filter({ visible: true }).innerText(), 'Cédula, certificado de residencia y contrato de arriendo.', 'panel visible');
 });
 
-await prueba('calendar: teclado respeta min y el enlace x-model se actualiza', async (page) => {
+await prueba('calendar: el teclado elige, respeta min y el enlace x-model se actualiza', async (page) => {
     const c = demo(page, 'calendar');
     const enlazado = c.locator('.muni-cal').nth(1);
     const valor = () => c.locator('code').last().innerText();
     igual(await valor(), '2026-10-05', 'valor inicial');
-    await enlazado.locator('button[aria-pressed=true]').focus();
-    await page.keyboard.press('ArrowDown');
-    await page.waitForTimeout(150);
+    // develop dejó la rejilla APG (flechas) fuera a propósito: cada día es un botón.
+    await enlazado.locator('button:not([disabled])', { hasText: /^12$/ }).first().focus();
     await page.keyboard.press('Enter');
     await page.waitForTimeout(150);
-    igual(await valor(), '2026-10-12', 'flecha abajo + Enter elige una semana después');
+    igual(await valor(), '2026-10-12', 'Enter sobre el 12 lo elige');
     await c.getByRole('button', { name: 'Poner 24-12-2026' }).click();
     await page.waitForTimeout(150);
     igual(await enlazado.locator('button[aria-pressed=true]').innerText(), '24', 'el valor externo marca el día');
@@ -193,11 +192,13 @@ pruebas++;
     const page = await pagina({ width: 390, height: 844 });
     try {
         const frame = page.frameLocator('#c-dashboard-shell iframe');
-        const menu = frame.getByRole('button', { name: 'Menú' });
+        // Por clase y no por rol: con la lateral abierta, x-trap.inert deja el resto
+        // (el botón incluido) con aria-hidden y el rol ya no lo encuentra.
+        const menu = frame.locator('.muni-ds__burger');
         await menu.click();
         await page.waitForTimeout(350);
         igual(await menu.getAttribute('aria-expanded'), 'true', 'el menú abre la barra lateral en móvil');
-        await frame.locator('body').press('Escape');
+        await page.keyboard.press('Escape');
         await page.waitForTimeout(350);
         igual(await menu.getAttribute('aria-expanded'), 'false', 'Escape la cierra');
     } catch (e) {

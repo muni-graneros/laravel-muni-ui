@@ -1,12 +1,18 @@
 @props([
-    'value', // cifra principal (ya formateada)
-    'label', // qué mide
+    'value', // cifra principal, obligatoria
+    'label', // rótulo de la cifra, obligatorio
     'tone' => 'neutral', // neutral | ok | warn | danger | info
-    'hint' => null, // texto chico bajo la etiqueta
+    'hint' => null, // línea secundaria bajo el rótulo
 ])
 
 @php
-    $accent = \Muni\Ui\Tono::color($tone === 'muted' ? 'neutral' : $tone, 'neutral');
+    $accent = [
+        'neutral' => 'var(--muni-text)',
+        'ok' => 'var(--muni-ok-fg)',
+        'warn' => 'var(--muni-warn-fg)',
+        'danger' => 'var(--muni-danger-fg)',
+        'info' => 'var(--muni-info-fg)',
+    ][$tone] ?? 'var(--muni-text)';
 @endphp
 
 <div

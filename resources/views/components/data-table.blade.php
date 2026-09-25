@@ -1,6 +1,6 @@
 @props([
-    'columns' => [],
-    'empty' => 'Sin resultados para este filtro.',
+    'columns' => [], // encabezados: strings o ['label' => , 'sort' => clave]
+    'empty' => 'Sin resultados para este filtro.', // texto cuando el slot no trae filas
     /*
      * Nombre de la tabla. Va como <caption> oculto a la vista pero presente en el
      * árbol de accesibilidad, y es también el nombre de la región desplazable.
@@ -14,14 +14,14 @@
      * que hoy está bien.
      */
     'stickyHeader' => false,
-    'stickyColumn' => false,
+    'stickyColumn' => false, // fija la primera columna al desplazar en horizontal
     /* Alto máximo del marco (p. ej. `60vh`). También opt-in: sin él no hay recorte. */
     'maxHeight' => null,
     /* Densidad: 'normal' o 'compact'. Dos, no cinco: nueve sistemas que deben verse
        igual no necesitan cinco densidades, necesitan un default bueno.
        Se conserva porque ya está publicada y hay vistas que la usan; lo nuevo se
        pide con `densidad`, que es la que además se hereda del anfitrión. */
-    'density' => 'normal',
+    'density' => 'normal', // normal | compact (heredada; preferir `densidad`)
     /*
      * Densidad de la fila: 'comoda' (la de siempre) o 'compacta'. Sin la prop, la
      * tabla hereda lo que el anfitrión haya pintado en el <html> como
@@ -59,6 +59,18 @@
     'selectable' => false,
     /* Nombre accesible de la casilla de cabecera. Sin él el lector dice «casilla». */
     'selectionLabel' => 'Seleccionar todas las filas de esta página',
+    /*
+     * ORDEN EN EL SERVIDOR, para tablas grandes y paginadas (`sortable-table`
+     * ordena en el navegador y solo sirve para listas cortas ya cargadas). Una
+     * columna declarada como ['label' => , 'sort' => clave] se vuelve un enlace
+     * (`sortUrl`: fn (string $clave, string $dir) => string) o un botón Livewire
+     * (`wireSort`: nombre del método, recibe la clave), con `aria-sort` en el <th>.
+     * `sort` y `direction` dicen por qué columna y en qué sentido viene ordenada.
+     */
+    'sort' => null,
+    'direction' => 'asc', // asc | desc: sentido del orden actual
+    'sortUrl' => null, // fn (string $clave, string $dir) => string
+    'wireSort' => null, // método Livewire que recibe la clave de orden
 ])
 
 @php
@@ -104,6 +116,15 @@
     $scrollClass = 'muni-dt__scroll'
         .($stickyHeader ? ' muni-dt__scroll--head' : '')
         .($stickyColumn ? ' muni-dt__scroll--col' : '');
+
+    $direction = $direction === 'desc' ? 'desc' : 'asc';
+
+    /*
+     * Livewire envuelve cada @foreach/@if en comentarios de morph, así que un slot
+     * sin filas no llega vacío y el estado vacío no se mostraba nunca dentro de un
+     * componente Livewire. Para decidir si hay filas se ignoran los comentarios.
+     */
+    $hayFilas = trim((string) preg_replace('/<!--.*?-->/s', '', (string) $slot)) !== '';
 
     $tableClass = 'muni-dt'
         .($selectable ? ' muni-dt--pick' : '')
@@ -228,14 +249,23 @@
                     @endif
                     {{-- `scope="col"` no es decorativo: sin él, una celda leída suelta no
                          dice a qué encabezado pertenece (WCAG 2.2 AA 1.3.1). --}}
+                    {{-- Una columna sin texto (la de acciones) se rotula «Acciones» solo
+                         para el lector: un encabezado vacío no dice qué hay debajo. --}}
                     @foreach ($columns as $col)
-                        <th scope="col">{{ $col }}</th>
+                        @php
+                            $muniDtRotulo = is_array($col) ? (string) ($col['label'] ?? '') : (string) $col;
+                            $muniDtClave = is_array($col) ? ($col['sort'] ?? null) : null;
+                            $muniDtOrdenable = $muniDtClave !== null && ($sortUrl || $wireSort);
+                            $muniDtActual = $muniDtOrdenable && (string) $sort === (string) $muniDtClave;
+                            $muniDtSiguiente = $muniDtActual && $direction === 'asc' ? 'desc' : 'asc';
+                        @endphp
+                        <th scope="col" @if ($muniDtOrdenable) aria-sort="{{ $muniDtActual ? ($direction === 'asc' ? 'ascending' : 'descending') : 'none' }}" @endif @if (is_array($col) && isset($col['align'])) style="text-align:{{ $col['align'] }};" @endif>@if (trim($muniDtRotulo) === '')<span class="muni-sr">Acciones</span>@elseif ($muniDtOrdenable)@if ($sortUrl)<a href="{{ $sortUrl($muniDtClave, $muniDtSiguiente) }}" class="muni-dt__sort">@else<button type="button" wire:click="{{ $wireSort }}({{ \Illuminate\Support\Js::from((string) $muniDtClave) }})" class="muni-dt__sort">@endif{{ $muniDtRotulo }}<span aria-hidden="true" class="muni-dt__arrow {{ $muniDtActual ? 'muni-dt__arrow--on' : '' }}">{{ $muniDtActual ? ($direction === 'asc' ? '↑' : '↓') : '↕' }}</span>@if ($sortUrl)</a>@else</button>@endif @else{{ $muniDtRotulo }}@endif</th>
                     @endforeach
                 </tr>
             </thead>
         @endif
         <tbody class="muni-data-body">
-            @if (trim($slot) !== '')
+            @if ($hayFilas)
                 {{ $slot }}
             @else
                 <tr>
@@ -260,7 +290,8 @@
            quedaría sin nombre. */
         .muni-sr { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
 
-        .muni-dt__scroll { overflow:auto; border:1px solid var(--muni-border); border-radius:var(--muni-radius); background:var(--muni-surface); }
+        /* `position:relative` contiene a los `.muni-sr` absolutos de la tabla («Acciones»): sin él escapan del scroll y ensanchan la página en móvil. */
+        .muni-dt__scroll { position:relative; overflow:auto; border:1px solid var(--muni-border); border-radius:var(--muni-radius); background:var(--muni-surface); }
         /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
         .muni-dt__scroll:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:2px; }
 
@@ -301,6 +332,14 @@
         [data-muni-row].muni-row--danger td:first-child { box-shadow: inset 3px 0 0 var(--muni-danger-fg); }
         [data-muni-row].muni-row--danger td:first-child { color: var(--muni-danger-fg); font-weight: 600; }
         .muni-num { font-family: var(--muni-font-mono); font-variant-numeric: tabular-nums; }
+
+        /* Encabezado ordenable (orden en el servidor). Hereda tipo y color de la cabecera. */
+        .muni-dt__sort { display:inline-flex; align-items:center; gap:5px; min-height:24px; padding:0; border:0; background:none; font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit; text-decoration:none; cursor:pointer; border-radius:4px; }
+        .muni-dt__sort:hover { color:var(--muni-text); }
+        /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
+        .muni-dt__sort:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:2px; }
+        .muni-dt__arrow { font-family:var(--muni-font-mono); font-size:11px; opacity:.4; }
+        .muni-dt__arrow--on { opacity:1; }
 
         /* Lo que se imprime es un acta: el marco no puede recortar la nómina y la
            cabecera se repite en cada hoja, que es lo que se quiere en un documento

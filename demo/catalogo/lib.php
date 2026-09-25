@@ -9,6 +9,14 @@ use Illuminate\Contracts\View\Factory;
 final class CatalogoHead
 {
     public static string $html = '';
+
+    public static string $escudo = '';
+
+    /** Reemplaza la URL publicada del escudo por la imagen embebida. */
+    public static function embeber(string $html): string
+    {
+        return self::$escudo === '' ? $html : str_replace(asset('vendor/muni-ui/logo-graneros.png'), self::$escudo, $html);
+    }
 }
 
 /**
@@ -22,15 +30,33 @@ function componente_meta(string $archivo): array
     $props = [];
 
     if (preg_match('/@props\(\[(.*?)\n\]\)/s', $src, $m)) {
+        // Dos estilos de documentar una prop: comentario en la misma línea
+        // (`'tone' => 'ok', // ok | warn`) o un bloque /* … */ o // justo encima,
+        // que es como lo hace develop. Del bloque se toma la primera oración.
+        $bloque = '';
         foreach (explode("\n", $m[1]) as $linea) {
-            if (! preg_match("/^\s*'(\w+)'(?:\s*=>\s*(.*?))?,\s*(?:\/\/\s*(.*))?$/", $linea, $p)) {
+            $t = trim($linea);
+            if (str_starts_with($t, '/*') || str_starts_with($t, '*') || str_starts_with($t, '//')) {
+                $bloque .= ' '.trim(preg_replace('#^(/\*+|\*+/?|//)#', '', $t));
+
                 continue;
+            }
+            if (! preg_match("/^\s*'(\w+)'(?:\s*=>\s*(.*?))?,\s*(?:\/\/\s*(.*))?$/", $linea, $p)) {
+                $bloque = '';
+
+                continue;
+            }
+            $doc = isset($p[3]) && $p[3] !== '' ? $p[3] : null;
+            if ($doc === null && trim($bloque) !== '') {
+                $texto = trim(preg_replace('/\s+/', ' ', str_replace('*/', '', $bloque)));
+                $doc = preg_match('/^(.+?[.:])(\s|$)/u', $texto, $o) ? $o[1] : mb_substr($texto, 0, 160);
             }
             $props[] = [
                 'nombre' => $p[1],
                 'defecto' => ($p[2] ?? '') === '' ? null : $p[2],
-                'doc' => isset($p[3]) && $p[3] !== '' ? $p[3] : null,
+                'doc' => $doc,
             ];
+            $bloque = '';
         }
     }
 
@@ -94,7 +120,7 @@ function catalogo_datos(Factory $view, string $root): array
                 'vista' => $info['vista'] ?? 'fila',
                 'meta' => componente_meta($root.'/resources/views/components/'.$nombre.'.blade.php'),
                 'subs' => $subs,
-                'html' => $view->file($ejemplo)->render(),
+                'html' => CatalogoHead::embeber($view->file($ejemplo)->render()),
                 'codigo' => resaltar($codigo),
                 'crudo' => rtrim($codigo),
             ];
@@ -107,7 +133,7 @@ function catalogo_datos(Factory $view, string $root): array
         $archivo = $dir.'/recetas/'.$slug.'.blade.php';
         $codigo = file_get_contents($archivo);
         $recetas[$slug] = $info + [
-            'html' => $view->file($archivo)->render(),
+            'html' => CatalogoHead::embeber($view->file($archivo)->render()),
             'codigo' => resaltar($codigo),
             'crudo' => rtrim($codigo),
         ];

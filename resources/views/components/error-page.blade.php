@@ -24,6 +24,7 @@
     </style>
 </head>
 <body>
+    <x-muni::gob-stripe style="position:fixed;top:0;left:0;right:0;z-index:60;" />
     <div class="muni-err__grid" aria-hidden="true"></div>
     <main class="muni-err__card">
         <div style="font-family:var(--muni-font-mono);font-size:clamp(80px,20vw,140px);font-weight:700;line-height:1;letter-spacing:-.04em;color:var(--muni-accent);text-shadow:var(--muni-glow);">{{ $code }}</div>

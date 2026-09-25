@@ -1,7 +1,7 @@
 @props([
-    'name',
-    'legend',
-    'options' => [],
+    'name', // name base; cada casilla envía name[]
+    'legend', // texto del <legend> del grupo
+    'options' => [], // ['value'=>, 'label'=>, 'description'=>?] o valor => texto
     /*
      * NINGUNA CASILLA VIENE MARCADA, y no es una preferencia de estilo.
      *
@@ -21,11 +21,11 @@
      * texto legal y la base de licitud los pone el host.
      */
     'selected' => [],
-    'hint' => null,
-    'error' => null,
-    'required' => false,
-    'requiredText' => 'obligatorio',
-    'requiredTextVisible' => false,
+    'hint' => null, // texto de ayuda bajo la leyenda
+    'error' => null, // mensaje de error ya redactado
+    'required' => false, // marca el grupo como obligatorio
+    'requiredText' => 'obligatorio', // texto accesible junto al asterisco
+    'requiredTextVisible' => false, // muestra requiredText entre paréntesis
 ])
 
 @php
@@ -162,7 +162,7 @@
     {{ $attributes->merge($muniAria + ['class' => 'muni-cbgroup']) }}
 >
     <legend class="muni-cbgroup__legend">
-        {{ $legend }}@if ($required)@if ($muniObl !== '')<span aria-hidden="true" style="color:var(--muni-danger-fg);margin-left:2px;">*</span><span class="{{ $muniOblClase }}"> {{ $muniOblTexto }}</span>@else<span style="color:var(--muni-danger-fg);margin-left:2px;">*</span>@endif@endif
+        {{ $legend }}@if ($required)@if ($muniObl !== '')<span aria-hidden="true" style="color:var(--muni-danger-fg);margin-left:2px;">*</span><span class="{{ $muniOblClase }}"> {{ $muniOblTexto }}</span>@else<span style="color:var(--muni-danger-fg);margin-left:2px;">*</span>@endif @endif
     </legend>
 
     {{-- La ayuda va atada al fieldset, no a las casillas: describe al grupo. --}}

@@ -1,6 +1,6 @@
 @props([
-    'label' => null,
-    'name' => null,
+    'label' => null, // texto de la etiqueta
+    'name' => null, // name del input
     /*
      * NUNCA marcada por defecto, y no es una preferencia de estilo.
      *
@@ -19,12 +19,12 @@
      * cliente decidiendo el contenido de un registro legal.
      */
     'checked' => false,
-    'description' => null,
-    'error' => null,
-    'required' => false,
-    'requiredText' => 'obligatorio',
-    'requiredTextVisible' => false,
-    'value' => '1',
+    'description' => null, // texto de ayuda bajo la etiqueta
+    'error' => null, // mensaje de error ya redactado
+    'required' => false, // marca la casilla como obligatoria
+    'requiredText' => 'obligatorio', // texto accesible junto al asterisco
+    'requiredTextVisible' => false, // muestra requiredText entre paréntesis
+    'value' => '1', // value enviado al marcarla
 ])
 
 @php
@@ -89,6 +89,14 @@
      * `required-text-visible` se ve, para el formulario corto donde la leyenda
      * queda lejos.
      */
+    /*
+     * La etiqueta puede venir por la prop o por el slot
+     * (`<x-muni::checkbox name="dias[]" value="lun">Lunes</x-muni::checkbox>`): el
+     * slot permite marcado dentro (un enlace a las bases). La prop manda si vienen
+     * las dos.
+     */
+    $muniEtiqueta = filled($label) ? $label : (trim((string) $slot) !== '' ? $slot : null);
+
     $muniObl = trim((string) $requiredText);
     $muniOblClase = $requiredTextVisible ? 'muni-obl' : 'muni-sr';
     $muniOblTexto = $requiredTextVisible ? '('.$muniObl.')' : $muniObl;
@@ -125,9 +133,9 @@
             </span>
         </span>
 
-        @if ($label)
+        @if ($muniEtiqueta)
             <span style="font-family:var(--muni-font-sans);font-size:13.5px;line-height:1.45;color:var(--muni-text);">
-                {{ $label }}@if ($required)@if ($muniObl !== '')<span aria-hidden="true" style="color:var(--muni-danger-fg);margin-left:2px;">*</span><span class="{{ $muniOblClase }}"> {{ $muniOblTexto }}</span>@else<span style="color:var(--muni-danger-fg);margin-left:2px;">*</span>@endif@endif
+                {{ $muniEtiqueta }}@if ($required)@if ($muniObl !== '')<span aria-hidden="true" style="color:var(--muni-danger-fg);margin-left:2px;">*</span><span class="{{ $muniOblClase }}"> {{ $muniOblTexto }}</span>@else<span style="color:var(--muni-danger-fg);margin-left:2px;">*</span>@endif @endif
             </span>
         @endif
     </label>
@@ -169,7 +177,11 @@
            --muni-border-2 sobre la superficie da 1,61:1 en claro y 1,90:1 en oscuro, y una
            casilla SIN marcar no tiene más pista visual que ese borde. WCAG 2.2 AA 1.4.11
            exige 3:1 para el límite de un control de formulario. Con --muni-muted son 6:1. */
-        /* La marca se dibuja siempre y se revela con :checked: sin JS y sin dos verdades. */
+        /* La marca se dibuja siempre y se revela con :checked: sin JS y sin dos verdades.
+           La capa visual no recibe el puntero: la marca con opacity:0 abre su propio
+           contexto de apilamiento y quedaba ENCIMA del input real, que es el que tiene
+           que recibir el clic (así lo ve también una prueba de navegador). */
+        .muni-checkbox { pointer-events:none; }
         .muni-checkbox__mark { opacity:0; transition:opacity var(--muni-dur) var(--muni-ease); }
         .muni-checkbox-input:checked + .muni-checkbox { background:var(--muni-accent); border-color:var(--muni-accent); }
         .muni-checkbox-input:checked + .muni-checkbox .muni-checkbox__mark { opacity:1; }

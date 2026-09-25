@@ -15,16 +15,28 @@ class Formulario extends Component
     use WithFileUploads;
 
     public string $fecha = '2026-10-05';
+
     public string $codigo = '';
+
     public int $nota = 2;
+
     public string $vista = 'lista';
+
     public string $tipo = 'acceso';
+
     public bool $acepta = false;
+
     public string $obs = '';
+
     public string $run = '';
+
     public bool $notificar = true;
+
     public $archivo = null;
-    public string $orden = 'razon';
+
+    public string $orden = 'nombre';
+
+    public string $direccion = 'asc';
 
     public function reiniciar(): void
     {
@@ -36,8 +48,10 @@ class Formulario extends Component
         $this->obs = 'Del servidor';
     }
 
-    public function ordenarPor(string $clave): void
+    /** Lo llama el encabezado de data-table (`wireSort`): misma columna invierte. */
+    public function ordenar(string $clave): void
     {
+        $this->direccion = $this->orden === $clave && $this->direccion === 'asc' ? 'desc' : 'asc';
         $this->orden = $clave;
     }
 

@@ -1,13 +1,13 @@
 @props([
-    'label' => null,
-    'name' => null,
-    'error' => null,
-    'hint' => null,
-    'required' => false,
-    'requiredText' => 'obligatorio',
-    'requiredTextVisible' => false,
-    'rows' => 4,
-    'maxlength' => null,
+    'label' => null, // rótulo del campo
+    'name' => null, // nombre del campo; también base del id
+    'error' => null, // mensaje de error del servidor
+    'hint' => null, // ayuda bajo el campo
+    'required' => false, // marca el campo como obligatorio
+    'requiredText' => 'obligatorio', // texto que acompaña al rótulo si es obligatorio
+    'requiredTextVisible' => false, // muestra ese texto a la vista (si no, solo lector)
+    'rows' => 4, // alto inicial en líneas
+    'maxlength' => null, // tope de caracteres, con contador
 ])
 
 @php
@@ -143,7 +143,7 @@
 >
     @if ($label)
         <label for="{{ $muniId }}" style="font-family:var(--muni-font-sans);font-size:12.5px;font-weight:600;color:var(--muni-text);">
-            {{ $label }}@if ($required)@if ($muniObl !== '')<span aria-hidden="true" style="color:var(--muni-danger-fg);margin-left:2px;">*</span><span class="{{ $muniOblClase }}"> {{ $muniOblTexto }}</span>@else<span style="color:var(--muni-danger-fg);margin-left:2px;">*</span>@endif@endif
+            {{ $label }}@if ($required)@if ($muniObl !== '')<span aria-hidden="true" style="color:var(--muni-danger-fg);margin-left:2px;">*</span><span class="{{ $muniOblClase }}"> {{ $muniOblTexto }}</span>@else<span style="color:var(--muni-danger-fg);margin-left:2px;">*</span>@endif @endif
         </label>
     @endif
 
@@ -155,6 +155,10 @@
         @if ($required) required @endif
         @if ($muniMax > 0) maxlength="{{ $muniMax }}" @endif
         @input="sincronizar($event.target)"
+        {{-- Con `wire:model`/`x-model` el valor también cambia DESDE AFUERA (el servidor
+             lo reinicia tras guardar) sin ningún evento `input`: este efecto lee el modelo
+             —así Alpine lo vuelve a correr cuando cambia— y vuelve a contar. --}}
+        x-effect="if ($el._x_model) { $el._x_model.get(); $nextTick(function () { sincronizar($el) }) }"
         {{ $attributes->merge($muniAria + [
             'class' => 'muni-textarea',
             'style' => 'width:100%;padding:10px 12px;resize:vertical;'

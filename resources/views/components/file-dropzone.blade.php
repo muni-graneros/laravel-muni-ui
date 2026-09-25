@@ -1,10 +1,10 @@
 @props([
-    'name' => 'file',
-    'accept' => 'image/*,application/pdf',
-    'label' => 'Arrastra un archivo o haz clic para subir',
-    'hint' => 'PDF o imagen, hasta 10 MB',
-    'multiple' => false,
-    'maxMb' => 10,
+    'name' => 'file', // name del input file (con [] si es múltiple)
+    'accept' => 'image/*,application/pdf', // tipos aceptados, como el atributo accept
+    'label' => 'Arrastra un archivo o haz clic para subir', // texto principal de la zona
+    'hint' => 'PDF o imagen, hasta 10 MB', // texto de ayuda con formatos y tamaño
+    'multiple' => false, // permite varios archivos
+    'maxMb' => 10, // tamaño máximo por archivo, en MB
 ])
 
 @php
@@ -19,6 +19,15 @@
     $dzId = $attributes->get('id')
         ?: 'muni-dz-'.trim((string) preg_replace('/[^A-Za-z0-9_-]+/', '-', (string) $name), '-')
             .'-'.substr(sha1((string) $name), 0, 6);
+
+    /*
+     * `wire:model` y `x-model` van al <input type="file"> REAL, que es el que tiene el
+     * archivo y el que emite `change`: en el <div> de la zona no enlazaban nada, sin
+     * error visible. Lo que se suelta arrastrando pasa por `sincronizar()`, que reescribe
+     * el FileList del input y reemite `change`, así que también sube por el modelo.
+     */
+    $dzModelo = $attributes->filter(fn ($v, $k) => str_starts_with($k, 'wire:model') || str_starts_with($k, 'x-model'));
+    $attributes = $attributes->filter(fn ($v, $k) => ! str_starts_with($k, 'wire:model') && ! str_starts_with($k, 'x-model'));
 @endphp
 
 {{-- Zona de carga de archivos (Alpine 3 core). Arrastrar y soltar + lista de lo adjuntado.
@@ -155,6 +164,7 @@
                accept="{{ $accept }}" @if ($multiple) multiple @endif
                aria-label="{{ $label }}" aria-describedby="{{ $dzId }}-hint"
                @change="if (! silencio) pick($event.target.files, true)"
+               {{ $dzModelo }}
                style="position:absolute;inset:0;opacity:0;cursor:pointer;">
         <span class="muni-dz__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="24" height="24"><path d="M12 16V4m0 0L8 8m4-4l4 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round"/></svg>

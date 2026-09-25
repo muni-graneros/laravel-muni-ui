@@ -171,3 +171,7 @@ Route::get('/vendor/muni-ui/{archivo}', function (string $archivo) use ($raiz) {
 
     return response()->file($raiz.'/resources/images/'.$archivo);
 })->where('archivo', '[A-Za-z0-9._-]+');
+
+// Formulario Livewire de la prueba de punta a punta (demo/catalogo/livewire.mjs):
+// cada control enlazable del paquete con wire:model.
+Route::get('/formulario', fn () => view('workbench::pagina'));

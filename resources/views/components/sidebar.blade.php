@@ -1,10 +1,10 @@
 @props([
-    'width' => '240px',
+    'width' => '240px', // ancho de la columna (CSS)
     /* Punto de quiebre entre columna fija y panel superpuesto. `null` toma el del
        paquete, que está escrito una sola vez en el bloque de abajo. Se acepta
        tanto «960px» como «960». */
-    'breakpoint' => null,
-    'label' => 'Navegación principal',
+    'breakpoint' => null, // quiebre a panel superpuesto; null = el del paquete
+    'label' => 'Navegación principal', // nombre accesible del landmark de navegación
 ])
 
 @php

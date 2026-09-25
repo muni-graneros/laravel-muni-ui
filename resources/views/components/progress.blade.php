@@ -1,9 +1,9 @@
 @props([
-    'value' => 0,
-    'max' => 100,
-    'tone' => 'accent',
-    'label' => null,
-    'showValue' => false,
+    'value' => 0, // valor actual
+    'max' => 100, // valor que equivale al 100 %
+    'tone' => 'accent', // accent | ok | warn | danger | info
+    'label' => null, // rótulo visible y nombre accesible
+    'showValue' => false, // muestra el porcentaje a la derecha
 ])
 
 @php

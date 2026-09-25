@@ -21,12 +21,12 @@
             ]" />
         </x-muni::tab-panel>
         <x-muni::tab-panel :index="1">
-            <x-muni::description-list style="margin-top:12px;" :items="[
-                'Giro' => 'Ferretería',
-                'Dirección' => 'Av. Libertador 1450, Graneros',
-                'Patente desde' => ['value' => '14-03-2019', 'mono' => true],
-                'Cuotas impagas' => ['value' => '1', 'mono' => true],
-            ]" />
+            <x-muni::description-list label="Datos de la patente" stacked style="margin-top:12px;">
+                <x-muni::description-item label="Giro">Ferretería</x-muni::description-item>
+                <x-muni::description-item label="Dirección">Av. Libertador 1450, Graneros</x-muni::description-item>
+                <x-muni::description-item label="Patente desde" mono>14-03-2019</x-muni::description-item>
+                <x-muni::description-item label="Cuotas impagas" mono>1</x-muni::description-item>
+            </x-muni::description-list>
         </x-muni::tab-panel>
     </x-muni::tabs>
 

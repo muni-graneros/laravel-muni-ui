@@ -6,12 +6,23 @@
 # lee configuración de vitrina, así que los sistemas que instalan laravel-muni-ui
 # nunca la exponen. Las tarjetas se generan recorriendo
 # resources/views/components/: un componente nuevo aparece el día que se crea.
+#
+# La misma app sirve /formulario: un componente Livewire (workbench/app/Livewire)
+# con cada control enlazable del paquete, que recorre demo/catalogo/livewire.mjs
+# para probar wire:model de punta a punta. CI copia workbench/ y este archivo a
+# demo/livewire3 para repetir la prueba con Livewire 3.
 providers:
+  - Livewire\LivewireServiceProvider
   - Muni\Ui\MuniUiServiceProvider
+  - Workbench\App\Providers\WorkbenchServiceProvider
 
 env:
   - APP_ENV=local
   - APP_DEBUG=true
+  # Livewire necesita sesión y cifrado; clave fija solo para esta app de desarrollo.
+  - APP_KEY=base64:eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHg=
+  - SESSION_DRIVER=file
+  - CACHE_STORE=file
 
 workbench:
   start: '/vitrina'

@@ -4,18 +4,18 @@
        entrada más en la lista de regiones del lector que no lleva a ninguna
        parte—, pero el componente NO revienta: el anfitrión que se olvida de
        `items` ve una ficha sin solapas, no una página caída. */
-    'items' => [],
+    'items' => [], // solapas ya resueltas por el anfitrión
     /* La CLAVE de la página que se está mirando, resuelta por el anfitrión
        (el nombre de la ruta, la ruta URL, lo que el sistema use). El paquete
        nunca la calcula: no sabe qué es una petición. */
-    'actual' => null,
+    'actual' => null, // clave de la solapa de la página actual
     /* Nombre accesible del landmark. Si el consumidor prefiere apuntar a un
        título que ya está en la página, pasa `aria-labelledby` y este no se emite. */
-    'label' => 'Secciones',
+    'label' => 'Secciones', // nombre accesible del landmark
     /* Estampa `wire:navigate` en cada solapa. Apagado por defecto: el paquete se
        instala también donde no hay Livewire. Una solapa puede desactivarlo con
        'navegar' => false (una descarga, un enlace a otro sistema). */
-    'navegar' => false,
+    'navegar' => false, // agrega wire:navigate a cada solapa
 ])
 
 @php

@@ -1,9 +1,9 @@
 @props([
-    'target' => null,
-    'loading' => 'Cargando…',
-    'status' => null,
-    'delay' => 'long',
-    'busy' => false,
+    'target' => null, // acción o propiedad Livewire (azúcar de wire:target)
+    'loading' => 'Cargando…', // texto visible mientras la petición está en vuelo
+    'status' => null, // resultado ya redactado que se anuncia al terminar
+    'delay' => 'long', // shortest…longest de Livewire | none; por defecto long
+    'busy' => false, // nace ocupada (wire:init); el anfitrión la apaga
 ])
 
 {{-- LA REGIÓN QUE DICE QUE ALGO ESTÁ EN CURSO, EN TEXTO, Y DICE CUÁNDO TERMINÓ.

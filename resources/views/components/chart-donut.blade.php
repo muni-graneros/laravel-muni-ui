@@ -1,9 +1,9 @@
 @props([
-    'segments' => [],
-    'size' => 150,
-    'thickness' => 18,
-    'total' => null,
-    'centerLabel' => null,
+    'segments' => [], // ['label'=>, 'value'=>, 'tone'=>? o 'color'=>?]
+    'size' => 150, // diámetro del anillo en px
+    'thickness' => 18, // grosor del anillo (1-50, unidades del viewBox)
+    'total' => null, // total de la vuelta; por defecto la suma de valores
+    'centerLabel' => null, // cifra o texto al centro del anillo
 ])
 
 @php
@@ -12,18 +12,24 @@
         'accent' => 'var(--muni-accent)', 'ok' => 'var(--muni-ok-fg)', 'warn' => 'var(--muni-warn-fg)',
         'danger' => 'var(--muni-danger-fg)', 'info' => 'var(--muni-info-fg)', 'muted' => 'var(--muni-border-2)',
     ];
-    $sum = $total;
-    if ($sum === null) { $sum = 0; foreach ($segments as $s) { $sum += (float) $s['value']; } }
-    $sum = $sum ?: 1;
-    $r = 42;
+    // Un 'value' ausente cuenta 0 y un negativo se recorta a 0: un arco no mide menos.
+    $sum = 0;
+    foreach ($segments as $s) { $sum += max(0, (float) ($s['value'] ?? 0)); }
+    if ($total !== null) { $sum = (float) $total; }
+    $sum = $sum > 0 ? $sum : 1;
+    // El radio deja el borde exterior del anillo dentro del viewBox 0..100: con r fijo
+    // en 42, un grosor de 18 llegaba a 51 y el borde salía recortado.
+    $thickness = max(1, min(50, (float) $thickness));
+    $r = 50 - $thickness / 2;
     $circ = 2 * M_PI * $r;
     $offset = 0;
     $arcs = [];
     foreach ($segments as $s) {
-        $frac = (float) $s['value'] / $sum;
-        $len = $circ * $frac;
+        $frac = max(0, (float) ($s['value'] ?? 0)) / $sum;
+        // Con un `total` menor que la suma, los arcos se detienen al completar la vuelta.
+        $len = min($circ * $frac, $circ - $offset);
         $color = $s['color'] ?? ($toneColor[$s['tone'] ?? 'accent'] ?? 'var(--muni-accent)');
-        $arcs[] = ['len' => $len, 'gap' => $circ - $len, 'off' => -$offset, 'color' => $color, 'label' => $s['label'] ?? '', 'value' => $s['value']];
+        $arcs[] = ['len' => $len, 'gap' => $circ - $len, 'off' => -$offset, 'color' => $color, 'label' => $s['label'] ?? '', 'value' => $s['value'] ?? 0];
         $offset += $len;
     }
 @endphp

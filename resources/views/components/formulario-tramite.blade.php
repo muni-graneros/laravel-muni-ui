@@ -1,15 +1,15 @@
 @props([
-    'title' => null,
-    'subtitle' => null,
-    'action' => null,
-    'method' => 'post',
-    'enctype' => null,
-    'csrf' => true,
-    'level' => 2,
-    'errors' => null,
-    'errorIds' => [],
-    'errorSummary' => true,
-    'errorFocus' => true,
+    'title' => null, // título del trámite
+    'subtitle' => null, // línea secundaria bajo el título
+    'action' => null, // URL a la que se envía el formulario
+    'method' => 'post', // post | get | put | patch | delete
+    'enctype' => null, // null lo deduce (multipart si hay input file)
+    'csrf' => true, // agrega el token CSRF si el slot no lo trae
+    'level' => 2, // nivel del encabezado del título
+    'errors' => null, // MessageBag o array para el resumen de errores
+    'errorIds' => [], // mapa clave de error => id del control
+    'errorSummary' => true, // muestra el resumen de errores arriba
+    'errorFocus' => true, // enfoca el resumen de errores al aparecer
     /*
      * Para APAGAR esta leyenda se pasa la cadena vacía (`required-note=""`), no `null`:
      * la directiva de props de arriba aplica el valor por defecto con `??`, así que un
@@ -20,14 +20,14 @@
      * un comentario es justo la trampa #5.)
      */
     'requiredNote' => 'Los campos marcados con * son obligatorios.',
-    'requisitos' => [],
-    'requisitosTitle' => 'Requisitos para ingresar',
-    'requisitosNote' => null,
-    'pendingLabel' => 'Falta',
-    'doneLabel' => 'Listo',
-    'submitLabel' => 'Ingresar solicitud',
-    'cancelHref' => null,
-    'cancelLabel' => 'Cancelar',
+    'requisitos' => [], // lista: strings o ['texto', 'campo', 'cumplido']
+    'requisitosTitle' => 'Requisitos para ingresar', // título del bloque de requisitos
+    'requisitosNote' => null, // nota bajo la lista de requisitos
+    'pendingLabel' => 'Falta', // rótulo de un requisito pendiente
+    'doneLabel' => 'Listo', // rótulo de un requisito cumplido
+    'submitLabel' => 'Ingresar solicitud', // texto del botón de envío
+    'cancelHref' => null, // URL de Cancelar; sin ella no hay botón
+    'cancelLabel' => 'Cancelar', // texto del enlace Cancelar
 ])
 
 {{-- El trámite que el funcionario ingresa con los papeles en la mano: secciones con

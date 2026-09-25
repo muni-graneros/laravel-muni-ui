@@ -1,5 +1,5 @@
 @props([
-    'items' => [],
+    'items' => [], // hitos: [['title'=>, 'tone'=>?, …], …]
 ])
 
 {{--

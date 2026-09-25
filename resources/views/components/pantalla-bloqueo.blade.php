@@ -1,21 +1,21 @@
 @props([
-    'nombre',
-    'cargo' => null,
-    'avatar' => null,
-    'modo' => 'capa',
-    'abierto' => false,
-    'inactividad' => null,
-    'accion' => null,
-    'campo' => 'password',
-    'etiqueta' => 'Contraseña',
-    'error' => null,
-    'titulo' => 'Pantalla bloqueada',
-    'mensaje' => null,
-    'entrar' => 'Entrar',
-    'otroUrl' => null,
-    'otroRotulo' => 'Entrar como otro usuario',
-    'otroMetodo' => 'post',
-    'autofoco' => true,
+    'nombre', // nombre del funcionario conectado, obligatorio
+    'cargo' => null, // cargo bajo el nombre
+    'avatar' => null, // URL de la foto; sin ella, iniciales
+    'modo' => 'capa', // capa | pagina
+    'abierto' => false, // nace bloqueada (modo capa)
+    'inactividad' => null, // segundos sin actividad para bloquear; 0/null lo apaga
+    'accion' => null, // URL del POST de desbloqueo
+    'campo' => 'password', // name del campo de contraseña
+    'etiqueta' => 'Contraseña', // etiqueta del campo de contraseña
+    'error' => null, // mensaje de error del desbloqueo
+    'titulo' => 'Pantalla bloqueada', // título de la tarjeta
+    'mensaje' => null, // texto explicativo; tiene uno por defecto
+    'entrar' => 'Entrar', // texto del botón de desbloqueo
+    'otroUrl' => null, // URL para entrar como otro usuario
+    'otroRotulo' => 'Entrar como otro usuario', // texto de esa salida
+    'otroMetodo' => 'post', // post | get (get la vuelve un enlace)
+    'autofoco' => true, // enfoca el campo de contraseña al abrir
 ])
 
 @php

@@ -1,10 +1,13 @@
-<x-muni::spinner size="sm" />
-<x-muni::spinner />
-<x-muni::spinner size="lg" tone="neutral" />
-<x-muni::spinner showLabel label="Buscando en el padrón…" />
+{{-- Solo el dibujo: decorativo (aria-hidden) y del color del texto que lo rodea. --}}
+<div style="display:flex;align-items:center;gap:16px;">
+    <x-muni::spinner size="16px" />
+    <x-muni::spinner />
+    <span style="color:var(--muni-accent);"><x-muni::spinner size="32px" /></span>
+</div>
 
-{{-- Con Livewire: aparece solo mientras corre guardar() --}}
+{{-- Con Livewire, dentro del botón que dispara la acción. Lo que se ANUNCIA lo pone
+     <x-muni::busy-region>, no la ruedita. --}}
 <x-muni::button wire:click="guardar" wire:loading.attr="disabled">
-    <x-muni::spinner size="sm" tone="neutral" wire:loading.inline-flex wire:target="guardar" label="Guardando" />
+    <x-muni::spinner size="16px" wire:loading wire:target="guardar" />
     Guardar
 </x-muni::button>

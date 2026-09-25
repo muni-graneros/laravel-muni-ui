@@ -79,9 +79,10 @@ it('renderiza cada receta del catálogo sin errores', function (string $archivo)
  */
 it('mantiene idénticas las copias de cada tema en muni-ui.css', function () {
     $t = tokens_css(file_get_contents(__DIR__.'/../resources/css/muni-ui.css'));
-    $invariantes = ['muni-radius', 'muni-radius-lg', 'muni-radius-sm', 'muni-ease', 'muni-dur'];
+    // Los que solo declara :root (radios, duraciones) no cambian con el tema.
+    $invariantes = array_diff_key($t['light'], $t['dark']);
 
     expect($t['dark_os'])->toBe($t['dark'])
-        ->and($t['light_override'])->toBe(array_diff_key($t['light'], array_flip($invariantes)))
+        ->and($t['light_override'])->toBe(array_diff_key($t['light'], $invariantes))
         ->and(array_keys($t['dark']))->toEqualCanonicalizing(array_keys($t['light_override']));
 });

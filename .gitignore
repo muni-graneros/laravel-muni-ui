@@ -3,3 +3,7 @@ composer.lock
 /.phpunit.cache/
 demo/vendor/
 demo/catalogo/node_modules/
+demo/livewire3/vendor/
+demo/livewire3/composer.lock
+demo/livewire3/workbench/
+demo/livewire3/testbench.yaml

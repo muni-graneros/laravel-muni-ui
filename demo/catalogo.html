@@ -4693,7 +4693,7 @@ body {
     </div>
     <div class="muni-cal__grid" x-ref="grid" role="group" :aria-label="titulo" @keydown="tecla($event)">
         <template x-for="d in dias" :key="d"><span class="muni-cal__dow" x-text="d"></span></template>
-        <template x-for="(c,i) in celdas" :key="i">
+        <template x-for="(c,i) in celdas" :key="c ? iso(c) : 'vacía-' + i">
             
             <button type="button" class="muni-cal__day" :class="same(c,sel) && 'muni-cal__day--on'" :style="c ? '' : 'visibility:hidden'" :disabled="!c || disabled(c)" @click="c && pick(c)" x-text="c ? c.getDate() : ''"
                     :data-dia="c ? iso(c) : null" :aria-label="c ? nombre(c) : null" :aria-pressed="c ? (same(c,sel) ? 'true' : 'false') : null"
@@ -4780,7 +4780,7 @@ body {
     </div>
     <div class="muni-cal__grid" x-ref="grid" role="group" :aria-label="titulo" @keydown="tecla($event)">
         <template x-for="d in dias" :key="d"><span class="muni-cal__dow" x-text="d"></span></template>
-        <template x-for="(c,i) in celdas" :key="i">
+        <template x-for="(c,i) in celdas" :key="c ? iso(c) : 'vacía-' + i">
             
             <button type="button" class="muni-cal__day" :class="same(c,sel) && 'muni-cal__day--on'" :style="c ? '' : 'visibility:hidden'" :disabled="!c || disabled(c)" @click="c && pick(c)" x-text="c ? c.getDate() : ''"
                     :data-dia="c ? iso(c) : null" :aria-label="c ? nombre(c) : null" :aria-pressed="c ? (same(c,sel) ? 'true' : 'false') : null"
@@ -10286,7 +10286,7 @@ ${r?&#039;Expression: &quot;&#039;+r+`&quot;
     </div>
     <div class="muni-cal__grid" x-ref="grid" role="group" :aria-label="titulo" @keydown="tecla($event)">
         <template x-for="d in dias" :key="d"><span class="muni-cal__dow" x-text="d"></span></template>
-        <template x-for="(c,i) in celdas" :key="i">
+        <template x-for="(c,i) in celdas" :key="c ? iso(c) : 'vacía-' + i">
             
             <button type="button" class="muni-cal__day" :class="same(c,sel) && 'muni-cal__day--on'" :style="c ? '' : 'visibility:hidden'" :disabled="!c || disabled(c)" @click="c && pick(c)" x-text="c ? c.getDate() : ''"
                     :data-dia="c ? iso(c) : null" :aria-label="c ? nombre(c) : null" :aria-pressed="c ? (same(c,sel) ? 'true' : 'false') : null"

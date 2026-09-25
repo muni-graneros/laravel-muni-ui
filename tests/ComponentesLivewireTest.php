@@ -55,3 +55,14 @@ it('textarea, checkbox y radio-group llevan wire:model al control real', functio
     expect(substr_count($radios, 'wire:model="tipo"'))->toBe(2)
         ->and($radios)->not->toMatch('/<fieldset[^>]*wire:model/');
 });
+
+/*
+ * Con Alpine 3.15 (el que trae Livewire 3) un x-for con clave por posición reutiliza
+ * los botones al cambiar de mes y no recalcula cuál está marcado: la fecha que
+ * llegaba del servidor no se veía seleccionada. La clave tiene que ser la fecha.
+ */
+it('calendar identifica cada día por su fecha y no por su posición', function () {
+    expect(Blade::render('<x-muni::calendar name="f" />'))
+        ->toContain(':key="c ? iso(c) : ')
+        ->not->toContain('in celdas" :key="i"');
+});

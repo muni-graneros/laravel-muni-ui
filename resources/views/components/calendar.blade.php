@@ -79,7 +79,7 @@
     </div>
     <div class="muni-cal__grid" x-ref="grid" role="group" :aria-label="titulo" @keydown="tecla($event)">
         <template x-for="d in dias" :key="d"><span class="muni-cal__dow" x-text="d"></span></template>
-        <template x-for="(c,i) in celdas" :key="i">
+        <template x-for="(c,i) in celdas" :key="c ? iso(c) : 'vacía-' + i">
             {{-- Las celdas vacías previas al día 1 deben ocupar su columna: con x-if no
                  renderizaban nada y todos los meses empezaban en lunes. --}}
             <button type="button" class="muni-cal__day" :class="same(c,sel) && 'muni-cal__day--on'" :style="c ? '' : 'visibility:hidden'" :disabled="!c || disabled(c)" @click="c && pick(c)" x-text="c ? c.getDate() : ''"

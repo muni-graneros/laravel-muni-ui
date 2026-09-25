@@ -37,7 +37,7 @@ return [
         'ring' => ['desc' => 'Avance circular hacia una meta.'],
         'progress' => ['desc' => 'Avance lineal con etiqueta y porcentaje.', 'vista' => 'columna'],
         'data-table' => ['desc' => 'Tabla densa renderizada en servidor. Las filas van en el slot; `muni-row--danger` pinta la franja de libro mayor y `muni-num` alinea cifras.', 'vista' => 'columna', 'notas' => ['Las filas se renderizan en servidor y funcionan sin JS; para cientos de filas, pagina en servidor con pagination.', '`muni-num` alinea RUT y montos con dígitos tabulares.']],
-        'sortable-table' => ['desc' => 'Tabla con orden por columna y búsqueda en el navegador. Para listados cortos que ya están en memoria.', 'vista' => 'columna', 'notas' => ['Ordena y filtra en el navegador: úsala para listas cortas ya cargadas. Necesita Alpine para mostrar las filas.', 'Entiende montos (`$1.234.567`), RUT y fechas `dd-mm-aaaa`.']],
+        'sortable-table' => ['desc' => 'Tabla con orden por columna y búsqueda en el navegador. Para listados cortos que ya están en memoria.', 'vista' => 'columna', 'notas' => ['Ordena y filtra en el navegador: úsala para listas cortas ya cargadas. Sin JS se ve como tabla fija, sin orden ni buscador.', 'Entiende montos (`$1.234.567`), RUT y fechas `dd-mm-aaaa`.']],
         'description-list' => ['desc' => 'Ficha de datos etiqueta: valor, como una lista de definición real. Para el detalle de una persona, patente o solicitud.', 'vista' => 'columna', 'notas' => ['`mono` alinea RUT, folios y montos; un valor vacío muestra «—».', 'En móvil siempre es una columna.']],
         'timeline' => ['desc' => 'Bitácora vertical de eventos con tono por hito.', 'vista' => 'columna'],
         'badge' => ['desc' => 'Estado corto dentro de tablas y fichas.'],

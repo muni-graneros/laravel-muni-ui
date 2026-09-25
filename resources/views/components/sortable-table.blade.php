@@ -45,7 +45,7 @@
     {{ $attributes }}
 >
     @if ($searchable)
-        <div style="margin-bottom:12px;position:relative;max-width:280px;">
+        <div x-cloak style="margin-bottom:12px;position:relative;max-width:280px;">
             <input type="search" x-model="q" placeholder="Buscar…" aria-label="Buscar en la tabla" class="muni-st__search">
         </div>
     @endif
@@ -53,6 +53,13 @@
     <div style="overflow-x:auto;border:1px solid var(--muni-border);border-radius:var(--muni-radius);background:var(--muni-surface);">
         <table class="muni-st">
             <thead>
+                {{-- Encabezado y filas renderizados en el servidor: la tabla se lee sin JS.
+                     Al arrancar Alpine se ocultan y toma el control la versión ordenable. --}}
+                <tr x-show="false">
+                    @foreach ($columns as $c)
+                        <th scope="col" style="text-align:{{ $c['align'] ?? 'left' }};">{{ $c['label'] ?? '' }}</th>
+                    @endforeach
+                </tr>
                 <tr>
                     <template x-for="c in cols" :key="c.key">
                         <th scope="col" :style="`text-align:${c.align||'left'}`" :class="(c.sortable!==false) && 'muni-st__sortable'"
@@ -71,6 +78,15 @@
                 </tr>
             </thead>
             <tbody>
+                @forelse ($rows as $row)
+                    <tr x-show="false" @class(['muni-st__danger' => ($row['_tone'] ?? null) === 'danger'])>
+                        @foreach ($columns as $c)
+                            <td style="text-align:{{ $c['align'] ?? 'left' }};{{ ! empty($c['mono']) ? 'font-family:var(--muni-font-mono);font-variant-numeric:tabular-nums;' : '' }}">{{ $row[$c['key']] ?? '' }}</td>
+                        @endforeach
+                    </tr>
+                @empty
+                    <tr x-show="false"><td colspan="{{ max(1, count($columns)) }}" style="text-align:center;padding:28px;color:var(--muni-muted);">{{ $empty }}</td></tr>
+                @endforelse
                 <template x-for="(row,ri) in view" :key="ri">
                     <tr :class="row._tone==='danger' && 'muni-st__danger'">
                         <template x-for="c in cols" :key="c.key">

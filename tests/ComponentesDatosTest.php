@@ -159,3 +159,11 @@ it('la red de reduced-motion solo toca clases muni-, no utilidades del host como
     expect($css)->not->toContain('[class*="muni-"]')
         ->and($css)->toContain('[class^="muni-"], [class*=" muni-"]');
 });
+
+it('sortable-table renderiza encabezados y filas en el servidor para verse sin JS', function () {
+    $html = Blade::render('<x-muni::sortable-table :columns="[[\'key\' => \'n\', \'label\' => \'Nombre\'], [\'key\' => \'d\', \'label\' => \'Deuda\', \'mono\' => true]]" :rows="[[\'n\' => \'Ana <b>\', \'d\' => \'$0\'], [\'n\' => \'Luis\', \'d\' => \'$9\', \'_tone\' => \'danger\']]" />');
+
+    expect($html)->toContain('>Nombre</th>')
+        ->and($html)->toContain('>Ana &lt;b&gt;</td>')
+        ->and($html)->toMatch('/<tr x-show="false" class="muni-st__danger">/');
+});

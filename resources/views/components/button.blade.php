@@ -1,13 +1,19 @@
 @props([
-    'variant' => 'primary',
-    'size' => 'md',
-    'href' => null,
-    'icon' => null,
-    'type' => 'button',
+    'variant' => 'primary', // primary | ghost | subtle | danger
+    'size' => 'md', // sm | md | lg
+    'href' => null, // si se indica, renderiza un <a>
+    'icon' => null, // SVG a la izquierda del texto
+    'type' => 'button', // type del <button> (button | submit | reset)
 ])
 
 @php
     $tag = $href ? 'a' : 'button';
+    // Un <a> no tiene `disabled`: sin href y con aria-disabled deja de ser un enlace activo.
+    if ($href && $attributes->has('disabled')) {
+        $href = null;
+        $tag = 'a';
+        $attributes = $attributes->except('disabled')->merge(['aria-disabled' => 'true', 'role' => 'link']);
+    }
     $sizes = [
         'sm' => 'padding:6px 12px;font-size:12.5px;',
         'md' => 'padding:9px 16px;font-size:13.5px;',
@@ -21,7 +27,7 @@
 @endphp
 
 <{{ $tag }}
-    @if ($href) href="{{ $href }}" @else type="{{ $type }}" @endif
+    @if ($href) href="{{ $href }}" @elseif ($tag === 'button') type="{{ $type }}" @endif
     {{ $attributes->merge(['class' => 'muni-btn muni-btn--'.$variant, 'style' => $base]) }}
 >
     @if ($icon)<span class="muni-btn__icon" aria-hidden="true">{!! $icon !!}</span>@endif
@@ -31,20 +37,25 @@
 @once
     <style>
         .muni-btn:focus-visible { outline: none; box-shadow: var(--muni-ring); }
-        .muni-btn:active { transform: translateY(1px); }
+        .muni-btn:not(:disabled,[aria-disabled=true]):active { transform: translateY(1px); }
+        /* Deshabilitado (también wire:loading.attr="disabled") y en curso: Livewire marca con
+           data-loading el elemento que disparó la petición. */
+        .muni-btn:disabled, .muni-btn[aria-disabled=true] { opacity: .55; cursor: not-allowed; }
+        .muni-btn[data-loading] { cursor: progress; opacity: .7; }
         .muni-btn__icon { display: inline-flex; }
         .muni-btn__icon svg { width: 15px; height: 15px; }
 
         .muni-btn--primary { background: var(--muni-accent); color: var(--muni-on-accent); }
-        .muni-btn--primary:hover { background: var(--muni-accent-strong); box-shadow: var(--muni-shadow); }
+        .muni-btn--primary:not(:disabled,[aria-disabled=true]):hover { background: var(--muni-accent-strong); box-shadow: var(--muni-shadow); }
 
         .muni-btn--ghost { background: transparent; color: var(--muni-text); border-color: var(--muni-border); }
-        .muni-btn--ghost:hover { background: var(--muni-surface-2); border-color: var(--muni-border-2); }
+        .muni-btn--ghost:not(:disabled,[aria-disabled=true]):hover { background: var(--muni-surface-2); border-color: var(--muni-border-2); }
 
         .muni-btn--subtle { background: var(--muni-surface-2); color: var(--muni-text); }
-        .muni-btn--subtle:hover { background: var(--muni-surface-3); }
+        .muni-btn--subtle:not(:disabled,[aria-disabled=true]):hover { background: var(--muni-surface-3); }
 
         .muni-btn--danger { background: var(--muni-danger-bg); color: var(--muni-danger-fg); border-color: var(--muni-danger-border); }
-        .muni-btn--danger:hover { background: var(--muni-danger-fg); color: #fff; }
+        /* Texto con --muni-surface: >= 4.5:1 sobre --muni-danger-fg en claro, oscuro y panel. */
+        .muni-btn--danger:not(:disabled,[aria-disabled=true]):hover { background: var(--muni-danger-fg); color: var(--muni-surface); }
     </style>
 @endonce

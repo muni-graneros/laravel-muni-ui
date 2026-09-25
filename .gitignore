@@ -2,3 +2,4 @@
 composer.lock
 /.phpunit.cache/
 demo/vendor/
+demo/catalogo/node_modules/

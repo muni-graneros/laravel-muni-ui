@@ -1,9 +1,10 @@
 @props([
-    'items' => [],
+    'items' => [], // lista de ['label' => , 'url' => ?]; el último es la página actual
+    'label' => 'Ruta', // nombre accesible del nav; un aria-label explícito manda
 ])
 
 {{-- $items: array de ['label'=>, 'url'=>?]. El último es la página actual (sin url). --}}
-<nav aria-label="Ruta" {{ $attributes->merge(['style' => 'display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-family:var(--muni-font-sans);font-size:12.5px;']) }}>
+<nav aria-label="{{ $attributes->get('aria-label', $label) }}" {{ $attributes->except('aria-label')->merge(['style' => 'display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-family:var(--muni-font-sans);font-size:12.5px;']) }}>
     @foreach ($items as $i => $item)
         @if ($i > 0)
             <span aria-hidden="true" style="color:var(--muni-hint);">

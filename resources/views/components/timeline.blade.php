@@ -1,5 +1,5 @@
 @props([
-    'items' => [],
+    'items' => [], // lista de ['title' => , 'time' => ?, 'description' => ?, 'tone' => ?]
 ])
 
 @php
@@ -10,10 +10,7 @@
     @foreach ($items as $item)
         @php
             $tone = $item['tone'] ?? 'accent';
-            $color = [
-                'accent' => 'var(--muni-accent)', 'ok' => 'var(--muni-ok-fg)', 'warn' => 'var(--muni-warn-fg)',
-                'danger' => 'var(--muni-danger-fg)', 'info' => 'var(--muni-info-fg)', 'muted' => 'var(--muni-border-2)',
-            ][$tone] ?? 'var(--muni-accent)';
+            $color = \Muni\Ui\Tono::color($tone);
         @endphp
         <li class="muni-tl__item">
             <span class="muni-tl__dot" style="--dot:{{ $color }};"></span>

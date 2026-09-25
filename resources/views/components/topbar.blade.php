@@ -1,9 +1,9 @@
 @props([
-    'system',
-    'subtitle' => null,
-    'status' => 'online',
-    'statusLabel' => null,
-    'logo' => null,
+    'system', // nombre del sistema
+    'subtitle' => null, // línea secundaria
+    'status' => 'online', // online | degraded | offline
+    'statusLabel' => null, // texto propio para el estado
+    'logo' => null, // HTML del logo; por defecto «GRA»
 ])
 
 @php

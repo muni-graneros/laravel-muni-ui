@@ -1,15 +1,46 @@
 @props([
-    'title' => null,
-    'maxWidth' => '480px',
+    'title' => null, // título del diálogo
+    'maxWidth' => '480px', // ancho máximo del panel
 ])
 
 {{-- Modal accesible (Alpine 3). El slot `trigger` abre; Escape / click en el fondo /
-     botón × cierran. Bloquea el scroll del body mientras está abierto y devuelve el foco
-     al panel al abrir. El slot `footer` es opcional (acciones). --}}
+     botón × cierran. Bloquea el scroll del body mientras está abierto, lleva el foco al
+     panel (primer elemento con autofocus o enfocable), lo atrapa con Tab y lo devuelve
+     al cerrar. El slot `footer` es opcional (acciones). --}}
 <div
-    x-data="{ open: false }"
-    @keydown.escape.window="open = false"
-    x-effect="document.body.style.overflow = open ? 'hidden' : ''"
+    x-data="{
+        open: false, prevFoco: null, prevOverflow: null,
+        init() { this.$watch('open', v => v ? this.abrirPanel() : this.cerrarPanel()); },
+        destroy() { if (this.open) this.cerrarPanel(); },
+        enfocables() {
+            return [...this.$refs.panel.querySelectorAll('a[href],button,input,select,textarea,[tabindex]')]
+                .filter(e => ! e.disabled && e.tabIndex >= 0 && e.getClientRects().length);
+        },
+        abrirPanel() {
+            this.prevFoco = document.activeElement;
+            this.prevOverflow = document.body.style.overflow;
+            document.body.style.overflow = 'hidden';
+            this.$nextTick(() => (this.$refs.panel.querySelector('[autofocus]') || this.enfocables()[0] || this.$refs.panel).focus({ preventScroll: true }));
+        },
+        cerrarPanel() {
+            document.body.style.overflow = this.prevOverflow ?? '';
+            const e = this.prevFoco; this.prevFoco = null;
+            if (e && e.isConnected && e.focus) e.focus();
+        },
+        atrapar(ev) {
+            if (ev.key !== 'Tab') return;
+            const f = this.enfocables(), a = document.activeElement;
+            if (! f.length) { ev.preventDefault(); return; }
+            if (ev.shiftKey && (a === f[0] || a === this.$refs.panel)) { ev.preventDefault(); f[f.length - 1].focus(); }
+            else if (! ev.shiftKey && a === f[f.length - 1]) { ev.preventDefault(); f[0].focus(); }
+        },
+        cerrarConEscape() {
+            const a = document.activeElement;
+            if (this.open && (this.$refs.panel.contains(a) || ! a?.closest('[aria-modal=true]'))) this.open = false;
+        }
+    }"
+    x-id="['muni-modal']"
+    @keydown.escape.window="cerrarConEscape()"
 >
     @isset($trigger)
         <div @click="open = true" style="display:inline-flex;">{{ $trigger }}</div>
@@ -19,9 +50,7 @@
         <div
             x-show="open"
             x-cloak
-            role="dialog"
-            aria-modal="true"
-            style="position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;"
+            style="position:fixed;inset:0;z-index:210;display:flex;align-items:center;justify-content:center;padding:20px;"
         >
             {{-- Fondo --}}
             <div
@@ -37,7 +66,14 @@
                 x-show="open"
                 x-transition:enter="muni-pop" x-transition:enter-start="muni-pop-0" x-transition:enter-end="muni-pop-1"
                 x-transition:leave="muni-pop" x-transition:leave-start="muni-pop-1" x-transition:leave-end="muni-pop-0"
+                x-ref="panel"
+                role="dialog"
+                aria-modal="true"
+                :aria-labelledby="$id('muni-modal')"
+                tabindex="-1"
+                @keydown="atrapar($event)"
                 {{ $attributes->merge([
+                    'class' => 'muni-modal__panel',
                     'style' => "position:relative;width:100%;max-width:{$maxWidth};max-height:calc(100vh - 40px);"
                         ."display:flex;flex-direction:column;background:var(--muni-surface);color:var(--muni-text);"
                         ."border:1px solid var(--muni-border);border-radius:var(--muni-radius-lg);"
@@ -45,7 +81,7 @@
                 ]) }}
             >
                 <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid var(--muni-border);">
-                    <h2 style="margin:0;font-size:15px;font-weight:700;color:var(--muni-text);">{{ $title }}</h2>
+                    <h2 :id="$id('muni-modal')" style="margin:0;font-size:15px;font-weight:700;color:var(--muni-text);">{{ $title }}</h2>
                     <button type="button" @click="open = false" aria-label="Cerrar" class="muni-modal-x">
                         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><path d="M5 5l10 10M15 5L5 15" stroke-linecap="round"/></svg>
                     </button>
@@ -70,6 +106,7 @@
         .muni-modal-x { display:inline-flex;padding:6px;border:none;background:transparent;color:var(--muni-muted);border-radius:var(--muni-radius-sm);cursor:pointer;transition:background var(--muni-dur) var(--muni-ease),color var(--muni-dur) var(--muni-ease); }
         .muni-modal-x:hover { background:var(--muni-surface-3);color:var(--muni-text); }
         .muni-modal-x:focus-visible { outline:none;box-shadow:var(--muni-ring); }
+        .muni-modal__panel:focus { outline:none; }
         .muni-fade { transition:opacity var(--muni-dur) var(--muni-ease); }
         .muni-fade-0 { opacity:0; } .muni-fade-1 { opacity:1; }
         .muni-pop { transition:opacity var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease); }

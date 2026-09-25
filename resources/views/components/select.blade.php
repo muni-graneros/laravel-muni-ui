@@ -1,15 +1,24 @@
 @props([
-    'label' => null,
-    'name' => null,
-    'options' => [],
-    'selected' => null,
-    'placeholder' => null,
-    'error' => null,
-    'hint' => null,
-    'required' => false,
+    'label' => null, // etiqueta
+    'name' => null, // name e id del select
+    'options' => [], // mapa valor => etiqueta
+    'selected' => null, // valor seleccionado
+    'placeholder' => null, // primera opción vacía
+    'error' => null, // mensaje de error
+    'hint' => null, // ayuda bajo el campo
+    'required' => false, // marca el campo como obligatorio
 ])
 
-@php $id = $name ? 'muni-'.$name : 'muni-'.uniqid(); @endphp
+@php
+    // Un `id` explícito gana: dos campos con el mismo name en la página no chocan.
+    $id = $attributes->get('id') ?: ($name ? 'muni-'.$name : 'muni-'.uniqid());
+    $attributes = $attributes->except('id');
+    // La ayuda o el error se anuncian al entrar al campo (aria-describedby), sumados a
+    // los que ya traiga el host.
+    $ayuda = ($error || $hint) ? $id.'-ayuda' : null;
+    $describe = trim($attributes->get('aria-describedby', '').' '.$ayuda) ?: null;
+    $attributes = $attributes->except('aria-describedby');
+@endphp
 
 <div style="display:flex;flex-direction:column;gap:6px;">
     @if ($label)
@@ -23,11 +32,13 @@
             id="{{ $id }}"
             @if ($name) name="{{ $name }}" @endif
             @if ($required) required @endif
+            @if ($error) aria-invalid="true" @endif
+            @if ($describe) aria-describedby="{{ $describe }}" @endif
             {{ $attributes->merge([
                 'class' => 'muni-select',
                 'style' => 'width:100%;padding:10px 34px 10px 12px;appearance:none;'
                     .'font-family:var(--muni-font-sans);font-size:13.5px;color:var(--muni-text);'
-                    .'background:var(--muni-surface);border:1px solid '.($error ? 'var(--muni-danger-border)' : 'var(--muni-border)').';'
+                    .'background:var(--muni-surface);border:1px solid '.($error ? 'var(--muni-danger-border)' : 'var(--muni-border-strong, var(--muni-border))').';'
                     .'border-radius:var(--muni-radius-sm);cursor:pointer;transition:border-color var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease);',
             ]) }}
         >
@@ -45,8 +56,8 @@
         </span>
     </div>
 
-    @if ($error)<span style="font-size:11.5px;color:var(--muni-danger-fg);">{{ $error }}</span>
-    @elseif ($hint)<span style="font-size:11.5px;color:var(--muni-hint);">{{ $hint }}</span>@endif
+    @if ($error)<span id="{{ $ayuda }}" style="font-size:11.5px;color:var(--muni-danger-fg);">{{ $error }}</span>
+    @elseif ($hint)<span id="{{ $ayuda }}" style="font-size:11.5px;color:var(--muni-hint);">{{ $hint }}</span>@endif
 </div>
 
 @once

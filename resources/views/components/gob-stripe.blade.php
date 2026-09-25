@@ -1,5 +1,5 @@
 @props([
-    'height' => '5px',
+    'height' => '5px', // alto de la franja (CSS)
 ])
 
 {{-- Franja institucional de la Municipalidad de Graneros: la barra de 7 colores del

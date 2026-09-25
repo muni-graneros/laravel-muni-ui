@@ -1,15 +1,38 @@
 @props([
-    'name' => 'fecha',
-    'min' => null,
+    'name' => 'fecha', // name del input oculto (valor YYYY-MM-DD)
+    'min' => null, // fecha mínima seleccionable, YYYY-MM-DD
+    'value' => null, // fecha inicial, YYYY-MM-DD (con wire:model la pone Livewire)
 ])
 
 {{-- Calendario de mes (Alpine 3). Navega meses, selecciona un día, escribe el valor
-     ISO en un input oculto. Sin dependencias de fechas externas. --}}
+     ISO en un input oculto. Sin dependencias de fechas externas. wire:model / x-model en
+     el componente enlazan `valor` (x-modelable), en formato YYYY-MM-DD.
+     Teclado (tabindex móvil: un solo día tabulable): ←/→ día, ↑/↓ semana, Inicio/Fin
+     extremos de la semana, RePág/AvPág mes (con Mayús, año), Enter/Espacio elige.
+     Los días antes de `min` se saltan. --}}
+@php
+    // `min` se arma como fecha LOCAL desde sus partes: new Date('YYYY-MM-DD') es UTC y
+    // en Chile dejaba elegible el día anterior.
+    if ($min instanceof \DateTimeInterface) { $min = $min->format('Y-m-d'); }
+    $min = is_string($min) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $min) ? $min : null;
+    if ($value instanceof \DateTimeInterface) { $value = $value->format('Y-m-d'); }
+    $value = is_string($value) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) ? $value : null;
+@endphp
 <div
     x-data="{
         sel: null,
+        foco: null,
         view: new Date(),
-        min: {{ $min ? "new Date('".$min."')" : 'null' }},
+        hoy: (d => new Date(d.getFullYear(), d.getMonth(), d.getDate()))(new Date()),
+        valor: {{ \Illuminate\Support\Js::from($value ?? '') }},
+        local(s){ if(!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null; const p = s.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); },
+        init(){ const aplicar = v => { const d = this.local(v); this.sel = d; if (d) this.view = new Date(d.getFullYear(), d.getMonth(), 1); };
+                aplicar(this.valor);
+                // Sin fecha elegida y con un min en un mes futuro, se abre en ese mes: si no,
+                // todos los días visibles quedan deshabilitados y ninguno recibe el foco.
+                if (!this.sel && this.min && this.min > new Date(this.view.getFullYear(), this.view.getMonth() + 1, 0)) this.view = new Date(this.min.getFullYear(), this.min.getMonth(), 1);
+                this.$watch('valor', v => { if (v !== this.iso(this.sel)) aplicar(v); }); },
+        min: (s => { if(!s) return null; const p = s.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); })({{ \Illuminate\Support\Js::from($min) }}),
         dias: ['L','M','X','J','V','S','D'],
         meses: ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'],
         get titulo(){ return this.meses[this.view.getMonth()] + ' ' + this.view.getFullYear(); },
@@ -23,23 +46,45 @@
             return out;
         },
         move(n){ this.view = new Date(this.view.getFullYear(), this.view.getMonth()+n, 1); },
-        pick(d){ if(this.disabled(d)) return; this.sel = d; },
-        disabled(d){ return this.min && d < this.min.setHours(0,0,0,0) && d < this.min; },
+        pick(d){ if(this.disabled(d)) return; this.sel = d; this.foco = d; this.valor = this.iso(d); },
+        enVista(d){ return !!d && d.getMonth()===this.view.getMonth() && d.getFullYear()===this.view.getFullYear() && !this.disabled(d); },
+        // Día tabulable: el enfocado, el elegido u hoy si están en el mes visible; si no, el primero habilitado.
+        get objetivo(){ return [this.foco, this.sel, this.hoy].find(d => this.enVista(d)) || this.celdas.find(d => this.enVista(d)) || null; },
+        nombre(d){ return d.getDate()+' de '+this.meses[d.getMonth()]+' de '+d.getFullYear(); },
+        tecla(ev){
+            const b = this.objetivo; if(!b) return;
+            const y=b.getFullYear(), m=b.getMonth(), d=b.getDate(), dow=(b.getDay()+6)%7;
+            const mes = n => new Date(y, m+n, Math.min(d, new Date(y, m+n+1, 0).getDate()));
+            const t = ({ ArrowLeft:()=>new Date(y,m,d-1), ArrowRight:()=>new Date(y,m,d+1), ArrowUp:()=>new Date(y,m,d-7), ArrowDown:()=>new Date(y,m,d+7),
+                Home:()=>new Date(y,m,d-dow), End:()=>new Date(y,m,d+6-dow), PageUp:()=>mes(ev.shiftKey?-12:-1), PageDown:()=>mes(ev.shiftKey?12:1) })[ev.key];
+            if(!t) return;
+            ev.preventDefault();
+            let n = t(); if(this.disabled(n)) n = this.min;
+            this.foco = n;
+            if(!this.enVista(n)) this.view = new Date(n.getFullYear(), n.getMonth(), 1);
+            this.$nextTick(() => { const s=this.iso(n); const e=[...this.$refs.grid.querySelectorAll('button')].find(x => x.dataset.dia===s); e && e.focus(); });
+        },
+        disabled(d){ return !!(d && this.min && d < this.min); },
         same(a,b){ return a&&b && a.toDateString()===b.toDateString(); },
         iso(d){ return d ? d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0') : ''; }
     }"
+    x-modelable="valor"
     {{ $attributes->merge(['class' => 'muni-cal']) }}
 >
-    <input type="hidden" name="{{ $name }}" :value="iso(sel)">
+    <input type="hidden" name="{{ $name }}" value="{{ $value }}" :value="valor">
     <div class="muni-cal__head">
         <button type="button" @click="move(-1)" class="muni-cal__nav" aria-label="Mes anterior">‹</button>
-        <span class="muni-cal__title" x-text="titulo"></span>
+        <span class="muni-cal__title" x-text="titulo" aria-live="polite"></span>
         <button type="button" @click="move(1)" class="muni-cal__nav" aria-label="Mes siguiente">›</button>
     </div>
-    <div class="muni-cal__grid">
+    <div class="muni-cal__grid" x-ref="grid" role="group" :aria-label="titulo" @keydown="tecla($event)">
         <template x-for="d in dias" :key="d"><span class="muni-cal__dow" x-text="d"></span></template>
         <template x-for="(c,i) in celdas" :key="i">
-            <template x-if="c"><button type="button" class="muni-cal__day" :class="same(c,sel) && 'muni-cal__day--on'" @click="pick(c)" x-text="c.getDate()"></button></template>
+            {{-- Las celdas vacías previas al día 1 deben ocupar su columna: con x-if no
+                 renderizaban nada y todos los meses empezaban en lunes. --}}
+            <button type="button" class="muni-cal__day" :class="same(c,sel) && 'muni-cal__day--on'" :style="c ? '' : 'visibility:hidden'" :disabled="!c || disabled(c)" @click="c && pick(c)" x-text="c ? c.getDate() : ''"
+                    :data-dia="c ? iso(c) : null" :aria-label="c ? nombre(c) : null" :aria-pressed="c ? (same(c,sel) ? 'true' : 'false') : null"
+                    :aria-current="same(c,hoy) ? 'date' : null" :tabindex="c && same(c,objetivo) ? 0 : -1" @focus="c && (foco = c)"></button>
         </template>
     </div>
 </div>
@@ -49,12 +94,13 @@
         .muni-cal { display:inline-block; padding:14px; background:var(--muni-surface); border:1px solid var(--muni-border); border-radius:var(--muni-radius); box-shadow:var(--muni-shadow); font-family:var(--muni-font-sans); width:280px; }
         .muni-cal__head { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
         .muni-cal__title { font-size:13.5px; font-weight:700; text-transform:capitalize; }
-        .muni-cal__nav { width:30px; height:30px; border:1px solid var(--muni-border); background:var(--muni-surface); color:var(--muni-text); border-radius:var(--muni-radius-sm); cursor:pointer; font-size:16px; transition:.15s; }
+        .muni-cal__nav { width:30px; height:30px; border:1px solid var(--muni-border); background:var(--muni-surface); color:var(--muni-text); border-radius:var(--muni-radius-sm); cursor:pointer; font-size:16px; transition:border-color var(--muni-dur) var(--muni-ease),color var(--muni-dur) var(--muni-ease); }
         .muni-cal__nav:hover { border-color:var(--muni-accent); color:var(--muni-accent); }
         .muni-cal__grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
         .muni-cal__dow { text-align:center; font-family:var(--muni-font-mono); font-size:10.5px; font-weight:600; color:var(--muni-hint); padding-bottom:6px; }
         .muni-cal__day { aspect-ratio:1; border:none; background:transparent; color:var(--muni-text); border-radius:var(--muni-radius-sm); font-family:var(--muni-font-mono); font-size:12.5px; cursor:pointer; transition:background var(--muni-dur) var(--muni-ease); }
-        .muni-cal__day:hover { background:var(--muni-surface-2); }
+        .muni-cal__day:hover:not(:disabled) { background:var(--muni-surface-2); }
+        .muni-cal__day:disabled { color:var(--muni-hint); opacity:.45; cursor:not-allowed; }
         .muni-cal__day:focus-visible { outline:none; box-shadow:var(--muni-ring); }
         .muni-cal__day--on { background:var(--muni-accent); color:var(--muni-on-accent); font-weight:700; }
     </style>

@@ -1,9 +1,9 @@
 @props([
-    'theme' => 'light',
-    'title' => 'Ingresar',
-    'system' => 'Municipalidad de Graneros',
-    'subtitle' => null,
-    'logo' => null,
+    'theme' => 'light', // light | dark
+    'title' => 'Ingresar', // título del formulario y del documento
+    'system' => 'Municipalidad de Graneros', // nombre mostrado en la columna lateral
+    'subtitle' => null, // texto bajo el título
+    'logo' => null, // HTML del logo, p. ej. el componente gob-escudo
 ])
 
 <!DOCTYPE html>
@@ -11,8 +11,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>    <x-muni::reverb-meta />
-{{ $title }} · {{ $system }}</title>
+    <x-muni::reverb-meta />
+    <title>{{ $title }} · {{ $system }}</title>
     {{ $head ?? '' }}
     <style>
         *,*::before,*::after{ box-sizing:border-box; }

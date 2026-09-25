@@ -1,16 +1,17 @@
 @props([
-    'width' => '240px',
+    'width' => '240px', // ancho en escritorio
 ])
 
 {{-- Barra lateral de navegación para dashboards. En móvil se colapsa (toggle con el
-     evento `muni-sidebar`). El slot son <x-muni::nav-item> y <x-muni::nav-section>. --}}
+     evento `muni-sidebar`; con detail.open fija el estado) y Escape la cierra; emite
+     `muni-sidebar-state` al cambiar. El slot son nav-item y nav-section de muni. --}}
 <aside
     x-data="{ open: window.innerWidth >= 900 }"
-    @muni-sidebar.window="open = !open"
+    @muni-sidebar.window="open = typeof $event.detail?.open === 'boolean' ? $event.detail.open : !open"
+    @keydown.escape.window="if (open && window.matchMedia('(max-width: 899px)').matches) open = false"
+    x-effect="window.dispatchEvent(new CustomEvent('muni-sidebar-state', { detail: { open } }))"
     :class="open ? 'muni-sb--open' : ''"
-    class="muni-sb"
-    style="--sb-w:{{ $width }};"
-    {{ $attributes }}
+    {{ $attributes->merge(['class' => 'muni-sb', 'style' => "--sb-w:{$width};"]) }}
 >
     <div class="muni-sb__inner">
         {{ $slot }}

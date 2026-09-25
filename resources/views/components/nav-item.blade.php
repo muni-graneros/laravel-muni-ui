@@ -1,8 +1,8 @@
 @props([
-    'href' => '#',
-    'icon' => null,
-    'active' => false,
-    'badge' => null,
+    'href' => '#', // destino del enlace
+    'icon' => null, // SVG a la izquierda
+    'active' => false, // marca el ítem como página actual
+    'badge' => null, // contador a la derecha
 ])
 
 <a

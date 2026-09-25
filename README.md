@@ -92,6 +92,8 @@ php artisan vendor:publish --tag=muni-ui-css   # → resources/css/vendor/muni-u
 
 ### Al ACTUALIZAR el paquete en un sistema
 
+Qué cambia en cada versión y qué revisar en el sistema: [UPGRADE.md](UPGRADE.md).
+
 Subir la versión **no aplica nada por sí solo**: el tema de Filament y el escudo son
 artefactos ya copiados a `public/vendor/muni-ui/`, y ahí se quedan hasta que se los vuelva
 a publicar. Un sistema puede estar en la última versión y seguir sirviendo el CSS viejo,
@@ -153,7 +155,7 @@ cacheado en el proceso.
 | `<x-muni::segmented>` | `name`, `options` (array), `value` — radios reales sin JS; o slot |
 | `<x-muni::filter-bar>` | `action`, `method`; slots `submitLabel`, `actions` |
 | `<x-muni::field>` | `label`; el control (input/select) va en el slot |
-| `<x-muni::data-table>` | `columns` (array), `empty`; el slot son los `<tr data-muni-row>` |
+| `<x-muni::data-table>` | `columns` (strings o `['label','sort','align']`), `empty`, `sort`, `direction`, `sortUrl`/`wireSort` (orden en servidor), `caption` |
 | `<x-muni::pagination>` | `current`, `total`, `url` (closure fn(\$p)), `info` |
 
 ### Interactivos (requieren Alpine 3)
@@ -188,6 +190,11 @@ cacheado en el proceso.
 |-----------|-------------------|
 | `<x-muni::input>` | `label`, `name`, `type`, `error`, `hint`, `icon`, `required` |
 | `<x-muni::select>` | `label`, `name`, `options`, `selected`, `placeholder`, `error` |
+| `<x-muni::textarea>` | `label`, `name`, `rows`, `error`, `hint`, `maxlength` (contador) |
+| `<x-muni::checkbox>` | `label` (o slot), `name`, `value`, `checked`, `description`, `error` |
+| `<x-muni::radio-group>` | `label` (legend), `name`, `options`, `value`, `inline`, `error` |
+| `<x-muni::description-list>` | `items` (etiqueta => valor), `columns` — ficha de datos |
+| `<x-muni::spinner>` | `size`, `label`, `showLabel`, `tone` — con `wire:loading` |
 | `<x-muni::switch>` | `label`, `name`, `checked`, `description` (Alpine) |
 | `<x-muni::sidebar>` | `width`; slot con `<x-muni::nav-section>` + `<x-muni::nav-item>` (colapsa en móvil) |
 | `<x-muni::nav-item>` | `href`, `icon`, `active`, `badge` |
@@ -218,6 +225,8 @@ izquierdo (banda de libro mayor), y los RUT/cifras usan `.muni-num` (mono tabula
 Todas self-contained (Alpine inline, sin CDN).
 
 **Componentes y sistema**
+- `catalogo.html` — **la documentación de referencia**: los 53 componentes renderizados con Blade real en ambos temas, cada uno con su código copiable y su tabla de props y slots, más 6 recetas de pantalla completa. Se regenera con `cd demo/catalogo && npm ci && npm run construir` (después de `composer install`), y `npm run verificar` lo abre en Chromium y revisa errores de JS, scroll en móvil y accesibilidad con axe. CI corre las dos cosas y falla si `demo/catalogo.html` no está al día. Además, `workbench/` es una app mínima con Livewire real: `vendor/bin/testbench serve --port=8765` y `npm run livewire` prueban que cada control con `wire:model` lleve su valor al servidor y refleje lo que el servidor devuelve.
+  Para documentar un componente nuevo: describe cada prop con un comentario en su `@props` (`'tone' => 'ok', // ok | warn | danger`), agrega su ejemplo en `demo/catalogo/ejemplos/` y regístralo en `demo/catalogo/componentes.php`. `tests/CatalogoTest.php` falla si falta cualquiera de las tres cosas.
 - `index.html` — panel de datos en ambos temas · `interactive.html` — modal/dropdown/tabs/toasts
 - `showcase.html` — sala de control cívica con consola viva · `templates.html` — galería de pantallas (landing, login, paneles por rol, error)
 - `app.html` — **dashboard de patentes funcional completo** (command palette ⌘K, charts, tabla sortable, drawer, modal, toasts)

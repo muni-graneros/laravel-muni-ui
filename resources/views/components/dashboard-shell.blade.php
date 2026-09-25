@@ -1,10 +1,10 @@
 @props([
-    'theme' => 'light',
-    'title' => null,
-    'system' => 'Panel',
-    'subtitle' => null,
-    'status' => 'online',
-    'user' => null,
+    'theme' => 'light', // light | dark
+    'title' => null, // <title> del documento; por defecto usa system
+    'system' => 'Panel', // nombre del sistema en la barra superior
+    'subtitle' => null, // línea secundaria bajo el nombre
+    'status' => 'online', // online | degraded | offline
+    'user' => null, // nombre del usuario (avatar arriba a la derecha)
 ])
 
 <!DOCTYPE html>
@@ -12,8 +12,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>    <x-muni::reverb-meta />
-{{ $title ?? $system }}</title>
+    <x-muni::reverb-meta />
+    <title>{{ $title ?? $system }}</title>
     {{ $head ?? '' }}
     <style>
         *,*::before,*::after{ box-sizing:border-box; }
@@ -21,18 +21,25 @@
         .muni-ds__col{ flex:1; min-width:0; display:flex; flex-direction:column; }
         .muni-ds__top{ position:sticky; top:0; z-index:40; height:var(--muni-topbar-h); display:flex; align-items:center; gap:12px; padding:0 18px; background:var(--muni-surface); border-bottom:1px solid var(--muni-border); }
         .muni-ds__burger{ display:none; padding:6px; border:none; background:transparent; color:var(--muni-text); cursor:pointer; border-radius:var(--muni-radius-sm); }
+        .muni-ds__burger:focus-visible{ outline:none; box-shadow:var(--muni-ring); }
         @media (max-width:899px){ .muni-ds__burger{ display:inline-flex; } }
         .muni-ds__main{ flex:1; padding:24px; max-width:1280px; width:100%; margin:0 auto; }
         .muni-ds__scrim{ display:none; position:fixed; inset:0; z-index:140; background:rgba(10,14,20,.5); }
         @media (max-width:899px){ .muni-ds__scrim.on{ display:block; } }
     </style>
 </head>
-<body>
+<body
+    x-data="{ sbOpen: false, cerrarSb() { window.dispatchEvent(new CustomEvent('muni-sidebar', { detail: { open: false } })); this.sbOpen = false; } }"
+    @muni-sidebar.window="sbOpen = typeof $event.detail?.open === 'boolean' ? $event.detail.open : ! sbOpen"
+    @muni-sidebar-state.window="sbOpen = $event.detail.open"
+    @keydown.escape.window="if (sbOpen && window.matchMedia('(max-width: 899px)').matches) cerrarSb()"
+>
     {{ $sidebar ?? '' }}
+    <div class="muni-ds__scrim" :class="sbOpen && 'on'" @click="cerrarSb()" aria-hidden="true"></div>
 
     <div class="muni-ds__col">
         <header class="muni-ds__top">
-            <button class="muni-ds__burger" @click="window.dispatchEvent(new CustomEvent('muni-sidebar'))" aria-label="Menú">
+            <button class="muni-ds__burger" @click="window.dispatchEvent(new CustomEvent('muni-sidebar'))" :aria-expanded="sbOpen" aria-label="Menú">
                 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M3 6h14M3 10h14M3 14h14" stroke-linecap="round"/></svg>
             </button>
             <div style="display:flex;flex-direction:column;line-height:1.2;min-width:0;">

@@ -1,21 +1,19 @@
 @props([
-    'value' => 0,
-    'max' => 100,
-    'size' => 96,
-    'tone' => 'accent',
-    'label' => null,
-    'showValue' => true,
+    'value' => 0, // valor actual
+    'max' => 100, // valor máximo
+    'size' => 96, // diámetro en px
+    'tone' => 'accent', // accent | ok | warn | danger | info
+    'label' => null, // texto bajo el anillo
+    'showValue' => true, // muestra el porcentaje al centro
 ])
 
 @php
+    $value = (float) $value; $max = (float) $max;
     $pct = $max > 0 ? max(0, min(100, $value / $max * 100)) : 0;
     $r = 42;
     $circ = 2 * M_PI * $r;
     $offset = $circ * (1 - $pct / 100);
-    $color = [
-        'accent' => 'var(--muni-accent)', 'ok' => 'var(--muni-ok-fg)', 'warn' => 'var(--muni-warn-fg)',
-        'danger' => 'var(--muni-danger-fg)', 'info' => 'var(--muni-info-fg)',
-    ][$tone] ?? 'var(--muni-accent)';
+    $color = \Muni\Ui\Tono::color($tone);
 @endphp
 
 <div {{ $attributes->merge(['style' => "display:inline-flex;flex-direction:column;align-items:center;gap:8px;"]) }}>
@@ -24,7 +22,7 @@
             <circle cx="50" cy="50" r="{{ $r }}" fill="none" stroke="var(--muni-surface-3)" stroke-width="8"/>
             <circle cx="50" cy="50" r="{{ $r }}" fill="none" stroke="{{ $color }}" stroke-width="8" stroke-linecap="round"
                     stroke-dasharray="{{ $circ }}" stroke-dashoffset="{{ $offset }}"
-                    style="transition:stroke-dashoffset .8s var(--muni-ease);"/>
+                    style="transition:stroke-dashoffset calc(var(--muni-dur) * 5) var(--muni-ease);"/>
         </svg>
         @if ($showValue)
             <div style="position:absolute;inset:0;display:grid;place-items:center;">

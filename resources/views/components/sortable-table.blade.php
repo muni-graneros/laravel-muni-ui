@@ -1,8 +1,8 @@
 @props([
-    'columns' => [],
-    'rows' => [],
-    'empty' => 'Sin resultados.',
-    'searchable' => false,
+    'columns' => [], // lista de ['key' => , 'label' => , 'align' => ?, 'mono' => ?, 'sortable' => ?]
+    'rows' => [], // filas asociativas por key; '_tone' => 'danger' pinta la franja
+    'empty' => 'Sin resultados.', // texto sin resultados
+    'searchable' => false, // agrega un buscador sobre la tabla
 ])
 
 @php
@@ -21,35 +21,72 @@
         get view(){
             let r = this.rows;
             if(this.q.trim()){ const t=this.q.toLowerCase(); r = r.filter(row => Object.values(row).some(v => String(v).toLowerCase().includes(t))); }
-            if(this.sortKey){ const k=this.sortKey,d=this.sortDir; r=[...r].sort((a,b)=>{ let x=a[k],y=b[k]; const nx=parseFloat(String(x).replace(/[^0-9.-]/g,'')), ny=parseFloat(String(y).replace(/[^0-9.-]/g,'')); if(!isNaN(nx)&&!isNaN(ny)){ return (nx-ny)*d; } return String(x).localeCompare(String(y),'es')*d; }); }
+            if(this.sortKey){ const k=this.sortKey,d=this.sortDir; r=[...r].sort((a,b)=>this.cmp(a[k],b[k])*d); }
             return r;
+        },
+        clave(v){
+            if(v===null || v===undefined) return '';
+            if(typeof v==='number') return v;
+            const t=String(v).trim();
+            const f=t.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/);
+            if(f) return f[3]+'-'+f[2].padStart(2,'0')+'-'+f[1].padStart(2,'0');
+            const s=t.replace(/[\s\u00a0$%]/g,'');
+            if(/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s)) return parseFloat(s.replace(/\./g,'').replace(',','.'));
+            if(/^-?\d+(,\d+)?$/.test(s)) return parseFloat(s.replace(',','.'));
+            if(/^-?\d*\.\d+$/.test(s)) return parseFloat(s);
+            return t;
+        },
+        cmp(a,b){
+            const x=this.clave(a), y=this.clave(b);
+            if(typeof x==='number' && typeof y==='number') return x-y;
+            return String(x).localeCompare(String(y),'es',{numeric:true,sensitivity:'base'});
         }
     }"
     {{ $attributes }}
 >
     @if ($searchable)
-        <div style="margin-bottom:12px;position:relative;max-width:280px;">
-            <input x-model="q" placeholder="Buscar…" class="muni-st__search">
+        <div x-cloak style="margin-bottom:12px;position:relative;max-width:280px;">
+            <input type="search" x-model="q" placeholder="Buscar…" aria-label="Buscar en la tabla" class="muni-st__search">
         </div>
     @endif
 
     <div style="overflow-x:auto;border:1px solid var(--muni-border);border-radius:var(--muni-radius);background:var(--muni-surface);">
         <table class="muni-st">
             <thead>
+                {{-- Encabezado y filas renderizados en el servidor: la tabla se lee sin JS.
+                     Al arrancar Alpine se ocultan y toma el control la versión ordenable. --}}
+                <tr x-show="false">
+                    @foreach ($columns as $c)
+                        <th scope="col" style="text-align:{{ $c['align'] ?? 'left' }};">{{ $c['label'] ?? '' }}</th>
+                    @endforeach
+                </tr>
                 <tr>
                     <template x-for="c in cols" :key="c.key">
-                        <th :style="`text-align:${c.align||'left'}`" :class="(c.sortable!==false) && 'muni-st__sortable'" @click="c.sortable!==false && sort(c.key)">
-                            <span style="display:inline-flex;align-items:center;gap:5px;">
+                        <th scope="col" :style="`text-align:${c.align||'left'}`" :class="(c.sortable!==false) && 'muni-st__sortable'"
+                            :aria-sort="c.sortable===false ? null : (sortKey===c.key ? (sortDir>0 ? 'ascending' : 'descending') : 'none')">
+                            <template x-if="c.sortable!==false">
+                                <button type="button" class="muni-st__sortbtn" @click="sort(c.key)">
+                                    <span x-text="c.label"></span>
+                                    <span class="muni-st__arrow" aria-hidden="true" :style="sortKey===c.key ? 'opacity:1' : 'opacity:.3'" x-text="sortKey===c.key ? (sortDir>0?'↑':'↓') : '↕'"></span>
+                                </button>
+                            </template>
+                            <template x-if="c.sortable===false">
                                 <span x-text="c.label"></span>
-                                <template x-if="c.sortable!==false">
-                                    <span class="muni-st__arrow" :style="sortKey===c.key ? 'opacity:1' : 'opacity:.3'" x-text="sortKey===c.key ? (sortDir>0?'↑':'↓') : '↕'"></span>
-                                </template>
-                            </span>
+                            </template>
                         </th>
                     </template>
                 </tr>
             </thead>
             <tbody>
+                @forelse ($rows as $row)
+                    <tr x-show="false" @class(['muni-st__danger' => ($row['_tone'] ?? null) === 'danger'])>
+                        @foreach ($columns as $c)
+                            <td style="text-align:{{ $c['align'] ?? 'left' }};{{ ! empty($c['mono']) ? 'font-family:var(--muni-font-mono);font-variant-numeric:tabular-nums;' : '' }}">{{ $row[$c['key']] ?? '' }}</td>
+                        @endforeach
+                    </tr>
+                @empty
+                    <tr x-show="false"><td colspan="{{ max(1, count($columns)) }}" style="text-align:center;padding:28px;color:var(--muni-muted);">{{ $empty }}</td></tr>
+                @endforelse
                 <template x-for="(row,ri) in view" :key="ri">
                     <tr :class="row._tone==='danger' && 'muni-st__danger'">
                         <template x-for="c in cols" :key="c.key">
@@ -71,6 +108,8 @@
         .muni-st th { text-align:left; white-space:nowrap; padding:9px 12px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--muni-muted); background:var(--muni-surface-2); border-bottom:1px solid var(--muni-border); }
         .muni-st__sortable { cursor:pointer; user-select:none; transition:color var(--muni-dur) var(--muni-ease); }
         .muni-st__sortable:hover { color:var(--muni-text); }
+        .muni-st__sortbtn { display:inline-flex; align-items:center; gap:5px; padding:0; margin:0; border:0; background:none; font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit; cursor:pointer; border-radius:4px; }
+        .muni-st__sortbtn:focus-visible { outline:none; box-shadow:var(--muni-ring); }
         .muni-st__arrow { font-family:var(--muni-font-mono); font-size:11px; }
         .muni-st td { padding:9px 12px; border-bottom:1px solid var(--muni-border); white-space:nowrap; color:var(--muni-text); }
         .muni-st tbody tr { transition:background var(--muni-dur) var(--muni-ease); }

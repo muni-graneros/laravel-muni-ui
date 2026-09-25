@@ -1,10 +1,10 @@
 @props([
-    'theme' => 'light',
-    'title' => null,
-    'system',
-    'subtitle' => null,
-    'status' => 'online',
-    'maxWidth' => '1200px',
+    'theme' => 'light', // light | dark
+    'title' => null, // <title> del documento; por defecto usa system
+    'system', // nombre del sistema en la topbar
+    'subtitle' => null, // línea secundaria bajo el nombre
+    'status' => 'online', // online | degraded | offline
+    'maxWidth' => '1200px', // ancho máximo del contenido
 ])
 
 <!DOCTYPE html>
@@ -12,8 +12,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>    <x-muni::reverb-meta />
-{{ $title ?? $system }}</title>
+    <x-muni::reverb-meta />
+    <title>{{ $title ?? $system }}</title>
     {{ $head ?? '' }}
     <style>
         *, *::before, *::after { box-sizing: border-box; }

@@ -1,7 +1,7 @@
 @props([
-    'href' => null,
-    'icon' => null,
-    'tone' => 'default',
+    'href' => null, // si se indica, renderiza un <a>
+    'icon' => null, // SVG a la izquierda
+    'tone' => 'default', // default | danger
 ])
 
 @php
@@ -12,7 +12,7 @@
 <{{ $tag }}
     @if ($href) href="{{ $href }}" @else type="button" @endif
     role="menuitem"
-    @click="open = false"
+    @click="$dispatch('muni-dropdown-close')"
     {{ $attributes->merge([
         'class' => 'muni-dd-item',
         'style' => "display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;"

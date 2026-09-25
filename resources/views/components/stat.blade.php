@@ -1,21 +1,21 @@
 @props([
-    'value',
-    'label',
-    'tone' => 'neutral',
-    'delta' => null,
-    'deltaDir' => null,
-    'spark' => null,
-    'hint' => null,
+    'value', // cifra principal (ya formateada)
+    'label', // qué mide
+    'tone' => 'neutral', // neutral | ok | warn | danger | info
+    'delta' => null, // variación, p. ej. «+12%»
+    'deltaDir' => null, // up | down
+    'spark' => null, // serie de números para la sparkline
+    'hint' => null, // texto chico bajo la etiqueta
 ])
 
 @php
-    $accent = [
-        'neutral' => 'var(--muni-text)', 'ok' => 'var(--muni-ok-fg)',
-        'warn' => 'var(--muni-warn-fg)', 'danger' => 'var(--muni-danger-fg)', 'info' => 'var(--muni-info-fg)',
-    ][$tone] ?? 'var(--muni-text)';
+    $accent = \Muni\Ui\Tono::color($tone === 'muted' ? 'neutral' : $tone, 'neutral');
 
     // Sparkline: array de números → path SVG normalizado en un viewbox 100x28.
     $sparkPath = null;
+    // Se reindexa: una serie con claves (['ene' => 3, ...]) rompía la división.
+    if ($spark instanceof \Illuminate\Contracts\Support\Arrayable) { $spark = $spark->toArray(); }
+    if (is_array($spark)) { $spark = array_values(array_map(fn ($v) => (float) $v, $spark)); }
     if (is_array($spark) && count($spark) > 1) {
         $min = min($spark); $max = max($spark); $range = ($max - $min) ?: 1;
         $n = count($spark) - 1;
@@ -32,7 +32,7 @@
     $arrow = $deltaDir === 'up' ? '&#9650;' : ($deltaDir === 'down' ? '&#9660;' : '');
 @endphp
 
-<div class="muni-stat" {{ $attributes->merge(['style' => 'position:relative;padding:16px 18px;background:var(--muni-surface);border:1px solid var(--muni-border);border-radius:var(--muni-radius);box-shadow:var(--muni-shadow);min-width:170px;transition:box-shadow var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease);']) }}>
+<div {{ $attributes->merge(['class' => 'muni-stat', 'style' => 'position:relative;padding:16px 18px;background:var(--muni-surface);border:1px solid var(--muni-border);border-radius:var(--muni-radius);box-shadow:var(--muni-shadow);min-width:170px;transition:box-shadow var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease);']) }}>
     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
         <div style="min-width:0;">
             <div style="font-family:var(--muni-font-mono);font-variant-numeric:tabular-nums;font-size:26px;font-weight:700;line-height:1.05;color:{{ $accent }};">{{ $value }}</div>

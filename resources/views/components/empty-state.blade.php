@@ -1,7 +1,7 @@
 @props([
-    'title' => 'Sin resultados',
-    'description' => null,
-    'icon' => null,
+    'title' => 'Sin resultados', // mensaje principal
+    'description' => null, // texto de ayuda
+    'icon' => null, // SVG propio; por defecto una lupa
 ])
 
 <div {{ $attributes->merge(['style' => 'display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;padding:48px 24px;']) }}>

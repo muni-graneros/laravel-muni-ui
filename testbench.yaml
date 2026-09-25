@@ -1,0 +1,18 @@
+# App mínima para probar los componentes con Livewire de verdad (vendor/bin/testbench serve).
+# La usa demo/catalogo/livewire.mjs; no es parte del paquete.
+laravel: '@testbench'
+
+providers:
+  - Livewire\LivewireServiceProvider
+  - Muni\Ui\MuniUiServiceProvider
+  - Workbench\App\Providers\WorkbenchServiceProvider
+
+env:
+  - APP_KEY=base64:eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHg=
+  - APP_DEBUG=true
+  - SESSION_DRIVER=file
+  - CACHE_STORE=file
+
+workbench:
+  discovers:
+    web: true

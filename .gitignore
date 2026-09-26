@@ -2,4 +2,25 @@
 composer.lock
 /.phpunit.cache/
 demo/vendor/
+
+# direnv (tokens por frente; NUNCA versionar)
+.envrc
+.direnv/
+
+# caché de la reja de accesibilidad (axe-core se descarga o llega por npm)
+/scripts/.cache/
+/node_modules/
+a11y-informe.json
+.venv-a11y/
+/build/
+
+# Artefactos del sandbox de Claude Code: son dispositivos y archivos vacíos que el
+# harness monta dentro del repo, no configuración del proyecto. Se colaron en 95a1ee2.
+/.claude/
+
+# Herramientas del catálogo y prueba con Livewire 3 (no son parte del paquete)
 demo/catalogo/node_modules/
+demo/livewire3/vendor/
+demo/livewire3/composer.lock
+demo/livewire3/workbench/
+demo/livewire3/testbench.yaml

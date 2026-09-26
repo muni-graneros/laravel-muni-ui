@@ -1,17 +1,30 @@
 @props([
-    'action' => null, // URL del formulario
-    'method' => 'get', // get | post | put | patch | delete (los no-GET llevan CSRF)
+    'action' => null, // URL del formulario; null envía a la misma página
+    'method' => 'get', // get | post | put | patch | delete (CSRF fuera de GET)
 ])
 
 {{-- Barra de filtros GET: los valores quedan en la URL para que las descargas
      (xlsx/csv) los arrastren. El slot son los campos (usar <x-muni::field>). --}}
 @php
-    // Los forms HTML solo saben GET/POST: PUT/PATCH/DELETE van por POST con @method.
-    $verbo = strtolower((string) $method);
-    $metodoForm = $verbo === 'get' ? 'get' : 'post';
+    /* El token va SOLO si el método no es GET, y la comparación es insensible a
+       mayúsculas porque `method="POST"` es igual de válido en HTML. En GET sería
+       peor que inútil: los filtros viven en la URL —esa es toda la gracia del
+       componente— y el token acabaría en la cadena de consulta que el funcionario
+       copia y pega en un correo. En POST, sin token, Laravel responde 419 y el
+       filtro no se aplica jamás: es el defecto que el juez mandó arreglar antes
+       que cualquier componente nuevo. */
+    $muniFbVerbo = strtolower(trim((string) $method));
+    $muniFbProtegido = $muniFbVerbo !== 'get';
+
+    /* Un <form> solo sabe GET y POST: `method="put"` lo trata el navegador como
+       GET y el token terminaba en la URL. PUT, PATCH y DELETE van por POST con el
+       campo `_method` que entiende Laravel. */
+    $muniFbMetodoForm = $muniFbProtegido ? 'post' : 'get';
+    $muniFbSuplanta = ! in_array($muniFbVerbo, ['get', 'post'], true);
 @endphp
+
 <form
-    method="{{ $metodoForm }}"
+    method="{{ $muniFbMetodoForm }}"
     @if ($action) action="{{ $action }}" @endif
     {{ $attributes->merge([
         'style' => 'display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;'
@@ -19,10 +32,13 @@
             .'border:1px solid var(--muni-border);border-radius:var(--muni-radius);',
     ]) }}
 >
-    @if ($metodoForm === 'post')
+    @if ($muniFbProtegido)
         @csrf
-        @if (! in_array($verbo, ['post', 'get'], true)) @method(strtoupper($verbo)) @endif
     @endif
+    @if ($muniFbSuplanta)
+        @method(strtoupper($muniFbVerbo))
+    @endif
+
     {{ $slot }}
 
     <div style="display:flex;gap:8px;margin-left:auto;">

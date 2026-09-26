@@ -16,8 +16,15 @@
  */
 
 use Illuminate\Config\Repository;
+use Illuminate\Events\EventServiceProvider;
+use Illuminate\Filesystem\FilesystemServiceProvider;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
+use Illuminate\Routing\RoutingServiceProvider;
+use Illuminate\Session\SessionServiceProvider;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Translation\TranslationServiceProvider;
+use Illuminate\View\ViewServiceProvider;
 
 require __DIR__.'/../../vendor/autoload.php';
 
@@ -38,27 +45,37 @@ $app = new class(sys_get_temp_dir()) extends Application
 };
 Facade::setFacadeApplication($app);
 $app->instance('config', new Repository([
+    'app' => ['url' => 'http://localhost', 'key' => 'base64:'.base64_encode(str_repeat('c', 32)), 'cipher' => 'AES-256-CBC'],
     'view' => ['paths' => [__DIR__], 'compiled' => $cache],
+    'session' => ['driver' => 'array', 'lifetime' => 120, 'expire_on_close' => false, 'encrypt' => false, 'cookie' => 'catalogo', 'path' => '/', 'domain' => null, 'secure' => false, 'http_only' => true, 'same_site' => 'lax', 'partitioned' => false],
     'broadcasting' => ['connections' => ['reverb' => []]],
+    'app.locale' => 'es', 'app.fallback_locale' => 'es',
 ]));
-$app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
-$app->register(Illuminate\Events\EventServiceProvider::class);
-$app->register(Illuminate\View\ViewServiceProvider::class);
+$app->register(FilesystemServiceProvider::class);
+$app->register(EventServiceProvider::class);
+$app->register(RoutingServiceProvider::class);
+$app->register(SessionServiceProvider::class);
+$app->register(ViewServiceProvider::class);
+$app->register(TranslationServiceProvider::class);
+$app->instance('path.lang', __DIR__.'/lang');
+// Los componentes de develop leen la sesión (selector-tema, sesion-guardia) y
+// arman URLs: una petición y una sesión de mentira alcanzan para renderizar.
+$app->instance('request', Request::create('http://localhost/catalogo'));
+$app['session']->driver()->setId(str_repeat('a', 40));
+$app['session']->driver()->start();
+// Token fijo: con uno aleatorio cada construcción daría otro HTML y CI no podría
+// comprobar que el catálogo publicado está al día.
+$app['session']->driver()->put('_token', str_repeat('catalogo', 5));
+$app['request']->setLaravelSession($app['session']->driver());
 
-// asset() lo usa <x-muni::gob-escudo>: el escudo va embebido para que el HTML sea autocontenido.
-$escudo = 'data:image/png;base64,'.base64_encode(file_get_contents($root.'/resources/images/logo-graneros.png'));
-$app->instance('url', new class($escudo)
-{
-    public function __construct(private string $escudo) {}
-
-    public function asset($path)
-    {
-        return str_ends_with($path, 'logo-graneros.png') ? $this->escudo : $path;
-    }
-});
+// El escudo se embebe para que el HTML sea autocontenido: asset() arma la URL real
+// y lib.php la reemplaza por la imagen al renderizar cada ejemplo.
+CatalogoHead::$escudo = 'data:image/png;base64,'.base64_encode(file_get_contents($root.'/resources/images/logo-graneros.png'));
 
 $css = file_get_contents($root.'/resources/css/muni-ui.css');
-$alpine = isset($argv[1]) ? file_get_contents($argv[1]) : null;
+// Scripts en orden: primero los plugins (Focus, que da x-trap a modal, drawer y
+// paleta) y al final Alpine, que al arrancar dispara el alpine:init que los registra.
+$alpine = count($argv) > 1 ? implode(";\n", array_map('file_get_contents', array_slice($argv, 1))) : null;
 $head = $app['view']->file(__DIR__.'/_head.blade.php', compact('css', 'alpine'))->render();
 
 // Los ejemplos de plantillas escriben `@vite('resources/css/app.css')` en su slot
@@ -70,5 +87,6 @@ $app['blade.compiler']->anonymousComponentPath($root.'/resources/views/component
 $catalogo = catalogo_datos($app['view'], $root);
 
 $html = $app['view']->file(__DIR__.'/catalogo.blade.php', $catalogo + compact('head'))->render();
-file_put_contents($root.'/demo/catalogo.html', $html);
+// El escudo del índice lateral también va embebido: el HTML se abre sin servidor.
+file_put_contents($root.'/demo/catalogo.html', CatalogoHead::embeber($html));
 echo 'demo/catalogo.html ('.round(strlen($html) / 1024).' KB, '.$catalogo['total'].' componentes, '.count($catalogo['recetas'])." recetas)\n";

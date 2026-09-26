@@ -1,0 +1,19 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+    # UN error pre-existente, ajeno a esta tarea: `SolicitudResource.php` (que esta
+    # sesión tiene prohibido tocar — ya arreglado y commiteado aparte) llama a
+    # `BuscaTitulares::comoSeBusca()`, un método que el CONTRATO de la interfaz
+    # —en `laravel-muni-shared`, otro repo— no declara. No es baseline "por si
+    # las dudas": es la única entrada, documentada, y desaparece sola en cuanto
+    # se corrija el contrato en el repo dueño.
+    - phpstan-baseline.neon
+
+parameters:
+    level: 8
+
+    # Solo `src`, como `scaffold-laravel-filament-pwa` (analiza `app`, no `tests`):
+    # la suite usa el encadenamiento fluido de Pest (`it(...)->resolutora()->actingAs()`,
+    # macros propias del repo) que PHPStan no puede tipar sin stubs a medida, y
+    # generan decenas de falsos positivos sin relación con el código de producción.
+    paths:
+        - src

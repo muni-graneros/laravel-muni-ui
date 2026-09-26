@@ -1,39 +1,76 @@
 @props([
-    'size' => 'md', // sm | md | lg
-    'label' => 'Cargando…', // texto para el lector de pantalla (y visible con showLabel)
-    'showLabel' => false, // muestra el texto junto al indicador
-    'tone' => 'accent', // accent | neutral | ok | warn | danger | info
+    'size' => '20px', // diámetro (CSS)
 ])
 
-{{-- Indicador de carga. Con Livewire: wire:loading.inline-flex y wire:target van
-     directo en el componente (p. ej. wire:loading.inline-flex wire:target="guardar").
-     El display vive en la clase y no en style: así la regla de Livewire que oculta
-     [wire:loading] gana mientras no hay petición. El texto queda para el lector de
-     pantalla; dentro de un botón no se anuncia solo (el botón ya dice qué hace).
-     Con movimiento reducido gira más lento en vez de detenerse: un indicador quieto
-     parece colgado. --}}
+{{-- EL DIBUJO de una carga en curso. Solo el dibujo.
+
+     Es decorativo: `aria-hidden`, sin rol, sin texto. No cumple NADA por sí solo. Lo que
+     cierra WCAG 2.2 AA 4.1.3 (Mensajes de estado) es el patrón de región, que vive en
+     <x-muni::busy-region>: una región `role="status"` persistente, `aria-busy` sobre el
+     contenedor que se reemplaza y el mensaje de RESULTADO pintado por el servidor al
+     terminar. Un `<span role="status" wire:loading>` con esta ruedita adentro no se
+     anuncia de forma fiable en NVDA, JAWS ni VoiceOver —una región viva que pasa de
+     `display:none` a visible es el bug clásico— y queda de adorno dando falsa
+     sensación de cumplimiento. Sin busy-region, spinner no es un componente de
+     accesibilidad; es un icono.
+
+     Dos decisiones que no son estéticas:
+
+     1. Se dibuja con SVG EN LÍNEA y no con una máscara `data:` en CSS ni con una fuente
+        de iconos: la CSP estricta de los sistemas bloquea `data:` en `mask-image` sin un
+        solo error en consola. El trazo es `currentColor`, así que hereda el color del
+        texto donde se coloque y no tiene color propio.
+     2. La animación va ENVUELTA en `@media (prefers-reduced-motion: no-preference)`: se
+        anima solo si la persona lo permite, en vez de animar y apagar después. Bajo
+        movimiento reducido queda el arco quieto, que sigue leyéndose como «en curso»
+        porque el TEXTO lo pone la región, no el dibujo. La duración es local
+        (`--mspin-dur`) y no `--muni-dur`: ese token baja a 0 ms con movimiento reducido
+        y a 160 ms no gira, parpadea.
+
+     Uso suelto, dentro de un botón que dispara una acción:
+
+       <x-muni::button wire:click="generar">
+           <x-muni::spinner size="16px" wire:loading wire:target="generar" /> Generar padrón
+       </x-muni::button>
+
+     Ahí `wire:loading` alterna el `display` de este span, y como es decorativo da igual
+     que nazca y muera con el estado. --}}
+
 @php
-    $px = ['sm' => 14, 'md' => 20, 'lg' => 32][$size] ?? 20;
-    $color = \Muni\Ui\Tono::color($tone);
+    // Solo una longitud CSS: el valor va dentro de un `style` y cualquier otra cosa sería
+    // inyección de CSS. Un tamaño inválido cae al de defecto en vez de imprimirse.
+    $muniSpinnerSize = preg_match('/^\d+(\.\d+)?(px|em|rem|%)$/', (string) $size) ? $size : '20px';
 @endphp
 
-<span role="status" {{ $attributes->merge(['class' => 'muni-spinner-wrap', 'style' => 'font-family:var(--muni-font-sans);font-size:13px;color:var(--muni-muted);']) }}>
-    <svg class="muni-spinner" viewBox="0 0 24 24" width="{{ $px }}" height="{{ $px }}" aria-hidden="true" style="color:{{ $color }};">
-        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="3" opacity=".2"/>
-        <path d="M21 12a9 9 0 00-9-9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+{{-- `aria-hidden` va por merge y no escrito a mano antes del derrame: si el consumidor
+     lo pasa, saldría dos veces y en HTML gana el primero (DESIGN §8). Se saca de la
+     bolsa para que sea siempre "true": decorativo por contrato, no por defecto. --}}
+<span
+    {{ $attributes->except('aria-hidden')->merge([
+        'aria-hidden' => 'true',
+        'class' => 'muni-spinner',
+        'style' => "width:{$muniSpinnerSize};height:{$muniSpinnerSize};",
+    ]) }}
+>
+    <svg viewBox="0 0 24 24" fill="none" focusable="false" width="100%" height="100%">
+        <circle class="muni-spinner__track" cx="12" cy="12" r="10" stroke-width="3"/>
+        <circle class="muni-spinner__arc" cx="12" cy="12" r="10" stroke-width="3" stroke-linecap="round" pathLength="100" stroke-dasharray="28 72"/>
     </svg>
-    @if ($showLabel)
-        <span>{{ $label }}</span>
-    @else
-        <span style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;">{{ $label }}</span>
-    @endif
 </span>
 
 @once
     <style>
-        .muni-spinner-wrap { position:relative; display:inline-flex; align-items:center; gap:8px; vertical-align:middle; }
-        .muni-spinner { flex-shrink:0; animation:muni-spin .75s linear infinite; }
+        /* Viaja con el componente: dentro de un panel Filament solo se inyecta
+           vendor/muni-ui/filament.css y una clase declarada únicamente en
+           muni-ui.css se vería sin estilo, sin un solo error en consola. */
+        .muni-spinner { --mspin-dur: 800ms; display:inline-block; flex:none; vertical-align:middle; color:inherit; line-height:0; }
+        .muni-spinner svg { display:block; width:100%; height:100%; }
+        .muni-spinner__track { stroke:currentColor; opacity:.25; }
+        .muni-spinner__arc { stroke:currentColor; }
         @keyframes muni-spin { to { transform:rotate(360deg); } }
-        @media (prefers-reduced-motion:reduce) { .muni-spinner { animation:muni-spin 1.6s linear infinite !important; } }
+        /* Anima solo si se permite. Fuera de este bloque no hay ninguna `animation`. */
+        @media (prefers-reduced-motion: no-preference) {
+            .muni-spinner svg { animation:muni-spin var(--mspin-dur) linear infinite; }
+        }
     </style>
 @endonce

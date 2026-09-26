@@ -2,9 +2,12 @@
 
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\FileUpload;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ViewErrorBag;
+use Muni\Shared\Privacidad\DiscoEvidenciaNoConfigurado;
 use Muni\Shared\Privacidad\EstadoDeSolicitud;
 use Muni\Shared\Privacidad\Modelos\EntradaBitacora;
 use Muni\Shared\Privacidad\Modelos\Solicitud;
@@ -12,7 +15,6 @@ use Muni\Shared\Privacidad\ResultadoVerificacion;
 use Muni\Shared\Privacidad\Solicitante;
 use Muni\Shared\Privacidad\Solicitudes;
 use Muni\Shared\Privacidad\TipoDeSolicitud;
-use Muni\Ui\Filament\Privacidad\PanelArcopPlugin;
 use Muni\Ui\Filament\Privacidad\SolicitudResource;
 use Muni\Ui\Filament\Privacidad\SolicitudResource\Pages\CreateSolicitud;
 use Muni\Ui\Filament\Privacidad\SolicitudResource\Pages\ListSolicitudes;
@@ -316,4 +318,65 @@ it('no muestra las solicitudes de otro sistema del ecosistema', function () {
         ->assertOk()
         ->assertCanSeeTableRecords([$propia])
         ->assertCanNotSeeTableRecords([$ajena]);
+});
+
+// ─── El documento de acreditación es un dato personal ────────────────────────
+
+/**
+ * El campo de la acreditación tal como lo arma el recurso.
+ *
+ * La página va sin montar: recorrer el árbol exige un componente Livewire
+ * dueño del schema, pero no una petición. `withHidden: true` porque el campo
+ * solo se muestra cuando no viene el propio titular, y evaluar esa condición
+ * no es lo que se prueba acá.
+ */
+function campoAcreditacion(): FileUpload
+{
+    $schema = SolicitudResource::form(Schema::make(new CreateSolicitud));
+
+    foreach ($schema->getFlatComponents(withHidden: true) as $componente) {
+        if ($componente instanceof FileUpload && $componente->getName() === 'acreditacion_path') {
+            return $componente;
+        }
+    }
+
+    throw new LogicException('El formulario de recepción no tiene el campo acreditacion_path.');
+}
+
+it('no arma el formulario si el disco de la acreditación no está configurado', function () {
+    // Es lo que hay en un adoptante sin PRIVACIDAD_DISCO_EVIDENCIA: la clave
+    // existe (la fusiona muni-shared) pero vale null. Antes, `(string) null`
+    // era '' y Filament caía en silencio a `filament.default_filesystem_disk`.
+    config()->set('privacidad.disco_evidencia', null);
+
+    expect(fn () => SolicitudResource::form(Schema::make()))
+        ->toThrow(DiscoEvidenciaNoConfigurado::class, 'PRIVACIDAD_DISCO_EVIDENCIA');
+});
+
+it('tampoco acepta la variable presente pero vacía', function () {
+    // `PRIVACIDAD_DISCO_EVIDENCIA=` en el .env da '' y no null: `??` no lo atrapa.
+    config()->set('privacidad.disco_evidencia', '  ');
+
+    expect(fn () => SolicitudResource::form(Schema::make()))
+        ->toThrow(DiscoEvidenciaNoConfigurado::class);
+});
+
+it('guarda la acreditación en el disco declarado y como privada', function () {
+    $campo = campoAcreditacion();
+
+    expect($campo->getDiskName())->toBe('evidencia')
+        // Explícito y no por defecto: es el segundo candado de Filament, el
+        // que manda a `local` (y no a `public`) si el disco no resolviera.
+        ->and($campo->getCustomVisibility())->toBe('private');
+});
+
+it('la acreditación no acepta SVG ni permite abrirlo en el navegador', function () {
+    $campo = campoAcreditacion();
+
+    // `image/*` incluía SVG: XML con scripts que, abierto en el origen del
+    // panel, corre con la sesión y el MFA del funcionario ya superados.
+    expect($campo->getAcceptedFileTypes())->toBe(['application/pdf', 'image/jpeg', 'image/png', 'image/webp'])
+        ->and($campo->getMaxSize())->toBe(10240)
+        ->and($campo->isOpenable())->toBeFalse()
+        ->and($campo->isDownloadable())->toBeTrue();
 });

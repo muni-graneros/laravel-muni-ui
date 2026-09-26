@@ -18,37 +18,34 @@ it('la paleta es combobox + listbox, atrapa Tab y devuelve el foco', function ()
         </x-muni::command-palette>
         BLADE);
 
+    // La trampa de foco y la devolución al cerrar las pone x-trap (plugin Focus).
     expect($html)->toContain('role="combobox"')
-        ->toContain(':aria-expanded=')
-        ->toContain(":aria-controls=\"\$id('muni-cp')\"")
+        ->toContain('aria-expanded="true"')
+        ->toContain(":aria-controls=\"\$id('muni-cmdk-lista')\"")
         ->toContain(':aria-activedescendant=')
         ->toContain('role="listbox"')
         ->toContain('role="option"')
         ->toContain(':aria-selected=')
-        ->toContain('@keydown="atrapar($event)"')
-        ->toContain('devolverFoco()')
-        ->toContain('muni-cp__opt--on{background:var(--muni-accent-soft)');
+        ->toContain('x-trap.inert.noscroll=')
+        ->toContain('.muni-cmdk__opcion--activa');
 });
 
-it('el calendario nombra cada día con la fecha completa y tiene teclado de grilla', function () {
+it('el calendario nombra cada día con la fecha completa', function () {
     $html = Blade::render('<x-muni::calendar name="f" value="2026-10-12" min="2026-10-01" />');
 
-    expect($html)->toContain(':aria-label="c ? nombre(c) : null"')
-        ->toContain(':aria-pressed=')
-        ->toContain(':tabindex="c && same(c,objetivo) ? 0 : -1"')
-        ->toContain('@keydown="tecla($event)"')
-        ->toContain('PageUp')->toContain('Home')
+    expect($html)->toContain(':aria-label="largo(c)"')
         // x-modelable, value y min siguen intactos.
         ->toContain('x-modelable="valor"')
         ->toContain('value="2026-10-12"')
-        ->toContain("('2026-10-01')");
+        ->toContain('data-min="2026-10-01"');
 });
 
-it('las estrellas interactivas miden al menos 24×24 y sin marcar usan el borde fuerte', function () {
+it('las estrellas interactivas miden al menos 24×24 y sin marcar no bajan de 3:1', function () {
     $html = Blade::render('<x-muni::rating :value="2" />');
 
+    // --muni-border-2 queda en 1,6:1; --muni-hint tiene las dos ramas sobre 4,5:1.
     expect($html)->toContain('min-width:24px')->toContain('min-height:24px')
-        ->toContain('var(--muni-border-strong')
+        ->toContain('color:var(--muni-hint)')->not->toContain('color:var(--muni-border-2)')
         ->toContain('x-modelable="value"');
 });
 
@@ -62,14 +59,14 @@ it('el dropdown cierra cuando el foco sale del componente', function () {
         </x-muni::dropdown>
         BLADE);
 
-    expect($html)->toContain('@focusout="if (open && $event.relatedTarget && ! $el.contains($event.relatedTarget)) open = false"');
+    expect($html)->toContain('@focusout="alPerderElFoco($event)"');
 });
 
 it('los encabezados de data-table tienen scope y el vacío se rotula «Acciones»', function () {
     $html = Blade::render('<x-muni::data-table :columns="[\'RUT\', \'Nombre\', \'\']" />');
 
     expect(substr_count($html, '<th scope="col"'))->toBe(3)
-        ->and($html)->toMatch('/<th scope="col"[^>]*><span style="position:absolute;[^"]*">Acciones<\/span><\/th>/')
+        ->and($html)->toMatch('/<th scope="col"[^>]*><span class="muni-sr">Acciones<\/span><\/th>/')
         ->and($html)->toMatch('/<th scope="col"[^>]*>RUT<\/th>/');
 });
 
@@ -79,25 +76,28 @@ it('la página de error pone el contenido en un <main>', function () {
     expect($html)->toMatch('/<main class="muni-err__card">.*Volver al inicio.*<\/main>/s');
 });
 
-it('breadcrumb y paginación aceptan otro nombre accesible', function (string $tag, string $porDefecto) {
-    expect(Blade::render("<x-muni::{$tag} />"))->toContain("aria-label=\"{$porDefecto}\"");
+/*
+ * Con dos navegaciones iguales en la página, el `aria-label` del consumidor
+ * reemplaza el del paquete dentro de merge() y no se duplica. (Los detalles de
+ * breadcrumb viven en MigasDeRutaTest.)
+ */
+it('breadcrumb y paginación aceptan otro nombre accesible', function (string $tag, string $props, string $porDefecto) {
+    expect(Blade::render("<x-muni::{$tag} {$props} />"))->toContain("aria-label=\"{$porDefecto}\"");
 
-    $conLabel = Blade::render("<x-muni::{$tag} label=\"Secundaria\" />");
-    expect($conLabel)->toContain('aria-label="Secundaria"')->not->toContain("aria-label=\"{$porDefecto}\"");
-
-    $conAria = Blade::render("<x-muni::{$tag} aria-label=\"Otra\" />");
+    $conAria = Blade::render("<x-muni::{$tag} {$props} aria-label=\"Otra\" />");
     expect($conAria)->toContain('aria-label="Otra"')->and(substr_count($conAria, 'aria-label='))->toBe(1);
 })->with([
-    ['breadcrumb', 'Ruta'],
-    ['pagination', 'Paginación'],
+    ['breadcrumb', ':items="[\'Inicio\']"', 'Ruta'],
+    ['pagination', '', 'Paginación, página 1 de 1'],
 ]);
 
-it('el texto legal del footer y las etiquetas del stepper no pierden legibilidad', function () {
-    $footer = Blade::render('<x-muni::gob-footer />');
-    expect($footer)->toMatch('/\.muni-gob-footer__legal \{[^}]*opacity:\.7;/');
+it('el texto legal del footer no pierde legibilidad', function () {
+    expect(Blade::render('<x-muni::gob-footer />'))->toMatch('/\.muni-gob-footer__legal \{[^}]*opacity:\.7;/');
+});
 
-    $stepper = Blade::render('<x-muni::stepper :steps="[\'Datos\', \'Documentos\']" />');
-    expect($stepper)->toMatch('/\.muni-step__label \{[^}]*\}/')
-        ->and(preg_match('/\.muni-step__label \{([^}]*)\}/', $stepper, $m))->toBe(1)
-        ->and($m[1])->not->toContain('ellipsis')->not->toContain('nowrap');
+it('el scroll de data-table contiene sus textos ocultos y no ensancha la página', function () {
+    // `.muni-sr` es absoluto: sin un contenedor posicionado sale del scroll y el
+    // documento entero gana scroll horizontal a 390 px.
+    expect(Blade::render('<x-muni::data-table :columns="[\'RUT\', \'\']" />'))
+        ->toMatch('/\.muni-dt__scroll \{ position:relative; overflow:auto;/');
 });

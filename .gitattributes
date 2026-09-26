@@ -1,0 +1,14 @@
+# Lo que no viaja en el paquete que descarga cada sistema: herramientas de
+# desarrollo, pruebas y maquetas. El código Blade, las hojas CSS y la documentación
+# para quien lo adopta sí viajan.
+/workbench        export-ignore
+/testbench.yaml   export-ignore
+/tests            export-ignore
+/demo             export-ignore
+/scripts          export-ignore
+/build            export-ignore
+/package.json     export-ignore
+/package-lock.json export-ignore
+/phpunit.xml      export-ignore
+/phpstan.neon     export-ignore
+/.github          export-ignore

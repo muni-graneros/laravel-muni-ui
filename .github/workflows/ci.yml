@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: Pest
+    name: Pint + PHPStan + Pest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -31,6 +31,22 @@ jobs:
           fi
 
       - run: composer install --no-progress --prefer-dist
+
+      - name: Pint (linter)
+        run: ./vendor/bin/pint --test
+
+      - name: PHPStan (nivel 8)
+        run: ./vendor/bin/phpstan analyse --memory-limit=1G --no-progress
+
+      # Los bancos de navegador que genera Pest (pantalla-bloqueo, selector-tema,
+      # plantilla-pantalla…) embeben Alpine y el plugin Focus desde node_modules:
+      # sin ellos las pruebas fallan con «corre `npm install`».
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
 
       - name: Pest
         run: ./vendor/bin/pest
@@ -72,7 +88,7 @@ jobs:
       # cambió y nadie lo regeneró, el catálogo muestra algo que ya no existe.
       - name: El catálogo está al día
         run: |
-          php demo/catalogo/build.php demo/catalogo/node_modules/alpinejs/dist/cdn.min.js
+          php demo/catalogo/build.php demo/catalogo/node_modules/@alpinejs/focus/dist/cdn.min.js demo/catalogo/node_modules/alpinejs/dist/cdn.min.js
           git diff --exit-code --stat demo/catalogo.html || {
             echo "::error file=demo/catalogo.html::El catálogo no está al día. Corre: cd demo/catalogo && npm run construir, y commitea demo/catalogo.html."
             exit 1
@@ -93,3 +109,45 @@ jobs:
           vendor/bin/testbench serve --port=8765 > /tmp/serve.log 2>&1 &
           for i in $(seq 1 30); do curl -sf -o /dev/null http://127.0.0.1:8765/formulario && break; sleep 1; done
           node demo/catalogo/livewire.mjs || { cat /tmp/serve.log; exit 1; }
+
+  livewire3:
+    name: Livewire 3
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      # personas-graneros sigue en Livewire 3 / Filament 3. El entorno de desarrollo
+      # del paquete trae Livewire 4 (lo exige Filament 5), así que aquí se arma una app
+      # aparte con Livewire 3 y el paquete desde este checkout, y se corre la misma
+      # prueba de punta a punta. Livewire 3 trae Alpine 3.15, que se comporta distinto
+      # (así se encontró el bug del día marcado en calendar).
+      - name: App con Livewire 3
+        working-directory: demo/livewire3
+        run: |
+          composer install --no-progress --prefer-dist
+          cp -r ../../workbench ../../testbench.yaml .
+          composer dump-autoload
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: demo/catalogo/package-lock.json
+
+      - name: Herramientas del catálogo
+        working-directory: demo/catalogo
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Livewire 3 de punta a punta
+        working-directory: demo/livewire3
+        run: |
+          vendor/bin/testbench serve --port=8766 > /tmp/serve.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf -o /dev/null http://127.0.0.1:8766/formulario && break; sleep 1; done
+          LIVEWIRE_URL=http://127.0.0.1:8766/formulario node ../catalogo/livewire.mjs || { cat /tmp/serve.log; exit 1; }

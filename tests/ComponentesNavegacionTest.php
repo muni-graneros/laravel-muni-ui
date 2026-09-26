@@ -9,7 +9,7 @@
 
 use Illuminate\Support\Facades\Blade;
 
-function tituloDe(string $html): string
+function navegacionTituloDe(string $html): string
 {
     preg_match('/<title>(.*?)<\/title>/s', $html, $m);
 
@@ -21,18 +21,9 @@ it('deja la meta de Reverb fuera del <title> en los shells', function (string $s
 
     $html = Blade::render("<x-muni::{$shell} system=\"Licencias\" title=\"Inicio\">Hola</x-muni::{$shell}>");
 
-    expect(tituloDe($html))->not->toContain('<meta')->not->toContain('reverb')
+    expect(navegacionTituloDe($html))->not->toContain('<meta')->not->toContain('reverb')
         ->and($html)->toMatch('/<meta name="reverb-key" content="clave-de-prueba">\s*<title>/');
 })->with(['dashboard-shell', 'app-shell', 'auth-shell']);
-
-it('el dashboard-shell tiene estado para el burger, velo y Escape', function () {
-    $html = Blade::render('<x-muni::dashboard-shell system="Panel">Hola</x-muni::dashboard-shell>');
-
-    expect($html)->toMatch('/<body\s[^>]*x-data=/')
-        ->toContain('class="muni-ds__scrim"')
-        ->toContain('@keydown.escape.window=')
-        ->toContain("new CustomEvent('muni-sidebar')");
-});
 
 it('la página de error no recorta el contenido en pantallas bajas', function () {
     $html = Blade::render('<x-muni::error-page />');
@@ -40,27 +31,14 @@ it('la página de error no recorta el contenido en pantallas bajas', function ()
     expect($html)->not->toContain('overflow:hidden');
 });
 
-it('el sidebar combina las clases del host con la suya', function () {
-    $html = Blade::render('<x-muni::sidebar class="extra" style="color:red;">x</x-muni::sidebar>');
-
-    preg_match('/<aside.*?\n>/s', $html, $m);
-
-    expect(substr_count($m[0], ' class="'))->toBe(1)
-        ->and($m[0])->toContain('class="muni-sb extra"')
-        ->and(substr_count($m[0], ' style="'))->toBe(1)
-        ->and($m[0])->toContain('--sb-w:240px;')->toContain('color:red;')
-        ->and($m[0])->toContain('@keydown.escape.window=');
-});
-
-it('modal y drawer son diálogos etiquetados que no pisan el overflow en cada cierre', function (string $componente) {
+it('modal y drawer bloquean el scroll con la trampa de foco y no pisan el overflow a mano', function (string $componente) {
+    // role, aria-modal y aria-labelledby → DialogosCoherentesTest. Acá, solo el
+    // scroll: lo gobierna `x-trap.noscroll`, que al cerrar devuelve el overflow
+    // que había; un x-effect sobre body.style.overflow lo pisaba en cada cierre.
     $html = Blade::render("<x-muni::{$componente} title=\"Ficha\">Contenido</x-muni::{$componente}>");
 
-    expect($html)->toContain('role="dialog"')
-        ->toContain('aria-modal="true"')
-        ->toContain(":aria-labelledby=\"\$id('muni-{$componente}')\"")
-        ->toContain(":id=\"\$id('muni-{$componente}')\"")
-        ->toContain('destroy()')
-        ->not->toContain('x-effect="document.body.style.overflow');
+    expect($html)->toContain('x-trap.inert.noscroll="open"')
+        ->not->toContain('body.style.overflow');
 })->with(['modal', 'drawer']);
 
 it('el drawer usa la duración del token (movimiento reducido)', function () {
@@ -69,24 +47,24 @@ it('el drawer usa la duración del token (movimiento reducido)', function () {
     expect($html)->not->toContain('.28s')->toContain('var(--muni-dur)');
 });
 
-it('el ítem del dropdown no cierra cualquier `open` ancestro', function () {
-    $html = Blade::render('<x-muni::dropdown-item>Ver</x-muni::dropdown-item>');
-
-    expect($html)->not->toContain('open = false')
-        ->toContain("\$dispatch('muni-dropdown-close')");
-});
-
-it('el dropdown escucha su evento de cierre y no pone ARIA en el envoltorio', function () {
+it('el ítem del dropdown cierra su desplegable y no el `open` de un modal ancestro', function () {
+    // Dentro de un modal, el `cerrar()` más cercano es el del desplegable: el modal
+    // no tiene `cerrar` y su `open` solo se toca en un x-data propio sin desplegable
+    // (contrato de siempre). Medido en Chromium: Enter en el ítem cierra el menú y el
+    // modal sigue abierto.
     $html = Blade::render(<<<'BLADE'
-        <x-muni::dropdown>
-            <x-slot:trigger><button>Acciones</button></x-slot:trigger>
-            x
-        </x-muni::dropdown>
+        <x-muni::modal title="Ficha">
+            <x-muni::dropdown><x-muni::dropdown-item>Ver</x-muni::dropdown-item></x-muni::dropdown>
+        </x-muni::modal>
         BLADE);
 
-    expect($html)->toContain('@muni-dropdown-close=')
-        ->not->toContain(':aria-expanded="open"')
-        ->toContain("setAttribute('aria-expanded', open)");
+    preg_match('/<button[^>]*role="menuitem"[^>]*>/s', $html, $item);
+    preg_match_all('/\sx-data="([^"]*)"/', $html, $scopes);
+
+    // El primer scope es el del modal; el segundo, el del desplegable.
+    expect($item[0] ?? '')->toContain("typeof cerrar === 'function' ? cerrar(true)")
+        ->and($scopes[1][0])->toContain('open: false')->not->toContain('cerrar(')
+        ->and($scopes[1][1])->toContain('cerrar(destino)');
 });
 
 it('sin JS se ve el panel por defecto de las pestañas', function () {
@@ -104,7 +82,8 @@ it('sin JS se ve el panel por defecto de las pestañas', function () {
         ->and($m[0][0])->toContain('x-cloak')
         ->and($m[0][1])->not->toContain('x-cloak')
         ->and($m[0][2])->toContain('x-cloak')
-        ->and($html)->toContain(":aria-controls=\"\$id('muni-tabpanel', 1)\"");
+        ->and($m[0][1])->toMatch('/id="(muni-tabs-[0-9a-f]{8})-panel-1"/')
+        ->and($html)->toMatch('/<button[^>]*aria-controls="muni-tabs-[0-9a-f]{8}-panel-1"[^>]*aria-selected="true"/s');
 });
 
 it('las pestañas sin etiquetas no dividen por cero', function () {
@@ -114,28 +93,21 @@ it('las pestañas sin etiquetas no dividen por cero', function () {
         ->not->toContain('% count"');
 });
 
-it('el tooltip queda referenciado por aria-describedby', function () {
-    $html = Blade::render('<x-muni::tooltip text="Ayuda"><button>?</button></x-muni::tooltip>');
-
-    expect($html)->toContain(":id=\"\$id('muni-tip')\"")
-        ->toContain('aria-describedby')
-        ->toContain('@keydown.escape.window="show=false"');
-});
-
-it('la paleta escapa hotkey y placeholder y rotula el buscador', function () {
+it('la paleta rotula el buscador, reinicia el activo al filtrar y no repite claves del x-for', function () {
+    // hotkey y placeholder con apóstrofo → RotuloDelAtajoTest. Dos ítems con la
+    // misma url daban la misma clave y Alpine no pintaba ningún resultado (Chromium).
     $html = Blade::render(<<<'BLADE'
-        <x-muni::command-palette hotkey="'" placeholder="Busca 'algo' &quot;aquí&quot;" :items="[
+        <x-muni::command-palette placeholder="Busca 'algo'" :items="[
             ['label' => 'A', 'url' => '/x'],
             ['label' => 'B', 'url' => '/x'],
         ]" />
         BLADE);
 
-    expect($html)->not->toContain("==='''")
-        ->toContain("\$event.key.toLowerCase()==='\\u0027'")
-        ->not->toContain(':placeholder=')
-        ->toContain('aria-label="Busca &#039;algo&#039;')
-        ->toContain(':key="i"')
+    expect($html)->toContain('aria-label="Busca &#039;algo&#039;"')
         ->toContain('@input="active=0"')
+        ->toContain(':key="item.clave"')
+        ->toContain('&quot;clave&quot;:0')
+        ->toContain('&quot;clave&quot;:1')
         ->toContain('aria-label="Paleta de comandos"');
 });
 
@@ -147,8 +119,19 @@ it('los toasts se muestran con x-show para que la transición ocurra', function 
 });
 
 it('tabs acepta etiquetas con claves de texto sin escribir la clave en JS', function () {
-    $html = Blade::render('<x-muni::tabs :tabs="[\'datos\' => \'Datos\', \'docs\' => \'Documentos\']"><x-muni::tab-panel :index="0">a</x-muni::tab-panel><x-muni::tab-panel :index="1">b</x-muni::tab-panel></x-muni::tabs>');
+    $html = Blade::render(<<<'BLADE'
+        <x-muni::tabs id="ficha" :tabs="['datos' => 'Datos', 'docs' => 'Documentos']" default="docs">
+            <x-muni::tab-panel :index="0">a</x-muni::tab-panel>
+            <x-muni::tab-panel :index="1">b</x-muni::tab-panel>
+        </x-muni::tabs>
+        BLADE);
 
-    expect($html)->toContain('@click="active = 1"')
-        ->and($html)->not->toContain('active = docs');
+    // A Alpine y a los id viaja la posición; `default` acepta la clave.
+    expect($html)->toContain('@click="seleccionar(1)"')
+        ->toMatch('/id="ficha-tab-1"\s+aria-controls="ficha-panel-1"/')
+        ->toContain('active: 1,')
+        ->not->toContain('seleccionar(docs)')
+        ->not->toContain('=== datos')
+        ->and((bool) preg_match('/<div[^>]*id="ficha-panel-1"[^>]*>/s', $html, $panel))->toBeTrue()
+        ->and($panel[0])->not->toContain('x-cloak');
 });

@@ -1,65 +1,46 @@
 @props([
-    'title' => null, // título del panel
+    'title' => null, // título del panel lateral
     'side' => 'right', // right | left
-    'width' => '400px', // ancho del panel (máx. 92vw)
+    'width' => '400px', // ancho del panel (CSS); tope de 92vw
 ])
 
-@php $isRight = $side !== 'left'; @endphp
+@php
+    $isRight = $side !== 'left';
 
-{{-- Panel lateral deslizante (Alpine 3). El slot `trigger` abre; Escape / click en el fondo
-     cierran. Bloquea el scroll del body, lleva el foco al panel, lo atrapa con Tab y lo
-     devuelve al cerrar. --}}
-<div
-    x-data="{
-        open: false, prevFoco: null, prevOverflow: null,
-        init() { this.$watch('open', v => v ? this.abrirPanel() : this.cerrarPanel()); },
-        destroy() { if (this.open) this.cerrarPanel(); },
-        enfocables() {
-            return [...this.$refs.panel.querySelectorAll('a[href],button,input,select,textarea,[tabindex]')]
-                .filter(e => ! e.disabled && e.tabIndex >= 0 && e.getClientRects().length);
-        },
-        abrirPanel() {
-            this.prevFoco = document.activeElement;
-            this.prevOverflow = document.body.style.overflow;
-            document.body.style.overflow = 'hidden';
-            this.$nextTick(() => (this.$refs.panel.querySelector('[autofocus]') || this.enfocables()[0] || this.$refs.panel).focus({ preventScroll: true }));
-        },
-        cerrarPanel() {
-            document.body.style.overflow = this.prevOverflow ?? '';
-            const e = this.prevFoco; this.prevFoco = null;
-            if (e && e.isConnected && e.focus) e.focus();
-        },
-        atrapar(ev) {
-            if (ev.key !== 'Tab') return;
-            const f = this.enfocables(), a = document.activeElement;
-            if (! f.length) { ev.preventDefault(); return; }
-            if (ev.shiftKey && (a === f[0] || a === this.$refs.panel)) { ev.preventDefault(); f[f.length - 1].focus(); }
-            else if (! ev.shiftKey && a === f[f.length - 1]) { ev.preventDefault(); f[0].focus(); }
-        },
-        cerrarConEscape() {
-            const a = document.activeElement;
-            if (this.open && (this.$refs.panel.contains(a) || ! a?.closest('[aria-modal=true]'))) this.open = false;
-        }
-    }"
-    x-id="['muni-drawer']"
-    @keydown.escape.window="cerrarConEscape()"
-    {{ $attributes }}
->
+    /* El id del título NO puede salir de uniqid(): cambiaba en cada render y bajo
+       Livewire eso rehace el <h2> y el aria-labelledby en cada actualización, así
+       que el diff reemplaza nodos que no cambiaron y cualquier aria-labelledby
+       externo queda apuntando a un id que ya no existe. Se deriva, por este orden:
+       1) del `id` que dé el consumidor —lo recomendado cuando hay más de un drawer
+          con el mismo título en la página—, o
+       2) del propio título, estable entre renders mientras la prop no cambie. */
+    $dialogoId = $attributes->get('id') ?: 'muni-drawer-'.substr(sha1((string) $title), 0, 8);
+    $tituloId = $dialogoId.'-title';
+@endphp
+
+{{-- Panel lateral deslizante (Alpine 3 + plugin Focus, ya presente en el bundle de
+     Livewire de los paneles). El slot `trigger` abre; Escape / click en el fondo cierran.
+     `x-trap.inert.noscroll` atrapa el foco (Tab/Shift+Tab no se escapan), marca inerte el
+     resto de la página, bloquea el scroll del body y devuelve el foco a quien lo abrió al
+     cerrar. Mismo contrato que <x-muni::modal>: los dos diálogos se comportan igual. --}}
+<div x-data="{ open:false }" @keydown.escape.window="open && (open = false)" {{ $attributes }}>
     @isset($trigger)<div @click="open=true" style="display:inline-flex;">{{ $trigger }}</div>@endisset
 
     <template x-teleport="body">
         <div x-show="open" x-cloak style="position:fixed;inset:0;z-index:210;">
-            <div x-show="open" @click="open=false"
-                 x-transition:enter="muni-fade" x-transition:enter-start="muni-fade-0" x-transition:enter-end="muni-fade-1"
-                 x-transition:leave="muni-fade" x-transition:leave-start="muni-fade-1" x-transition:leave-end="muni-fade-0"
-                 style="position:absolute;inset:0;background:rgba(10,14,20,.5);backdrop-filter:blur(2px);"></div>
+            <div x-show="open" @click="open=false" class="muni-drawer__velo"
+                 x-transition:enter="muni-fade" x-transition:enter-start="muni-drawer__velo-0" x-transition:enter-end="muni-drawer__velo-1"
+                 x-transition:leave="muni-fade" x-transition:leave-start="muni-drawer__velo-1" x-transition:leave-end="muni-drawer__velo-0"></div>
 
-            <div x-show="open" x-ref="panel" role="dialog" aria-modal="true" :aria-labelledby="$id('muni-drawer')" tabindex="-1" @keydown="atrapar($event)" class="muni-drawer__panel"
+            {{-- Sin `title` el aria-labelledby apuntaría a un <h2> vacío y el diálogo se
+                 anunciaría sin nombre: en ese caso se cae a un aria-label genérico. --}}
+            <div x-show="open" x-trap.inert.noscroll="open" role="dialog" aria-modal="true"
+                 @if(filled($title)) aria-labelledby="{{ $tituloId }}" @else aria-label="Panel lateral de detalle" @endif
                  x-transition:enter="muni-drawer" x-transition:enter-start="{{ $isRight ? 'muni-drawer-r0' : 'muni-drawer-l0' }}" x-transition:enter-end="muni-drawer-1"
                  x-transition:leave="muni-drawer" x-transition:leave-start="muni-drawer-1" x-transition:leave-end="{{ $isRight ? 'muni-drawer-r0' : 'muni-drawer-l0' }}"
-                 style="position:absolute;top:0;bottom:0;{{ $isRight ? 'right:0;' : 'left:0;' }}width:{{ $width }};max-width:92vw;display:flex;flex-direction:column;background:var(--muni-surface);border-{{ $isRight ? 'left' : 'right' }}:1px solid var(--muni-border);box-shadow:var(--muni-shadow-lg);">
+                 style="position:absolute;top:0;bottom:0;{{ $isRight ? 'right:0;' : 'left:0;' }}width:{{ $width }};max-width:92vw;display:flex;flex-direction:column;background:var(--muni-surface);border-{{ $isRight ? 'left' : 'right' }}:1px solid var(--muni-overlay-border, var(--muni-border));box-shadow:var(--muni-shadow-lg);">
                 <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--muni-border);">
-                    <h2 :id="$id('muni-drawer')" style="margin:0;font-family:var(--muni-font-sans);font-size:15px;font-weight:700;color:var(--muni-text);">{{ $title }}</h2>
+                    <h2 id="{{ $tituloId }}" style="margin:0;font-family:var(--muni-font-sans);font-size:15px;font-weight:700;color:var(--muni-text);">{{ $title }}</h2>
                     <button type="button" @click="open=false" aria-label="Cerrar" class="muni-drawer__x">
                         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><path d="M5 5l10 10M15 5L5 15" stroke-linecap="round"/></svg>
                     </button>
@@ -73,11 +54,22 @@
 
 @once
     <style>
-        .muni-drawer__x { display:inline-flex; padding:6px; border:none; background:transparent; color:var(--muni-muted); border-radius:var(--muni-radius-sm); cursor:pointer; transition:background var(--muni-dur) var(--muni-ease); }
+        .muni-drawer__x { display:inline-flex; padding:6px; border:none; background:transparent; color:var(--muni-muted); border-radius:var(--muni-radius-sm); cursor:pointer; transition:background var(--muni-dur) var(--muni-ease),color var(--muni-dur) var(--muni-ease); }
         .muni-drawer__x:hover { background:var(--muni-surface-3); color:var(--muni-text); }
+        /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
+        .muni-drawer__x:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:2px; box-shadow:var(--muni-ring); }
+        /* .muni-fade* las definen también modal y command-palette, cada uno en su propio bloque de estilos
+           de una sola vez: este bloque tiene que bastarse solo, porque una página puede
+           traer el drawer y ninguno de los otros dos. */
         .muni-fade { transition:opacity var(--muni-dur) var(--muni-ease); } .muni-fade-0 { opacity:0; } .muni-fade-1 { opacity:1; }
-        .muni-drawer__x:focus-visible { outline:none; box-shadow:var(--muni-ring); }
-        .muni-drawer__panel:focus { outline:none; }
+        /* El velo, como el del modal: color de --muni-scrim y opacidad propia, con
+           clases -0/-1 de inicio y fin del fundido DESPUÉS de la base para ganarle.
+           Con muni-fade-1 (opacidad 1) el velo terminaría opaco y saltaría a .55 al
+           soltar las clases. El respaldo es el velo del modal sin hoja publicada. */
+        .muni-drawer__velo { position:absolute; inset:0; background:var(--muni-scrim, var(--muni-gob-petroleo-dark)); opacity:.55; backdrop-filter:blur(2px); }
+        .muni-drawer__velo-0 { opacity:0; } .muni-drawer__velo-1 { opacity:.55; }
+        /* El deslizamiento dura más que un fundido, pero SIEMPRE atado a --muni-dur:
+           con prefers-reduced-motion muni-ui.css lo baja a 0ms y el calc() da 0ms. */
         .muni-drawer { transition:transform calc(var(--muni-dur) * 1.75) var(--muni-ease); }
         .muni-drawer-r0 { transform:translateX(100%); } .muni-drawer-l0 { transform:translateX(-100%); } .muni-drawer-1 { transform:translateX(0); }
     </style>

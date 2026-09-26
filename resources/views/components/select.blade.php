@@ -1,44 +1,102 @@
 @props([
-    'label' => null, // etiqueta
-    'name' => null, // name e id del select
-    'options' => [], // mapa valor => etiqueta
+    'label' => null, // rótulo del campo
+    'name' => null, // nombre del campo; también base del id
+    'options' => [], // opciones: ['valor' => 'texto', …]
     'selected' => null, // valor seleccionado
     'placeholder' => null, // primera opción vacía
-    'error' => null, // mensaje de error
+    'error' => null, // mensaje de error del servidor
     'hint' => null, // ayuda bajo el campo
     'required' => false, // marca el campo como obligatorio
+    'requiredText' => 'obligatorio', // texto que acompaña al rótulo si es obligatorio
+    'requiredTextVisible' => false, // muestra ese texto a la vista (si no, solo lector)
 ])
 
 @php
-    // Un `id` explícito gana: dos campos con el mismo name en la página no chocan.
-    $id = $attributes->get('id') ?: ($name ? 'muni-'.$name : 'muni-'.uniqid());
-    $attributes = $attributes->except('id');
-    // La ayuda o el error se anuncian al entrar al campo (aria-describedby), sumados a
-    // los que ya traiga el host.
-    $ayuda = ($error || $hint) ? $id.'-ayuda' : null;
-    $describe = trim($attributes->get('aria-describedby', '').' '.$ayuda) ?: null;
-    $attributes = $attributes->except('aria-describedby');
+    /*
+     * Mismo bloque que input.blade.php: si cambia acá, cambia allá (y en switch).
+     *
+     * Identificador determinista, NUNCA uniqid() (DESIGN §10): cambia en cada render,
+     * rompe el `for` de la etiqueta y ensucia el diffing de Livewire. Manda el `id`
+     * que pase el consumidor; si no lo pasa, sale del `name` saneado —`items[0][rut]`
+     * no es un selector válido y dos filas de un formulario repetido colisionarían—,
+     * con sufijo de hash para conservar la unicidad. El `name` viaja intacto al
+     * backend: lo que se sanea es el id.
+     */
+    $muniId = trim((string) $attributes->get('id'));
+
+    if ($muniId === '') {
+        $base = (string) $name;
+
+        if ($base === '') {
+            $base = 'select-'.substr(sha1(json_encode([$label, $placeholder, $hint], JSON_UNESCAPED_UNICODE) ?: ''), 0, 8);
+        } elseif (! preg_match('/^[A-Za-z0-9_-]+$/', $base)) {
+            $base = trim((string) preg_replace('/[^A-Za-z0-9_-]+/', '-', $base), '-').'-'.substr(sha1($base), 0, 6);
+        }
+
+        $muniId = 'muni-'.$base;
+    }
+
+    $muniHintId = $muniId.'-hint';
+    $muniErrorId = $muniId.'-error';
+
+    /*
+     * `$attributes->merge()` REEMPLAZA, no concatena, en todo lo que no sea class ni
+     * style: el aria-describedby del consumidor y el del componente no pueden
+     * coexistir por merge. Se lee, se encadena a mano y se saca de la bolsa.
+     * `aria-invalid` es nuevo en select: antes el error era solo color rojo.
+     */
+    $muniAria = array_filter([
+        'aria-describedby' => implode(' ', array_filter([
+            trim((string) $attributes->get('aria-describedby')),
+            $hint ? $muniHintId : '',
+            $error ? $muniErrorId : '',
+        ])),
+        'aria-invalid' => $error ? 'true' : '',
+    ]);
+
+    $attributes = $attributes->except(['id', 'aria-describedby']);
+
+    /*
+     * La palabra «obligatorio» va en TEXTO junto a la etiqueta, y no solo el
+     * asterisco. El asterisco es un glifo: un lector de pantalla lo lee
+     * «asterisco» —o no lo lee—, y quien no conoce la convención no sabe qué
+     * significa. Con la palabra al lado, el asterisco pasa a ser decoración y
+     * lleva aria-hidden; sin ella (`required-text=""`) vuelve a ser el único
+     * indicador y se deja audible, porque taparlo dejaría al campo sin ninguno.
+     *
+     * Se apaga con la CADENA VACÍA, no con `null`: la directiva de props aplica
+     * el valor por defecto con `??`, así que un null explícito vuelve al texto
+     * de fábrica. Es lo contrario de lo que hace un `:algo="null"` sobre un
+     * componente hijo, que sí gana (DESIGN §8).
+     *
+     * Oculta a la vista por defecto: el `required` nativo ya la anuncia y el
+     * formulario pone la leyenda general (técnica G184), así que repetirla
+     * visible en los treinta campos de un trámite es ruido. Con
+     * `required-text-visible` se ve, para el formulario corto donde la leyenda
+     * queda lejos.
+     */
+    $muniObl = trim((string) $requiredText);
+    $muniOblClase = $requiredTextVisible ? 'muni-obl' : 'muni-sr';
+    $muniOblTexto = $requiredTextVisible ? '('.$muniObl.')' : $muniObl;
 @endphp
 
 <div style="display:flex;flex-direction:column;gap:6px;">
     @if ($label)
-        <label for="{{ $id }}" style="font-family:var(--muni-font-sans);font-size:12.5px;font-weight:600;color:var(--muni-text);">
-            {{ $label }}@if ($required)<span style="color:var(--muni-danger-fg);margin-left:2px;">*</span>@endif
+        <label for="{{ $muniId }}" style="font-family:var(--muni-font-sans);font-size:12.5px;font-weight:600;color:var(--muni-text);">
+            {{ $label }}@if ($required)@if ($muniObl !== '')<span aria-hidden="true" style="color:var(--muni-danger-fg);margin-left:2px;">*</span><span class="{{ $muniOblClase }}"> {{ $muniOblTexto }}</span>@else<span style="color:var(--muni-danger-fg);margin-left:2px;">*</span>@endif @endif
         </label>
     @endif
 
     <div style="position:relative;">
         <select
-            id="{{ $id }}"
+            id="{{ $muniId }}"
             @if ($name) name="{{ $name }}" @endif
             @if ($required) required @endif
-            @if ($error) aria-invalid="true" @endif
-            @if ($describe) aria-describedby="{{ $describe }}" @endif
-            {{ $attributes->merge([
+            {{ $attributes->merge($muniAria + [
                 'class' => 'muni-select',
                 'style' => 'width:100%;padding:10px 34px 10px 12px;appearance:none;'
                     .'font-family:var(--muni-font-sans);font-size:13.5px;color:var(--muni-text);'
-                    .'background:var(--muni-surface);border:1px solid '.($error ? 'var(--muni-danger-border)' : 'var(--muni-border-strong, var(--muni-border))').';'
+                    .'background:var(--muni-surface);border:1px solid '.($error ? 'var(--muni-field-border-error)' : 'var(--muni-field-border)').';'
                     .'border-radius:var(--muni-radius-sm);cursor:pointer;transition:border-color var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease);',
             ]) }}
         >
@@ -56,12 +114,30 @@
         </span>
     </div>
 
-    @if ($error)<span id="{{ $ayuda }}" style="font-size:11.5px;color:var(--muni-danger-fg);">{{ $error }}</span>
-    @elseif ($hint)<span id="{{ $ayuda }}" style="font-size:11.5px;color:var(--muni-hint);">{{ $hint }}</span>@endif
+    {{-- La ayuda y el error CONVIVEN, cada uno con su id, y los dos van encadenados
+         en aria-describedby. La región existe desde el primer render y reserva el
+         alto de una línea: con Livewire el error llega sin recargar la página, así
+         que un <span> que nace de la nada no lo lee ningún lector de pantalla
+         (WCAG 2.2 AA 4.1.3) y encima empuja el contenido de abajo. --}}
+    <div role="status" aria-live="polite" style="display:flex;flex-direction:column;gap:2px;min-height:15px;">
+        @if ($hint)
+            <span id="{{ $muniHintId }}" style="font-size:11.5px;line-height:15px;color:var(--muni-hint);">{{ $hint }}</span>
+        @endif
+        @if ($error)
+            {{-- El icono acompaña al color: el estado no se comunica solo con rojo. --}}
+            <span id="{{ $muniErrorId }}" style="display:flex;align-items:flex-start;gap:4px;font-size:11.5px;line-height:15px;font-weight:600;color:var(--muni-danger-fg);background:var(--muni-danger-bg);border-radius:var(--muni-radius-sm);padding:2px 6px;">
+                <svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="12" height="12" style="flex-shrink:0;margin-top:1px;"><path d="M8 2.5L15 14H1L8 2.5z" stroke-linejoin="round"/><path d="M8 6.5v3.2M8 11.8v.2" stroke-linecap="round"/></svg>
+                <span>{{ $error }}</span>
+            </span>
+        @endif
+    </div>
 </div>
 
 @once
     <style>
-        .muni-select:focus { outline: none; border-color: var(--muni-accent); box-shadow: var(--muni-ring); }
+        .muni-sr { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
+        .muni-obl { font-weight:400; font-size:.92em; color:var(--muni-muted); }
+        /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
+        .muni-select:focus { outline: 3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset: 2px; border-color: var(--muni-accent); box-shadow: var(--muni-ring); }
     </style>
 @endonce

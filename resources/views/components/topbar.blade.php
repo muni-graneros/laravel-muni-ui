@@ -4,6 +4,7 @@
     'status' => 'online', // online | degraded | offline
     'statusLabel' => null, // texto propio para el estado
     'logo' => null, // HTML del logo; por defecto «GRA»
+    'franja' => true, // franja institucional en el borde superior (va en todo diseño)
 ])
 
 @php
@@ -13,18 +14,23 @@
 
 <header
     {{ $attributes->merge([
+        'class' => 'muni-topbar',
         'style' => 'position:sticky;top:0;z-index:100;height:var(--muni-topbar-h);'
             .'display:flex;align-items:center;gap:12px;padding:0 16px;'
             .'background:var(--muni-surface);border-bottom:1px solid var(--muni-border);',
     ]) }}
 >
-    {{-- Logo sobre lienzo blanco: patrón del ecosistema (el escudo municipal necesita
-         fondo claro para leerse igual en tema oscuro y claro). --}}
-    <div style="height:38px;display:flex;align-items:center;justify-content:center;padding:4px 10px;background:#fff;border-radius:var(--muni-radius-sm);flex-shrink:0;">
+    {{-- Placa del escudo: el PNG tiene el contorno en petróleo casi negro y sobre
+         la superficie oscura se pierde, así que va sobre placa clara. La placa es
+         un token con dos ramas (blanca en claro, gris apagado en oscuro) y no el
+         recuadro blanco fijo de antes, que encandilaba en una sala a oscuras. El
+         respaldo es otro token con dos ramas, para el sistema que todavía tiene
+         publicada la hoja anterior. --}}
+    <div style="height:38px;display:flex;align-items:center;justify-content:center;padding:4px 10px;background:var(--muni-logo-plate, var(--muni-surface));border-radius:var(--muni-radius-sm);flex-shrink:0;">
         @if ($logo)
             {{ $logo }}
         @else
-            <span style="font-family:var(--muni-font-mono);font-weight:700;font-size:13px;color:#0b0f14;letter-spacing:-.02em;">GRA</span>
+            <span style="font-family:var(--muni-font-mono);font-weight:700;font-size:13px;color:var(--muni-logo-plate-fg, var(--muni-text));letter-spacing:-.02em;">GRA</span>
         @endif
     </div>
 
@@ -40,4 +46,18 @@
     <x-muni::badge :tone="$statusTone">{{ $statusText }}</x-muni::badge>
 
     {{ $slot }}
+
+    {{-- La franja institucional en el borde superior, dentro del header: viaja con él
+         cuando es sticky. Si la página ya tiene gob-bar (que trae la suya), se oculta
+         para no pintar dos. --}}
+    @if ($franja)
+        <x-muni::gob-stripe class="muni-topbar__franja" />
+    @endif
 </header>
+
+@once
+    <style>
+        .muni-topbar__franja { position: absolute; top: 0; left: 0; right: 0; }
+        body:has(.muni-gob-bar) .muni-topbar__franja { display: none; }
+    </style>
+@endonce

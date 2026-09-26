@@ -1,44 +1,89 @@
 @props([
-    'tabs' => [], // etiquetas de las pestañas
-    'default' => 0, // índice activo al cargar
+    'tabs' => [], // pestañas: ['clave' => 'Etiqueta', …]
+    'default' => 0, // índice o clave de la pestaña activa al cargar
+    'id' => null, // base de los ids; por defecto sale de las pestañas
+    'label' => null, // nombre accesible del tablist
+    'activation' => 'auto', // auto | manual (activar con Enter/Espacio)
 ])
 
-{{-- Pestañas (Alpine 3). `tabs` es un array de etiquetas; los paneles van en el slot como
-     tab-panel de muni en el mismo orden. Navegación con flechas ←/→, Inicio y Fin. --}}
+@php
+    /*
+     * Identificador del GRUPO. Tiene que salir igual acá y en <x-muni::tab-panel>,
+     * porque de él cuelgan los id de cada pestaña y de cada panel (aria-controls /
+     * aria-labelledby). Por eso NO se usa uniqid(): bajo Livewire 3 cada refresco
+     * generaría ids nuevos y rompería la relación —el mismo defecto que ya arrastran
+     * modal, drawer, input y select—. Se deriva del MISMO dato que el hijo puede leer
+     * con @aware: la prop `id` si el consumidor la pasó, y si no un slug determinista
+     * del array `tabs`. Si esta línea cambia, hay que cambiarla igual en
+     * tab-panel.blade.php.
+     *
+     * Dos grupos con etiquetas idénticas en la misma página colisionarían: para eso
+     * está la prop `id`.
+     */
+    $grupoId = $id ?: 'muni-tabs-'.substr(sha1(json_encode(array_values((array) $tabs), JSON_UNESCAPED_UNICODE) ?: ''), 0, 8);
+    /*
+     * `tabs` puede venir con claves de texto (['datos' => 'Datos', …]). A Alpine y a
+     * los id solo viaja la POSICIÓN: con la clave escrita tal cual, `active === datos`
+     * es un identificador suelto y Alpine tumba el grupo entero. `default` acepta la
+     * posición o la clave. Si esto cambia, cambia igual en tab-panel.blade.php.
+     */
+    $etiquetas = array_values((array) $tabs);
+    $claveDefecto = array_search($default, array_keys((array) $tabs), true);
+    $activo = is_string($default) && $claveDefecto !== false ? (int) $claveDefecto : (int) $default;
+    $manual = $activation === 'manual';
+@endphp
+
+{{-- Pestañas (Alpine 3 core, patrón «tabs» de las WAI-ARIA APG). `tabs` es un array
+     de etiquetas; los paneles van en el slot como <x-muni::tab-panel> en el mismo
+     orden. Teclado: ←/→ circulares, Home, End y —con activation="manual"— Enter o
+     Espacio, que resuelve el <button> nativo sin manejador propio.
+
+     `focused` va aparte de `active` para permitir la activación manual: con
+     wire:model, activar en cada flecha dispararía una petición Livewire por pulsación.
+     Con activation="auto" (el default, retrocompatible) `focused` sigue a `active`. --}}
 <div
+    id="{{ $grupoId }}"
     x-data="{
-        active: {{ (int) $default }}, count: {{ count($tabs) }},
-        ir(i) {
+        active: {{ $activo }},
+        focused: {{ $activo }},
+        count: {{ count($etiquetas) }},
+        manual: {{ $manual ? 'true' : 'false' }},
+        mover(i) {
             if (! this.count) return;
-            this.active = (i + this.count) % this.count;
-            this.$nextTick(() => this.$refs.tablist.children[this.active]?.focus());
-        }
+            this.focused = ((i % this.count) + this.count) % this.count;
+            if (! this.manual) { this.active = this.focused; }
+            this.$nextTick(() => { const b = this.$refs['tab' + this.focused]; if (b) b.focus(); });
+        },
+        seleccionar(i) { this.focused = i; this.active = i; },
     }"
-    x-id="['muni-tab', 'muni-tabpanel']"
     {{ $attributes }}
 >
     <div
         role="tablist"
-        x-ref="tablist"
+        @if ($label) aria-label="{{ $label }}" @endif
         style="display:flex;gap:2px;border-bottom:1px solid var(--muni-border);margin-bottom:16px;overflow-x:auto;"
-        @keydown.right.prevent="ir(active + 1)"
-        @keydown.left.prevent="ir(active - 1)"
-        @keydown.home.prevent="ir(0)"
-        @keydown.end.prevent="ir(count - 1)"
+        @keydown.right.prevent="mover(focused + 1)"
+        @keydown.left.prevent="mover(focused - 1)"
+        @keydown.home.prevent="mover(0)"
+        @keydown.end.prevent="mover(count - 1)"
     >
-        @foreach (collect($tabs)->values() as $i => $label)
+        @foreach ($etiquetas as $i => $etiqueta)
             <button
                 type="button"
                 role="tab"
-                aria-selected="{{ $i == (int) $default ? 'true' : 'false' }}"
+                id="{{ $grupoId }}-tab-{{ $i }}"
+                aria-controls="{{ $grupoId }}-panel-{{ $i }}"
+                {{-- Estáticos además de enlazados: hasta que Alpine hidrate, si no
+                     estuvieran, las N pestañas serían tabulables y ninguna seleccionada. --}}
+                aria-selected="{{ $i === $activo ? 'true' : 'false' }}"
+                tabindex="{{ $i === $activo ? '0' : '-1' }}"
+                x-ref="tab{{ $i }}"
                 :aria-selected="active === {{ $i }}"
-                :tabindex="active === {{ $i }} ? 0 : -1"
-                :id="$id('muni-tab', {{ $i }})"
-                :aria-controls="$id('muni-tabpanel', {{ $i }})"
-                @click="active = {{ $i }}"
+                :tabindex="focused === {{ $i }} ? 0 : -1"
+                @click="seleccionar({{ $i }})"
                 class="muni-tab"
                 :class="active === {{ $i }} && 'muni-tab--on'"
-            >{{ $label }}</button>
+            >{{ $etiqueta }}</button>
         @endforeach
     </div>
 
@@ -51,9 +96,12 @@
             color:var(--muni-muted);background:transparent;border:none;cursor:pointer;white-space:nowrap;
             transition:color var(--muni-dur) var(--muni-ease); }
         .muni-tab:hover { color:var(--muni-text); }
-        .muni-tab:focus-visible { outline:none;box-shadow:var(--muni-ring);border-radius:var(--muni-radius-sm); }
+        /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
+        .muni-tab:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:-2px; box-shadow:var(--muni-ring); border-radius:var(--muni-radius-sm); }
         .muni-tab--on { color:var(--muni-accent); }
         .muni-tab--on::after { content:"";position:absolute;left:8px;right:8px;bottom:-1px;height:2px;
             background:var(--muni-accent);border-radius:2px 2px 0 0; }
+        /* El panel enfocable (tabindex=0, APG) también necesita indicador de foco propio. */
+        .muni-tabpanel:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:2px; box-shadow:var(--muni-ring); border-radius:var(--muni-radius-sm); }
     </style>
 @endonce

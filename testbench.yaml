@@ -1,18 +1,36 @@
-# App mínima para probar los componentes con Livewire de verdad (vendor/bin/testbench serve).
-# La usa demo/catalogo/livewire.mjs; no es parte del paquete.
-laravel: '@testbench'
-
+# Vitrina de desarrollo del paquete (ficha `vitrina` de docs/GAP-ANALYSIS.md).
+#
+#   vendor/bin/testbench serve      → http://127.0.0.1:8000/vitrina
+#
+# Vive en workbench/ y NO en el paquete: el service provider no registra rutas ni
+# lee configuración de vitrina, así que los sistemas que instalan laravel-muni-ui
+# nunca la exponen. Las tarjetas se generan recorriendo
+# resources/views/components/: un componente nuevo aparece el día que se crea.
+#
+# La misma app sirve /formulario: un componente Livewire (workbench/app/Livewire)
+# con cada control enlazable del paquete, que recorre demo/catalogo/livewire.mjs
+# para probar wire:model de punta a punta. CI copia workbench/ y este archivo a
+# demo/livewire3 para repetir la prueba con Livewire 3.
 providers:
   - Livewire\LivewireServiceProvider
   - Muni\Ui\MuniUiServiceProvider
   - Workbench\App\Providers\WorkbenchServiceProvider
 
 env:
-  - APP_KEY=base64:eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHg=
+  - APP_ENV=local
   - APP_DEBUG=true
+  # Livewire necesita sesión y cifrado; clave fija solo para esta app de desarrollo.
+  - APP_KEY=base64:eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHg=
   - SESSION_DRIVER=file
   - CACHE_STORE=file
 
 workbench:
+  start: '/vitrina'
+  install: false
+  health: false
   discovers:
     web: true
+    api: false
+    commands: false
+    components: false
+    views: false

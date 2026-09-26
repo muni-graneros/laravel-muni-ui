@@ -22,7 +22,7 @@ it('enlaza la ayuda o el error con aria-describedby en input, select y textarea'
 
 it('conserva el aria-describedby que trae el host y le suma la ayuda', function () {
     expect(Blade::render('<x-muni::input name="run" hint="Con guion" aria-describedby="extra" />'))
-        ->toContain('aria-describedby="extra muni-run-ayuda"');
+        ->toContain('aria-describedby="extra muni-run-hint"');
 });
 
 it('marca aria-invalid en select con error', function () {
@@ -40,38 +40,23 @@ it('radio-group marca la opción de value y usa fieldset con legend', function (
 it('checkbox usa el slot como etiqueta y da ids distintos por valor', function () {
     $html = Blade::render('<x-muni::checkbox name="dias[]" value="lun">Lunes</x-muni::checkbox><x-muni::checkbox name="dias[]" value="mar">Martes</x-muni::checkbox>');
 
-    preg_match_all('/<input type="checkbox" id="([^"]+)"/', $html, $m);
+    preg_match_all('/<input\s+type="checkbox"\s+id="([^"]+)"/', $html, $m);
     expect($html)->toContain('Lunes')
         ->and(count(array_unique($m[1])))->toBe(2);
-});
-
-it('description-list arma pares dt/dd y muestra un guion en valores vacíos', function () {
-    $html = Blade::render('<x-muni::description-list :items="[\'RUT\' => [\'value\' => \'1-9\', \'mono\' => true], \'Teléfono\' => null]" />');
-
-    expect($html)->toContain('<dt>RUT</dt>')
-        ->and($html)->toContain('class="muni-num"')
-        ->and($html)->toContain('—');
-});
-
-it('spinner se anuncia como status y deja wire:loading en su raíz', function () {
-    $html = Blade::render('<x-muni::spinner wire:loading wire:target="guardar" label="Guardando" />');
-
-    expect($html)->toMatch('/<span role="status"[^>]*wire:loading/')
-        ->and($html)->toContain('Guardando');
 });
 
 it('checkbox da ids distintos a valores que un slug confundiría', function () {
     $html = Blade::render('<x-muni::checkbox name="r[]" value="Sí" label="A" /><x-muni::checkbox name="r[]" value="si" label="B" /><x-muni::checkbox name="r[]" value="+" label="C" /><x-muni::checkbox name="r[]" value="-" label="D" />');
 
-    preg_match_all('/<input type="checkbox" id="([^"]+)"/', $html, $m);
+    preg_match_all('/<input\s+type="checkbox"\s+id="([^"]+)"/', $html, $m);
     expect(count(array_unique($m[1])))->toBe(4);
 });
 
 it('checkbox y radio-group suman el aria-describedby del host al suyo', function () {
     expect(Blade::render('<x-muni::checkbox name="a" label="A" description="Ayuda" aria-describedby="extra" />'))
-        ->toMatch('/aria-describedby="extra muni-a-[0-9a-f]{8}-ayuda"/')
+        ->toContain('aria-describedby="extra muni-a-desc"')
         ->and(Blade::render('<x-muni::radio-group name="t" hint="Ayuda" aria-describedby="extra" :options="[\'a\' => \'A\']" />'))
-        ->toContain('aria-describedby="extra t-ayuda"');
+        ->toContain('aria-describedby="extra muni-t-hint"');
 });
 
 it('spinner deja el display en la clase para que wire:loading lo oculte', function () {

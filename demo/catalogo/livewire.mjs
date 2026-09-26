@@ -45,7 +45,7 @@ await paso('spinner oculto sin petición', async () => {
 
 // Del componente al servidor
 await paso('calendar', async () => {
-    await page.locator('.muni-cal button[aria-label="12 de octubre de 2026"]').click();
+    await page.locator('.muni-cal button[aria-label$="12 de octubre de 2026"]').click();
     await llega('fecha', '2026-10-12', 'calendar → servidor');
 });
 await paso('otp-input', async () => {
@@ -91,9 +91,14 @@ await paso('file-dropzone (soltar un archivo)', async () => {
     });
     await llega('archivo', 'cedula.pdf', 'file-dropzone (arrastrado) → servidor');
 });
-await paso('data-table wireSort', async () => {
-    await page.getByRole('button', { name: /Deuda/ }).click();
-    await llega('orden', 'deuda', 'data-table wireSort → servidor');
+
+await paso('data-table (orden por wireSort)', async () => {
+    const deuda = page.getByRole('columnheader', { name: /Deuda/ });
+    await deuda.getByRole('button').click();
+    await llega('orden', 'deuda asc', 'data-table → servidor');
+    await page.waitForFunction(() => [...document.querySelectorAll('th')].some((th) => th.textContent.includes('Deuda') && th.getAttribute('aria-sort') === 'ascending'));
+    await deuda.getByRole('button').click();
+    await llega('orden', 'deuda desc', 'data-table invierte la misma columna');
 });
 
 // Del servidor al componente
@@ -102,15 +107,16 @@ await paso('servidor → componentes', async () => {
     await llega('fecha', '2026-12-24', 'reinicio en el servidor');
     await page.waitForTimeout(200);
     const cal = await page.locator('.muni-cal [aria-pressed=true]').getAttribute('aria-label');
-    if (cal !== '24 de diciembre de 2026') fallas.push(`servidor → calendar: marca «${cal}»`);
+    if (!cal?.endsWith('24 de diciembre de 2026')) fallas.push(`servidor → calendar: marca «${cal}»`);
     const otp = await page.locator('.muni-otp').evaluateAll((els) => els.map((e) => e.value).join(''));
     if (otp !== '1357') fallas.push(`servidor → otp-input: muestra «${otp}»`);
     const nota = await page.locator('[role=radiogroup][aria-label=Nota] [aria-checked=true]').getAttribute('aria-label');
     if (nota !== '4 de 5') fallas.push(`servidor → rating: marca «${nota}»`);
     if (!(await page.locator('input[name=vista][value=mapa]').isChecked())) fallas.push('servidor → segmented: «mapa» no quedó marcado');
     if (!(await page.getByRole('radio', { name: 'Oposición' }).isChecked())) fallas.push('servidor → radio-group: «Oposición» no quedó marcado');
-    const contador = await page.locator('textarea[name=obs]').locator('xpath=..').locator('[x-text]').innerText();
-    if (contador !== '12 / 50') fallas.push(`servidor → textarea: el contador dice «${contador}», se esperaba «12 / 50»`);
+    // «Del servidor» son 12 caracteres: quedan 38 de 50.
+    const contador = await page.locator('.muni-textarea__contador').innerText();
+    if (contador !== '38 de 50 caracteres disponibles') fallas.push(`servidor → textarea: el contador dice «${contador}», se esperaba «38 de 50 caracteres disponibles»`);
 });
 
 await browser.close();

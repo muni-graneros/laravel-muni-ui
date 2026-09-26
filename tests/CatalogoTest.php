@@ -14,7 +14,7 @@ function catalogoDir(): string
     return __DIR__.'/../demo/catalogo';
 }
 
-function componentesDelPaquete(): array
+function catalogoComponentesDelPaquete(): array
 {
     return array_map(
         fn ($f) => basename($f, '.blade.php'),
@@ -31,7 +31,7 @@ it('documenta todos los componentes del paquete en el catálogo', function () {
         }
     }
 
-    expect(array_diff(componentesDelPaquete(), $documentados))->toBe([]);
+    expect(array_diff(catalogoComponentesDelPaquete(), $documentados))->toBe([]);
 });
 
 it('tiene un ejemplo por cada componente del índice', function () {
@@ -44,7 +44,7 @@ it('tiene un ejemplo por cada componente del índice', function () {
 
 it('describe cada prop con un comentario en su @props', function () {
     $sinDoc = [];
-    foreach (componentesDelPaquete() as $nombre) {
+    foreach (catalogoComponentesDelPaquete() as $nombre) {
         foreach (componente_meta(__DIR__."/../resources/views/components/{$nombre}.blade.php")['props'] as $p) {
             if ($p['doc'] === null) {
                 $sinDoc[] = "{$nombre}.{$p['nombre']}";
@@ -79,9 +79,10 @@ it('renderiza cada receta del catálogo sin errores', function (string $archivo)
  */
 it('mantiene idénticas las copias de cada tema en muni-ui.css', function () {
     $t = tokens_css(file_get_contents(__DIR__.'/../resources/css/muni-ui.css'));
-    $invariantes = ['muni-radius', 'muni-radius-lg', 'muni-radius-sm', 'muni-ease', 'muni-dur'];
+    // Los que solo declara :root (radios, duraciones) no cambian con el tema.
+    $invariantes = array_diff_key($t['light'], $t['dark']);
 
     expect($t['dark_os'])->toBe($t['dark'])
-        ->and($t['light_override'])->toBe(array_diff_key($t['light'], array_flip($invariantes)))
+        ->and($t['light_override'])->toBe(array_diff_key($t['light'], $invariantes))
         ->and(array_keys($t['dark']))->toEqualCanonicalizing(array_keys($t['light_override']));
 });

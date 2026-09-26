@@ -87,5 +87,6 @@ $app['blade.compiler']->anonymousComponentPath($root.'/resources/views/component
 $catalogo = catalogo_datos($app['view'], $root);
 
 $html = $app['view']->file(__DIR__.'/catalogo.blade.php', $catalogo + compact('head'))->render();
-file_put_contents($root.'/demo/catalogo.html', $html);
+// El escudo del índice lateral también va embebido: el HTML se abre sin servidor.
+file_put_contents($root.'/demo/catalogo.html', CatalogoHead::embeber($html));
 echo 'demo/catalogo.html ('.round(strlen($html) / 1024).' KB, '.$catalogo['total'].' componentes, '.count($catalogo['recetas'])." recetas)\n";

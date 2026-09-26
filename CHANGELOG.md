@@ -10,11 +10,14 @@ las etiquetas de git, así que dicen *qué* cambió pero no siempre *qué había
 republicar*. Desde acá en adelante cada versión anota si el sistema que la adopta debe
 volver a publicar artefactos, porque subir el `composer.json` no aplica nada por sí solo.
 
-## [Sin publicar]
+## [0.20.0] — 2026-09-26
 
-**Hay que volver a publicar el tema del panel** (`php artisan vendor:publish --tag=muni-ui-filament --force`):
-trae la franja institucional arriba de la barra. Nada de lo demás renombra ni quita props, slots,
-clases ni eventos.
+El constraint de cada sistema pasa a `^0.20` (en 0.x, `^0.19` no cruza) y **hay que volver a
+publicar el tema del panel** (`php artisan vendor:publish --tag=muni-ui-filament --force`): trae la
+franja institucional arriba de la barra. Nada renombra ni quita props, slots, clases ni eventos;
+`segmented` deja de enviar formularios POST solo.
+
+Antes de subirla, lee [`docs/UPGRADE-0.20.0.md`](docs/UPGRADE-0.20.0.md).
 
 ### Agregado
 
@@ -53,6 +56,10 @@ clases ni eventos.
   `method="put"`.
 - `input`, `select`, `textarea`, `checkbox`, `checkbox-group`, `radio-group` y `combobox` compilan
   también sin el precompilador de Livewire (un `@endif@endif` pegado quedaba sin compilar).
+- `segmented` solo se autoenvía en formularios GET y nunca con `wire:submit`/`@submit`; un POST
+  necesita `autosubmit="siempre"`. Antes enviaba cualquier formulario (en Livewire, un 419).
+- CI instala las dependencias npm de la raíz antes de Pest: 14 pruebas de banco que embeben Alpine
+  y el plugin Focus fallaban sin ellas.
 
 ## [0.19.0] — 2026-09-15
 

@@ -10,6 +10,16 @@ las etiquetas de git, así que dicen *qué* cambió pero no siempre *qué había
 republicar*. Desde acá en adelante cada versión anota si el sistema que la adopta debe
 volver a publicar artefactos, porque subir el `composer.json` no aplica nada por sí solo.
 
+## [Sin publicar]
+
+### Corregido
+
+- **`<x-muni::data-table>` alargaba la página entera.** El `<caption class="muni-sr">` tiene
+  `position:absolute` y estaba dentro de `.muni-dt__scroll` que tiene `overflow:auto` pero
+  carecía de `position:relative`. El elemento absoluto escapaba del contexto de apilamiento
+  y se rendía fuera del flujo, incrementando la altura total del documento (hallado en
+  seguridad-graneros). Tests nuevos: `DataTableScrollRelativeTest.php`.
+
 ## [0.19.0] — 2026-09-15
 
 **La 0.18.0 publicada no trae nada de esto.** Su etiqueta quedó apuntando a un commit del 13 de

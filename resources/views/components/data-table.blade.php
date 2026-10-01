@@ -260,7 +260,7 @@
            quedaría sin nombre. */
         .muni-sr { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
 
-        .muni-dt__scroll { overflow:auto; border:1px solid var(--muni-border); border-radius:var(--muni-radius); background:var(--muni-surface); }
+        .muni-dt__scroll { position:relative; overflow:auto; border:1px solid var(--muni-border); border-radius:var(--muni-radius); background:var(--muni-surface); }
         /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
         .muni-dt__scroll:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:2px; }
 

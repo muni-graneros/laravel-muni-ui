@@ -1,7 +1,7 @@
 @props([
-    'name' => 'fecha',
-    'min' => null,
-    'value' => null,
+    'name' => 'fecha', // name del input oculto con la fecha ISO
+    'min' => null, // fecha mínima elegible, 'Y-m-d' o DateTimeInterface
+    'value' => null, // fecha elegida, 'Y-m-d' o DateTimeInterface
 ])
 
 @php

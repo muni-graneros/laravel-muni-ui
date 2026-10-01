@@ -1,14 +1,14 @@
 @props([
-    'title' => null,
-    'maxWidth' => '480px',
+    'title' => null, // título del diálogo; también semilla del id
+    'maxWidth' => '480px', // ancho máximo del panel (CSS)
     /* Las cuatro que lo endurecen para confirmar algo irreversible (ficha `confirmar`
        de docs/GAP-ANALYSIS.md, tal como la corrigió el juez: es una variante de modal,
        no un componente aparte). Todas con valor por defecto igual a lo de siempre. */
-    'role' => 'dialog',
-    'dismissable' => true,
-    'describedby' => null,
-    'initialFocus' => null,
-    'cancelLabel' => 'Cancelar',
+    'role' => 'dialog', // dialog | alertdialog
+    'dismissable' => true, // false quita la × y el cierre al clic en el fondo
+    'describedby' => null, // id que describe el diálogo (aria-describedby)
+    'initialFocus' => null, // 'cancelar' o selector CSS del foco inicial
+    'cancelLabel' => 'Cancelar', // texto del botón Cancelar propio
 ])
 
 @php

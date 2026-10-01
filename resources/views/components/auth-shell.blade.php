@@ -1,9 +1,9 @@
 @props([
-    'theme' => null,
-    'title' => 'Ingresar',
-    'system' => 'Municipalidad de Graneros',
-    'subtitle' => null,
-    'logo' => null,
+    'theme' => null, // light | dark; null sigue al sistema operativo
+    'title' => 'Ingresar', // título del formulario y del <title>
+    'system' => 'Municipalidad de Graneros', // nombre del sistema (panel lateral y <title>)
+    'subtitle' => null, // bajada bajo el título
+    'logo' => null, // HTML del logo; por defecto «GRA»
 ])
 
 {{-- `theme` sin valor = seguir al sistema operativo; la <meta name="color-scheme">
@@ -37,6 +37,9 @@
     {{-- Primer elemento del documento: `position:fixed` lo deja fuera de la
          grilla del body, así que no ocupa una columna. --}}
     <x-muni::skip-link />
+    {{-- Franja institucional fija arriba, DESPUÉS del salto (que abre el body): el
+         body es una grilla de dos columnas y la franja no puede ocupar una celda. --}}
+    <x-muni::gob-stripe style="position:fixed;top:0;left:0;right:0;z-index:60;" />
 
     <aside class="muni-auth-aside">
         <div style="position:relative;display:flex;align-items:center;gap:11px;">

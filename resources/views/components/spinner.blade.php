@@ -1,5 +1,5 @@
 @props([
-    'size' => '20px',
+    'size' => '20px', // diámetro (CSS)
 ])
 
 {{-- EL DIBUJO de una carga en curso. Solo el dibujo.

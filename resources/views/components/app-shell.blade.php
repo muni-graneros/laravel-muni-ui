@@ -1,10 +1,10 @@
 @props([
-    'theme' => null,
-    'title' => null,
-    'system',
-    'subtitle' => null,
-    'status' => 'online',
-    'maxWidth' => '1200px',
+    'theme' => null, // light | dark; null sigue al sistema operativo
+    'title' => null, // <title> de la página; por defecto system
+    'system', // nombre del sistema (topbar)
+    'subtitle' => null, // línea secundaria del topbar
+    'status' => 'online', // online | degraded | offline
+    'maxWidth' => '1200px', // ancho máximo del <main> (CSS)
 ])
 
 {{-- `theme` sin valor = seguir al sistema operativo (el media query de muni-ui.css

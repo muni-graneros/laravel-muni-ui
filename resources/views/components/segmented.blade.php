@@ -1,8 +1,8 @@
 @props([
-    'name' => null,
-    'options' => [],
-    'value' => null,
-    'label' => null,
+    'name' => null, // nombre del grupo de radios
+    'options' => [], // opciones: ['valor' => 'texto', …]
+    'value' => null, // valor seleccionado
+    'label' => null, // nombre accesible del grupo (por defecto «Opciones»)
     /*
      * Rótulo del botón de respaldo. Ese botón existe porque el autoenvío ya no
      * puede dispararse con las flechas del teclado (ver abajo): sin él, quien
@@ -12,6 +12,15 @@
      * ve nunca, porque los dos traen el suyo.
      */
     'submitLabel' => 'Aplicar',
+    /*
+     * Cuándo se envía solo el formulario al elegir con el puntero. `true` (de
+     * fábrica): solo si es GET —un filtro—; un POST que se envía al tocar una
+     * píldora es un guardado que nadie pidió. `'siempre'`: también POST. `false`:
+     * nunca. En ningún caso con `wire:model`/`x-model` (el enlace ya lleva el
+     * valor) ni en un formulario con `wire:submit`/`@submit`: requestSubmit()
+     * dispararía la acción del anfitrión en cada clic.
+     */
+    'autosubmit' => true,
 ])
 
 {{-- Control segmentado (toggle de filtro): alternativa moderna al <select> para pocas
@@ -19,6 +28,21 @@
      sin `name` es puramente visual/enlaces (usar el slot). --}}
 @php
     $esRadios = ! empty($options) && $name;
+
+    /*
+     * `wire:model` y `x-model` van a CADA radio, que es donde vive el valor: en el
+     * radiogroup no enlazaban nada, sin error visible. Con enlace no hay autoenvío,
+     * ni envoltorio, ni botón de respaldo: el modelo ya recibe cada cambio.
+     */
+    $modelo = $attributes->filter(fn ($v, $k) => str_starts_with($k, 'wire:model') || str_starts_with($k, 'x-model'));
+    $attributes = $attributes->filter(fn ($v, $k) => ! str_starts_with($k, 'wire:model') && ! str_starts_with($k, 'x-model'));
+
+    $siempre = $autosubmit === 'siempre';
+    $autoenvio = $esRadios && $modelo->isEmpty()
+        && ($siempre || filter_var($autosubmit, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== false);
+
+    // Un `id` del consumidor sirve de prefijo: dos grupos con el mismo name no chocan.
+    $prefijo = trim((string) $attributes->get('id')) ?: $name;
 
     /*
      * Nombre accesible del grupo. Un conjunto de opciones excluyentes sin nombre
@@ -56,13 +80,24 @@
      Ahora el envío es de Alpine (`requestSubmit()`, que sí dispara la validación
      nativa y el evento `submit`, cosa que `form.submit()` se salta) y SOLO cuando
      el cambio no viene de una flecha. El teclado aplica con Enter —el submit
-     implícito del formulario— o con el botón de respaldo. --}}
-@if ($esRadios)
+     implícito del formulario— o con el botón de respaldo.
+
+     `envia()` decide si ESTE formulario se autoenvía: GET salvo `autosubmit="siempre"`,
+     y nunca si el formulario ya tiene su propio manejador de submit (Livewire o
+     Alpine). Donde no se autoenvía tampoco hace falta el respaldo. --}}
+@if ($autoenvio)
 <div
     class="muni-seg-grupo"
     x-data="{
         flechas: false,
         respaldo: false,
+        siempre: @js($siempre),
+
+        envia(form) {
+            return !! form
+                && (this.siempre || form.method === 'get')
+                && ! [...form.attributes].some(a => /^(wire:submit|x-on:submit|@submit)/.test(a.name));
+        },
 
         /* El botón de respaldo sobra si el formulario ya tiene el suyo: dentro de
            `filter-bar` habría dos «Aplicar» pegados. Se mira el formulario REAL del
@@ -73,7 +108,7 @@
             const radio = this.$el.querySelector('input[type=radio]');
             const form = radio ? radio.form : null;
 
-            if (! form) { return; }
+            if (! this.envia(form)) { return; }
 
             const respaldos = form.querySelectorAll('.muni-seg-aplicar');
 
@@ -101,11 +136,11 @@
      {{ $bag->merge(['style' => 'display:inline-flex;padding:3px;gap:2px;background:var(--muni-surface-2);border:1px solid var(--muni-border);border-radius:var(--muni-radius-sm);']) }}>
     @if ($esRadios)
         @foreach ($options as $val => $texto)
-            @php $id = $name.'-'.$loop->index; $active = (string) $value === (string) $val; @endphp
+            @php $id = $prefijo.'-'.$loop->index; $active = (string) $value === (string) $val; @endphp
             <label for="{{ $id }}" class="muni-seg {{ $active ? 'muni-seg--on' : '' }}">
-                <input type="radio" id="{{ $id }}" name="{{ $name }}" value="{{ $val }}" @checked($active)
+                <input type="radio" id="{{ $id }}" name="{{ $name }}" value="{{ $val }}" @checked($active) {{ $modelo }}
                        style="position:absolute;opacity:0;width:0;height:0;"
-                       x-on:change="if (! flechas && $el.form) { $el.form.requestSubmit(); }">
+                       @if ($autoenvio) x-on:change="if (! flechas && envia($el.form)) { $el.form.requestSubmit(); }" @endif>
                 {{-- El texto va envuelto porque es lo único visible de la píldora: el
                      radio real mide 0×0 y es transparente, así que un anillo dibujado
                      sobre él no se vería. --}}
@@ -117,7 +152,7 @@
     @endif
 </div>
 
-@if ($esRadios)
+@if ($autoenvio)
     {{-- Nace oculto desde el SERVIDOR y lo revela Alpine solo si hace falta: así no
          hay parpadeo de un botón que en la barra de filtros sobra. Sin Alpine no se
          ve, y entonces el formulario del anfitrión aporta su propio envío —que es el
@@ -172,6 +207,11 @@
            prohíbe en todo el paquete. */
         @supports selector(:has(*)) {
             .muni-seg input:focus-visible ~ .muni-seg__txt { outline-width:0; }
+            /* La píldora sigue al radio MARCADO y no solo a la clase del servidor: con
+               `wire:model` el anfitrión no pasa `value`, y sin re-render (o con uno
+               diferido) la selección cambiaba sin que se viera cuál quedó. */
+            .muni-seg:has(input:checked) { background:var(--muni-surface);color:var(--muni-text);box-shadow:var(--muni-shadow); }
+            .muni-seg--on:has(input:not(:checked)) { background:transparent;color:var(--muni-muted);box-shadow:none; }
             .muni-seg:has(input:focus-visible) { outline:3px solid var(--muni-focus, var(--muni-accent, #767676));
                 outline-offset:-2px;box-shadow:var(--muni-ring); }
         }

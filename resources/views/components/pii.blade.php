@@ -32,8 +32,8 @@
      * Sin valor que mostrar no abre nada.
      */
     'revealed' => false,
-    'showLabel' => 'Mostrar',
-    'hideLabel' => 'Ocultar',
+    'showLabel' => 'Mostrar', // texto del botón para revelar
+    'hideLabel' => 'Ocultar', // texto del botón para volver a ocultar
     /*
      * Lo que dice la pantalla entre el clic y la respuesta del anfitrión en el
      * modo diferido. Va dentro de la región viva: quien usa lector de pantalla

@@ -1,12 +1,12 @@
 @props([
-    'title' => null,
-    'subtitle' => null,
-    'flush' => false,
+    'title' => null, // título del encabezado
+    'subtitle' => null, // texto bajo el título
+    'flush' => false, // sin padding interno (tablas, listas)
 ])
 
 <section
-    class="muni-card"
     {{ $attributes->merge([
+        'class' => 'muni-card',
         'style' => 'background:var(--muni-surface);border:1px solid var(--muni-border);'
             .'border-radius:var(--muni-radius-lg);box-shadow:var(--muni-shadow);overflow:hidden;'
             .'transition:box-shadow var(--muni-dur) var(--muni-ease);',

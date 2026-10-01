@@ -1,12 +1,12 @@
 @props([
-    'label' => 'Contraseña',
-    'name' => 'password',
-    'autocomplete' => 'current-password',
-    'error' => null,
-    'hint' => null,
-    'required' => false,
-    'showLabel' => 'Mostrar contraseña',
-    'hideLabel' => 'Ocultar contraseña',
+    'label' => 'Contraseña', // etiqueta visible del campo
+    'name' => 'password', // name del input; también semilla del id
+    'autocomplete' => 'current-password', // current-password | new-password
+    'error' => null, // mensaje de error del campo
+    'hint' => null, // texto de ayuda bajo el campo
+    'required' => false, // marca el campo como obligatorio
+    'showLabel' => 'Mostrar contraseña', // rótulo del botón para mostrar la clave
+    'hideLabel' => 'Ocultar contraseña', // rótulo del botón para ocultarla
 ])
 
 @php

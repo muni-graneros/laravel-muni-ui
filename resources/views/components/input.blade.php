@@ -1,13 +1,13 @@
 @props([
-    'label' => null,
-    'name' => null,
-    'type' => 'text',
-    'error' => null,
-    'hint' => null,
-    'icon' => null,
-    'required' => false,
-    'requiredText' => 'obligatorio',
-    'requiredTextVisible' => false,
+    'label' => null, // etiqueta visible; null no la emite
+    'name' => null, // name del input; también semilla del id
+    'type' => 'text', // tipo HTML del input: text | email | number | …
+    'error' => null, // mensaje de error; activa aria-invalid
+    'hint' => null, // texto de ayuda bajo el campo
+    'icon' => null, // SVG crudo decorativo a la izquierda
+    'required' => false, // marca el campo como obligatorio
+    'requiredText' => 'obligatorio', // palabra junto al asterisco; "" la quita
+    'requiredTextVisible' => false, // muestra esa palabra en vez de dejarla solo al lector
 ])
 
 @php
@@ -101,7 +101,7 @@
 <div style="display:flex;flex-direction:column;gap:6px;">
     @if ($label)
         <label for="{{ $muniId }}" style="font-family:var(--muni-font-sans);font-size:12.5px;font-weight:600;color:var(--muni-text);">
-            {{ $label }}@if ($required)@if ($muniObl !== '')<span aria-hidden="true" style="color:var(--muni-danger-fg);margin-left:2px;">*</span><span class="{{ $muniOblClase }}"> {{ $muniOblTexto }}</span>@else<span style="color:var(--muni-danger-fg);margin-left:2px;">*</span>@endif@endif
+            {{ $label }}@if ($required)@if ($muniObl !== '')<span aria-hidden="true" style="color:var(--muni-danger-fg);margin-left:2px;">*</span><span class="{{ $muniOblClase }}"> {{ $muniOblTexto }}</span>@else<span style="color:var(--muni-danger-fg);margin-left:2px;">*</span>@endif @endif
         </label>
     @endif
 

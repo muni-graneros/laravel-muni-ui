@@ -8,11 +8,11 @@
      * página necesitan que el consumidor pase su propio `id`.
      */
     'id' => null,
-    'label' => 'Filtros',
+    'label' => 'Filtros', // texto del disparador; también base del id
     /* Borde del disparador contra el que se alinea el panel: start o end. */
     'align' => 'end',
-    'width' => '320px',
-    'closeLabel' => 'Cerrar',
+    'width' => '320px', // ancho del panel (CSS); en móvil ocupa todo
+    'closeLabel' => 'Cerrar', // texto del botón de cerrar
 ])
 
 @php

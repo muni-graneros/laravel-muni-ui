@@ -1,9 +1,9 @@
 @props([
-    'system' => null,
-    'home' => 'https://www.municipalidadgraneros.cl/',
-    'address' => 'Av. Bernardo O\'Higgins 630, Graneros, Región de O\'Higgins',
-    'phone' => '+56 72 249 1000',
-    'email' => 'contacto@municipalidadgraneros.cl',
+    'system' => null, // nombre del sistema bajo el municipio
+    'home' => 'https://www.municipalidadgraneros.cl/', // URL del sitio municipal
+    'address' => 'Av. Bernardo O\'Higgins 630, Graneros, Región de O\'Higgins', // dirección de contacto
+    'phone' => '+56 72 249 1000', // teléfono de contacto
+    'email' => 'contacto@municipalidadgraneros.cl', // correo de contacto
 ])
 
 {{-- Footer institucional compartido por los subdominios del ecosistema. Cierra la página
@@ -56,11 +56,13 @@
         .muni-gob-footer__name { font-size:15px; font-weight:800; color:#fff; letter-spacing:-.01em; }
         .muni-gob-footer__sys { font-size:12.5px; opacity:.75; margin-top:2px; }
         .muni-gob-footer__cols { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:26px; flex:1; min-width:260px; }
+        .muni-gob-footer__col { min-width:0; overflow-wrap:anywhere; }
         .muni-gob-footer__col h4 { font-family:var(--muni-font-mono); font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muni-gob-lima); margin:0 0 10px; }
         .muni-gob-footer__col p { font-size:12.5px; line-height:1.55; margin:0 0 6px; opacity:.85; }
         .muni-gob-footer__col a { color:#d9e6e8; text-decoration:none; }
         .muni-gob-footer__col a:hover { color:#fff; text-decoration:underline; }
         .muni-gob-footer__legal { border-top:1px solid rgba(255,255,255,.12); }
-        .muni-gob-footer__legal { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; max-width:1180px; margin:0 auto; padding:14px clamp(16px,3vw,26px); font-size:11.5px; opacity:.6; }
+        /* Opacidad .7: con .6 el texto legal quedaba en 4,26:1 a 11.5px. */
+        .muni-gob-footer__legal { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; max-width:1180px; margin:0 auto; padding:14px clamp(16px,3vw,26px); font-size:11.5px; opacity:.7; }
     </style>
 @endonce

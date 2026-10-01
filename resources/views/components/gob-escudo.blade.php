@@ -1,6 +1,6 @@
 @props([
-    'size' => 40,
-    'src' => null,
+    'size' => 40, // lado en px
+    'src' => null, // URL alternativa del escudo (CDN, R2)
 ])
 
 @php

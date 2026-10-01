@@ -1,19 +1,19 @@
 @props([
-    'title',
-    'armazon' => 'dashboard',
-    'system' => 'Municipalidad de Graneros',
-    'systemSubtitle' => null,
-    'documentTitle' => null,
-    'subtitle' => null,
-    'eyebrow' => null,
-    'migas' => [],
-    'aviso' => null,
-    'avisoTone' => 'info',
-    'avisoTitle' => null,
-    'theme' => null,
-    'status' => 'online',
-    'user' => null,
-    'announcer' => true,
+    'title', // título de la pantalla: <h1>, <title> y nombre de la región
+    'armazon' => 'dashboard', // dashboard | app
+    'system' => 'Municipalidad de Graneros', // nombre del sistema en la cabecera y el <title>
+    'systemSubtitle' => null, // línea secundaria bajo el nombre del sistema
+    'documentTitle' => null, // reemplaza el <title> calculado («título · sistema»)
+    'subtitle' => null, // bajada bajo el <h1>
+    'eyebrow' => null, // antetítulo sobre el <h1>
+    'migas' => [], // migas: [['label' => …, 'url' => …?], …]
+    'aviso' => null, // mensaje que se ve en un alert y se anuncia una vez
+    'avisoTone' => 'info', // info | ok | warn | danger
+    'avisoTitle' => null, // título del recuadro de aviso
+    'theme' => null, // null (sigue al SO) | light | dark
+    'status' => 'online', // online | degraded | offline
+    'user' => null, // nombre del usuario para el avatar de la cabecera
+    'announcer' => true, // monta la región de mensajes; false si el host pone la suya
 ])
 
 {{-- EL PUNTO DE PARTIDA DE TODA PANTALLA NUEVA — armazón, salto al contenido, migas,

@@ -1,12 +1,12 @@
 @props([
-    'expiraEn',
-    'renovarUrl' => null,
-    'salirUrl' => null,
-    'ingresarUrl' => null,
-    'avisarA' => 300,
-    'dialogoA' => 60,
-    'ahora' => null,
-    'duracion' => null,
+    'expiraEn', // instante ISO 8601 en que vence la sesión
+    'renovarUrl' => null, // URL que renueva la sesión (POST); sin ella no se renueva
+    'salirUrl' => null, // URL de cierre de sesión (POST)
+    'ingresarUrl' => null, // adónde ir cuando la sesión ya venció
+    'avisarA' => 300, // segundos restantes para mostrar la tira de aviso
+    'dialogoA' => 60, // segundos restantes para abrir el diálogo
+    'ahora' => null, // hora ISO del servidor, corrige el reloj del equipo
+    'duracion' => null, // SESSION_LIFETIME en segundos, lo que otorga renovar
 ])
 
 @php

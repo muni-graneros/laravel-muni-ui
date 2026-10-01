@@ -1,15 +1,15 @@
 @props([
-    'title' => null,
-    'message' => null,
-    'folio' => null,
-    'folioLabel' => 'Folio',
-    'copyLabel' => 'Copiar folio',
-    'tone' => 'ok',
-    'printHref' => null,
-    'printLabel' => 'Imprimir comprobante',
-    'exitHref' => null,
-    'exitLabel' => 'Volver al inicio',
-    'autofocus' => true,
+    'title' => null, // título del resultado (único <h1>)
+    'message' => null, // texto bajo el título
+    'folio' => null, // folio del trámite, ya redactado por el host
+    'folioLabel' => 'Folio', // rótulo del folio
+    'copyLabel' => 'Copiar folio', // texto del botón para copiar el folio
+    'tone' => 'ok', // ok | warn | danger | info
+    'printHref' => null, // URL del comprobante; sin ella no hay botón
+    'printLabel' => 'Imprimir comprobante', // texto del botón de imprimir
+    'exitHref' => null, // URL de salida; sin ella no hay salida
+    'exitLabel' => 'Volver al inicio', // texto del enlace de salida
+    'autofocus' => true, // enfoca el título al cargar
 ])
 
 {{-- El cierre de un trámite: «Su solicitud fue recibida. Folio 2026-04871».

@@ -1,6 +1,6 @@
 @props([
-    'current' => 1,
-    'total' => 1,
+    'current' => 1, // página actual (desde 1)
+    'total' => 1, // última página
     /*
      * Constructor de URL: `fn (int $pagina) => string`. Si no es invocable, el
      * componente NO degrada a «#» en silencio: revienta. Un «#» activable salta al
@@ -61,6 +61,11 @@
 
         $link = $url;
     }
+
+    /* La actual se acota a [1, total]: con `current` fuera de rango (una URL con
+       ?page=9 de 3, o 0) no se marcaba ninguna página y «Anterior» llevaba a una
+       página que no existe. */
+    $current = max(1, min($current, $total));
 
     /* Ventana de páginas: 1 … (actual-1, actual, actual+1) … total */
     $pages = collect(range(1, $total))

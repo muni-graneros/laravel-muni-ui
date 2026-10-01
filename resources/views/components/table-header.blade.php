@@ -1,10 +1,10 @@
 @props([
-    'title' => null,
-    'level' => 2,
-    'total' => null,
-    'filtered' => null,
-    'unit' => 'resultados',
-    'countLabel' => null,
+    'title' => null, // título de la tabla
+    'level' => 2, // nivel del encabezado: 2 a 6
+    'total' => null, // total de registros
+    'filtered' => null, // registros tras el filtro («X de Y»)
+    'unit' => 'resultados', // sustantivo del conteo
+    'countLabel' => null, // texto propio que reemplaza el conteo
 ])
 
 {{-- La franja entre el <h1> de la pantalla y la tabla: de qué sección es, cuántos

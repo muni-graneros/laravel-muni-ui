@@ -5,13 +5,13 @@
      * ensucia el diffing de Livewire (DESIGN §10).
      */
     'id' => 'muni-hoja',
-    'organization' => 'Municipalidad de Graneros',
+    'organization' => 'Municipalidad de Graneros', // institución emisora en el encabezado
     /* Unidad emisora: «Dirección de Tránsito», «Oficina de Partes». */
     'unit' => null,
     /* Tipo de documento: «Acta de fiscalización», «Comprobante de ingreso». */
     'type' => null,
-    'folio' => null,
-    'folioLabel' => 'Folio',
+    'folio' => null, // folio del documento, ya formateado por el host
+    'folioLabel' => 'Folio', // rótulo del folio
     /* Fecha ya formateada por el host: el paquete no decide formato ni zona. */
     'date' => null,
     /*
@@ -19,10 +19,10 @@
      * sabe dónde se comprueba el folio. El paquete no inventa una URL.
      */
     'verification' => null,
-    'crest' => true,
-    'crestSrc' => null,
-    'printable' => true,
-    'printLabel' => 'Imprimir',
+    'crest' => true, // muestra el escudo en el encabezado
+    'crestSrc' => null, // URL propia del escudo; null usa el del paquete
+    'printable' => true, // muestra el botón Imprimir
+    'printLabel' => 'Imprimir', // texto del botón Imprimir
     /*
      * Nivel del encabezado del tipo de documento. Por defecto 2, como el resto
      * del paquete: el <h1> es de page-header y dos en una página rompen el
@@ -107,6 +107,9 @@
             <tr>
                 <td class="muni-hoja__celda">
                     <div class="muni-hoja__lienzo">
+                        {{-- La franja institucional encabeza la hoja también en papel: está
+                             hecha de bordes, que se imprimen sin los gráficos de fondo. --}}
+                        <x-muni::gob-stripe class="muni-hoja__franja" />
                         <header class="muni-hoja__membrete">
                             @if (filter_var($crest, FILTER_VALIDATE_BOOLEAN))
                                 <x-muni::gob-escudo :size="56" :src="$crestSrc" class="muni-hoja__escudo" />

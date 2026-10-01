@@ -1,8 +1,8 @@
 @props([
-    'tone' => 'info',
-    'title' => null,
-    'icon' => null,
-    'role' => null,
+    'tone' => 'info', // info | ok | warn | danger
+    'title' => null, // título opcional en negrita
+    'icon' => null, // nombre de glifo del catálogo (no HTML); o slot icon
+    'role' => null, // status | alert | note; sin él, no anuncia
 ])
 
 {{-- Recuadro de aviso fijo en uno de cuatro tonos (ok, warn, danger, info), con título

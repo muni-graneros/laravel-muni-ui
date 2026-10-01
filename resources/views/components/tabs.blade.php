@@ -1,9 +1,9 @@
 @props([
-    'tabs' => [],
-    'default' => 0,
-    'id' => null,
-    'label' => null,
-    'activation' => 'auto',
+    'tabs' => [], // pestañas: ['clave' => 'Etiqueta', …]
+    'default' => 0, // índice o clave de la pestaña activa al cargar
+    'id' => null, // base de los ids; por defecto sale de las pestañas
+    'label' => null, // nombre accesible del tablist
+    'activation' => 'auto', // auto | manual (activar con Enter/Espacio)
 ])
 
 @php
@@ -21,7 +21,15 @@
      * está la prop `id`.
      */
     $grupoId = $id ?: 'muni-tabs-'.substr(sha1(json_encode(array_values((array) $tabs), JSON_UNESCAPED_UNICODE) ?: ''), 0, 8);
-    $activo = (int) $default;
+    /*
+     * `tabs` puede venir con claves de texto (['datos' => 'Datos', …]). A Alpine y a
+     * los id solo viaja la POSICIÓN: con la clave escrita tal cual, `active === datos`
+     * es un identificador suelto y Alpine tumba el grupo entero. `default` acepta la
+     * posición o la clave. Si esto cambia, cambia igual en tab-panel.blade.php.
+     */
+    $etiquetas = array_values((array) $tabs);
+    $claveDefecto = array_search($default, array_keys((array) $tabs), true);
+    $activo = is_string($default) && $claveDefecto !== false ? (int) $claveDefecto : (int) $default;
     $manual = $activation === 'manual';
 @endphp
 
@@ -38,7 +46,7 @@
     x-data="{
         active: {{ $activo }},
         focused: {{ $activo }},
-        count: {{ count($tabs) }},
+        count: {{ count($etiquetas) }},
         manual: {{ $manual ? 'true' : 'false' }},
         mover(i) {
             if (! this.count) return;
@@ -59,7 +67,7 @@
         @keydown.home.prevent="mover(0)"
         @keydown.end.prevent="mover(count - 1)"
     >
-        @foreach ($tabs as $i => $etiqueta)
+        @foreach ($etiquetas as $i => $etiqueta)
             <button
                 type="button"
                 role="tab"

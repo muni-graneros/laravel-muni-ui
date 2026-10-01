@@ -15,10 +15,9 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 ### Corregido
 
 - **`<x-muni::data-table>` alargaba la página entera.** El `<caption class="muni-sr">` tiene
-  `position:absolute` y estaba dentro de `.muni-dt__scroll` que tiene `overflow:auto` pero
-  carecía de `position:relative`. El elemento absoluto escapaba del contexto de apilamiento
-  y se rendía fuera del flujo, incrementando la altura total del documento (hallado en
-  seguridad-graneros). Tests nuevos: `DataTableScrollRelativeTest.php`.
+  `position:absolute` y estaba dentro de `.muni-dt__scroll` (`overflow:auto`) sin `position:relative`
+  (hallado en seguridad-graneros). El `position:relative` ya llegó con 0.20.0; aquí queda el
+  candado: `DataTableScrollRelativeTest.php`.
 - **Mismo defecto en `<x-muni::sortable-table>` y `<x-muni::diff-campos>`.** Su contenedor con
   `overflow` (el `<div>` de la tabla y `.muni-dc__marco`) contiene elementos `muni-sr`/`muni-dc__sr`
   absolutos y tampoco era `position:relative`. Candado ampliado en `DataTableScrollRelativeTest.php`.
@@ -26,6 +25,57 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
   declaraban; ahora vive en `tests/Helpers/ReglasCss.php`.
 - Sin cambio de artefactos publicados: el CSS va dentro de los componentes Blade, no hace falta
   volver a publicar nada.
+
+## [0.20.0] — 2026-09-26
+
+El constraint de cada sistema pasa a `^0.20` (en 0.x, `^0.19` no cruza) y **hay que volver a
+publicar el tema del panel** (`php artisan vendor:publish --tag=muni-ui-filament --force`): trae la
+franja institucional arriba de la barra. Nada renombra ni quita props, slots, clases ni eventos;
+`segmented` deja de enviar formularios POST solo.
+
+Antes de subirla, lee [`docs/UPGRADE-0.20.0.md`](docs/UPGRADE-0.20.0.md).
+
+### Agregado
+
+- **Franja institucional de siete colores en todo diseño, claro y oscuro**: `app-shell` (vía
+  `topbar`), `dashboard-shell`, `auth-shell`, `error-page`, `hoja` y la barra del panel Filament
+  (el login ya la tenía). `topbar` acepta `:franja="false"` para quitarla; con `gob-bar` en la
+  página se oculta sola para no pintar dos. `gob-stripe` pasa a bordes en vez de degradado, así
+  que también sale al imprimir.
+- **Catálogo de los 90 componentes** (`demo/catalogo.html`, `npm run construir` en `demo/catalogo/`):
+  cada uno con ejemplo real renderizado por Blade, su código, la tabla de props y slots, en claro y
+  oscuro, más seis recetas de pantalla completa. Toda prop del paquete lleva ahora su descripción en
+  `@props` (`CatalogoTest` lo exige).
+- `<x-muni::radio-group>` y `<x-muni::accordion-item>` (paneles en el slot en vez de `items`).
+- `data-table` ordena en el servidor con `sortUrl` (enlaces) o `wireSort` (método Livewire), con
+  `aria-sort` en el encabezado.
+- **CI**: el catálogo (errores de JS, scroll horizontal en móvil, axe en ambos temas), las
+  interacciones en navegador y una prueba de punta a punta con Livewire real, **en Livewire 4 y en
+  Livewire 3** (personas-graneros), donde cada control enlazable lleva su valor al servidor y
+  refleja lo que el servidor devuelve.
+
+### Corregido
+
+- `wire:model` enlaza de verdad en `segmented`, `file-dropzone` (va al `<input type="file">` real,
+  también al arrastrar), `otp-input`, `rating` y `calendar`: antes caía en un `<div>` sin error.
+- `calendar` marca el día que llega del servidor también con el Alpine 3.15 de Livewire 3.
+- `command-palette`: el buscador es un combobox con su listbox (`aria-activedescendant`), y el
+  atajo abre una sola paleta aunque haya dos en la página.
+- `tabs`, `tab-panel` y `accordion` aceptan claves de texto (antes Alpine se caía entero); sin JS
+  se ve el panel por defecto.
+- `rating` de solo lectura es una imagen con nombre; el interactivo es un radiogroup con flechas y
+  objetivos de 24×24.
+- `sortable-table` pinta cabecera y filas desde el servidor: sin JS la tabla se lee igual.
+- `data-table`: el «Acciones» oculto ya no ensancha la página en el teléfono.
+- `chart-bar`/`chart-donut` toleran valores faltantes o negativos y la dona ya no se recorta;
+  `stat` acepta series con claves; `pagination` acota la página actual; `filter-bar` acepta
+  `method="put"`.
+- `input`, `select`, `textarea`, `checkbox`, `checkbox-group`, `radio-group` y `combobox` compilan
+  también sin el precompilador de Livewire (un `@endif@endif` pegado quedaba sin compilar).
+- `segmented` solo se autoenvía en formularios GET y nunca con `wire:submit`/`@submit`; un POST
+  necesita `autosubmit="siempre"`. Antes enviaba cualquier formulario (en Livewire, un 419).
+- CI instala las dependencias npm de la raíz antes de Pest: 14 pruebas de banco que embeben Alpine
+  y el plugin Focus fallaban sin ellas.
 
 ## [0.19.0] — 2026-09-15
 

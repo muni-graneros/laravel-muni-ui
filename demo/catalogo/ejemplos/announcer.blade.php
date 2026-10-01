@@ -1,0 +1,1 @@
+<x-muni::announcer />

@@ -27,6 +27,7 @@
     --color-muni-muted: var(--muni-muted);
     --color-muni-hint: var(--muni-hint);
     --color-muni-border: var(--muni-border);
+    --color-muni-border-strong: var(--muni-border-strong);
     --color-muni-accent: var(--muni-accent);
     --color-muni-ok: var(--muni-ok-fg);
     --color-muni-warn: var(--muni-warn-fg);

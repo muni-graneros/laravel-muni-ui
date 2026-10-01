@@ -1,10 +1,10 @@
 @props([
-    'errors' => null,
-    'title' => null,
-    'prefix' => 'muni-',
-    'ids' => [],
-    'level' => 2,
-    'focus' => true,
+    'errors' => null, // MessageBag o array; null usa la bolsa $errors compartida
+    'title' => null, // título del resumen; por defecto según la cantidad
+    'prefix' => 'muni-', // prefijo de id de los campos para los enlaces
+    'ids' => [], // mapa clave de error => id del control, si no sigue el prefijo
+    'level' => 2, // nivel del encabezado (2-6)
+    'focus' => true, // enfoca el resumen al aparecer
 ])
 
 @php

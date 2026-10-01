@@ -1,7 +1,7 @@
 @props([
-    'width' => '100%',
-    'height' => '14px',
-    'rounded' => 'var(--muni-radius-sm)',
+    'width' => '100%', // ancho (CSS)
+    'height' => '14px', // alto (CSS)
+    'rounded' => 'var(--muni-radius-sm)', // border-radius (CSS)
 ])
 
 <span

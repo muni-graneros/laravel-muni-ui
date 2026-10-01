@@ -1,18 +1,24 @@
 @props([
-    'data' => [],
-    'height' => 160,
-    'tone' => 'accent',
-    'labels' => true,
+    'data' => [], // ['label'=>, 'value'=>, 'tone'=>?] o números
+    'height' => 160, // alto del área de barras en px
+    'tone' => 'accent', // accent | ok | warn | danger | info
+    'labels' => true, // muestra las etiquetas bajo las barras
 ])
 
 @php
     // $data: array de ['label'=>, 'value'=>, 'tone'=>?] o de números.
+    // Sin 'label' o 'value' no truena: faltantes valen '' y 0. Un negativo se dibuja
+    // en 0 —un alto no puede ser menor— pero la cifra se muestra tal cual.
     $norm = [];
-    foreach ($data as $d) {
-        $norm[] = is_array($d) ? $d : ['label' => '', 'value' => $d];
+    foreach ($data ?? [] as $d) {
+        $d = is_array($d) ? $d : ['value' => $d];
+        $d['label'] = $d['label'] ?? '';
+        $d['value'] = $d['value'] ?? 0;
+        $d['alto'] = max(0, (float) $d['value']);
+        $norm[] = $d;
     }
     $max = 0;
-    foreach ($norm as $d) { $max = max($max, (float) $d['value']); }
+    foreach ($norm as $d) { $max = max($max, $d['alto']); }
     $max = $max ?: 1;
     $toneColor = [
         'accent' => 'var(--muni-accent)', 'ok' => 'var(--muni-ok-fg)', 'warn' => 'var(--muni-warn-fg)',
@@ -20,11 +26,13 @@
     ];
 @endphp
 
-<div {{ $attributes->merge(['class' => 'muni-chartbar']) }} style="display:flex;flex-direction:column;">
+{{-- El style va DENTRO de merge(): escrito aparte, el style del consumidor salía
+     como un segundo atributo y el navegador descartaba uno de los dos. --}}
+<div {{ $attributes->merge(['class' => 'muni-chartbar', 'style' => 'display:flex;flex-direction:column;']) }}>
     <div style="display:flex;align-items:flex-end;gap:8px;height:{{ $height }}px;padding-top:8px;">
         @foreach ($norm as $d)
             @php
-                $h = round((float) $d['value'] / $max * 100, 1);
+                $h = round($d['alto'] / $max * 100, 1);
                 $c = $toneColor[$d['tone'] ?? $tone] ?? 'var(--muni-accent)';
             @endphp
             <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;min-width:0;" title="{{ $d['label'] }}: {{ $d['value'] }}">

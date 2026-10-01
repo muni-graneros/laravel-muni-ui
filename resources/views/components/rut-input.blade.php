@@ -1,10 +1,10 @@
 @props([
-    'label' => 'RUT',
-    'name' => null,
-    'value' => null,
-    'error' => null,
-    'hint' => 'Formato 12.345.678-9. El dígito verificador puede ser la letra K.',
-    'required' => false,
+    'label' => 'RUT', // rótulo del campo
+    'name' => null, // nombre del campo; también base del id
+    'value' => null, // RUT inicial (se formatea con puntos y guion)
+    'error' => null, // mensaje de error del servidor
+    'hint' => 'Formato 12.345.678-9. El dígito verificador puede ser la letra K.', // ayuda bajo el campo
+    'required' => false, // marca el campo como obligatorio
 ])
 
 @php

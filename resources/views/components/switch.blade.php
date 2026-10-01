@@ -1,9 +1,9 @@
 @props([
-    'label' => null,
-    'name' => null,
-    'checked' => false,
-    'description' => null,
-    'error' => null,
+    'label' => null, // rótulo del interruptor
+    'name' => null, // nombre del campo
+    'checked' => false, // encendido de entrada
+    'description' => null, // texto de apoyo bajo el rótulo
+    'error' => null, // mensaje de error del servidor
 ])
 
 @php
@@ -52,11 +52,14 @@
 
 <div style="display:flex;flex-direction:column;gap:4px;">
     <label for="{{ $muniId }}" style="display:flex;align-items:flex-start;gap:11px;cursor:pointer;">
-        <span x-data="{ on: {{ $checked ? 'true' : 'false' }} }" style="position:relative;flex-shrink:0;margin-top:1px;">
+        {{-- Sin x-data ni x-model propios: el aspecto sale de `input:checked` en CSS. Un
+             `x-model` interno sobre el mismo input que el `wire:model` del anfitrión eran
+             dos modelos peleando por el checkbox: el estado inicial de Alpine pisaba el
+             del servidor y el clic no llegaba a la propiedad de Livewire. --}}
+        <span style="position:relative;flex-shrink:0;margin-top:1px;">
             <input type="checkbox" id="{{ $muniId }}" @if ($name) name="{{ $name }}" @endif @checked($checked)
-                   x-model="on"
                    {{ $attributes->merge($muniAria + ['style' => 'position:absolute;opacity:0;width:0;height:0;']) }}>
-            <span class="muni-switch" :class="on && 'muni-switch--on'">
+            <span class="muni-switch" aria-hidden="true">
                 <span class="muni-switch__thumb"></span>
             </span>
         </span>
@@ -88,8 +91,8 @@
     <style>
         .muni-switch { display:inline-block; width:38px; height:22px; border-radius:999px; background:var(--muni-surface-3); border:1px solid var(--muni-field-border); transition:background var(--muni-dur) var(--muni-ease),border-color var(--muni-dur) var(--muni-ease); }
         .muni-switch__thumb { display:block; width:16px; height:16px; margin:2px; border-radius:50%; background:var(--muni-surface); box-shadow:0 1px 3px rgba(0,0,0,.25); transition:transform var(--muni-dur) var(--muni-ease); }
-        .muni-switch--on { background:var(--muni-accent); border-color:var(--muni-accent); }
-        .muni-switch--on .muni-switch__thumb { transform:translateX(16px); }
+        .muni-switch--on, input:checked + .muni-switch { background:var(--muni-accent); border-color:var(--muni-accent); }
+        .muni-switch--on .muni-switch__thumb, input:checked + .muni-switch .muni-switch__thumb { transform:translateX(16px); }
         /* El <input> real va con opacity:0 y 0×0, así que el contorno nativo del
            navegador no se ve: el ÚNICO indicador de foco era esta box-shadow, y la
            box-shadow se pierde dentro del panel de Filament (ver --muni-focus). */

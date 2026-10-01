@@ -1,5 +1,5 @@
 @props([
-    'target' => '#muni-contenido',
+    'target' => '#muni-contenido', // ancla del contenido principal al que salta
 ])
 
 {{-- ENLACE DE SALTO AL CONTENIDO (WCAG 2.2 nivel A, 2.4.1 «Evitar bloques»).

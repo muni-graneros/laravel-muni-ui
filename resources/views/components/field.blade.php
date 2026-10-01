@@ -1,5 +1,5 @@
 @props([
-    'label' => null,
+    'label' => null, // etiqueta que envuelve el control del slot
     /*
      * `name` es una prop ACEPTADA Y SIN EFECTO, documentada a propósito: no es
      * un olvido y no hay nada que «arreglar» acá sin romper algo.

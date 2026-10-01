@@ -2,26 +2,26 @@
     /* La URL de la ficha del registro. Con ella el título se emite como enlace
        real: Enter nativo, «abrir en otra pestaña» y un enlace que se puede
        copiar. Sin ella el título es texto. */
-    'href' => null,
+    'href' => null, // URL de la ficha; con ella el título es enlace
     /* El estado del registro: ok / warn / danger / info / accent / muted. Son
        los MISMOS seis de timeline, y a propósito: el día que la línea de tiempo
        y la ficha del mismo trámite usen palabras distintas para el mismo estado,
        el funcionario ve dos verdades en una pantalla. */
-    'tone' => null,
+    'tone' => null, // ok | warn | danger | info | accent | muted
     /* Reescribe la etiqueta textual del estado («En terreno» en vez de «Con
        observación»). El texto SIEMPRE se emite: el color de la banda no puede
        ser el único portador del estado (WCAG 2.2 AA 1.4.1). */
-    'toneLabel' => null,
+    'toneLabel' => null, // texto propio para el estado (siempre se emite)
     /* El identificador del registro tal como lo lee el vecino por teléfono:
        folio, número de orden, rol. Sale en `.muni-num` —mono tabular— para poder
        comparar dos folios de un vistazo, y es texto seleccionable. */
-    'folio' => null,
+    'folio' => null, // identificador del registro, en mono tabular
     /* Qué ES ese código, para el lector de pantalla. Sin esto se anuncia
        «AV guion 2026 guion 4821» sin decir de qué se trata. */
-    'folioLabel' => 'Folio',
+    'folioLabel' => 'Folio', // qué es el folio, para el lector de pantalla
     /* Estampa `wire:navigate` en el enlace del título. Apagado por defecto: el
        paquete se instala también donde no hay Livewire. */
-    'navegar' => false,
+    'navegar' => false, // agrega wire:navigate al enlace del título
 ])
 
 @php

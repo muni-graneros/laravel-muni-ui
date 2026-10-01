@@ -1,9 +1,10 @@
 @props([
-    'system',
-    'subtitle' => null,
-    'status' => 'online',
-    'statusLabel' => null,
-    'logo' => null,
+    'system', // nombre del sistema
+    'subtitle' => null, // línea secundaria
+    'status' => 'online', // online | degraded | offline
+    'statusLabel' => null, // texto propio para el estado
+    'logo' => null, // HTML del logo; por defecto «GRA»
+    'franja' => true, // franja institucional en el borde superior (va en todo diseño)
 ])
 
 @php
@@ -45,4 +46,18 @@
     <x-muni::badge :tone="$statusTone">{{ $statusText }}</x-muni::badge>
 
     {{ $slot }}
+
+    {{-- La franja institucional en el borde superior, dentro del header: viaja con él
+         cuando es sticky. Si la página ya tiene gob-bar (que trae la suya), se oculta
+         para no pintar dos. --}}
+    @if ($franja)
+        <x-muni::gob-stripe class="muni-topbar__franja" />
+    @endif
 </header>
+
+@once
+    <style>
+        .muni-topbar__franja { position: absolute; top: 0; left: 0; right: 0; }
+        body:has(.muni-gob-bar) .muni-topbar__franja { display: none; }
+    </style>
+@endonce

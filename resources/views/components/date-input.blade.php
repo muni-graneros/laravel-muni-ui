@@ -1,24 +1,24 @@
 @props([
-    'label' => 'Fecha',
-    'name' => null,
-    'value' => null,
-    'min' => null,
-    'max' => null,
-    'error' => null,
-    'hint' => null,
-    'required' => false,
+    'label' => 'Fecha', // etiqueta visible del campo simple
+    'name' => null, // name del input simple; también semilla del id
+    'value' => null, // fecha inicial (Y-m-d)
+    'min' => null, // fecha mínima permitida (Y-m-d)
+    'max' => null, // fecha máxima permitida (Y-m-d)
+    'error' => null, // mensaje de error del campo simple
+    'hint' => null, // texto de ayuda bajo el campo
+    'required' => false, // marca el campo (o ambos extremos) como obligatorio
 
     /* Modo rango: los dos extremos de un periodo, coherentes entre sí. */
     'range' => false,
-    'legend' => 'Periodo',
-    'fromName' => null,
-    'toName' => null,
-    'fromLabel' => 'Desde',
-    'toLabel' => 'Hasta',
-    'fromValue' => null,
-    'toValue' => null,
-    'fromError' => null,
-    'toError' => null,
+    'legend' => 'Periodo', // leyenda del <fieldset> en modo rango
+    'fromName' => null, // name del extremo inicial (modo rango)
+    'toName' => null, // name del extremo final (modo rango)
+    'fromLabel' => 'Desde', // etiqueta del extremo inicial
+    'toLabel' => 'Hasta', // etiqueta del extremo final
+    'fromValue' => null, // fecha inicial del rango (Y-m-d)
+    'toValue' => null, // fecha final del rango (Y-m-d)
+    'fromError' => null, // error del extremo inicial
+    'toError' => null, // error del extremo final
 
     /*
      * Un solo attribute bag no puede repartir dos `wire:model` entre dos inputs,
@@ -26,8 +26,8 @@
      * (`live`, `blur`, `debounce.500ms`) se pasa aparte y sirve para los dos.
      */
     'fromModel' => null,
-    'toModel' => null,
-    'modelModifier' => null,
+    'toModel' => null, // propiedad Livewire del extremo final
+    'modelModifier' => null, // modificador de wire:model: live | blur | debounce.500ms
 ])
 
 @php

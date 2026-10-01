@@ -1,5 +1,5 @@
 @props([
-    'position' => 'bottom-right',
+    'position' => 'bottom-right', // bottom-right | bottom-left | top-right | top-left
 ])
 
 @php
@@ -188,7 +188,11 @@
             const vida = this.vidaDe(tone, texto, pedida);
             const id = ++this.secuencia;
 
-            this.items.push({ id, tone, title: title || null, message, vida, resto: vida, desde: 0, timer: null, pausas: 0 });
+            this.items.push({ id, tone, title: title || null, message, vida, resto: vida, desde: 0, timer: null, pausas: 0, shown: false });
+            /* x-transition solo corre con x-show: el aviso nace oculto y se muestra en
+               el tick siguiente, así la entrada se anima. La salida es inmediata a
+               propósito: `descartar` saca el nodo en el acto para devolver el foco. */
+            this.$nextTick(() => { const nuevo = this.buscar(id); if (nuevo) { nuevo.shown = true; } });
 
             while (this.items.length > this.maximo) { this.descartar(this.items[0].id); }
 
@@ -329,6 +333,7 @@
             @focusin="if (! $el.contains($event.relatedTarget)) { pausar(item.id) }"
             @focusout="if (! $el.contains($event.relatedTarget)) { reanudar(item.id) }"
             @keydown.escape.stop="descartar(item.id)"
+            x-show="item.shown"
             x-transition:enter="muni-toast-enter"
             x-transition:enter-start="muni-toast-enter-start"
             x-transition:enter-end="muni-toast-enter-end"

@@ -1,33 +1,33 @@
 @props([
-    'steps' => [],
-    'current' => 0,
-    'title' => null,
-    'subtitle' => null,
-    'stepTitle' => null,
-    'stepSubtitle' => null,
-    'level' => 2,
-    'action' => null,
-    'method' => 'post',
-    'enctype' => null,
-    'csrf' => true,
-    'errors' => null,
-    'errorIds' => [],
-    'errorSummary' => true,
-    'errorFocus' => true,
-    'prevLabel' => 'Anterior',
-    'nextLabel' => 'Siguiente',
-    'skipLabel' => 'Omitir este paso',
-    'submitLabel' => 'Enviar solicitud',
-    'prevHref' => null,
-    'skippable' => false,
-    'actionName' => '_accion',
-    'stepName' => '_paso',
-    'navName' => null,
-    'showStepper' => true,
-    'focusStep' => true,
-    'prevAttrs' => [],
-    'nextAttrs' => [],
-    'skipAttrs' => [],
+    'steps' => [], // rótulos de los pasos, o ['label'=>, 'disabled'=>?]
+    'current' => 0, // índice (desde 0) del paso actual
+    'title' => null, // título del trámite completo
+    'subtitle' => null, // bajada bajo el título del trámite
+    'stepTitle' => null, // encabezado del paso; por defecto su rótulo
+    'stepSubtitle' => null, // bajada bajo el encabezado del paso
+    'level' => 2, // nivel del título (2-6); el paso va un nivel abajo
+    'action' => null, // URL del <form>
+    'method' => 'post', // get | post | put | patch | delete (suplanta con _method)
+    'enctype' => null, // enctype del form; multipart si el slot trae un file
+    'csrf' => true, // agrega @csrf si el slot no lo trae
+    'errors' => null, // bolsa de errores; por defecto la compartida $errors
+    'errorIds' => [], // mapa campo => id del input para el resumen de errores
+    'errorSummary' => true, // muestra el error-summary sobre el paso
+    'errorFocus' => true, // el resumen de errores toma el foco
+    'prevLabel' => 'Anterior', // texto del botón Anterior
+    'nextLabel' => 'Siguiente', // texto del botón Siguiente
+    'skipLabel' => 'Omitir este paso', // texto del botón Omitir
+    'submitLabel' => 'Enviar solicitud', // texto del botón del último paso
+    'prevHref' => null, // URL de Anterior como enlace en vez de submit
+    'skippable' => false, // muestra el botón Omitir (salvo en el último paso)
+    'actionName' => '_accion', // name de los botones (anterior|siguiente|omitir|enviar)
+    'stepName' => '_paso', // name del campo oculto con el índice del paso
+    'navName' => null, // name que vuelve navegable el indicador de pasos
+    'showStepper' => true, // muestra el indicador de pasos
+    'focusStep' => true, // mueve el foco al encabezado al cambiar de paso
+    'prevAttrs' => [], // atributos extra del botón Anterior (wire:click…)
+    'nextAttrs' => [], // atributos extra del botón Siguiente (wire:click…)
+    'skipAttrs' => [], // atributos extra del botón Omitir (wire:click…)
 ])
 
 {{-- El trámite largo partido en pasos navegables: la solicitud de credencial de

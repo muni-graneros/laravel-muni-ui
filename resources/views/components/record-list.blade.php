@@ -4,7 +4,7 @@
        («Registros») le mete al lector una palabra que no está en la pantalla.
        Si el consumidor prefiere apuntar a un título que ya existe, pasa
        `aria-labelledby` y este no se emite. */
-    'label' => null,
+    'label' => null, // nombre accesible de la lista (opcional)
 ])
 
 @php

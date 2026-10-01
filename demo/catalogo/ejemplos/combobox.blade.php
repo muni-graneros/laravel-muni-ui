@@ -1,0 +1,1 @@
+<x-muni::combobox name="ejemplo_titular" label="Titular de la solicitud" selectedLabel="Ana Soto Miranda" value="4821" hint="Escribe el RUT o el nombre; se muestran hasta 20 resultados." :options="[['value' => '4821', 'label' => 'Ana Soto Miranda', 'hint' => '12.345.678-9']]" />

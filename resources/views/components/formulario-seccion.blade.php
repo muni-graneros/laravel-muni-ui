@@ -1,7 +1,7 @@
 @props([
-    'legend' => null,
-    'description' => null,
-    'columns' => 2,
+    'legend' => null, // leyenda del <fieldset>; sin ella no hay fieldset
+    'description' => null, // texto explicativo bajo la leyenda
+    'columns' => 2, // 1 | 2 columnas en escritorio
 ])
 
 {{-- Una sección de `<x-muni::formulario-tramite>`: un grupo de campos con su rótulo

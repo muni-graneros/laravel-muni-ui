@@ -1,8 +1,8 @@
 @props([
-    'name' => '',
-    'src' => null,
-    'size' => 'md',
-    'tone' => 'accent',
+    'name' => '', // nombre completo; se muestran las iniciales
+    'src' => null, // URL de la foto (reemplaza las iniciales)
+    'size' => 'md', // sm | md | lg
+    'tone' => 'accent', // accent | neutral
 ])
 
 @php

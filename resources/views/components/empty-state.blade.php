@@ -1,12 +1,12 @@
 @props([
-    'title' => null,
-    'description' => null,
-    'icon' => null,
-    'mode' => null,
-    'filter' => null,
-    'actionHref' => null,
-    'actionLabel' => null,
-    'announce' => false,
+    'title' => null, // título; por defecto según `mode`
+    'description' => null, // texto explicativo bajo el título
+    'icon' => null, // SVG crudo; por defecto según `mode`
+    'mode' => null, // no-data | no-matches; null = genérico
+    'filter' => null, // texto del filtro aplicado (modo no-matches)
+    'actionHref' => null, // URL de la acción de salida; sin ella no hay botón
+    'actionLabel' => null, // rótulo de la acción; por defecto según `mode`
+    'announce' => false, // emite role=status para anunciar el vacío
 ])
 
 {{-- Dos vacíos que para el funcionario son opuestos:

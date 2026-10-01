@@ -3,39 +3,39 @@
        de cada panel, de cada formulario de sesión y de cada diálogo. NUNCA sale de
        uniqid() (DESIGN §10): se saneá el del consumidor o se deriva de las
        etiquetas, que son estables entre renders. */
-    'id' => null,
-    'label' => 'Secciones de mi cuenta',
-    'default' => 0,
+    'id' => null, // base de los id de pestañas, paneles y diálogos
+    'label' => 'Secciones de mi cuenta', // nombre accesible del grupo de pestañas
+    'default' => 0, // índice de la pestaña abierta al cargar
     /* Los rótulos de las cuatro secciones. Cada una aparece SOLO si tiene
        contenido: una pestaña vacía es una parada de teclado que no lleva a nada. */
-    'perfilLabel' => 'Perfil',
-    'seguridadLabel' => 'Seguridad',
-    'preferenciasLabel' => 'Preferencias',
-    'peligroLabel' => 'Zona de peligro',
+    'perfilLabel' => 'Perfil', // rótulo de la pestaña Perfil
+    'seguridadLabel' => 'Seguridad', // rótulo de la pestaña Seguridad
+    'preferenciasLabel' => 'Preferencias', // rótulo de la pestaña Preferencias
+    'peligroLabel' => 'Zona de peligro', // rótulo de la pestaña Zona de peligro
     /* Las sesiones abiertas, YA REDACTADAS por el anfitrión: ['id','device',
        'detail','current']. `detail` es la línea que ve el funcionario («Rancagua ·
        hace 2 horas»), no el registro de sesión. */
-    'sessions' => [],
-    'sessionsAction' => null,
-    'sessionsTitle' => 'Sesiones activas',
-    'sessionsDescription' => 'Los dispositivos donde tu cuenta está abierta ahora.',
-    'sessionsEmpty' => 'No hay otras sesiones abiertas.',
-    'currentLabel' => 'Este equipo',
-    'closeLabel' => 'Cerrar sesión',
-    'closeExplanation' => 'El dispositivo tendrá que volver a ingresar. La sesión queda invalidada en el servidor.',
+    'sessions' => [], // [['id','device','detail','current']] ya redactadas
+    'sessionsAction' => null, // URL POST para cerrar una sesión; sin ella no hay botón
+    'sessionsTitle' => 'Sesiones activas', // título de la tarjeta de sesiones
+    'sessionsDescription' => 'Los dispositivos donde tu cuenta está abierta ahora.', // bajada de la tarjeta de sesiones
+    'sessionsEmpty' => 'No hay otras sesiones abiertas.', // texto cuando no hay otras sesiones
+    'currentLabel' => 'Este equipo', // marca de la sesión actual
+    'closeLabel' => 'Cerrar sesión', // texto del botón que cierra una sesión
+    'closeExplanation' => 'El dispositivo tendrá que volver a ingresar. La sesión queda invalidada en el servidor.', // explicación en el diálogo de confirmación
     /* La zona de peligro. Sale SOLO con las dos: la acción y la palabra que hay
        que escribir. Una acción destructiva sin puerta no la pone el paquete. */
-    'dangerAction' => null,
-    'dangerWord' => null,
-    'dangerTitle' => 'Zona de peligro',
-    'dangerDescription' => null,
-    'dangerLabel' => 'Eliminar mi cuenta',
-    'dangerName' => 'confirmacion',
-    'dangerMethod' => 'post',
+    'dangerAction' => null, // URL de la acción destructiva; exige dangerWord
+    'dangerWord' => null, // palabra que hay que escribir para confirmar
+    'dangerTitle' => 'Zona de peligro', // título de la tarjeta de zona de peligro
+    'dangerDescription' => null, // bajada de la tarjeta de zona de peligro
+    'dangerLabel' => 'Eliminar mi cuenta', // texto del botón destructivo
+    'dangerName' => 'confirmacion', // name del campo de confirmación
+    'dangerMethod' => 'post', // post | put | patch | delete (nunca GET)
     /* La pista bajo el campo. Por defecto NO promete mayúsculas: la palabra la pone
        el anfitrión y con `danger-word="Eliminar"` una pista que dijera «en
        mayúsculas» sería mentira, y una pista que miente es peor que ninguna. */
-    'dangerHint' => null,
+    'dangerHint' => null, // pista bajo el campo; por defecto nombra la palabra
 ])
 
 {{-- La pantalla de «Mi cuenta»: perfil, seguridad, preferencias y zona de peligro,

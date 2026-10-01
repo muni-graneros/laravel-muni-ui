@@ -1,0 +1,16 @@
+{
+    "name": "muni-graneros/prueba-livewire3",
+    "description": "Prueba de los componentes con Livewire 3 (lo que usa personas-graneros). No es parte del paquete: CI instala esto, copia workbench/ y corre demo/catalogo/livewire.mjs.",
+    "require": {
+        "php": "^8.3",
+        "livewire/livewire": "^3.6",
+        "orchestra/testbench": "^10.0",
+        "muni-graneros/laravel-muni-ui": "*"
+    },
+    "repositories": [
+        { "type": "path", "url": "../..", "options": { "symlink": true } }
+    ],
+    "autoload": { "psr-4": { "Workbench\\App\\": "workbench/app/" } },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

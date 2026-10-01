@@ -1,5 +1,5 @@
 @props([
-    'index',
+    'index', // posición de la pestaña que muestra (desde 0)
 ])
 
 {{-- El grupo se lee del padre con @aware. Blade solo expone al hijo los datos que el
@@ -9,12 +9,21 @@
 @aware([
     'tabs' => [],
     'id' => null,
+    'default' => 0,
 ])
 
 @php
     // Debe quedar idéntica a la línea equivalente de tabs.blade.php.
     $grupoId = $id ?: 'muni-tabs-'.substr(sha1(json_encode(array_values((array) $tabs), JSON_UNESCAPED_UNICODE) ?: ''), 0, 8);
     $posicion = (int) $index;
+
+    /*
+     * El panel por defecto nace SIN x-cloak: sin JS (o hasta que Alpine hidrate) se
+     * ve su contenido en vez de un grupo de pestañas vacío. Misma resolución de
+     * `default` que en tabs.blade.php (posición o clave de texto).
+     */
+    $claveDefecto = array_search($default, array_keys((array) $tabs), true);
+    $activo = is_string($default) && $claveDefecto !== false ? (int) $claveDefecto : (int) $default;
 
     /*
      * El APG pide tabindex="0" en el tabpanel SOLO cuando no contiene ningún elemento
@@ -50,7 +59,7 @@
 <div
     role="tabpanel"
     x-show="active === {{ $posicion }}"
-    x-cloak
+    @if ($posicion !== $activo) x-cloak @endif
     x-transition:enter="muni-fade" x-transition:enter-start="muni-fade-0" x-transition:enter-end="muni-fade-1"
     {{ $attributes->merge($atributosPanel) }}
 >

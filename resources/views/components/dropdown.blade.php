@@ -1,6 +1,6 @@
 @props([
-    'align' => 'end',
-    'width' => '220px',
+    'align' => 'end', // end | start: borde al que se alinea el menú
+    'width' => '220px', // ancho del menú (CSS)
     /*
      * Nombre accesible del disparador cuando el slot `trigger` no trae texto
      * propio. Un <button> vacío es «button-name» en axe, impacto critical.

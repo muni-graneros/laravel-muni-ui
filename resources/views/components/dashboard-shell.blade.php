@@ -1,10 +1,10 @@
 @props([
-    'theme' => null,
-    'title' => null,
-    'system' => 'Panel',
-    'subtitle' => null,
-    'status' => 'online',
-    'user' => null,
+    'theme' => null, // light | dark; null sigue al sistema operativo
+    'title' => null, // <title> de la pestaña; por defecto el nombre del sistema
+    'system' => 'Panel', // nombre del sistema en la barra superior
+    'subtitle' => null, // línea secundaria bajo el nombre
+    'status' => 'online', // online | degraded | offline
+    'user' => null, // nombre del usuario para el avatar; null lo oculta
 ])
 
 {{-- `theme` sin valor = seguir al sistema operativo; la <meta name="color-scheme">
@@ -25,6 +25,8 @@
         *,*::before,*::after{ box-sizing:border-box; }
         body{ margin:0; min-height:100vh; background:var(--muni-bg); color:var(--muni-text); font-family:var(--muni-font-sans); display:flex; }
         .muni-ds__col{ flex:1; min-width:0; display:flex; flex-direction:column; }
+        .muni-ds__franja{ position:absolute; top:0; left:0; right:0; }
+        body:has(.muni-gob-bar) .muni-ds__franja{ display:none; }
         .muni-ds__top{ position:sticky; top:0; z-index:40; height:var(--muni-topbar-h); display:flex; align-items:center; gap:12px; padding:0 18px; background:var(--muni-surface); border-bottom:1px solid var(--muni-border); }
         /* 44x44 reales: es el objetivo táctil del inspector con tablet en terreno,
            no el mínimo de 24x24 de escritorio. El icono va centrado, no estirado. */
@@ -121,6 +123,9 @@
                     aria-hidden="true"
                 ></div>
             </template>
+            {{-- Franja institucional en el borde superior de la cabecera (sticky, viaja con
+                 ella). Si la página ya trae gob-bar, que tiene la suya, se oculta. --}}
+            <x-muni::gob-stripe class="muni-ds__franja" />
         </header>
 
         {{-- `tabindex="-1"`: sin él el salto mueve el scroll pero no el punto de lectura. --}}

@@ -1,7 +1,7 @@
 @props([
-    'title',
-    'subtitle' => null,
-    'eyebrow' => null,
+    'title', // título de la página (h1)
+    'subtitle' => null, // texto bajo el título
+    'eyebrow' => null, // rótulo chico sobre el título
 ])
 
 {{-- CABECERA DE PÁGINA — el único `<h1>` de la pantalla, con la ruta encima y las acciones a la derecha.

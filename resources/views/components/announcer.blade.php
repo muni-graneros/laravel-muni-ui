@@ -1,7 +1,7 @@
 @props([
-    'message' => null,
-    'assertive' => false,
-    'clearAfter' => 5000,
+    'message' => null, // mensaje a anunciar tras la carga completa (sin Livewire)
+    'assertive' => false, // true: message sale por la región asertiva
+    'clearAfter' => 5000, // ms hasta vaciar la región; 0 no la vacía
 ])
 
 {{-- La región viva COMPARTIDA de la página (WCAG 2.2 AA 4.1.3, Mensajes de estado).

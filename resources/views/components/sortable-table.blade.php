@@ -1,9 +1,9 @@
 @props([
-    'columns' => [],
-    'rows' => [],
-    'empty' => 'Sin resultados.',
-    'searchable' => false,
-    'caption' => null,
+    'columns' => [], // [['key'=>, 'label'=>, 'align'=>?, 'mono'=>?, 'sortable'=>?], …]
+    'rows' => [], // filas: arreglos indexados por la key de cada columna
+    'empty' => 'Sin resultados.', // texto cuando no hay filas
+    'searchable' => false, // agrega el campo de búsqueda sobre la tabla
+    'caption' => null, // título de la tabla (solo lector de pantalla)
     /*
      * Selección en lote. Aditivo: sin `selectable` la tabla emite exactamente lo
      * mismo que antes, sin columna extra ni casillas.
@@ -22,7 +22,7 @@
      * destructiva es un incidente, así que 'filter' EXIGE el conteo del servidor.
      */
     'selectionScope' => 'page',
-    'selectionTotal' => null,
+    'selectionTotal' => null, // conteo del servidor; obligatorio con scope 'filter'
     /*
      * Si se declara, la barra emite un <input type="hidden"> por fila marcada con
      * ese `name`, para que un formulario POST del anfitrión —con su CSRF— reciba
@@ -319,6 +319,16 @@
                 <caption class="muni-sr">{{ $caption }}</caption>
             @endisset
             <thead>
+                {{-- Cabecera y filas pintadas también en el SERVIDOR: sin JS la tabla se
+                     lee igual (sin orden ni búsqueda). Al arrancar Alpine se QUITAN del
+                     DOM (no solo se ocultan: quien busque la primera fila tiene que dar
+                     con la ordenable) y manda la versión de abajo. --}}
+                <tr x-init="$el.remove()">
+                    @if ($selectable)<th scope="col" class="muni-st__pick"></th>@endif
+                    @foreach ($columns as $c)
+                        <th scope="col" style="text-align:{{ $c['align'] ?? 'left' }};">{{ $c['label'] ?? '' }}</th>
+                    @endforeach
+                </tr>
                 <tr>
                     @if ($selectable)
                         {{-- Casilla NATIVA, visible, estilada con accent-color: el patrón
@@ -367,6 +377,17 @@
                 </tr>
             </thead>
             <tbody>
+                @forelse ($rows as $row)
+                    <tr x-init="$el.remove()" @class(['muni-st__danger' => ($row['_tone'] ?? null) === 'danger'])>
+                        @if ($selectable)<td class="muni-st__pick"></td>@endif
+                        @foreach ($columns as $c)
+                            @php $muniStDato = $row[$c['key'] ?? ''] ?? ''; @endphp
+                            <td @class(['muni-st__first' => $loop->first]) style="text-align:{{ $c['align'] ?? 'left' }};{{ ! empty($c['mono']) ? 'font-family:var(--muni-font-mono);font-variant-numeric:tabular-nums;' : '' }}">{{ is_scalar($muniStDato) || $muniStDato instanceof \Stringable ? $muniStDato : '' }}</td>
+                        @endforeach
+                    </tr>
+                @empty
+                    <tr x-init="$el.remove()"><td colspan="{{ max(1, count($columns)) + ($selectable ? 1 : 0) }}" style="text-align:center;padding:28px;color:var(--muni-muted);">{{ $empty }}</td></tr>
+                @endforelse
                 <template x-for="(row,ri) in view" :key="ri">
                     <tr :class="row._tone==='danger' && 'muni-st__danger'">
                         @if ($selectable)

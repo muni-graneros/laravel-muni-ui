@@ -1,0 +1,1 @@
+<x-muni::pantalla-bloqueo modo="pagina" :autofoco="false" nombre="María Fernanda Soto" cargo="Atención al Vecino · Mesón 2" accion="#desbloquear" otro-url="#salir" error="La contraseña no coincide. Vuelve a intentarlo." />

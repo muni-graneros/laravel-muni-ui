@@ -2,16 +2,16 @@
     /* El ÁRBOL, ya filtrado por el anfitrión. Obligatorio: sin datos no hay menú
        y un <nav> vacío es ruido para el lector de pantalla. Forma de cada nodo en
        el comentario de abajo. */
-    'items',
+    'items', // árbol de nodos ya filtrado por el anfitrión
     /* La CLAVE de la página que se está mirando, resuelta por el anfitrión
        (`request()->route()->getName()`, `request()->path()`, lo que el sistema
        use). El paquete nunca la calcula. */
-    'actual' => null,
-    'label' => 'Navegación principal',
+    'actual' => null, // clave de la página actual, resuelta por el anfitrión
+    'label' => 'Navegación principal', // nombre accesible del <nav>
     /* Uso interno de la recursión: el nivel y el prefijo de ids. Un consumidor no
        los pasa nunca. */
-    'nivel' => 0,
-    'prefijo' => null,
+    'nivel' => 0, // uso interno: profundidad de la recursión
+    'prefijo' => null, // uso interno: prefijo de ids de la recursión
 ])
 
 @php

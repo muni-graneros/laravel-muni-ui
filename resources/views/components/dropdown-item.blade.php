@@ -1,7 +1,7 @@
 @props([
-    'href' => null,
-    'icon' => null,
-    'tone' => 'default',
+    'href' => null, // con URL es un <a>; sin ella, un <button>
+    'icon' => null, // SVG crudo decorativo (nunca datos de usuario)
+    'tone' => 'default', // default | danger
 ])
 
 @php

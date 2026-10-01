@@ -2,7 +2,7 @@
   "$schema": "https://muni-graneros.github.io/laravel-muni-ui/registry.schema.json",
   "name": "laravel-muni-ui",
   "homepage": "https://github.com/muni-graneros/laravel-muni-ui",
-  "baseVersion": "0.18.0",
+  "baseVersion": "0.19.0",
   "namespace": "muni",
   "usage": "Los componentes se usan como <x-muni::NOMBRE>. No requieren registro manual: el service provider del paquete declara el namespace.",
   "rules": [
@@ -15,11 +15,52 @@
   ],
   "components": [
     {
+      "name": "accordion-item",
+      "tag": "<x-muni::accordion-item>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/accordion-item.blade.php",
+      "description": "Panel de acordeón para usar en el slot del accordion padre, en lugar de `items`",
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "default": "",
+          "required": false
+        },
+        {
+          "name": "open",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        }
+      ],
+      "slots": [
+        {
+          "name": "default",
+          "description": "Contenido principal"
+        }
+      ],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-cloak",
+          "x-data",
+          "x-id",
+          "x-init",
+          "x-show",
+          "x-transition"
+        ],
+        "plugins": []
+      },
+      "tokens": [],
+      "example": "<x-muni::accordion-item></x-muni::accordion-item>"
+    },
+    {
       "name": "accordion",
       "tag": "<x-muni::accordion>",
       "type": "registry:blade-component",
       "file": "resources/views/components/accordion.blade.php",
-      "description": "Componente accordion del sistema de diseño municipal",
+      "description": "`_n` numera los accordion-item del slot al iniciar:",
       "props": [
         {
           "name": "items",
@@ -51,6 +92,7 @@
         "directives": [
           "x-cloak",
           "x-data",
+          "x-id",
           "x-muni",
           "x-show",
           "x-transition"
@@ -93,12 +135,6 @@
           "required": false
         },
         {
-          "name": "franjas",
-          "type": "array",
-          "default": "[]",
-          "required": false
-        },
-        {
           "name": "dias",
           "type": "array",
           "default": "[]",
@@ -106,12 +142,6 @@
         },
         {
           "name": "value",
-          "type": "mixed",
-          "default": "null",
-          "required": false
-        },
-        {
-          "name": "franja",
           "type": "mixed",
           "default": "null",
           "required": false
@@ -222,12 +252,6 @@
           "name": "id",
           "type": "mixed",
           "default": "null",
-          "required": false
-        },
-        {
-          "name": "label",
-          "type": "string",
-          "default": "Secciones de mi cuenta",
           "required": false
         },
         {
@@ -408,7 +432,7 @@
         "--muni-ring",
         "--muni-text"
       ],
-      "example": "<x-muni::ajustes-cuenta label=\"Secciones de mi cuenta\"></x-muni::ajustes-cuenta>"
+      "example": "<x-muni::ajustes-cuenta></x-muni::ajustes-cuenta>"
     },
     {
       "name": "alert",
@@ -604,12 +628,6 @@
           "name": "steps",
           "type": "array",
           "default": "[]",
-          "required": false
-        },
-        {
-          "name": "current",
-          "type": "int",
-          "default": "0",
           "required": false
         },
         {
@@ -1259,12 +1277,6 @@
           "type": "mixed",
           "default": "null",
           "required": false
-        },
-        {
-          "name": "value",
-          "type": "mixed",
-          "default": "null",
-          "required": false
         }
       ],
       "slots": [],
@@ -1363,7 +1375,7 @@
       "tag": "<x-muni::chart-bar>",
       "type": "registry:blade-component",
       "file": "resources/views/components/chart-bar.blade.php",
-      "description": "Componente chart-bar del sistema de diseño municipal",
+      "description": "El style va DENTRO de merge():",
       "props": [
         {
           "name": "data",
@@ -1390,7 +1402,12 @@
           "required": false
         }
       ],
-      "slots": [],
+      "slots": [
+        {
+          "name": "data",
+          "description": "Slot con nombre opcional"
+        }
+      ],
       "alpine": {
         "required": false,
         "directives": [],
@@ -1628,7 +1645,8 @@
         "required": true,
         "directives": [
           "x-data",
-          "x-model"
+          "x-model",
+          "x-muni"
         ],
         "plugins": []
       },
@@ -1851,6 +1869,7 @@
           "x-cloak",
           "x-data",
           "x-for",
+          "x-id",
           "x-if",
           "x-model",
           "x-ref",
@@ -1866,6 +1885,7 @@
       },
       "tokens": [
         "--muni-accent",
+        "--muni-accent-soft",
         "--muni-border",
         "--muni-border-2",
         "--muni-dur",
@@ -2058,6 +2078,30 @@
           "name": "selectionLabel",
           "type": "string",
           "default": "Seleccionar todas las filas de esta página",
+          "required": false
+        },
+        {
+          "name": "sort",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "direction",
+          "type": "string",
+          "default": "asc",
+          "required": false
+        },
+        {
+          "name": "sortUrl",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "wireSort",
+          "type": "mixed",
+          "default": "null",
           "required": false
         }
       ],
@@ -2542,12 +2586,6 @@
           "required": false
         },
         {
-          "name": "icon",
-          "type": "mixed",
-          "default": "null",
-          "required": false
-        },
-        {
           "name": "tone",
           "type": "string",
           "default": "default",
@@ -2579,7 +2617,7 @@
         "--muni-surface-2",
         "--muni-text"
       ],
-      "example": "<x-muni::dropdown-item></x-muni::dropdown-item>"
+      "example": "<x-muni::dropdown-item tone=\"default\"></x-muni::dropdown-item>"
     },
     {
       "name": "dropdown",
@@ -2856,12 +2894,6 @@
           "required": false
         },
         {
-          "name": "level",
-          "type": "int",
-          "default": "2",
-          "required": false
-        },
-        {
           "name": "focus",
           "type": "bool",
           "default": "true",
@@ -2953,12 +2985,6 @@
           "required": false
         },
         {
-          "name": "label",
-          "type": "string",
-          "default": "Arrastra un archivo o haz clic para subir",
-          "required": false
-        },
-        {
           "name": "hint",
           "type": "string",
           "default": "PDF o imagen, hasta 10 MB",
@@ -2983,6 +3009,7 @@
         "directives": [
           "x-data",
           "x-for",
+          "x-model",
           "x-ref",
           "x-show",
           "x-text"
@@ -3496,12 +3523,6 @@
           "required": false
         },
         {
-          "name": "folioLabel",
-          "type": "string",
-          "default": "Folio",
-          "required": false
-        },
-        {
           "name": "date",
           "type": "mixed",
           "default": "null",
@@ -3788,18 +3809,6 @@
           "required": true
         },
         {
-          "name": "label",
-          "type": "mixed",
-          "default": null,
-          "required": true
-        },
-        {
-          "name": "tone",
-          "type": "string",
-          "default": "neutral",
-          "required": false
-        },
-        {
           "name": "hint",
           "type": "mixed",
           "default": "null",
@@ -3827,7 +3836,7 @@
         "--muni-text",
         "--muni-warn-fg"
       ],
-      "example": "<x-muni::kpi :value=\"$value\" :label=\"$label\" />"
+      "example": "<x-muni::kpi :value=\"$value\" />"
     },
     {
       "name": "modal",
@@ -3945,18 +3954,6 @@
           "type": "mixed",
           "default": null,
           "required": true
-        },
-        {
-          "name": "abierto",
-          "type": "bool",
-          "default": "false",
-          "required": false
-        },
-        {
-          "name": "icono",
-          "type": "mixed",
-          "default": "null",
-          "required": false
         }
       ],
       "slots": [
@@ -4067,12 +4064,6 @@
           "required": false
         },
         {
-          "name": "label",
-          "type": "string",
-          "default": "Navegación principal",
-          "required": false
-        },
-        {
           "name": "nivel",
           "type": "int",
           "default": "0",
@@ -4162,15 +4153,16 @@
         "directives": [
           "x-data",
           "x-model",
+          "x-modelable",
           "x-ref"
         ],
         "plugins": []
       },
       "tokens": [
         "--muni-accent",
-        "--muni-border",
         "--muni-dur",
         "--muni-ease",
+        "--muni-field-border",
         "--muni-focus",
         "--muni-font-mono",
         "--muni-radius-sm",
@@ -4306,21 +4298,9 @@
           "required": true
         },
         {
-          "name": "cargo",
-          "type": "mixed",
-          "default": "null",
-          "required": false
-        },
-        {
           "name": "avatar",
           "type": "mixed",
           "default": "null",
-          "required": false
-        },
-        {
-          "name": "modo",
-          "type": "string",
-          "default": "capa",
           "required": false
         },
         {
@@ -4468,12 +4448,6 @@
           "name": "folio",
           "type": "mixed",
           "default": "null",
-          "required": false
-        },
-        {
-          "name": "folioLabel",
-          "type": "string",
-          "default": "Folio",
           "required": false
         },
         {
@@ -4655,12 +4629,6 @@
           "required": true
         },
         {
-          "name": "armazon",
-          "type": "string",
-          "default": "dashboard",
-          "required": false
-        },
-        {
           "name": "system",
           "type": "string",
           "default": "Municipalidad de Graneros",
@@ -4783,7 +4751,7 @@
         "--muni-text",
         "--muni-topbar-h"
       ],
-      "example": "<x-muni::plantilla-pantalla :title=\"$title\" armazon=\"dashboard\"></x-muni::plantilla-pantalla>"
+      "example": "<x-muni::plantilla-pantalla :title=\"$title\" system=\"Municipalidad de Graneros\"></x-muni::plantilla-pantalla>"
     },
     {
       "name": "popover",
@@ -4931,11 +4899,93 @@
       "example": "<x-muni::progress />"
     },
     {
+      "name": "radio-group",
+      "tag": "<x-muni::radio-group>",
+      "type": "registry:blade-component",
+      "file": "resources/views/components/radio-group.blade.php",
+      "description": "Fieldset y legend nativos, sin rol encima:",
+      "props": [
+        {
+          "name": "name",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "options",
+          "type": "array",
+          "default": "[]",
+          "required": false
+        },
+        {
+          "name": "hint",
+          "type": "mixed",
+          "default": "null",
+          "required": false
+        },
+        {
+          "name": "inline",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "required",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        },
+        {
+          "name": "requiredText",
+          "type": "string",
+          "default": "obligatorio",
+          "required": false
+        },
+        {
+          "name": "requiredTextVisible",
+          "type": "bool",
+          "default": "false",
+          "required": false
+        }
+      ],
+      "slots": [],
+      "alpine": {
+        "required": true,
+        "directives": [
+          "x-model"
+        ],
+        "plugins": []
+      },
+      "tokens": [
+        "--muni-accent",
+        "--muni-danger-bg",
+        "--muni-danger-fg",
+        "--muni-dur",
+        "--muni-ease",
+        "--muni-field-border",
+        "--muni-field-border-error",
+        "--muni-focus",
+        "--muni-font-sans",
+        "--muni-muted",
+        "--muni-radius-sm",
+        "--muni-ring",
+        "--muni-surface",
+        "--muni-text"
+      ],
+      "example": "<x-muni::radio-group />"
+    },
+    {
       "name": "rating",
       "tag": "<x-muni::rating>",
       "type": "registry:blade-component",
       "file": "resources/views/components/rating.blade.php",
-      "description": "Componente rating del sistema de diseño municipal",
+      "description": "Solo lectura:",
       "props": [
         {
           "name": "value",
@@ -4972,7 +5022,9 @@
       "alpine": {
         "required": true,
         "directives": [
-          "x-data"
+          "x-data",
+          "x-model",
+          "x-modelable"
         ],
         "plugins": []
       },
@@ -4983,6 +5035,7 @@
         "--muni-ease",
         "--muni-focus",
         "--muni-glow",
+        "--muni-hint",
         "--muni-ok-fg",
         "--muni-ring",
         "--muni-warn-fg"
@@ -5018,18 +5071,6 @@
           "name": "folio",
           "type": "mixed",
           "default": "null",
-          "required": false
-        },
-        {
-          "name": "folioLabel",
-          "type": "string",
-          "default": "Folio",
-          "required": false
-        },
-        {
-          "name": "navegar",
-          "type": "bool",
-          "default": "false",
           "required": false
         }
       ],
@@ -5306,6 +5347,12 @@
           "type": "string",
           "default": "Aplicar",
           "required": false
+        },
+        {
+          "name": "autosubmit",
+          "type": "bool",
+          "default": "true",
+          "required": false
         }
       ],
       "slots": [
@@ -5318,6 +5365,7 @@
         "required": true,
         "directives": [
           "x-data",
+          "x-model",
           "x-on",
           "x-show"
         ],
@@ -5561,12 +5609,6 @@
         },
         {
           "name": "ahora",
-          "type": "mixed",
-          "default": "null",
-          "required": false
-        },
-        {
-          "name": "duracion",
           "type": "mixed",
           "default": "null",
           "required": false
@@ -5847,6 +5889,7 @@
           "x-effect",
           "x-for",
           "x-if",
+          "x-init",
           "x-model",
           "x-show",
           "x-text"
@@ -6047,7 +6090,7 @@
       "tag": "<x-muni::switch>",
       "type": "registry:blade-component",
       "file": "resources/views/components/switch.blade.php",
-      "description": "El mensaje va FUERA del <label>:",
+      "description": "Sin x-data ni x-model propios:",
       "props": [
         {
           "name": "label",
@@ -6425,7 +6468,9 @@
         "required": true,
         "directives": [
           "x-data",
+          "x-effect",
           "x-init",
+          "x-model",
           "x-on",
           "x-ref",
           "x-text"
@@ -6521,6 +6566,7 @@
           "x-if",
           "x-muni",
           "x-ref",
+          "x-show",
           "x-text",
           "x-transition"
         ],
@@ -6645,6 +6691,12 @@
           "name": "logo",
           "type": "mixed",
           "default": "null",
+          "required": false
+        },
+        {
+          "name": "franja",
+          "type": "bool",
+          "default": "true",
           "required": false
         }
       ],

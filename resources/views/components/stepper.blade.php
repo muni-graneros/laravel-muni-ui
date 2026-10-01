@@ -1,9 +1,9 @@
 @props([
-    'steps' => [],
-    'current' => 0,
-    'orientation' => 'horizontal',
-    'navName' => null,
-    'label' => null,
+    'steps' => [], // strings o ['label'=>, 'hint'=>?, 'state'=>?, 'href'=>?]
+    'current' => 0, // índice del paso actual (desde 0)
+    'orientation' => 'horizontal', // horizontal | vertical
+    'navName' => null, // name de los botones; con él los pasos son navegables
+    'label' => null, // nombre accesible de la lista de pasos
 ])
 
 {{-- El indicador de pasos de un trámite. Nació como ilustración —una lista y nada

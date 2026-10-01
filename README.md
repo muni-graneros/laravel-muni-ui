@@ -364,6 +364,21 @@ los dos temas. Vive en `workbench/` y no la exponen los sistemas: el service pro
 rutas y `workbench/` no viaja en el paquete. Los datos de ejemplo están en
 `workbench/ejemplos.php`, siempre ficticios.
 
+## Catálogo de componentes (`demo/catalogo.html`)
+
+Un solo HTML autocontenido con **los 90 componentes**: ejemplo renderizado con Blade real, el
+código para copiar, la tabla de props y slots (sale de los comentarios de cada `@props`), claro y
+oscuro, y seis recetas de pantalla completa. Se abre sin servidor. Se regenera, no se edita:
+
+```bash
+cd demo/catalogo && npm ci && npm run construir   # escribe demo/catalogo.html
+npm run verificar                                 # JS, móvil, axe y pruebas de interacción
+```
+
+Los ejemplos viven en `demo/catalogo/ejemplos/<componente>.blade.php`. `CatalogoTest` los
+renderiza todos y exige que cada prop tenga descripción; CI falla si el HTML publicado quedó atrás.
+`npm run livewire` corre la prueba de punta a punta contra `vendor/bin/testbench serve --port=8765`.
+
 ## Demos (`demo/`)
 
 Todas self-contained (Alpine inline, sin CDN). **Son maquetas, no la fuente de los tokens:** la

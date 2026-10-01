@@ -260,6 +260,10 @@
    selector anterior, `.fi-topbar > nav`, no alcanzaba a nada y la barra quedaba
    en el blanco/gray-900 de Filament sobre un panel que no es gris. */
 .fi-topbar { background:color-mix(in srgb,#fff 82%, var(--mg-papel)) !important; backdrop-filter:saturate(1.2) blur(6px); border-bottom:1px solid var(--mg-borde); box-shadow:0 4px 20px -12px rgba(13,58,68,.25); }
+/* Franja institucional de siete colores en el borde superior del panel: la misma
+   del login (.fi-simple-layout) y de <x-muni::gob-stripe>, en claro y en oscuro.
+   `.fi-topbar` es sticky, así que es el bloque contenedor y la franja viaja con ella. */
+.fi-topbar::before{ content:""; position:absolute; top:0; left:0; right:0; height:4px; z-index:1; pointer-events:none; background:linear-gradient(90deg,var(--mg-lima) 0 14.28%,var(--mg-petroleo) 14.28% 28.57%,var(--mg-oro) 28.57% 42.85%,var(--mg-naranja) 42.85% 57.14%,var(--mg-celeste) 57.14% 71.42%,var(--mg-carmin) 71.42% 85.71%,#9c9b9b 85.71% 100%); }
 .fi-topbar .fi-input-wrp, .fi-global-search-field .fi-input-wrp { border-radius:11px; border:1px solid var(--mg-borde); box-shadow:inset 0 1px 2px rgba(13,58,68,.05); }
 .fi-global-search-field .fi-input-wrp:focus-within { border-color:var(--mg-petroleo); box-shadow:0 0 0 3px color-mix(in srgb,var(--mg-petroleo) 18%,transparent); }
 .fi-topbar .fi-avatar { box-shadow:0 0 0 2px #fff,0 0 0 3px color-mix(in srgb,var(--mg-petroleo) 55%,transparent); }

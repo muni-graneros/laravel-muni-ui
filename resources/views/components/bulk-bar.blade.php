@@ -15,11 +15,11 @@
      * del número.
      */
     'countSingular' => '1 fila seleccionada',
-    'countPlural' => ':n filas seleccionadas',
-    'clearLabel' => 'Quitar selección',
+    'countPlural' => ':n filas seleccionadas', // texto de la cuenta en plural; :n es el número
+    'clearLabel' => 'Quitar selección', // texto del botón que quita la selección
     /* Lo que se anuncia al quedarse sin nada marcado: sin esto, vaciar la selección
        es silencio absoluto para quien no ve la barra desaparecer. */
-    'emptyAnnounce' => 'Sin filas seleccionadas.',
+    'emptyAnnounce' => 'Sin filas seleccionadas.', // anuncio al quedar sin filas marcadas
 ])
 
 {{-- BARRA DE ACCIONES EN LOTE.

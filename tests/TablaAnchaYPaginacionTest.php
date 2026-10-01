@@ -62,20 +62,6 @@ function cssPaginador(): string
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $bloques[1] ?? []));
 }
 
-/** El cuerpo de la primera regla CSS cuyo selector contiene `$aguja`. */
-function reglaCss(string $css, string $aguja): string
-{
-    preg_match_all('/([^{}]+)\{([^{}]*)\}/', $css, $reglas, PREG_SET_ORDER);
-
-    foreach ($reglas as [, $selector, $cuerpo]) {
-        if (str_contains(preg_replace('/\s+/', ' ', $selector), $aguja)) {
-            return trim($cuerpo);
-        }
-    }
-
-    return '';
-}
-
 /** El z-index declarado en la primera regla cuyo selector contiene `$aguja`. */
 function zIndexDe(string $css, string $aguja): ?int
 {

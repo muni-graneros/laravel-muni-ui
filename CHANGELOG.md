@@ -10,6 +10,22 @@ las etiquetas de git, así que dicen *qué* cambió pero no siempre *qué había
 republicar*. Desde acá en adelante cada versión anota si el sistema que la adopta debe
 volver a publicar artefactos, porque subir el `composer.json` no aplica nada por sí solo.
 
+## [Sin publicar]
+
+### Corregido
+
+- **`<x-muni::data-table>` alargaba la página entera.** El `<caption class="muni-sr">` tiene
+  `position:absolute` y estaba dentro de `.muni-dt__scroll` (`overflow:auto`) sin `position:relative`
+  (hallado en seguridad-graneros). El `position:relative` ya llegó con 0.20.0; aquí queda el
+  candado: `DataTableScrollRelativeTest.php`.
+- **Mismo defecto en `<x-muni::sortable-table>` y `<x-muni::diff-campos>`.** Su contenedor con
+  `overflow` (el `<div>` de la tabla y `.muni-dc__marco`) contiene elementos `muni-sr`/`muni-dc__sr`
+  absolutos y tampoco era `position:relative`. Candado ampliado en `DataTableScrollRelativeTest.php`.
+- **La suite entera reventaba con «Cannot redeclare function reglaCss()».** Dos archivos de prueba la
+  declaraban; ahora vive en `tests/Helpers/ReglasCss.php`.
+- Sin cambio de artefactos publicados: el CSS va dentro de los componentes Blade, no hace falta
+  volver a publicar nada.
+
 ## [0.20.0] — 2026-09-26
 
 El constraint de cada sistema pasa a `^0.20` (en 0.x, `^0.19` no cruza) y **hay que volver a

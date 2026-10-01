@@ -1,0 +1,9 @@
+title = "laravel-muni-ui"
+
+[extend]
+useDefault = true
+
+# Falso positivo: los `wire:key="muni-asis-<hash>-paso-N"` del catálogo generado no son secretos.
+[allowlist]
+description = "catálogo generado"
+paths = ['''demo/catalogo\.html''']

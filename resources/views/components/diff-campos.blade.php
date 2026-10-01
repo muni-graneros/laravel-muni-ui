@@ -234,7 +234,7 @@
            esta página. */
         .muni-dc__sr { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
 
-        .muni-dc__marco { border:1px solid var(--muni-border); border-radius:var(--muni-radius); background:var(--muni-surface); overflow:hidden; }
+        .muni-dc__marco { position:relative; border:1px solid var(--muni-border); border-radius:var(--muni-radius); background:var(--muni-surface); overflow:hidden; }
 
         /* `table-layout:fixed` + `overflow-wrap` es lo que impide que una glosa de
            400 caracteres o una URL sin espacios reviente el ancho de la pantalla:

@@ -122,8 +122,10 @@
     --muni-dur-slow:    600ms;
     --muni-topbar-h:    56px;
     /* Alto de la barra superior de FILAMENT (no la de <x-muni::topbar>, que es
-       --muni-topbar-h). Filament 5 no lo expone en una variable: lo fija con
-       `min-h-16` en topbar.css y la barra lateral repite `top-[4rem]`. Lo usa el
+       --muni-topbar-h). Hasta Filament 5.7.6 va fijo como `min-h-16` en
+       topbar.css (y la barra lateral repite `top-[4rem]`); desde 5.7.8 es
+       `--topbar-height: 4rem`, pero declarada en `.fi-body`, donde `:root` no
+       puede leerla: por eso sigue siendo un valor fijo y no un var(). Lo usa el
        scroll-padding del documento; el candado lo compara con el vendor. */
     --muni-panel-topbar-h: 4rem;
 

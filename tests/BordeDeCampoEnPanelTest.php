@@ -233,10 +233,32 @@ it('el borde normal y el de error llegan a 3:1 en claro y en oscuro sobre todo f
 | 2. Con Shift+Tab el campo enfocado quedaba debajo de la barra superior fija
 |    (`.fi-topbar-ctn` es sticky): sin `scroll-padding-top` el navegador lo
 |    desplaza hasta el borde del viewport, que es justo donde está la barra
-|    (2.4.11 / 2.4.12, foco no oculto).
+|    (2.4.11 / 2.4.12, foco no oculto). Filament pone `scroll-margin-top` solo en
+|    `[data-field-wrapper]` (hasta 5.7.6; en 5.7.8 también en sus descendientes),
+|    así que un control fuera de un campo de formulario de Filament —un wrapper
+|    suelto, un enlace, una acción de tabla— seguía quedando tapado.
 | 3. Con el borde a 3:1, el campo deshabilitado se veía igual de «activo» que
 |    uno normal: mismo borde, cursor por defecto.
 */
+
+/**
+ * El alto de `.fi-topbar` según el topbar.css de Filament, en rem, o null si no
+ * se reconoce: `min-h-16` (≤ 5.7.6, escala de Tailwind: 16 × 0,25rem) o
+ * `min-h-(--topbar-height)` con `--topbar-height: Xrem` (≥ 5.7.8).
+ */
+function bdcAltoDeLaBarraDeFilament(string $topbarCss): ?string
+{
+    if (preg_match('/\.fi-topbar\s*\{[^}]*\bmin-h-(\d+)\b/', $topbarCss, $m) === 1) {
+        return ((int) $m[1] / 4).'rem';
+    }
+
+    if (preg_match('/\.fi-topbar\s*\{[^}]*\bmin-h-\(--topbar-height\)/', $topbarCss) === 1
+        && preg_match('/--topbar-height\s*:\s*([\d.]+rem)\s*;/', $topbarCss, $m) === 1) {
+        return $m[1];
+    }
+
+    return null;
+}
 
 /** El bloque de tokens del papel (dentro de `@media print`). */
 function bdcBloqueImpresion(string $hoja): string
@@ -319,15 +341,17 @@ it('el foco no queda bajo la barra superior fija: scroll-padding-top con el alto
     $hoja = bdcHoja();
     $claro = bloqueTrasAncla(cssMuniUiFilament(), ':root{');
 
-    // Filament 5 no expone variable para el alto de la barra: lo fija con
-    // `min-h-16` en topbar.css (y la barra lateral repite `top-[4rem]`). El token
-    // del tema tiene que valer lo mismo; si Filament lo cambia, esto se pone rojo.
+    // El token del tema tiene que valer lo mismo que el alto real de la barra de
+    // Filament; si Filament lo cambia, esto se pone rojo. Hasta 5.7.6 lo fija con
+    // `min-h-16` en topbar.css (y la barra lateral repite `top-[4rem]`); desde
+    // 5.7.8 es `min-h-(--topbar-height)` con `.fi-body { --topbar-height: 4rem }`.
+    // Esa variable vive en `.fi-body`, no en la raíz, así que `:root` no puede
+    // leerla y el token sigue siendo un valor fijo: se compara con las dos formas.
     $topbar = __DIR__.'/../vendor/filament/filament/resources/css/components/topbar.css';
     if (! is_file($topbar)) {
         $this->markTestSkipped('Sin vendor/filament: no se puede comparar con el alto real de la barra.');
     }
-    expect(preg_match('/\.fi-topbar\s*\{[^}]*\bmin-h-(\d+)\b/', (string) file_get_contents($topbar), $m))->toBe(1);
-    expect(tokenValor($claro, 'panel-topbar-h'))->toBe(((int) $m[1] / 4).'rem');
+    expect(bdcAltoDeLaBarraDeFilament((string) file_get_contents($topbar)))->toBe(tokenValor($claro, 'panel-topbar-h'));
 
     // El que hace scroll en un panel Filament 5 es el documento (`html.fi` lleva
     // `min-h-dvh` y ningún contenedor intermedio tiene overflow vertical). Solo

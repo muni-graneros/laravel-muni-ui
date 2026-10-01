@@ -19,6 +19,13 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
   carecía de `position:relative`. El elemento absoluto escapaba del contexto de apilamiento
   y se rendía fuera del flujo, incrementando la altura total del documento (hallado en
   seguridad-graneros). Tests nuevos: `DataTableScrollRelativeTest.php`.
+- **Mismo defecto en `<x-muni::sortable-table>` y `<x-muni::diff-campos>`.** Su contenedor con
+  `overflow` (el `<div>` de la tabla y `.muni-dc__marco`) contiene elementos `muni-sr`/`muni-dc__sr`
+  absolutos y tampoco era `position:relative`. Candado ampliado en `DataTableScrollRelativeTest.php`.
+- **La suite entera reventaba con «Cannot redeclare function reglaCss()».** Dos archivos de prueba la
+  declaraban; ahora vive en `tests/Helpers/ReglasCss.php`.
+- Sin cambio de artefactos publicados: el CSS va dentro de los componentes Blade, no hace falta
+  volver a publicar nada.
 
 ## [0.19.0] — 2026-09-15
 

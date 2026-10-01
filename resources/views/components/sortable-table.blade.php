@@ -313,7 +313,7 @@
         </div>
     @endif
 
-    <div style="overflow-x:auto;border:1px solid var(--muni-border);border-radius:var(--muni-radius);background:var(--muni-surface);">
+    <div style="position:relative;overflow-x:auto;border:1px solid var(--muni-border);border-radius:var(--muni-radius);background:var(--muni-surface);">
         <table class="{{ $tableClass }}">
             @isset($caption)
                 <caption class="muni-sr">{{ $caption }}</caption>

@@ -217,3 +217,162 @@ it('el borde normal y el de error llegan a 3:1 en claro y en oscuro sobre todo f
 
     expect($fallos)->toBe([], implode(' · ', $fallos));
 });
+
+/*
+|--------------------------------------------------------------------------
+| LO QUE QUEDÓ ALREDEDOR DEL BORDE: CHEVRON, FOCO BAJO LA BARRA, DESHABILITADO
+|--------------------------------------------------------------------------
+|
+| Revisión a11y por píxel del borde a 3:1 (banco estático con el CSS real de
+| Filament 5 y este tema, claro/oscuro, 1440 y 390):
+|
+| 1. El chevron del `<select>` es un SVG en data-URI de Filament con el trazo
+|    #6b7280 FIJO: en oscuro da 2,66:1 sobre el campo en surface-3 y 3,03:1
+|    sobre surface (1.4.11 pide 3:1 para el gráfico que dice «esto se despliega»).
+|    En claro da 4,83:1 y no puede empeorar.
+| 2. Con Shift+Tab el campo enfocado quedaba debajo de la barra superior fija
+|    (`.fi-topbar-ctn` es sticky): sin `scroll-padding-top` el navegador lo
+|    desplaza hasta el borde del viewport, que es justo donde está la barra
+|    (2.4.11 / 2.4.12, foco no oculto).
+| 3. Con el borde a 3:1, el campo deshabilitado se veía igual de «activo» que
+|    uno normal: mismo borde, cursor por defecto.
+*/
+
+/** El bloque de tokens del papel (dentro de `@media print`). */
+function bdcBloqueImpresion(string $hoja): string
+{
+    return bloqueTrasAncla($hoja, 'PALETA CLARA FORZADA');
+}
+
+/** El color del trazo de un chevron en data-URI (`stroke='%23rrggbb'`). */
+function bdcTrazoDelChevron(?string $url): ?string
+{
+    if ($url !== null && preg_match("/^url\(\"data:image\/svg\+xml,.*stroke='%23([0-9a-fA-F]{6})'/", $url, $m)) {
+        return '#'.strtolower($m[1]);
+    }
+
+    return null;
+}
+
+it('el chevron del select sale de un token que sigue el tema y no del gris fijo de Filament', function () {
+    $hoja = bdcHoja();
+    $capa = bdcCapaComponents($hoja);
+
+    // Nativo y el botón del select con buscador (JS). Los dos selectores de
+    // Filament puntúan 0,1,1 y 0,2,0 y viven en su propia `@layer components`:
+    // estos los superan por especificidad, así que ganan aunque esta hoja llegue
+    // antes que la de Filament.
+    foreach (['.fi-input-wrp select.fi-select-input', '.fi-input-wrp .fi-select-input .fi-select-input-btn'] as $selector) {
+        $reglas = array_filter(
+            bdcReglas($capa),
+            fn (array $r) => in_array($selector, array_map('trim', explode(',', $r[0])), true),
+        );
+
+        expect($reglas)->not->toBe([], "Falta «{$selector}» en @layer components.");
+        expect(implode(' ', array_column($reglas, 1)))->toContain('background-image:var(--muni-select-chevron)');
+        expect(implode(' ', array_column($reglas, 1)))->not->toContain('!important');
+    }
+});
+
+it('el chevron del select llega a 3:1 en claro y en oscuro sobre todo fondo del campo, y en claro no empeora', function () {
+    $hoja = cssMuniUiFilament();
+    $claro = bloqueTrasAncla($hoja, ':root{');
+    $oscuro = bloqueTrasAncla($hoja, 'En oscuro mandan los tonos institucionales');
+    $papel = bdcBloqueImpresion($hoja);
+
+    // El SVG de un data-URI no puede leer una variable CSS: el trazo se escribe
+    // con el valor de `--muni-muted` de CADA rama, y este candado los ata.
+    $ramas = [
+        'claro' => [$claro, ['campo (bg-white)' => '#ffffff', 'deshabilitado (gray-50)' => '#fafafa']],
+        'oscuro' => [$oscuro, []],
+        'papel' => [$papel, ['papel' => '#ffffff']],
+    ];
+    foreach (['bg', 'surface', 'surface-2', 'surface-3'] as $n) {
+        $ramas['claro'][1]["--muni-{$n}"] = tokenColor($claro, $hoja, $n);
+        $fondo = tokenHex($oscuro, $n);
+        $ramas['oscuro'][1]["--muni-{$n} (deshabilitado: transparente)"] = $fondo;
+        $ramas['oscuro'][1]["campo (white/5 sobre --muni-{$n})"] = bdcCompuesto('#ffffff', 0.05, $fondo);
+    }
+
+    $fallos = [];
+    foreach ($ramas as $rama => [$bloque, $fondos]) {
+        $trazo = bdcTrazoDelChevron(tokenValor($bloque, 'select-chevron'));
+        expect($trazo)->not->toBeNull("La rama {$rama} no declara --muni-select-chevron como SVG en data-URI con trazo hex.");
+        expect($trazo)->toBe(colorResuelto(tokenValor($bloque, 'muted'), $hoja), "El chevron {$rama} no usa el --muni-muted de su rama.");
+
+        foreach ($fondos as $nombre => $fondo) {
+            $ratio = ratioContraste($trazo, $fondo);
+            if ($ratio < 3.0) {
+                $fallos[] = sprintf('%s %s sobre %s %s = %.2f:1', $rama, $trazo, $nombre, $fondo, $ratio);
+            }
+        }
+    }
+
+    expect($fallos)->toBe([], implode(' · ', $fallos));
+
+    // Claro hoy (gris de Filament #6b7280 sobre el campo blanco): 4,83:1.
+    $trazoClaro = bdcTrazoDelChevron(tokenValor($claro, 'select-chevron'));
+    expect(ratioContraste($trazoClaro, '#ffffff'))->toBeGreaterThanOrEqual(ratioContraste('#6b7280', '#ffffff'));
+});
+
+it('el foco no queda bajo la barra superior fija: scroll-padding-top con el alto real de la barra', function () {
+    $hoja = bdcHoja();
+    $claro = bloqueTrasAncla(cssMuniUiFilament(), ':root{');
+
+    // Filament 5 no expone variable para el alto de la barra: lo fija con
+    // `min-h-16` en topbar.css (y la barra lateral repite `top-[4rem]`). El token
+    // del tema tiene que valer lo mismo; si Filament lo cambia, esto se pone rojo.
+    $topbar = __DIR__.'/../vendor/filament/filament/resources/css/components/topbar.css';
+    if (! is_file($topbar)) {
+        $this->markTestSkipped('Sin vendor/filament: no se puede comparar con el alto real de la barra.');
+    }
+    expect(preg_match('/\.fi-topbar\s*\{[^}]*\bmin-h-(\d+)\b/', (string) file_get_contents($topbar), $m))->toBe(1);
+    expect(tokenValor($claro, 'panel-topbar-h'))->toBe(((int) $m[1] / 4).'rem');
+
+    // El que hace scroll en un panel Filament 5 es el documento (`html.fi` lleva
+    // `min-h-dvh` y ningún contenedor intermedio tiene overflow vertical). Solo
+    // cuando hay barra: en el login no hay nada que la tape.
+    $reglas = array_filter(
+        bdcReglas($hoja),
+        fn (array $r) => preg_match('/^(html|:root):has\(/', $r[0]) === 1
+            && str_contains($r[0], '.fi-topbar')
+            && str_contains($r[1], 'scroll-padding-top'),
+    );
+    expect($reglas)->not->toBe([], 'Falta scroll-padding-top en el documento cuando hay .fi-topbar.');
+    expect(implode(' ', array_column($reglas, 1)))->toMatch('/scroll-padding-top\s*:\s*calc\(\s*var\(--muni-panel-topbar-h\)\s*\+/');
+});
+
+it('el campo deshabilitado se distingue del activo: borde atenuado propio y cursor not-allowed', function () {
+    $hoja = cssMuniUiFilament();
+    $capa = bdcCapaComponents(bdcHoja());
+
+    $deshabilitado = array_filter(bdcReglas($capa), fn (array $r) => str_contains($r[0], '.fi-input-wrp.fi-disabled'));
+    $cuerpos = implode(' ', array_column($deshabilitado, 1));
+
+    expect($cuerpos)->toContain('border-color:var(--muni-field-border-disabled)');
+    expect($cuerpos)->toContain('cursor:not-allowed');
+
+    // El cursor va también en el control: input, select y textarea fijan el suyo
+    // y no lo heredan del envoltorio.
+    $conCursorEnControl = array_filter(
+        $deshabilitado,
+        fn (array $r) => str_contains($r[1], 'cursor:not-allowed') && preg_match('/\.fi-input-wrp\.fi-disabled\s+:?\S*(input|select|textarea|disabled)/', $r[0]),
+    );
+    expect($conCursorEnControl)->not->toBe([], 'El cursor not-allowed no alcanza al control deshabilitado.');
+
+    // El inválido deshabilitado conserva el borde de error.
+    $borde = array_filter($deshabilitado, fn (array $r) => str_contains($r[1], 'field-border-disabled'));
+    expect(implode(' ', array_column($borde, 0)))->toContain(':not(.fi-invalid)');
+
+    // Atenuado: exento de 1.4.11 (control inactivo), pero tiene que verse distinto.
+    foreach (['claro' => ':root{', 'oscuro' => 'En oscuro mandan los tonos institucionales'] as $rama => $ancla) {
+        $bloque = bloqueTrasAncla($hoja, $ancla);
+        $normal = tokenColor($bloque, $hoja, 'field-border');
+        $atenuado = tokenColor($bloque, $hoja, 'field-border-disabled');
+
+        expect($atenuado)->not->toBeNull("La rama {$rama} no declara --muni-field-border-disabled.");
+        expect(ratioContraste($normal, $atenuado))->toBeGreaterThanOrEqual(1.5,
+            "En {$rama} el borde deshabilitado {$atenuado} casi no se distingue del activo {$normal}."
+        );
+    }
+});

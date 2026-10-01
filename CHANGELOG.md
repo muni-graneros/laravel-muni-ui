@@ -38,6 +38,23 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 - **`--muni-field-border` oscuro del panel: `#467c89` → `#52899a`.** Filament pinta el interior del
   campo `bg-white/5` sobre lo que haya debajo; sobre `--muni-surface-3` eso daba 2,76:1. Ahora 3,31:1
   en el peor caso. `--muni-overlay-border` no cambia. Candado: `BordeDeCampoEnPanelTest.php`.
+- **El chevron del `<select>` de Filament no llegaba a 3:1 en oscuro (WCAG 1.4.11).** Filament lo dibuja
+  con un SVG en data-URI de trazo `#6b7280` fijo: medido por píxel, 2,66:1 sobre el campo en
+  `--muni-surface-3` y 3,03:1 sobre `--muni-surface`. Nuevo token `--muni-select-chevron` (claro,
+  oscuro y papel) con el trazo de `--muni-muted` de cada rama, aplicado en `@layer components` al
+  `<select>` nativo y al botón del select con buscador, con más especificidad que la regla de
+  Filament. Medido: claro 5,48:1 (antes 4,83), oscuro 5,91–7,69:1.
+- **Con Shift+Tab el campo enfocado quedaba debajo de la barra superior fija (WCAG 2.4.11).** El
+  documento no tenía `scroll-padding-top`. Ahora, cuando hay `.fi-topbar`, `scroll-padding-top:
+  calc(var(--muni-panel-topbar-h) + 1rem)`; el token nuevo `--muni-panel-topbar-h` vale `4rem`, el
+  `min-h-16` de la barra de Filament 5 (que no lo expone en una variable; el candado lo compara con
+  el vendor). Medido en el banco: de 7/22 campos tapados a 0/22.
+- **El campo deshabilitado se veía igual de activo que uno normal.** `.fi-input-wrp.fi-disabled`
+  lleva ahora un borde atenuado propio (`--muni-field-border-disabled`, que es `--muni-border-2`:
+  2,28:1 frente al borde activo en claro y 2,46:1 en oscuro) y `cursor: not-allowed` en el envoltorio
+  y en el control. El inválido deshabilitado conserva el borde de error.
+- Estos tres cambios están en `muni-ui-filament.css`: el sistema que adopte la versión tiene que
+  volver a publicar la hoja del tema, como con el borde de campo.
 - **Republicar:** los sistemas con `MuniPanel` deben correr
   `php artisan vendor:publish --tag=muni-ui-filament --force` para
   que `public/vendor/muni-ui/filament.css` reciba el arreglo; subir solo el `composer.json` no basta.

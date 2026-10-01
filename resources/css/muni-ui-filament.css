@@ -41,6 +41,16 @@
        porque muni-ui.css no se carga dentro de un panel Filament. */
     --muni-field-border: #90815b;
     --muni-field-border-error: var(--muni-danger-fg);
+    /* Campo DESHABILITADO: exento de 1.4.11 (control inactivo), pero con el borde
+       a 3:1 se veía igual de «activo» que uno normal. Atenuado propio, 2,28:1
+       frente al borde activo. Candado: BordeDeCampoEnPanelTest. */
+    --muni-field-border-disabled: var(--muni-border-2);
+    /* Chevron del <select>: Filament lo dibuja con un SVG en data-URI de trazo
+       #6b7280 fijo, que en oscuro daba 2,66:1 sobre el campo. Un data-URI no puede
+       leer una variable, así que el trazo repite el --muni-muted de ESTA rama
+       (#5a6d6b): 5,48:1 sobre el campo blanco (Filament: 4,83) y 4,63:1 sobre
+       --muni-surface-3. Si cambia --muni-muted, cambia acá: lo ata el candado. */
+    --muni-select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%235a6d6b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
     /* Límite de una superficie que FLOTA (popover, dropdown, modal, drawer,
        avisos): el beige de --muni-border daba 1,15:1 sobre el papel y el panel
        lo separaba solo la sombra. Se declara acá TAMBIÉN, como el de campo,
@@ -111,6 +121,11 @@
        prefers-reduced-motion en el bloque que sigue a este. */
     --muni-dur-slow:    600ms;
     --muni-topbar-h:    56px;
+    /* Alto de la barra superior de FILAMENT (no la de <x-muni::topbar>, que es
+       --muni-topbar-h). Filament 5 no lo expone en una variable: lo fija con
+       `min-h-16` en topbar.css y la barra lateral repite `top-[4rem]`. Lo usa el
+       scroll-padding del documento; el candado lo compara con el vendor. */
+    --muni-panel-topbar-h: 4rem;
 
     /* La tipografía la manda el panel: pedir aquí una familia propia haría que
        un componente suelto se viera distinto al resto de la pantalla. */
@@ -163,6 +178,13 @@
        4,81:1 sobre --muni-bg. Candado: BordeDeCampoEnPanelTest. */
     --muni-field-border: #52899a;
     --muni-field-border-error: var(--muni-danger-fg);
+    /* Se repiten en oscuro por el mismo motivo que el de error: un var() se
+       resuelve donde se declara, y si el host pone `.dark` en el <body> la raíz
+       seguiría dando el valor claro. Atenuado: 2,46:1 frente al borde activo.
+       Chevron con el --muni-muted oscuro (#a3b1c4): 5,91:1 sobre el campo en
+       surface-3 (peor caso; antes 2,66:1). */
+    --muni-field-border-disabled: var(--muni-border-2);
+    --muni-select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23a3b1c4' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
     /* Medido: 4,01:1 sobre --muni-bg, 3,59:1 sobre --muni-surface y 3,21:1
        sobre --muni-surface-3 #142a30 (peor caso). Mínimo exigido: 3:1. */
     --muni-overlay-border: #467c89;
@@ -315,6 +337,22 @@
 @layer components {
     .fi-input-wrp { border:1px solid var(--muni-field-border); }
     .fi-input-wrp.fi-invalid { border-color:var(--muni-field-border-error); }
+    /* Deshabilitado: borde atenuado (el inválido conserva el de error) y cursor
+       not-allowed también en el control, que fija el suyo y no lo hereda. */
+    .fi-input-wrp.fi-disabled:not(.fi-invalid) { border-color:var(--muni-field-border-disabled); }
+    .fi-input-wrp.fi-disabled,
+    .fi-input-wrp.fi-disabled :is(input, select, textarea, button):disabled { cursor:not-allowed; }
+    /* Chevron del <select> (nativo y el botón del select con buscador) con el
+       token del tema. Las reglas de Filament puntúan 0,1,1 y 0,2,0 en su propia
+       `components`: estas puntúan más, así que ganan aunque la hoja llegue antes. */
+    .fi-input-wrp select.fi-select-input,
+    .fi-input-wrp .fi-select-input .fi-select-input-btn { background-image:var(--muni-select-chevron); }
+    /* FOCO NO OCULTO BAJO LA BARRA (2.4.11): `.fi-topbar-ctn` es sticky y el que
+       hace scroll es el documento. Sin esto, Shift+Tab dejaba el campo enfocado
+       debajo de la barra. El margen extra deja ver la etiqueta y el anillo de
+       foco. Solo con barra: en el login no hay nada que tape. En la capa, como
+       el borde: una utilidad `scroll-pt-*` del host le gana. */
+    :root:has(.fi-topbar-ctn, .fi-topbar) { scroll-padding-top:calc(var(--muni-panel-topbar-h) + 1rem); }
 }
 .fi-input-wrp:focus-within { border-color:var(--mg-petroleo) !important; box-shadow:0 0 0 3px color-mix(in srgb,var(--mg-petroleo) 18%,transparent) !important; }
 .fi-ta-header-cell { background:color-mix(in srgb,var(--mg-papel) 40%,#fff); font-weight:700; color:var(--mg-petroleo); text-transform:uppercase; letter-spacing:.03em; font-size:.7rem; }
@@ -557,6 +595,9 @@
         --muni-surface-3:#ffffff;
         --muni-text:#000000;
         --muni-muted:#3a3f4b;
+        /* El chevron del <select> repite el atenuado del papel: en un panel
+           oscuro impreso saldría el gris claro de pantalla sobre blanco. */
+        --muni-select-chevron:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%233a3f4b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
         /* Derivado del atenuado en vez de repetir un hex: los dos se leen sobre
            el mismo papel blanco. */
         --muni-hint:var(--muni-muted);

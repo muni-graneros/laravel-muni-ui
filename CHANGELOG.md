@@ -24,7 +24,24 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 - **La suite entera reventaba con «Cannot redeclare function reglaCss()».** Dos archivos de prueba la
   declaraban; ahora vive en `tests/Helpers/ReglasCss.php`.
 - Sin cambio de artefactos publicados: el CSS va dentro de los componentes Blade, no hace falta
-  volver a publicar nada.
+  volver a publicar nada (esto vale para los tres puntos de arriba; el del borde de campo, abajo,
+  SÍ exige republicar).
+- **El borde de los campos de Filament no cumplía WCAG 1.4.11 y ningún sistema podía corregirlo.**
+  El tema pintaba `.fi-input-wrp` con `--mg-borde` (el beige de los separadores): medido por píxel
+  en Chromium, 1,36:1 sobre el campo y 1,25:1 sobre la página en claro (mínimo 3:1). Y la regla iba
+  sin capa CSS, así que le ganaba a cualquier utilidad de Tailwind 4 (hallado en seguridad-graneros,
+  que tuvo que poner el borde en `style`, commit f723b119). Ahora el borde usa
+  `--muni-field-border` (inválido: `--muni-field-border-error`) dentro de `@layer components`, con
+  el orden de capas de Tailwind 4 declarado, y el buscador de la barra superior deja de repetir el
+  beige. El foco no cambia: sigue sin capa y con `!important`. Medido: claro 3,24–3,83:1 (normal) y
+  6,62–7,82:1 (error); oscuro 3,31–4,81:1 (normal) y 6,15–7,86:1 (error).
+- **`--muni-field-border` oscuro del panel: `#467c89` → `#52899a`.** Filament pinta el interior del
+  campo `bg-white/5` sobre lo que haya debajo; sobre `--muni-surface-3` eso daba 2,76:1. Ahora 3,31:1
+  en el peor caso. `--muni-overlay-border` no cambia. Candado: `BordeDeCampoEnPanelTest.php`.
+- **Republicar:** los sistemas con `MuniPanel` deben correr
+  `php artisan vendor:publish --tag=muni-ui-filament --force` para
+  que `public/vendor/muni-ui/filament.css` reciba el arreglo; subir solo el `composer.json` no basta.
+  Un sistema que haya puesto el borde en `style` (seguridad-graneros) puede volver a la utilidad.
 
 ## [0.20.0] — 2026-09-26
 

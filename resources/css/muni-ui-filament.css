@@ -156,7 +156,12 @@
 
     --muni-border:      #1c343a;
     --muni-border-2:    #2a4a52;
-    --muni-field-border: #467c89;
+    /* El borde de campo NO es el flotante: Filament pinta el interior del campo
+       `bg-white/5` sobre lo que haya debajo, y con #467c89 el campo sobre
+       --muni-surface-3 daba 2,76:1 (1.4.11 pide 3:1). Medido contra el interior
+       compuesto: 3,31:1 sobre surface-3 (peor caso), 3,77:1 sobre surface,
+       4,81:1 sobre --muni-bg. Candado: BordeDeCampoEnPanelTest. */
+    --muni-field-border: #52899a;
     --muni-field-border-error: var(--muni-danger-fg);
     /* Medido: 4,01:1 sobre --muni-bg, 3,59:1 sobre --muni-surface y 3,21:1
        sobre --muni-surface-3 #142a30 (peor caso). Mínimo exigido: 3:1. */
@@ -264,7 +269,7 @@
    del login (.fi-simple-layout) y de <x-muni::gob-stripe>, en claro y en oscuro.
    `.fi-topbar` es sticky, así que es el bloque contenedor y la franja viaja con ella. */
 .fi-topbar::before{ content:""; position:absolute; top:0; left:0; right:0; height:4px; z-index:1; pointer-events:none; background:linear-gradient(90deg,var(--mg-lima) 0 14.28%,var(--mg-petroleo) 14.28% 28.57%,var(--mg-oro) 28.57% 42.85%,var(--mg-naranja) 42.85% 57.14%,var(--mg-celeste) 57.14% 71.42%,var(--mg-carmin) 71.42% 85.71%,#9c9b9b 85.71% 100%); }
-.fi-topbar .fi-input-wrp, .fi-global-search-field .fi-input-wrp { border-radius:11px; border:1px solid var(--mg-borde); box-shadow:inset 0 1px 2px rgba(13,58,68,.05); }
+.fi-topbar .fi-input-wrp, .fi-global-search-field .fi-input-wrp { border-radius:11px; box-shadow:inset 0 1px 2px rgba(13,58,68,.05); }
 .fi-global-search-field .fi-input-wrp:focus-within { border-color:var(--mg-petroleo); box-shadow:0 0 0 3px color-mix(in srgb,var(--mg-petroleo) 18%,transparent); }
 .fi-topbar .fi-avatar { box-shadow:0 0 0 2px #fff,0 0 0 3px color-mix(in srgb,var(--mg-petroleo) 55%,transparent); }
 
@@ -293,7 +298,24 @@
 .fi-btn.fi-color-primary, .fi-btn-color-primary { box-shadow:0 10px 22px -10px rgba(13,58,68,.55); background-image:linear-gradient(180deg,rgba(255,255,255,.1),transparent); }
 .fi-btn:active { transform:translateY(1px); }
 .fi-badge { font-weight:700; border-radius:8px; }
-.fi-input-wrp { border-radius:11px !important; border:1px solid var(--mg-borde); }
+.fi-input-wrp { border-radius:11px !important; }
+/* EL BORDE DEL CAMPO va en `@layer components` y con --muni-field-border.
+   Antes era `--mg-borde` (el beige de los separadores) y sin capa: 1,36:1 sobre
+   el campo y 1,25:1 sobre la página, contra el 3:1 de WCAG 1.4.11; y como una
+   regla sin capa le gana a TODAS las capas de Tailwind 4, ningún sistema podía
+   corregirlo con una utilidad (seguridad-graneros tuvo que ponerlo en `style`).
+   En `components` le gana al preflight (`base` pone el borde en 0) y pierde
+   ante una utilidad, como cualquier estilo de componente. Sin `!important`:
+   dentro de una capa le ganaría hasta a las utilidades `!important`.
+   El orden de capas se declara igual que Tailwind 4: si esta hoja llegara antes
+   que la de Filament, sin esta línea `components` quedaría debajo de `base` y el
+   preflight borraría el borde. Si ya está declarado, repetirlo no cambia nada.
+   El foco NO entra en la capa: sigue abajo, sin capa y con `!important`. */
+@layer properties, theme, base, components, utilities;
+@layer components {
+    .fi-input-wrp { border:1px solid var(--muni-field-border); }
+    .fi-input-wrp.fi-invalid { border-color:var(--muni-field-border-error); }
+}
 .fi-input-wrp:focus-within { border-color:var(--mg-petroleo) !important; box-shadow:0 0 0 3px color-mix(in srgb,var(--mg-petroleo) 18%,transparent) !important; }
 .fi-ta-header-cell { background:color-mix(in srgb,var(--mg-papel) 40%,#fff); font-weight:700; color:var(--mg-petroleo); text-transform:uppercase; letter-spacing:.03em; font-size:.7rem; }
 .fi-ta-row:hover { background:color-mix(in srgb,var(--mg-petroleo) 4%,transparent); }

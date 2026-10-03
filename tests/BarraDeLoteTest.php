@@ -50,7 +50,7 @@ function loteSinComentarios(string $fuente): string
 /** El CSS de los bloques de estilos de un componente, sin comentarios. */
 function loteCss(string $componente): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', loteFuente($componente), $bloques);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', loteFuente($componente), $bloques);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $bloques[1]));
 }

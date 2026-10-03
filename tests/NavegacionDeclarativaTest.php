@@ -235,7 +235,7 @@ it('respeta el contrato de color, foco y movimiento del paquete', function () {
     foreach (['nav-menu', 'nav-grupo'] as $componente) {
         $fuente = fuenteSinComentarios($componente);
 
-        preg_match_all('/<style>(.*?)<\/style>/s', $fuente, $bloques);
+        preg_match_all('/<style\b[^>]*>(.*?)<\/style>/s', $fuente, $bloques);
         $css = implode("\n", $bloques[1] ?? []);
 
         // Cero colores literales: con tokens de doble rama, la contraparte oscura

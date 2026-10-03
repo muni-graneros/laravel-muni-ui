@@ -145,7 +145,7 @@
      color sale de tokens con rama clara y rama oscura; el único literal es el
      tercer respaldo del foco. --}}
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-crumbs { font-family:var(--muni-font-sans);font-size:12.5px;line-height:1.2; }
         .muni-crumbs__list { display:flex;align-items:center;flex-wrap:wrap;gap:2px 7px;list-style:none;margin:0;padding:0; }
         .muni-crumbs__item { display:flex;align-items:center;gap:7px;min-width:0; }

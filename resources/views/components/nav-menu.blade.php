@@ -218,7 +218,7 @@
 @endif
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-navm { display:block; }
         .muni-navm__lista, .muni-navm__sub { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:2px; }
         .muni-navm__seccion { margin:14px 0 4px; display:block; }

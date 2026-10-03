@@ -83,7 +83,7 @@ function piiFuenteSinComentarios(): string
 /** El CSS que el componente lleva consigo, ya sin comentarios. */
 function piiCss(): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', piiFuenteSinComentarios(), $bloques);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', piiFuenteSinComentarios(), $bloques);
 
     return implode("\n", $bloques[1]);
 }

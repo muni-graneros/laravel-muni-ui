@@ -66,7 +66,7 @@ function asistenteCompleto(string $extra = ''): string
 /** El HTML sin el bloque de estilos: lo que ve el árbol del documento. */
 function asistenteSinEstilos(string $html): string
 {
-    return (string) preg_replace('/<style>.*?<\/style>/s', '', $html);
+    return (string) preg_replace('/<style\b[^>]*>.*?<\/style>/s', '', $html);
 }
 
 function asistenteFuente(): string
@@ -91,7 +91,7 @@ function asistenteFuenteSinComentarios(): string
 /** Solo el CSS de los dos bloques de estilo, con los comentarios ya fuera. */
 function asistenteCss(): string
 {
-    preg_match_all('/<style>(.*?)<\/style>/s', asistenteFuente()."\n".stepperFuente(), $m);
+    preg_match_all('/<style\b[^>]*>(.*?)<\/style>/s', asistenteFuente()."\n".stepperFuente(), $m);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $m[1]));
 }
@@ -205,7 +205,7 @@ it('no esconde pasos: el que no se rinde no está en el DOM', function () {
      */
     // El bloque de estilos queda fuera: ahí `display:none` es legítimo (en papel
     // no hay nada que enviar). Lo que se vigila es el MARCADO.
-    $marcado = (string) preg_replace('/<style>.*?<\/style>/s', '', $fuente);
+    $marcado = (string) preg_replace('/<style\b[^>]*>.*?<\/style>/s', '', $fuente);
 
     foreach (['x-show', 'x-cloak', 'display:none', 'hidden="hidden"'] as $aguja) {
         expect(str_contains($marcado, $aguja))->toBeFalse(
@@ -780,7 +780,7 @@ it('el movimiento sale del token y se apaga solo', function () {
 
 it('el CSS viaja dentro del bloque de estilos del componente', function () {
     foreach (['asistente' => asistenteFuente(), 'stepper' => stepperFuente()] as $cual => $fuente) {
-        expect(preg_match('/@once\s*<style>/s', $fuente))->toBe(1,
+        expect(preg_match('/@once\s*<style\b[^>]*>/s', $fuente))->toBe(1,
             "El CSS de `{$cual}` tiene que viajar con el componente: dentro de un panel Filament solo se inyecta "
             .'muni-ui-filament.css, y una clase declarada en muni-ui.css se vería sin estilo y sin un solo error (DESIGN §7).'
         );

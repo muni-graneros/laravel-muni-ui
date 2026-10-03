@@ -255,7 +255,7 @@
 </div>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-dd-enter { transition: opacity var(--muni-dur) var(--muni-ease), transform var(--muni-dur) var(--muni-ease); }
         .muni-dd-enter-start { opacity: 0; transform: scale(0.96) translateY(-4px); }
         .muni-dd-enter-end { opacity: 1; transform: scale(1) translateY(0); }

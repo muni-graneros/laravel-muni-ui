@@ -90,7 +90,7 @@ function resultadoFuenteSinComentarios(): string
 /** El CSS que el componente lleva consigo, sin comentarios. */
 function resultadoCss(): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', resultadoFuente(), $bloques);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', resultadoFuente(), $bloques);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $bloques[1] ?? []));
 }
@@ -280,7 +280,7 @@ it('funciona en Livewire 3 y en Livewire 4', function () {
 });
 
 it('no escribe un solo color literal', function () {
-    $css = resultadoCss().' '.(string) preg_replace('#<style>.*?</style>#s', '', resultadoFuenteSinComentarios());
+    $css = resultadoCss().' '.(string) preg_replace('#<style\b[^>]*>.*?</style>#s', '', resultadoFuenteSinComentarios());
 
     preg_match_all('/#[0-9a-fA-F]{3,8}\b/', $css, $m);
 
@@ -361,7 +361,7 @@ it('lleva su propio CSS dentro del componente', function () {
         'solo se inyecta muni-ui-filament.css y la clase se quedaría sin estilo (DESIGN §7).'
     );
 
-    expect(str_contains($fuente, '<style>'))->toBeTrue('El componente no lleva su bloque de estilos.');
+    expect(str_contains($fuente, '<style'))->toBeTrue('El componente no lleva su bloque de estilos.');
 });
 
 it('el estado no se comunica solo con color', function () {

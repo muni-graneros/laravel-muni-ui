@@ -84,7 +84,7 @@ function cifraComparadaFuenteSinComentarios(): string
 /** El CSS que el componente lleva consigo en su bloque de estilos, sin comentarios. */
 function cifraComparadaCss(): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', cifraComparadaFuente(), $bloques);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', cifraComparadaFuente(), $bloques);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $bloques[1] ?? []));
 }

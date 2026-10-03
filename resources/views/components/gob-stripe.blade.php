@@ -21,7 +21,7 @@
 ><i style="border-top-color:var(--muni-gob-lima)"></i><i style="border-top-color:var(--muni-gob-petroleo)"></i><i style="border-top-color:var(--muni-gob-oro)"></i><i style="border-top-color:var(--muni-gob-naranja)"></i><i style="border-top-color:var(--muni-gob-celeste)"></i><i style="border-top-color:var(--muni-gob-carmin)"></i><i style="border-top-color:var(--muni-gob-gris)"></i></div>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-gob-stripe { display: flex; width: 100%; height: var(--franja-alto, 5px); flex-shrink: 0; }
         .muni-gob-stripe > i { flex: 1; border-top: var(--franja-alto, 5px) solid; }
     </style>

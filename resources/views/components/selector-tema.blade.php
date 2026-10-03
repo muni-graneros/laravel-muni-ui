@@ -173,7 +173,7 @@
 </form>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* `color-scheme` es lo que pinta en oscuro los desplegables nativos, los
            input type=date, las barras de desplazamiento y la vista previa de
            impresión: sin él siguen en claro aunque los tokens ya sean oscuros.

@@ -54,7 +54,7 @@ function fuenteBuscadorListaSinComentarios(): string
 /** El contenido de los bloques `<style>` del componente, sin comentarios. */
 function cssBuscadorLista(): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', fuenteBuscadorLista(), $m);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', fuenteBuscadorLista(), $m);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $m[1]));
 }

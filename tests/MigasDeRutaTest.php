@@ -50,7 +50,7 @@ function fuenteDeMigas(): string
 /** El contenido de los bloques de estilo del componente ya renderizado. */
 function estilosDeMigas(string $html): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', $html, $m);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', $html, $m);
 
     return implode("\n", $m[1]);
 }

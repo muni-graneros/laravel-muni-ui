@@ -114,7 +114,7 @@ function agendaRadiosMarcados(string $html): array
 /** Solo el bloque de estilos del componente. */
 function agendaCss(): string
 {
-    preg_match('/<style>(.*?)<\/style>/s', agendaFuente(), $m);
+    preg_match('/<style\b[^>]*>(.*?)<\/style>/s', agendaFuente(), $m);
 
     return $m[1] ?? '';
 }

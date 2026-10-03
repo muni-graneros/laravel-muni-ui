@@ -86,7 +86,7 @@ function cssDeComponenteDenso(string $componente): string
     // envolver un `<style>` entero y contarlo sería medir CSS que nunca se emite.
     $fuente = (string) preg_replace('/\{\{--.*?--\}\}/s', '', $fuente);
 
-    preg_match_all('#<style>(.*?)</style>#s', $fuente, $bloques);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', $fuente, $bloques);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $bloques[1] ?? []));
 }

@@ -66,7 +66,7 @@
 </div>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* Guardia local de movimiento reducido. La hoja del panel y una hoja
            publicada vieja pueden no bajar la duración a 0 ms; el arco se apaga
            igual. Con !important porque la transición va en el style del

@@ -401,7 +401,7 @@
 </div>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* Viaja con el componente: dentro de un panel Filament solo se inyecta
            vendor/muni-ui/filament.css, y una clase declarada únicamente en muni-ui.css
            se vería sin estilo y sin un solo error en consola (DESIGN §7). */
@@ -494,7 +494,7 @@
          paquete. Por eso la puerta de la zona de peligro no puede ser `disabled`:
          el servidor es el que valida, y el botón tiene que llegar vivo hasta él. --}}
     <noscript>
-        <style>
+        <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
             .muni-ajc [role="tabpanel"][x-cloak] { display:block !important; }
             .muni-ajc [role="tabpanel"] + [role="tabpanel"] {
                 margin-top:18px; padding-top:18px; border-top:1px solid var(--muni-border); }

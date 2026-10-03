@@ -183,7 +183,7 @@
 {{-- El bloque de estilos viaja DENTRO del componente y no en muni-ui.css a propósito
      (DESIGN §7): dentro de un panel Filament solo se inyecta filament.css. --}}
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* Antes de que arranque Alpine no hay `x-show` que valga: sin esta regla la
            burbuja se ve pintada sobre la fila en el primer render. Viaja acá por lo
            mismo que el resto del bloque. */

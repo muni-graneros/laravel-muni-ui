@@ -43,7 +43,7 @@
     baja, y una hoja publicada vieja sin el token, que cae en el respaldo.
 --}}
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* Con !important: la transición va en el style del relleno. */
         @media (prefers-reduced-motion:reduce) { .muni-progress__relleno { transition:none !important; } }
     </style>

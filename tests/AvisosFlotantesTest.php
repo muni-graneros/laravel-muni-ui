@@ -51,7 +51,7 @@ function fuenteAvisosFlotantes(): string
 /** El contenido de los bloques `<style>` del componente, sin comentarios. */
 function cssAvisosFlotantes(): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', fuenteAvisosFlotantes(), $m);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', fuenteAvisosFlotantes(), $m);
 
     return implode("\n", $m[1]);
 }

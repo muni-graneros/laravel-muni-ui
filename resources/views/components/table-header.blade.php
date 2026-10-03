@@ -86,7 +86,7 @@
 </div>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* Viaja con el componente y no en muni-ui.css: dentro de un panel Filament
            solo se inyecta vendor/muni-ui/filament.css, así que una clase declarada
            únicamente allá deja la franja sin estilo y sin un error en consola. */

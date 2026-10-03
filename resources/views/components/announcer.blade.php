@@ -123,7 +123,7 @@
 </div>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* Oculto a la vista, presente en el árbol de accesibilidad: `display:none` y
            `visibility:hidden` lo sacarían del árbol y la región dejaría de anunciar.
            Se repite la misma declaración que publica `sortable-table` a propósito: el

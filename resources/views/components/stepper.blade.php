@@ -166,7 +166,7 @@
 </ol>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-stepper { list-style:none; margin:0; padding:0; display:flex; gap:0; font-family:var(--muni-font-sans); }
         .muni-step { flex:1; display:flex; align-items:center; gap:10px; position:relative; min-width:0; }
         /* La línea es un ítem flexible MÁS del paso, que ocupa el espacio que queda

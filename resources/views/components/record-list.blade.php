@@ -104,7 +104,7 @@
      página viene vacía, el bloque igual sale y la siguiente lista con fichas lo
      encuentra puesto. --}}
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-rec { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px;
             font-family:var(--muni-font-sans); }
         .muni-rec__item { display:flex; flex-wrap:wrap; align-items:flex-start; gap:12px;

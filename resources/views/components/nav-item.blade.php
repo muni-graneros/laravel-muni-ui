@@ -18,7 +18,7 @@
 </a>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-nav-item { display:flex; align-items:center; gap:11px; padding:9px 11px; border-radius:var(--muni-radius-sm);
             font-family:var(--muni-font-sans); font-size:13.5px; font-weight:500; color:var(--muni-muted); text-decoration:none;
             transition:background var(--muni-dur) var(--muni-ease),color var(--muni-dur) var(--muni-ease); }

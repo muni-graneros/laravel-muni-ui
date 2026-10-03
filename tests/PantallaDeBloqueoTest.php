@@ -106,7 +106,7 @@ function bloqueoFuenteSinComentarios(): string
 /** El CSS que el componente lleva consigo, sin comentarios. */
 function bloqueoCss(): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', bloqueoFuente(), $bloques);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', bloqueoFuente(), $bloques);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $bloques[1] ?? []));
 }

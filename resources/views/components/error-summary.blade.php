@@ -152,7 +152,7 @@
     </div>
 
     @once
-        <style>
+        <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
             .muni-errsum { padding:14px 16px; background:var(--muni-danger-bg); border:1px solid var(--muni-danger-border); border-left-width:3px; border-radius:var(--muni-radius); font-family:var(--muni-font-sans); }
             /* `:focus` y no `:focus-visible`: el foco acá SIEMPRE llega por programa, y varios
                navegadores no consideran «visible» un foco que el usuario no provocó. Sin esta

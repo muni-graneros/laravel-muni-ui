@@ -608,7 +608,7 @@
 </div>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-ag { display:block; padding:14px; background:var(--muni-surface); border:1px solid var(--muni-border); border-radius:var(--muni-radius); box-shadow:var(--muni-shadow); font-family:var(--muni-font-sans); color:var(--muni-text); }
         .muni-ag__mes { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; }
         .muni-ag__titulo { margin:0; font-size:14px; font-weight:700; text-transform:capitalize; color:var(--muni-text); }

@@ -45,7 +45,7 @@
 <dl {{ $attributes->merge($muniDlAtributos) }}>{{ $slot }}</dl>
 
 @once
-    <style>
+    <style @if ($muniNonce = \Illuminate\Support\Facades\Vite::cspNonce()) nonce="{{ $muniNonce }}" @endif>
         /* Rejilla sobre el propio <dl>: una columna por defecto, dos a partir de
            40em. dt y dd son hijos directos, así que la etiqueta de cada par cae
            siempre en la misma columna y el par sigue siendo un par para el lector. */

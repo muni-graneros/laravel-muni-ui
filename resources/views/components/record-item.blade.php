@@ -164,7 +164,7 @@
      template). Un <style> ahí es HTML inválido —y el Decreto N°1/2015 SEGPRES
      obliga a los sitios del Estado a los estándares del W3C—, sin que ninguna
      reja lo delate: axe salta todo hijo que el lector de pantalla no ve, y un
-     <style> es display:none.
+     <style{!! \Muni\Ui\Support\Nonce::attr() !!}> es display:none.
 
      Las clases que esta ficha usa —`.muni-rec__*`, `.muni-num` y `.muni-sr`— las
      declara el bloque de una sola emisión de <x-muni::record-list>, que es su

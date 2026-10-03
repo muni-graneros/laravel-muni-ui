@@ -224,7 +224,7 @@
 </div>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* La capa que centra el panel. El display:flex va en una clase y NO en el
            style inline a propósito: x-show, al mostrar, borra la propiedad display
            del style inline entera (removeProperty), así que un display:flex inline

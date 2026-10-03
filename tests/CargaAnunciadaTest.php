@@ -47,7 +47,7 @@ use Livewire\Livewire;
 /** El CSS de los bloques <style> de un HTML renderizado, sin comentarios. */
 function cargaCss(string $html): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', $html, $m);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', $html, $m);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $m[1]));
 }

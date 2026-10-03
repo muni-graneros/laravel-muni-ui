@@ -188,7 +188,7 @@
 </aside>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-sb { flex-shrink:0; width:var(--sb-w); background:var(--muni-surface); border-right:1px solid var(--muni-border); }
         .muni-sb:focus-visible { outline:3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset:-3px; }
         .muni-sb__inner { position:sticky; top:0; display:flex; flex-direction:column; gap:2px; height:100vh; overflow-y:auto; padding:16px 12px; }

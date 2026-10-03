@@ -38,7 +38,7 @@
 </{{ $tag }}>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-dd-item:hover { background: var(--muni-surface-2); }
         /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */
         .muni-dd-item:focus-visible { outline: 3px solid var(--muni-focus, var(--muni-accent, #767676)); outline-offset: -2px; box-shadow: var(--muni-ring); }

@@ -59,7 +59,7 @@
 </span>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* Viaja con el componente: dentro de un panel Filament solo se inyecta
            vendor/muni-ui/filament.css y una clase declarada únicamente en
            muni-ui.css se vería sin estilo, sin un solo error en consola. */

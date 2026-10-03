@@ -99,7 +99,7 @@ it('da el mismo id en dos renders idénticos', function (string $componente) {
 it('mide sus transiciones con var(--muni-dur) y no con una duración fija', function (string $componente) {
     $css = (string) preg_replace('#/\*.*?\*/#s', '', file_get_contents(dialogos()[$componente]));
 
-    preg_match_all('#<style>(.*?)</style>#s', $css, $bloques);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', $css, $bloques);
 
     $fijas = [];
 

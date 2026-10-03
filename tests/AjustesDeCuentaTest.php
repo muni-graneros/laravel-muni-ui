@@ -129,7 +129,7 @@ function ajustesFuenteSinComentarios(): string
  */
 function ajustesCss(): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', ajustesFuente(), $m);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', ajustesFuente(), $m);
 
     return implode("\n", $m[1] ?? []);
 }
@@ -362,7 +362,7 @@ it('no usa nada que solo exista en un major de Livewire ni atajos globales de te
 });
 
 it('no escribe un solo color literal', function () {
-    $css = ajustesCss().' '.(string) preg_replace('#<style>.*?</style>#s', '', ajustesFuenteSinComentarios());
+    $css = ajustesCss().' '.(string) preg_replace('#<style\b[^>]*>.*?</style>#s', '', ajustesFuenteSinComentarios());
 
     preg_match_all('/#[0-9a-fA-F]{3,8}\b/', $css, $m);
 

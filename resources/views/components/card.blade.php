@@ -25,5 +25,5 @@
 </section>
 
 @once
-    <style>.muni-card:hover { box-shadow: var(--muni-shadow-md); }</style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>.muni-card:hover { box-shadow: var(--muni-shadow-md); }</style>
 @endonce

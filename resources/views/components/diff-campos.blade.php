@@ -224,7 +224,7 @@
 </div>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* Todo lo que el componente necesita viaja con él y NO en muni-ui.css
            (DESIGN §7): dentro de un panel Filament solo se inyecta
            vendor/muni-ui/filament.css, así que una clase declarada únicamente en

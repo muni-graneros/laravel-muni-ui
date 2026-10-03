@@ -421,8 +421,8 @@ it('respetan el contrato: sin colores literales, sin uniqid, con el <style> en @
         .implode(' | ', $colores[0] ?? [])
     );
 
-    if (str_contains($codigo, '<style>')) {
-        expect((bool) preg_match('#@once\s*(?:\R|\s)*<style>#', $codigo))->toBeTrue(
+    if (str_contains($codigo, '<style')) {
+        expect((bool) preg_match('#@once\s*(?:\R|\s)*<style\b[^>]*>#', $codigo))->toBeTrue(
             'El bloque <style> no está dentro de @once: se repite una vez por cada instancia en la página.'
         );
     }

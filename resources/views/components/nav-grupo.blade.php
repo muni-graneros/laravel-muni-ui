@@ -93,7 +93,7 @@
 </div>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-navg { display:flex; flex-direction:column; }
         .muni-navg__btn { display:flex; align-items:center; gap:11px; width:100%; min-height:36px; padding:9px 11px; border:none;
             border-radius:var(--muni-radius-sm); background:transparent; cursor:pointer; text-align:left;

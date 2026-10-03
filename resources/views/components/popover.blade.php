@@ -214,7 +214,7 @@
 </div>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* El CSS viaja DENTRO del componente y no en muni-ui.css (DESIGN §7):
            en un panel Filament solo se inyecta filament.css, así que una clase
            declarada únicamente en la otra hoja dejaría el panel sin estilo y sin

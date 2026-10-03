@@ -56,7 +56,7 @@
 </header>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-topbar__franja { position: absolute; top: 0; left: 0; right: 0; }
         body:has(.muni-gob-bar) .muni-topbar__franja { display: none; }
     </style>

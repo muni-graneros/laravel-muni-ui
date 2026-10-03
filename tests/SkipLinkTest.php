@@ -31,7 +31,7 @@ use Illuminate\Support\Facades\Blade;
 /** El contenido de los bloques `<style>` de un HTML ya renderizado. */
 function estilosDe(string $html): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', $html, $m);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', $html, $m);
 
     return implode("\n", $m[1]);
 }

@@ -241,7 +241,7 @@
              detrás de </html>, que el navegador reubica en el <body> —funciona de
              casualidad— y en el fuente parece un documento roto. --}}
         @once
-            <style>
+            <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
                 .muni-plantilla { display: block; }
                 .muni-plantilla__aviso { margin: 0 0 18px; }
                 .muni-plantilla__cuerpo { display: block; }

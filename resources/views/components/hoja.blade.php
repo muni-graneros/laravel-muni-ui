@@ -190,7 +190,7 @@
 </section>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* El layout viaja con el componente y no en muni-ui.css (DESIGN §7):
            dentro de un panel Filament solo se inyecta filament.css, así que una
            clase declarada únicamente en la otra hoja dejaría el documento sin

@@ -240,7 +240,7 @@
 </div>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* Alpine borra el atributo cuando monta. La regla viaja con el componente
            y no en la hoja: dentro de un panel Filament solo se carga
            muni-ui-filament.css, y una clase declarada nada más en muni-ui.css

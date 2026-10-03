@@ -14,6 +14,12 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 
 ### Corregido
 
+- **Los `<style>` en línea de los componentes no llevaban nonce CSP.** Con `style-src 'nonce-…'`
+  el navegador los bloqueaba y se perdían el anillo de foco del botón, las cajas del OTP y la
+  franja gob (hallado al integrar laravel-muni-mfa, que ya imprime su nonce con `Vite::cspNonce()`).
+  Los 77 componentes que traen CSS ahora emiten `<style nonce="…">` vía `Muni\Ui\Support\Nonce::attr()`;
+  sin nonce configurado no se imprime ningún atributo. Candado: `NonceCspEnLineaTest.php`. Los
+  anfitriones con CSP de nonce deben llamar `Vite::useCspNonce()` en su middleware (como ya hacen).
 - **`<x-muni::data-table>` alargaba la página entera.** El `<caption class="muni-sr">` tiene
   `position:absolute` y estaba dentro de `.muni-dt__scroll` (`overflow:auto`) sin `position:relative`
   (hallado en seguridad-graneros). El `position:relative` ya llegó con 0.20.0; aquí queda el

@@ -80,7 +80,7 @@ function fuenteCalendario(): string
 /** El contenido de los bloques `<style>` del componente, sin comentarios. */
 function cssCalendario(): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', fuenteCalendario(), $m);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', fuenteCalendario(), $m);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $m[1]));
 }

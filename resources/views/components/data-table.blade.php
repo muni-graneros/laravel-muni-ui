@@ -284,7 +284,7 @@
      Viajan en el bloque de estilos del componente y no en muni-ui.css a propósito (DESIGN §7):
      dentro de un panel Filament solo se inyecta filament.css. --}}
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* Oculto a la vista, presente en el árbol de accesibilidad: `display:none`
            y `visibility:hidden` sacarían el <caption> del árbol y la tabla se
            quedaría sin nombre. */
@@ -380,7 +380,7 @@
      lo haya pedido. --}}
 @if ($selectable)
     @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* LA COLUMNA DE SELECCIÓN. El ancho lo fija la celda, no la casilla: así la
            columna no baila entre la cabecera y el cuerpo. */
         .muni-dt__pick { width:1%; white-space:nowrap; text-align:center; }
@@ -420,7 +420,7 @@
      regla nueva, ni siquiera apagada. --}}
 @if ($stickyHeader || $stickyColumn || filled($maxHeight))
     @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* CABECERA FIJA (opt-in).
            Con `border-collapse:collapse` el borde de una celda fija se pierde al
            desplazar, porque el borde colapsado pertenece a la tabla y no a la celda.
@@ -465,7 +465,7 @@
      por orden a igual especificidad. --}}
 @if ($selectable && $stickyColumn)
     @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-dt__scroll--col .muni-dt--pick td:nth-child(2):not([colspan]) { position:sticky; left:44px; z-index:1; background:var(--muni-surface); box-shadow: inset -1px 0 0 var(--muni-border); }
         .muni-dt__scroll--col .muni-dt--pick thead th:nth-child(2) { position:sticky; left:44px; z-index:4; background:var(--muni-surface-2); box-shadow: inset -1px 0 0 var(--muni-border); }
         /* La línea divisoria pasa de la casilla a la segunda columna. */

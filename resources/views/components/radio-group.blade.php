@@ -131,7 +131,7 @@
 </fieldset>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-sr { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
         .muni-obl { font-weight:400; font-size:.92em; color:var(--muni-muted); }
         .muni-radios { min-inline-size:0; margin:0; padding:0; border:0; font-family:var(--muni-font-sans); }

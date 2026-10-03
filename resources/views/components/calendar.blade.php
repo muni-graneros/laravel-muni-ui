@@ -145,7 +145,7 @@
 </div>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-cal { display:inline-block; padding:14px; background:var(--muni-surface); border:1px solid var(--muni-border); border-radius:var(--muni-radius); box-shadow:var(--muni-shadow); font-family:var(--muni-font-sans); width:280px; }
         .muni-cal__head { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
         .muni-cal__title { font-size:13.5px; font-weight:700; text-transform:capitalize; }

@@ -31,7 +31,7 @@ function cssSegmented(): string
 {
     $blade = file_get_contents(__DIR__.'/../resources/views/components/segmented.blade.php');
 
-    preg_match_all('#<style>(.*?)</style>#s', $blade, $bloques);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', $blade, $bloques);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $bloques[1]));
 }

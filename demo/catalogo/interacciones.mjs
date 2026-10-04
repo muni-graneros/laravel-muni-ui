@@ -129,7 +129,15 @@ await prueba('calendar: el teclado elige, respeta min y el enlace x-model se act
     await page.waitForTimeout(150);
     igual(await enlazado.locator('button[aria-pressed=true]').innerText(), '24', 'el valor externo marca el día');
     const conMin = c.locator('.muni-cal').first();
+    // El calendario abre en el mes de hoy cuando min ya pasó: sin volver al mes de min,
+    // el «9» es de otro mes y la prueba depende de la fecha en que corre el CI.
+    // textContent y no innerText: el título va capitalizado por CSS.
+    for (let i = 0; i < 120 && (await conMin.locator('.muni-cal__title').textContent()) !== 'septiembre 2026'; i++) {
+        await conMin.getByRole('button', { name: 'Mes anterior' }).click();
+    }
+    igual(await conMin.locator('.muni-cal__title').textContent(), 'septiembre 2026', 'mes de min a la vista');
     igual(await conMin.locator('button:has-text("9"):not([style*=hidden])').first().isDisabled(), true, 'días antes de min deshabilitados');
+    igual(await conMin.locator('button', { hasText: /^10$/ }).first().isDisabled(), false, 'el día de min se puede elegir');
 });
 
 await prueba('otp-input: pegar reemplaza el código y x-model lo recibe', async (page) => {

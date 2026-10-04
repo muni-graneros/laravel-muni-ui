@@ -12,6 +12,10 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 
 ## [Sin publicar]
 
+## [0.20.1] - 2026-10-01
+
+Solo arreglos: el constraint `^0.20` sigue valiendo. No hay que volver a publicar nada.
+
 ### Corregido
 
 - **`<x-muni::data-table>` alargaba la página entera.** El `<caption class="muni-sr">` tiene

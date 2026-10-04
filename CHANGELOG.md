@@ -10,6 +10,90 @@ las etiquetas de git, así que dicen *qué* cambió pero no siempre *qué había
 republicar*. Desde acá en adelante cada versión anota si el sistema que la adopta debe
 volver a publicar artefactos, porque subir el `composer.json` no aplica nada por sí solo.
 
+## [Sin publicar]
+
+Al cerrarse sale como **0.21.0**, no como 0.20.1: cambia el aspecto del panel sin que nadie toque
+una línea (el borde de todos los campos de Filament pasa de 1,4:1 a 3:1 y `--muni-field-border`
+oscuro cambia de valor) y cambia la cascada (el borde va en `@layer components`, así que una
+utilidad del host que antes perdía ahora gana). En 0.x eso es la segunda cifra: `^0.20` no cruza
+a 0.21 a propósito. El constraint de cada sistema pasa a `^0.21` y **hay que volver a publicar el
+tema del panel** (`php artisan vendor:publish --tag=muni-ui-filament --force`) y commitear
+`public/vendor/muni-ui/filament.css`. Nada renombra ni quita props, slots, clases ni eventos.
+Los siete sistemas del ecosistema siguen en `^0.19`: antes de esto les toca
+[`docs/UPGRADE-0.20.0.md`](docs/UPGRADE-0.20.0.md).
+
+Antes de subirla, lee [`docs/UPGRADE-0.21.0.md`](docs/UPGRADE-0.21.0.md).
+
+### Cambiado
+
+- **El borde de los campos de Filament no cumplía WCAG 1.4.11 y ningún sistema podía corregirlo.**
+  El tema pintaba `.fi-input-wrp` con `--mg-borde` (el beige de los separadores): medido por píxel
+  en Chromium, 1,36:1 sobre el campo y 1,25:1 sobre la página en claro (mínimo 3:1). Y la regla iba
+  sin capa CSS, así que le ganaba a cualquier utilidad de Tailwind 4 (hallado en seguridad-graneros,
+  que tuvo que poner el borde en `style`, commit f723b119). Ahora el borde usa
+  `--muni-field-border` (inválido: `--muni-field-border-error`) dentro de `@layer components`, con
+  el orden de capas de Tailwind 4 declarado, y el buscador de la barra superior deja de repetir el
+  beige. **Una utilidad del host sobre `.fi-input-wrp` ahora le gana al borde del tema.** El foco
+  no cambia: sigue sin capa y con `!important`. Medido: claro 3,24–3,83:1 (normal) y 6,62–7,82:1
+  (error); oscuro 3,31–4,81:1 (normal) y 6,15–7,86:1 (error). Candado:
+  `BordeDeCampoEnPanelTest.php`.
+- **`--muni-field-border` oscuro del panel: `#467c89` → `#52899a`.** Filament pinta el interior del
+  campo `bg-white/5` sobre lo que haya debajo; sobre `--muni-surface-3` eso daba 2,76:1. Ahora 3,31:1
+  en el peor caso. `--muni-overlay-border` no cambia.
+
+### Agregado
+
+- Tokens del tema del panel, documentados en el README: `--muni-field-border-disabled`
+  (`var(--muni-border-2)`), `--muni-select-chevron` (SVG en data-URI con el trazo del
+  `--muni-muted` de cada rama: claro, oscuro y papel) y `--muni-panel-topbar-h` (`4rem`, el alto
+  de la barra de Filament; no es `--muni-topbar-h`, la de `<x-muni::topbar>`).
+
+## [0.20.1] - 2026-10-01
+
+Solo arreglos: el constraint `^0.20` sigue valiendo. No hay que volver a publicar nada.
+
+### Corregido
+
+- **El chevron del `<select>` de Filament no llegaba a 3:1 en oscuro (WCAG 1.4.11).** Filament lo dibuja
+  con un SVG en data-URI de trazo `#6b7280` fijo: medido por píxel, 2,66:1 sobre el campo en
+  `--muni-surface-3` y 3,03:1 sobre `--muni-surface`. `--muni-select-chevron` se aplica en
+  `@layer components` al `<select>` nativo y al botón del select con buscador, con más
+  especificidad que la regla de Filament. Medido: claro 5,48:1 (antes 4,83), oscuro 5,91–7,69:1.
+- **Con Shift+Tab el campo enfocado quedaba debajo de la barra superior fija (WCAG 2.4.11).** El
+  documento no tenía `scroll-padding-top` (Filament solo pone `scroll-margin-top` en sus
+  `[data-field-wrapper]`: un wrapper suelto, un enlace o una acción de tabla seguían tapados).
+  Ahora, cuando hay `.fi-topbar`, `scroll-padding-top: calc(var(--muni-panel-topbar-h) + 1rem)`.
+  Medido en el banco: de 7/22 campos tapados a 0/22.
+- **El campo deshabilitado se veía igual de activo que uno normal.** `.fi-input-wrp.fi-disabled`
+  lleva ahora un borde atenuado propio (`--muni-field-border-disabled`: 2,28:1 frente al borde
+  activo en claro y 2,46:1 en oscuro) y `cursor: not-allowed` en el envoltorio y en el control. El
+  inválido deshabilitado conserva el borde de error.
+- **El candado del alto de la barra acepta Filament 5.7.8.** Hasta 5.7.6 `.fi-topbar` es
+  `min-h-16`; desde 5.7.8 es `min-h-(--topbar-height)` con `--topbar-height: 4rem` en `.fi-body`
+  (web-graneros ya está ahí). El alto no cambió, así que `--muni-panel-topbar-h` sigue en `4rem` y
+  fijo: la variable de Filament vive en `.fi-body`, donde la regla de `:root` no puede leerla.
+- **`<x-muni::data-table>` alargaba la página entera.** El `<caption class="muni-sr">` tiene
+  `position:absolute` y estaba dentro de `.muni-dt__scroll` (`overflow:auto`) sin `position:relative`
+  (hallado en seguridad-graneros). El `position:relative` ya llegó con 0.20.0; aquí queda el
+  candado: `DataTableScrollRelativeTest.php`.
+- **Mismo defecto en `<x-muni::sortable-table>` y `<x-muni::diff-campos>`.** Su contenedor con
+  `overflow` (el `<div>` de la tabla y `.muni-dc__marco`) contiene elementos `muni-sr`/`muni-dc__sr`
+  absolutos y tampoco era `position:relative`. Candado ampliado en `DataTableScrollRelativeTest.php`.
+- **La suite entera reventaba con «Cannot redeclare function reglaCss()».** Dos archivos de prueba la
+  declaraban; ahora vive en `tests/Helpers/ReglasCss.php`.
+
+### Republicar
+
+- Todo lo de **Cambiado**, lo **Agregado** y los tres primeros puntos de **Corregido** viven en
+  `muni-ui-filament.css`: los sistemas con `MuniPanel` deben correr
+  `php artisan vendor:publish --tag=muni-ui-filament --force` para que
+  `public/vendor/muni-ui/filament.css` lo reciba; subir solo el `composer.json` no basta. Los tres
+  puntos de las tablas van dentro de los componentes Blade y no exigen publicar nada.
+- Un sistema que haya puesto el borde en `style` (seguridad-graneros,
+  `reporte-operacion.blade.php`) debe quitarlo: el tema ya pinta el borde y el estado inválido, y si
+  hiciera falta otro borde, una utilidad en `class` ahora gana. El paso está en la nota de la
+  versión.
+
 ## [0.20.0] — 2026-09-26
 
 El constraint de cada sistema pasa a `^0.20` (en 0.x, `^0.19` no cruza) y **hay que volver a

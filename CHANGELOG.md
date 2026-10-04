@@ -48,6 +48,10 @@ Antes de subirla, lee [`docs/UPGRADE-0.21.0.md`](docs/UPGRADE-0.21.0.md).
   `--muni-muted` de cada rama: claro, oscuro y papel) y `--muni-panel-topbar-h` (`4rem`, el alto
   de la barra de Filament; no es `--muni-topbar-h`, la de `<x-muni::topbar>`).
 
+## [0.20.1] - 2026-10-01
+
+Solo arreglos: el constraint `^0.20` sigue valiendo. No hay que volver a publicar nada.
+
 ### Corregido
 
 - **El chevron del `<select>` de Filament no llegaba a 3:1 en oscuro (WCAG 1.4.11).** Filament lo dibuja

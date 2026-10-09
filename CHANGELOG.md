@@ -12,6 +12,10 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 
 ## [Sin publicar]
 
+### Seguridad
+
+- `filament/filament` (require-dev) con piso `^5.10` (antes `^5.0`): la suite del paquete se prueba contra la versión corregida de las cuatro advisories del 2026-10-08 (GHSA-6p72-cx74-63f5, GHSA-jpwg-8rw9-v3jj, GHSA-q2ph-j76w-c7qx y GHSA-9g92-9qj5-cqjc). No cambia lo que exige a quien lo instala: Filament sigue siendo opcional.
+
 Al cerrarse sale como **0.21.0**, no como 0.20.1: cambia el aspecto del panel sin que nadie toque
 una línea (el borde de todos los campos de Filament pasa de 1,4:1 a 3:1 y `--muni-field-border`
 oscuro cambia de valor) y cambia la cascada (el borde va en `@layer components`, así que una

@@ -43,7 +43,7 @@
 </div>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-otp { width:46px; height:54px; text-align:center; font-family:var(--muni-font-mono); font-size:22px; font-weight:700; color:var(--muni-text);
             background:var(--muni-surface); border:1px solid var(--muni-field-border); border-radius:var(--muni-radius-sm);
             transition:border-color var(--muni-dur) var(--muni-ease),box-shadow var(--muni-dur) var(--muni-ease); }

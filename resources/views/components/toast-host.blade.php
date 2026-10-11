@@ -365,7 +365,7 @@
 </div>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* Oculto a la vista, presente en el árbol de accesibilidad. Se repite la misma
            declaración que publican el anunciador y la tabla ordenable a propósito: lo que
            un componente necesita para funcionar viaja con él, porque dentro de un panel

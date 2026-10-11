@@ -51,7 +51,7 @@
 </div>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* La barra crece un trayecto: --muni-dur-slow, con respaldo para una
            hoja publicada vieja. La guardia de abajo cubre el panel Filament,
            donde --muni-dur no baja con movimiento reducido. */

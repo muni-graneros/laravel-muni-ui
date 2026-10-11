@@ -311,7 +311,7 @@ it('la hoja respeta el contrato del paquete', function () {
         .implode(' | ', $colores[0] ?? [])
     );
 
-    expect((bool) preg_match('#@once\s*(?:\R|\s)*<style>#', $codigo))->toBeTrue(
+    expect((bool) preg_match('#@once\s*(?:\R|\s)*<style\b[^>]*>#', $codigo))->toBeTrue(
         'El bloque <style> no está dentro de @once: se repite una vez por cada hoja de la página.'
     );
 

@@ -247,7 +247,7 @@
      color sale de un token con rama clara y rama oscura; el único literal es el
      tercer respaldo del foco. --}}
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-tabr { display:block;border-bottom:1px solid var(--muni-border);margin-bottom:16px; }
         {{-- La fila ENVUELVE en vez de desplazarse en horizontal: a 320px una fila
              desplazable rompe 1.4.10 y, de paso, recortaría la barra inferior de la

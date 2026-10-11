@@ -99,6 +99,12 @@ Solo arreglos: el constraint `^0.20` sigue valiendo. No hay que volver a publica
   `min-h-16`; desde 5.7.8 es `min-h-(--topbar-height)` con `--topbar-height: 4rem` en `.fi-body`
   (web-graneros ya está ahí). El alto no cambió, así que `--muni-panel-topbar-h` sigue en `4rem` y
   fijo: la variable de Filament vive en `.fi-body`, donde la regla de `:root` no puede leerla.
+- **Los `<style>` en línea de los componentes no llevaban nonce CSP.** Con `style-src 'nonce-…'`
+  el navegador los bloqueaba y se perdían el anillo de foco del botón, las cajas del OTP y la
+  franja gob (hallado al integrar laravel-muni-mfa, que ya imprime su nonce con `Vite::cspNonce()`).
+  Los 77 componentes que traen CSS ahora emiten `<style nonce="…">` vía `Muni\Ui\Support\Nonce::attr()`;
+  sin nonce configurado no se imprime ningún atributo. Candado: `NonceCspEnLineaTest.php`. Los
+  anfitriones con CSP de nonce deben llamar `Vite::useCspNonce()` en su middleware (como ya hacen).
 - **`<x-muni::data-table>` alargaba la página entera.** El `<caption class="muni-sr">` tiene
   `position:absolute` y estaba dentro de `.muni-dt__scroll` (`overflow:auto`) sin `position:relative`
   (hallado en seguridad-graneros). El `position:relative` ya llegó con 0.20.0; aquí queda el

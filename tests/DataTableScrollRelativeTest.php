@@ -14,7 +14,7 @@
 function cssDeComponente(string $nombre): string
 {
     $fuente = file_get_contents(__DIR__.'/../resources/views/components/'.$nombre.'.blade.php');
-    preg_match_all('#<style>(.*?)</style>#s', $fuente, $bloques);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', $fuente, $bloques);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $bloques[1] ?? []));
 }

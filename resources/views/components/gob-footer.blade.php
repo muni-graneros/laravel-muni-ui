@@ -49,7 +49,7 @@
 </footer>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-gob-footer { background:var(--muni-gob-petroleo-dark); color:#d9e6e8; font-family:var(--muni-font-sans); }
         .muni-gob-footer__in { display:flex; gap:clamp(24px,5vw,60px); max-width:1180px; margin:0 auto; padding:36px clamp(16px,3vw,26px) 28px; flex-wrap:wrap; }
         .muni-gob-footer__brand { display:flex; align-items:center; gap:14px; }

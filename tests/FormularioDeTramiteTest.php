@@ -62,7 +62,7 @@ function tramiteHtmlCompleto(): string
 /** El HTML del componente SIN su bloque de estilos: lo que ve el árbol del documento. */
 function tramiteSinEstilos(string $html): string
 {
-    return (string) preg_replace('/<style>.*?<\/style>/s', '', $html);
+    return (string) preg_replace('/<style\b[^>]*>.*?<\/style>/s', '', $html);
 }
 
 function tramiteFuente(): string
@@ -87,7 +87,7 @@ function tramiteFuenteSinComentarios(): string
 /** Solo el CSS de los dos bloques de estilo, con los comentarios ya fuera. */
 function tramiteCss(): string
 {
-    preg_match_all('/<style>(.*?)<\/style>/s', tramiteFuente()."\n".seccionFuente(), $m);
+    preg_match_all('/<style\b[^>]*>(.*?)<\/style>/s', tramiteFuente()."\n".seccionFuente(), $m);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $m[1]));
 }
@@ -626,7 +626,7 @@ it('el movimiento sale del token y se apaga solo', function () {
 
 it('lleva su propio CSS dentro del componente', function () {
     foreach (['formulario-tramite' => tramiteFuente(), 'formulario-seccion' => seccionFuente()] as $nombre => $fuente) {
-        expect(str_contains($fuente, '<style>'))->toBeTrue("`{$nombre}` no trae su bloque de estilos.");
+        expect(str_contains($fuente, '<style'))->toBeTrue("`{$nombre}` no trae su bloque de estilos.");
         expect(substr_count($fuente, '@once'))->toBe(1, "`{$nombre}` tiene que emitir su CSS una sola vez por petición.");
     }
 
@@ -743,7 +743,7 @@ it('no nombra una directiva dentro de un comentario CSS', function () {
     // Solo los comentarios que viven DENTRO de un bloque <style>: ahí `/* */` no es un
     // comentario de Blade, es texto que Blade compila (DESIGN §8, trampa #5). Un
     // comentario de PHP dentro de un bloque @php ya está fuera del compilador.
-    preg_match_all('/<style>(.*?)<\/style>/s', tramiteFuente()."\n".seccionFuente(), $bloques);
+    preg_match_all('/<style\b[^>]*>(.*?)<\/style>/s', tramiteFuente()."\n".seccionFuente(), $bloques);
 
     preg_match_all('#/\*(.*?)\*/#s', implode("\n", $bloques[1]), $comentarios);
 

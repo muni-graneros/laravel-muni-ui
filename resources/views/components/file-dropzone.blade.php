@@ -199,7 +199,7 @@
 </div>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-dz { position:relative; display:flex; flex-direction:column; align-items:center; gap:6px; padding:26px 20px; text-align:center;
             border:1.5px dashed var(--muni-border-2); border-radius:var(--muni-radius); background:var(--muni-surface-2); cursor:pointer;
             font-family:var(--muni-font-sans); transition:border-color var(--muni-dur) var(--muni-ease),background var(--muni-dur) var(--muni-ease); }

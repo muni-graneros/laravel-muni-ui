@@ -59,7 +59,7 @@ function fuenteAyudaBreveSinComentarios(): string
 /** El contenido de los bloques `<style>` del componente, sin comentarios. */
 function cssAyudaBreve(): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', fuenteAyudaBreve(), $m);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', fuenteAyudaBreve(), $m);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $m[1]));
 }
@@ -541,7 +541,7 @@ it('no escribe un solo color literal', function () {
 });
 
 it('el bloque de estilos viaja dentro del componente y el movimiento usa el token', function () {
-    expect((bool) preg_match('#@once\s*(?:\R|\s)*<style>#', fuenteAyudaBreve()))->toBeTrue(
+    expect((bool) preg_match('#@once\s*(?:\R|\s)*<style\b[^>]*>#', fuenteAyudaBreve()))->toBeTrue(
         'El bloque <style> no está dentro de @once: se repite una vez por cada ayuda de la página.'
     );
 

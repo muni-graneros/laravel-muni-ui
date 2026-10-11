@@ -235,7 +235,7 @@
 </span>
 
 @once
-    <style>
+    <style @if ($muniNonce = \Illuminate\Support\Facades\Vite::cspNonce()) nonce="{{ $muniNonce }}" @endif>
         /* Todo lo que este componente necesita para verse bien viaja con él:
            dentro de un panel Filament solo se carga muni-ui-filament.css, y una
            clase declarada nada más en muni-ui.css no existiría ahí, sin un solo

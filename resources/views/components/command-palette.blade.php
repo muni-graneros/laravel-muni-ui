@@ -140,7 +140,7 @@
 </div>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-cmdk__opcion{display:flex;align-items:center;gap:11px;padding:10px 11px;border-radius:var(--muni-radius-sm);text-decoration:none;color:var(--muni-text);}
         /* La opción marcada no puede ser solo un gris casi igual a la superficie (1,1:1):
            fondo de acento suave y una barra de acento a la izquierda. */

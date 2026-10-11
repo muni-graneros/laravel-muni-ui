@@ -14,7 +14,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $code }} · {{ $title }}</title>
     {{ $head ?? '' }}
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         *,*::before,*::after{ box-sizing:border-box; }
         body{ margin:0; min-height:100vh; display:grid; place-items:center; padding:24px; background:var(--muni-bg); color:var(--muni-text); font-family:var(--muni-font-sans); text-align:center; }
         .muni-err__grid{ position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.6;

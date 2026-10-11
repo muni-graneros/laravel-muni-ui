@@ -67,7 +67,7 @@ function codigoGrupoCasillas(string $componente): string
 /** El contenido de los bloques `<style>` de un componente, ya sin comentarios. */
 function cssGrupoCasillas(string $componente): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', fuenteGrupoCasillas($componente), $m);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', fuenteGrupoCasillas($componente), $m);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $m[1]));
 }
@@ -91,7 +91,7 @@ function grupoHtml(string $extra = ''): string
  */
 function etiquetasInputGrupo(string $html): array
 {
-    preg_match_all('/<input\b[^>]*>/i', (string) preg_replace('#<style>.*?</style>#s', '', $html), $m);
+    preg_match_all('/<input\b[^>]*>/i', (string) preg_replace('#<style\b[^>]*>.*?</style>#s', '', $html), $m);
 
     return $m[0];
 }

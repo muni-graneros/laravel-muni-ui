@@ -53,7 +53,7 @@
 </div>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-drawer__x { display:inline-flex; padding:6px; border:none; background:transparent; color:var(--muni-muted); border-radius:var(--muni-radius-sm); cursor:pointer; transition:background var(--muni-dur) var(--muni-ease),color var(--muni-dur) var(--muni-ease); }
         .muni-drawer__x:hover { background:var(--muni-surface-3); color:var(--muni-text); }
         /* El outline es el indicador REAL: la box-shadow del anillo se pierde dentro de Filament (ver --muni-focus). */

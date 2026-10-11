@@ -52,7 +52,7 @@ function stSinComentarios(string $fuente): string
 /** El CSS de los bloques `<style>` del componente, sin comentarios. */
 function stCss(): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', stFuente(), $m);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', stFuente(), $m);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $m[1]));
 }

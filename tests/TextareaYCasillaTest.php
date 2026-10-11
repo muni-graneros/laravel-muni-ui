@@ -69,7 +69,7 @@ function codigoCampoNuevo(string $componente): string
 /** El contenido de los bloques `<style>` de la fuente, ya sin comentarios. */
 function cssCampoNuevo(string $componente): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', fuenteCampoNuevo($componente), $m);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', fuenteCampoNuevo($componente), $m);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $m[1]));
 }

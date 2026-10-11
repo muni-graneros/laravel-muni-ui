@@ -157,7 +157,7 @@ it('el buscador tiene nombre accesible, no solo placeholder', function () {
     if ($tieneLabelPropio) {
         $componente = file_get_contents(__DIR__.'/../resources/views/components/sortable-table.blade.php');
 
-        preg_match('#<style>(.*?)</style>#s', $componente, $style);
+        preg_match('#<style\b[^>]*>(.*?)</style>#s', $componente, $style);
         $css = (string) preg_replace('#/\*.*?\*/#s', '', $style[1] ?? '');
 
         if (preg_match('/\.muni-sr\s*(?:,[^{]*)?\{([^}]*)\}/', $css, $regla)) {

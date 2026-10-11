@@ -18,6 +18,13 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 > 3:1. Las etiquetas no se mueven (los `composer.lock` ya la resolvieron): esta sección se cierra
 > como **0.22.0**, y donde abajo dice 0.21 / `^0.21` / `UPGRADE-0.21.0.md` vale para 0.22.
 
+### Seguridad (lo que se rompe al subir)
+
+- `composer.json` declara `"conflict": {"filament/filament": ">=5.0 <5.10.1"}`. Un sistema con
+  Filament 5 anterior a 5.10.1 en su lock tiene que subir Filament en el mismo `composer update`
+  para adoptar esta versión. Filament 3 (personas-graneros) no se ve afectado: el rango empieza
+  en 5.0 a propósito.
+
 ### CI
 
 - `permissions: contents: read` y `concurrency` en `ci.yml`; `actions/checkout` y

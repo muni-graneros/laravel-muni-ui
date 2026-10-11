@@ -6,12 +6,21 @@ on:
   pull_request:
     branches: [main, develop]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Solo lectura: ningún job escribe en el repositorio. El token de composer para el
+# paquete privado llega por secreto, no por el GITHUB_TOKEN.
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Pint + PHPStan + Pest
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -41,7 +50,7 @@ jobs:
       # Los bancos de navegador que genera Pest (pantalla-bloqueo, selector-tema,
       # plantilla-pantalla…) embeben Alpine y el plugin Focus desde node_modules:
       # sin ellos las pruebas fallan con «corre `npm install`».
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
           cache: npm
@@ -51,11 +60,16 @@ jobs:
       - name: Pest
         run: ./vendor/bin/pest
 
+      # Los sistemas del ecosistema instalan este paquete: un aviso de seguridad
+      # en lo que exige se reparte a todos. Bloquea a propósito, sin `|| true`.
+      - name: Auditoría de dependencias (composer audit)
+        run: composer audit --no-dev --format=plain
+
   catalogo:
     name: Catálogo
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -72,7 +86,7 @@ jobs:
 
       - run: composer install --no-progress --prefer-dist
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
           cache: npm
@@ -114,7 +128,7 @@ jobs:
     name: Livewire 3
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -133,7 +147,7 @@ jobs:
           cp -r ../../workbench ../../testbench.yaml .
           composer dump-autoload
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
           cache: npm

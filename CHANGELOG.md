@@ -12,6 +12,29 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 
 ## [Sin publicar]
 
+> **Ojo con el número:** la etiqueta `v0.21.0` ya existe en el remoto y apunta por error a
+> `436f1c1`, el mismo commit que `v0.19.0` («Release muni-ui 0.21.0: borde de campo 3:1» en el
+> mensaje, código de 0.19). Un sistema que pida `^0.21` instala hoy el código de 0.19 sin el borde
+> 3:1. Las etiquetas no se mueven (los `composer.lock` ya la resolvieron): esta sección se cierra
+> como **0.22.0**, y donde abajo dice 0.21 / `^0.21` / `UPGRADE-0.21.0.md` vale para 0.22.
+
+### Seguridad (lo que se rompe al subir)
+
+- `composer.json` declara `"conflict": {"filament/filament": ">=5.0 <5.10.1"}`. Un sistema con
+  Filament 5 anterior a 5.10.1 en su lock tiene que subir Filament en el mismo `composer update`
+  para adoptar esta versión. Filament 3 (personas-graneros) no se ve afectado: el rango empieza
+  en 5.0 a propósito.
+
+### CI
+
+- `permissions: contents: read` y `concurrency` en `ci.yml`; `actions/checkout` y
+  `actions/setup-node` a v7 (las demás piezas del ecosistema ya estaban ahí).
+- `composer audit --no-dev` bloqueante en el job principal, como en laravel-muni-shared.
+- Escaneo de secretos (gitleaks 8.30.1 verificado por checksum, árbol + historial) en un
+  workflow propio, `secretos.yml`.
+- Dependabot hacia `develop` (composer, npm de la raíz y de `demo/catalogo`, actions), con
+  menores agrupadas.
+
 ### Seguridad
 
 - `filament/filament` (require-dev) con piso `^5.10` (antes `^5.0`): la suite del paquete se prueba contra la versión corregida de las cuatro advisories del 2026-10-08 (GHSA-6p72-cx74-63f5, GHSA-jpwg-8rw9-v3jj, GHSA-q2ph-j76w-c7qx y GHSA-9g92-9qj5-cqjc). No cambia lo que exige a quien lo instala: Filament sigue siendo opcional.

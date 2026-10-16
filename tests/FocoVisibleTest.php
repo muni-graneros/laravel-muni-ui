@@ -60,7 +60,7 @@ it('toda regla de foco declara su propio outline visible', function () {
     $sinOutline = [];
 
     foreach (componentesBlade() as $archivo => $html) {
-        preg_match_all('#<style>(.*?)</style>#s', $html, $bloques);
+        preg_match_all('#<style\b[^>]*>(.*?)</style>#s', $html, $bloques);
 
         foreach ($bloques[1] as $css) {
             $css = (string) preg_replace('#/\*.*?\*/#s', '', $css);

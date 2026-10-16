@@ -118,7 +118,7 @@
 </ol>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-timeline { list-style:none; margin:0; padding:0; font-family:var(--muni-font-sans); }
         .muni-tl__item { position:relative; display:flex; gap:14px; padding-bottom:18px; }
         .muni-tl__item:not(:last-child)::before { content:""; position:absolute; left:6px; top:16px; bottom:0; width:2px; background:var(--muni-border); }

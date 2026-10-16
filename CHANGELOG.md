@@ -12,6 +12,35 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 
 ## [Sin publicar]
 
+## [0.22.0] - 2026-10-16
+
+> **Ojo con el número:** la etiqueta `v0.21.0` ya existe en el remoto y apunta por error a
+> `436f1c1`, el mismo commit que `v0.19.0` («Release muni-ui 0.21.0: borde de campo 3:1» en el
+> mensaje, código de 0.19). Un sistema que pida `^0.21` instala hoy el código de 0.19 sin el borde
+> 3:1. Las etiquetas no se mueven (los `composer.lock` ya la resolvieron): esta sección se cierra
+> como **0.22.0**, y donde abajo dice 0.21 / `^0.21` / `UPGRADE-0.21.0.md` vale para 0.22.
+
+### Seguridad (lo que se rompe al subir)
+
+- `composer.json` declara `"conflict": {"filament/filament": ">=5.0 <5.10.1"}`. Un sistema con
+  Filament 5 anterior a 5.10.1 en su lock tiene que subir Filament en el mismo `composer update`
+  para adoptar esta versión. Filament 3 (personas-graneros) no se ve afectado: el rango empieza
+  en 5.0 a propósito.
+
+### CI
+
+- `permissions: contents: read` y `concurrency` en `ci.yml`; `actions/checkout` y
+  `actions/setup-node` a v7 (las demás piezas del ecosistema ya estaban ahí).
+- `composer audit --no-dev` bloqueante en el job principal, como en laravel-muni-shared.
+- Escaneo de secretos (gitleaks 8.30.1 verificado por checksum, árbol + historial) en un
+  workflow propio, `secretos.yml`.
+- Dependabot hacia `develop` (composer, npm de la raíz y de `demo/catalogo`, actions), con
+  menores agrupadas.
+
+### Seguridad
+
+- `filament/filament` (require-dev) con piso `^5.10` (antes `^5.0`): la suite del paquete se prueba contra la versión corregida de las cuatro advisories del 2026-10-08 (GHSA-6p72-cx74-63f5, GHSA-jpwg-8rw9-v3jj, GHSA-q2ph-j76w-c7qx y GHSA-9g92-9qj5-cqjc). No cambia lo que exige a quien lo instala: Filament sigue siendo opcional.
+
 Al cerrarse sale como **0.21.0**, no como 0.20.1: cambia el aspecto del panel sin que nadie toque
 una línea (el borde de todos los campos de Filament pasa de 1,4:1 a 3:1 y `--muni-field-border`
 oscuro cambia de valor) y cambia la cascada (el borde va en `@layer components`, así que una
@@ -72,6 +101,12 @@ Solo arreglos: el constraint `^0.20` sigue valiendo. No hay que volver a publica
   `min-h-16`; desde 5.7.8 es `min-h-(--topbar-height)` con `--topbar-height: 4rem` en `.fi-body`
   (web-graneros ya está ahí). El alto no cambió, así que `--muni-panel-topbar-h` sigue en `4rem` y
   fijo: la variable de Filament vive en `.fi-body`, donde la regla de `:root` no puede leerla.
+- **Los `<style>` en línea de los componentes no llevaban nonce CSP.** Con `style-src 'nonce-…'`
+  el navegador los bloqueaba y se perdían el anillo de foco del botón, las cajas del OTP y la
+  franja gob (hallado al integrar laravel-muni-mfa, que ya imprime su nonce con `Vite::cspNonce()`).
+  Los 77 componentes que traen CSS ahora emiten `<style nonce="…">` vía `Muni\Ui\Support\Nonce::attr()`;
+  sin nonce configurado no se imprime ningún atributo. Candado: `NonceCspEnLineaTest.php`. Los
+  anfitriones con CSP de nonce deben llamar `Vite::useCspNonce()` en su middleware (como ya hacen).
 - **`<x-muni::data-table>` alargaba la página entera.** El `<caption class="muni-sr">` tiene
   `position:absolute` y estaba dentro de `.muni-dt__scroll` (`overflow:auto`) sin `position:relative`
   (hallado en seguridad-graneros). El `position:relative` ya llegó con 0.20.0; aquí queda el

@@ -63,7 +63,7 @@ function fuenteCampoDeClaveSinComentarios(): string
 /** El contenido de los bloques de estilo del componente, sin comentarios. */
 function cssCampoDeClave(): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', fuenteCampoDeClave(), $m);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', fuenteCampoDeClave(), $m);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $m[1]));
 }

@@ -73,7 +73,7 @@
     y una hoja publicada vieja sin el token.
 --}}
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* Con !important: la transición va en el style de cada arco. */
         @media (prefers-reduced-motion:reduce) { .muni-donut__arco { transition:none !important; } }
     </style>

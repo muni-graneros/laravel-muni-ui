@@ -91,6 +91,16 @@ if [ -n "$PHPSTAN_CFG" ]; then
             PHPSTAN="docker compose exec -T app vendor/bin/phpstan"
         fi
 
+        # Autoload viejo: si composer.json cambió (p. ej. un `autoload-dev` nuevo como
+        # `Workbench\App\`) y nadie regeneró vendor/, Larastan arranca el testbench y
+        # muere con «Class Workbench\App\Providers\WorkbenchServiceProvider not found»,
+        # un falso rojo de entorno. Se regenera solo cuando está desfasado.
+        if [ -f vendor/composer/autoload_psr4.php ] && [ composer.json -nt vendor/composer/autoload_psr4.php ] \
+            && command -v composer >/dev/null 2>&1; then
+            echo "pre-commit: composer.json es más nuevo que el autoload de vendor/; regenerando…"
+            XDEBUG_MODE=off composer dump-autoload --quiet || true
+        fi
+
         if [ -n "$PHPSTAN" ]; then
             echo "pre-commit: PHPStan sobre ${#ANALIZAR[@]} archivo(s)…"
             # --memory-limit=1G: sin esto PHPStan muere en los repos con Filament.

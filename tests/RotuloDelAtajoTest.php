@@ -34,7 +34,7 @@ function fuenteDeLaPaleta(): string
 /** Solo el bloque <style> del componente, sin comentarios. */
 function estiloDeLaPaleta(): string
 {
-    expect((bool) preg_match('#<style>(.*?)</style>#s', fuenteDeLaPaleta(), $m))->toBeTrue(
+    expect((bool) preg_match('#<style\b[^>]*>(.*?)</style>#s', fuenteDeLaPaleta(), $m))->toBeTrue(
         'La paleta no tiene bloque <style>.'
     );
 

@@ -125,7 +125,7 @@
 {{-- Lo que el componente necesita para verse bien viaja con el componente (DESIGN §7):
      dentro de un panel Filament `muni-ui.css` no se carga. --}}
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-page { display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;padding:0 9px;
             border-radius:var(--muni-radius-sm);border:1px solid transparent;color:var(--muni-muted);text-decoration:none;
             font-variant-numeric:tabular-nums;transition:background var(--muni-dur) var(--muni-ease),color var(--muni-dur) var(--muni-ease); }

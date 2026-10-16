@@ -269,7 +269,7 @@
 @endif
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* La firma del sistema: cifras y fechas en mono tabular, igual que en
            data-table. Se define también acá porque un formulario puede no tener
            ninguna tabla en pantalla, y entonces la clase no existiría. */

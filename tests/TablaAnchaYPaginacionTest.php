@@ -47,7 +47,7 @@ function cssTablaAncha(): string
 {
     $fuente = file_get_contents(__DIR__.'/../resources/views/components/data-table.blade.php');
 
-    preg_match_all('#<style>(.*?)</style>#s', $fuente, $bloques);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', $fuente, $bloques);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $bloques[1] ?? []));
 }
@@ -57,7 +57,7 @@ function cssPaginador(): string
 {
     $fuente = file_get_contents(__DIR__.'/../resources/views/components/pagination.blade.php');
 
-    preg_match_all('#<style>(.*?)</style>#s', $fuente, $bloques);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', $fuente, $bloques);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $bloques[1] ?? []));
 }

@@ -58,7 +58,7 @@
 </div>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-acc { border:1px solid var(--muni-border); border-radius:var(--muni-radius); overflow:hidden; background:var(--muni-surface); }
         .muni-acc__item + .muni-acc__item { border-top:1px solid var(--muni-border); }
         .muni-acc__head { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; padding:15px 18px; background:transparent; border:none; cursor:pointer; font-family:var(--muni-font-sans); font-size:14px; font-weight:600; color:var(--muni-text); text-align:left; transition:background var(--muni-dur) var(--muni-ease); }

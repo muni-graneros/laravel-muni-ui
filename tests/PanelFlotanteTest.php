@@ -74,7 +74,7 @@ function codigoPanelFlotante(): string
 /** El CSS que el componente lleva dentro de su bloque de estilos. */
 function cssPanelFlotante(): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', fuentePanelFlotante(), $m);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', fuentePanelFlotante(), $m);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $m[1] ?? []));
 }

@@ -562,7 +562,7 @@ it('el bloque de estilos viaja dentro del componente', function () {
 
     expect(substr_count($fuente, '@once'))->toBe(1, 'El bloque de estilos va una sola vez y dentro de su propio @once (DESIGN §7).');
     expect(substr_count($fuente, '@endonce'))->toBe(1, 'Falta cerrar el bloque.');
-    expect(str_contains($fuente, '<style>'))->toBeTrue('Lo que el componente necesita para verse bien viaja con el componente.');
+    expect(str_contains($fuente, '<style'))->toBeTrue('Lo que el componente necesita para verse bien viaja con el componente.');
 
     // Y entra por el <head> del armazón: detrás de </html> el navegador lo reubica
     // en el <body> y funciona de casualidad.

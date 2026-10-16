@@ -63,7 +63,7 @@ function fuenteGuardiaSinComentarios(): string
 /** El CSS del bloque de estilos del componente, sin comentarios. */
 function cssGuardia(): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', fuenteGuardia(), $m);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', fuenteGuardia(), $m);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $m[1]));
 }

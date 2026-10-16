@@ -82,7 +82,7 @@ function anilloFuenteSinComentarios(): string
 /** El CSS que el anillo lleva en su bloque de estilos, sin comentarios. */
 function anilloCss(): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', anilloFuente(), $bloques);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', anilloFuente(), $bloques);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $bloques[1] ?? []));
 }
@@ -223,7 +223,7 @@ it('apaga la transición del arco con movimiento reducido en su propio bloque de
         ->toBeTrue('el bloque de estilos apaga .muni-ring__arco bajo prefers-reduced-motion con !important');
     expect(preg_match('#class="muni-ring__arco"#', anilloHtml('value="40"')) === 1)
         ->toBeTrue('el círculo de avance lleva la clase que la guardia apunta');
-    preg_match_all('#<style>(.*?)</style>#s', anilloFuente(), $bloques);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', anilloFuente(), $bloques);
     preg_match_all('#/\*.*?\*/#s', implode("\n", $bloques[1] ?? []), $comentarios);
     expect(preg_match('/@(once|endonce|if|endif)\b/', implode("\n", $comentarios[0])) === 0)
         ->toBeTrue('DESIGN §8 trampa 5: ninguna directiva nombrada dentro de un comentario CSS');
@@ -342,10 +342,10 @@ it('anima con --muni-dur-slow y sin duración literal', function (string $compon
 it('apaga la transición con movimiento reducido en su propio bloque de estilos', function (string $componente, string $clase, string $html) {
     $fuente = familiaFuente($componente);
 
-    expect(preg_match('/@once\s*<style>/s', $fuente) === 1)
+    expect(preg_match('/@once\s*<style\b[^>]*>/s', $fuente) === 1)
         ->toBeTrue("{$componente}: la guardia viaja en su @once (DESIGN §7: el panel no carga muni-ui.css, y ahí --muni-dur no baja)");
 
-    preg_match_all('#<style>(.*?)</style>#s', $fuente, $bloques);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', $fuente, $bloques);
     $estilos = implode("\n", $bloques[1] ?? []);
     $css = (string) preg_replace('#/\*.*?\*/#s', '', $estilos);
 

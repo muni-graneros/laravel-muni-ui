@@ -185,7 +185,7 @@
 </div>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* Oculto a la vista, presente en el árbol de accesibilidad. Viaja con el
            componente y no en la hoja: dentro de un panel Filament solo se carga
            muni-ui-filament.css (DESIGN §7). */

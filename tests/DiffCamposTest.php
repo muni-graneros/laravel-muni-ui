@@ -67,7 +67,7 @@ function diffCamposFuenteSinComentarios(): string
 /** El CSS que el componente lleva consigo, sin comentarios. */
 function diffCamposCss(): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', diffCamposFuente(), $bloques);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', diffCamposFuente(), $bloques);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $bloques[1] ?? []));
 }

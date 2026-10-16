@@ -12,6 +12,8 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 
 ## [Sin publicar]
 
+## [0.22.0] - 2026-10-16
+
 > **Ojo con el número:** la etiqueta `v0.21.0` ya existe en el remoto y apunta por error a
 > `436f1c1`, el mismo commit que `v0.19.0` («Release muni-ui 0.21.0: borde de campo 3:1» en el
 > mensaje, código de 0.19). Un sistema que pida `^0.21` instala hoy el código de 0.19 sin el borde

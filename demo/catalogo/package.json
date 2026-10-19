@@ -9,8 +9,8 @@
   },
   "devDependencies": {
     "alpinejs": "3.17.4",
-    "axe-core": "4.13.0",
-    "playwright": "1.63.0",
+    "axe-core": "4.14.0",
+    "playwright": "1.64.1",
     "@alpinejs/focus": "3.17.4"
   }
 }

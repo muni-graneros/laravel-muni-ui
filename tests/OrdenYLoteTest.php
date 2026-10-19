@@ -427,7 +427,7 @@ it('la barra de acciones aparece solo con selección, y no tapa contenido ni rob
     );
 
     $componente = file_get_contents(__DIR__.'/../resources/views/components/sortable-table.blade.php');
-    preg_match('#<style>(.*?)</style>#s', $componente, $style);
+    preg_match('#<style\b[^>]*>(.*?)</style>#s', $componente, $style);
     $css = (string) preg_replace('#/\*.*?\*/#s', '', $style[1] ?? '');
 
     preg_match('/\.muni-st__bulk\s*\{([^}]*)\}/', $css, $regla);
@@ -474,7 +474,7 @@ it('la columna de selección y la barra no se imprimen', function () {
 
 it('la franja de morosidad cae sobre el dato y no sobre la casilla', function () {
     $componente = file_get_contents(__DIR__.'/../resources/views/components/sortable-table.blade.php');
-    preg_match('#<style>(.*?)</style>#s', $componente, $style);
+    preg_match('#<style\b[^>]*>(.*?)</style>#s', $componente, $style);
     $css = (string) preg_replace('#/\*.*?\*/#s', '', $style[1] ?? '');
 
     /* `td:first-child` NO sirve acá y por eso este candado cambió de selector

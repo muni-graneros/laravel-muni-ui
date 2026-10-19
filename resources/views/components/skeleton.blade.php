@@ -13,7 +13,7 @@
 ></span>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-skel { position:relative; overflow:hidden; background:var(--muni-surface-3); }
         .muni-skel::after { content:""; position:absolute; inset:0;
             background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--muni-text) 6%,transparent),transparent);

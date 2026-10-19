@@ -3,6 +3,7 @@
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\FileUpload;
+use Filament\Notifications\NotificationMailbox;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
@@ -69,6 +70,21 @@ function solicitudDePrueba(TipoDeSolicitud $tipo, Vecino $titular): Solicitud
 }
 
 /**
+ * Desde Filament 5.10.2 los avisos ya no viajan en la sesión: quedan pendientes en
+ * el buzón (`NotificationMailbox`, en caché) y la sesión solo guarda su dirección.
+ * Se publican los pendientes y se leen; cada prueba llama una sola vez.
+ *
+ * @return array<int, array<string, mixed>>
+ */
+function avisosDelBuzon(): array
+{
+    $buzon = app(NotificationMailbox::class);
+    $buzon->flush();
+
+    return $buzon->pull();
+}
+
+/**
  * Lo que el funcionario ve en pantalla.
  *
  * No se usa `assertNotified()`: compara solo el TÍTULO, y acá lo que hay que
@@ -79,10 +95,12 @@ function solicitudDePrueba(TipoDeSolicitud $tipo, Vecino $titular): Solicitud
 function avisos(): string
 {
     /** @var array<int, array<string, mixed>> $avisos */
-    $avisos = array_merge(
-        (array) session()->get('filament.claimed_notifications', []),
-        (array) session()->get('filament.notifications', []),
-    );
+    $avisos = class_exists(NotificationMailbox::class)
+        ? avisosDelBuzon()
+        : array_merge(
+            (array) session()->get('filament.claimed_notifications', []),
+            (array) session()->get('filament.notifications', []),
+        );
 
     return collect($avisos)
         ->map(fn (array $aviso): string => ((string) ($aviso['title'] ?? '')).' | '.((string) ($aviso['body'] ?? '')))

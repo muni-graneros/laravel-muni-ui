@@ -57,7 +57,7 @@
 @endif
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* Sin marcar va en --muni-hint y no en --muni-border-2: el borde queda en
            1,6:1 y la estrella vacía es lo único que dice cuántas faltan (1.4.11). */
         .muni-star { background:none; border:none; padding:0 1px; font-size:20px; line-height:1; color:var(--muni-hint); cursor:pointer; transition:color var(--muni-dur) var(--muni-ease),transform var(--muni-dur) var(--muni-ease); }

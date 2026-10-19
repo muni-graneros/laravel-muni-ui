@@ -40,7 +40,7 @@
 </a>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-skip-link {
             position: fixed; top: 0; left: 0; z-index: 1000;
             width: 1px; height: 1px; overflow: hidden;

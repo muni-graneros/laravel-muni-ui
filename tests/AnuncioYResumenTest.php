@@ -48,7 +48,7 @@ function fuenteResumenErrores(): string
 /** El contenido de los bloques `<style>` de un componente, sin comentarios. */
 function cssDelComponente(string $fuente): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', $fuente, $m);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', $fuente, $m);
 
     return (string) preg_replace('#/\*.*?\*/#s', '', implode("\n", $m[1]));
 }

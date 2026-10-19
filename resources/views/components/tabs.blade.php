@@ -91,7 +91,7 @@
 </div>
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-tab { position:relative;padding:10px 14px;font-family:var(--muni-font-sans);font-size:13.5px;font-weight:600;
             color:var(--muni-muted);background:transparent;border:none;cursor:pointer;white-space:nowrap;
             transition:color var(--muni-dur) var(--muni-ease); }

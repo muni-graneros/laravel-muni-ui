@@ -162,7 +162,7 @@
 @endif
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         /* El envoltorio NO genera caja: `display:contents` deja al radiogroup y al
            botón de respaldo como hijos directos del contenedor del anfitrión. Así la
            `class` y el `style` que el consumidor pone —y que van al radiogroup, como

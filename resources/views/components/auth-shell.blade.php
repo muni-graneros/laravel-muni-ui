@@ -20,7 +20,7 @@
     <x-muni::reverb-meta />
     <title>{{ $title }} · {{ $system }}</title>
     {{ $head ?? '' }}
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         *,*::before,*::after{ box-sizing:border-box; }
         body{ margin:0; min-height:100vh; display:grid; grid-template-columns:1fr; background:var(--muni-bg); color:var(--muni-text); font-family:var(--muni-font-sans); }
         @media (min-width:900px){ body{ grid-template-columns:1.05fr .95fr; } }

@@ -21,7 +21,7 @@
     <x-muni::reverb-meta />
     <title>{{ $title ?? $system }}</title>
     {{ $head ?? '' }}
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         *,*::before,*::after{ box-sizing:border-box; }
         body{ margin:0; min-height:100vh; background:var(--muni-bg); color:var(--muni-text); font-family:var(--muni-font-sans); display:flex; }
         .muni-ds__col{ flex:1; min-width:0; display:flex; flex-direction:column; }

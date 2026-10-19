@@ -25,7 +25,7 @@
 <x-muni::gob-stripe />
 
 @once
-    <style>
+    <style{!! \Muni\Ui\Support\Nonce::attr() !!}>
         .muni-gob-bar { width:100%; background:var(--muni-gob-petroleo-dark); color:#e8f1f2; font-family:var(--muni-font-sans); }
         .muni-gob-bar--sticky { position:sticky; top:0; z-index:70; }
         .muni-gob-bar__in { display:flex; align-items:center; gap:10px; max-width:1180px; margin:0 auto; padding:7px clamp(16px,3vw,26px); flex-wrap:wrap; }

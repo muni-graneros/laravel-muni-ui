@@ -80,7 +80,7 @@ function paresFuenteSinComentarios(string $nombre): string
 /** El CSS que un componente lleva consigo, ya sin comentarios. */
 function paresCss(string $nombre): string
 {
-    preg_match_all('#<style>(.*?)</style>#s', paresFuenteSinComentarios($nombre), $bloques);
+    preg_match_all('#<style\b[^>]*>(.*?)</style>#s', paresFuenteSinComentarios($nombre), $bloques);
 
     return implode("\n", $bloques[1]);
 }
@@ -451,7 +451,7 @@ it('respeta el contrato del paquete', function () {
         );
 
         // DESIGN §7: el CSS viaja DENTRO del componente, una sola vez.
-        if (str_contains($fuente, '<style>')) {
+        if (str_contains($fuente, '<style')) {
             expect(str_contains($fuente, '@once'))->toBeTrue(
                 "«{$nombre}» emite un bloque de estilos fuera de un bloque de una sola emisión: "
                 .'se repetiría una vez por par de la ficha.'
@@ -460,7 +460,7 @@ it('respeta el contrato del paquete', function () {
 
         // Trampa #5 de DESIGN §8: una directiva nombrada dentro de un comentario
         // CSS se compila igual y abre un bloque que nadie cierra.
-        preg_match_all('#<style>(.*?)</style>#s', paresFuente($nombre), $estilos);
+        preg_match_all('#<style\b[^>]*>(.*?)</style>#s', paresFuente($nombre), $estilos);
         preg_match_all('#/\*.*?\*/#s', implode("\n", $estilos[1]), $comentarios);
 
         foreach ($comentarios[0] as $comentario) {
@@ -538,7 +538,7 @@ it('el par no mete un bloque de estilos dentro del <dl>', function () {
     // dt, dd y elementos de soporte de script. Un <style> entre los pares es
     // HTML inválido y una violación de la regla `definition-list` de axe, que
     // además apagaría la revisión del resto del subárbol.
-    expect(str_contains(paresFuenteSinComentarios('description-item'), '<style>'))->toBeFalse(
+    expect(str_contains(paresFuenteSinComentarios('description-item'), '<style'))->toBeFalse(
         'El par declara su propio bloque de estilos: se emitiría dentro del <dl> y lo invalida. '
         .'Sus clases las emite el bloque de una sola emisión de <x-muni::description-list>.'
     );

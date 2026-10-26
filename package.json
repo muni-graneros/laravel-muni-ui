@@ -15,8 +15,8 @@
     "registro": "python3 scripts/gen-registry.py . registry.json"
   },
   "devDependencies": {
-    "@alpinejs/focus": "^3.17.4",
-    "alpinejs": "^3.17.4",
+    "@alpinejs/focus": "^3.17.5",
+    "alpinejs": "^3.17.5",
     "axe-core": "4.14.0"
   }
 }

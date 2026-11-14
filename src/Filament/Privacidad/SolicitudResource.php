@@ -17,6 +17,7 @@ use Filament\Support\Exceptions\Halt;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Client\RequestException;
@@ -119,17 +120,32 @@ class SolicitudResource extends Resource
      * Si alguna vez se quiere volver a la policy, hay que registrarla explícita
      * (`Gate::policy(Solicitud::class, …)`) y recién ahí quitar estos overrides.
      *
-     * El `?? false` no es defensivo por costumbre: sin sesión no hay a quién
-     * atribuirle el acceso a las solicitudes ARCOP de los vecinos.
+     * Los overrides son las respuestas de autorización que consume Filament:
+     * desde Filament 5.11 `authorizeCreate()` y `authorizeViewAny()` no
+     * consultan `canCreate()` ni `canViewAny()`.
      */
+    public static function getViewAnyAuthorizationResponse(): Response
+    {
+        return auth()->user()?->can(self::plugin()->permisoVer())
+            ? Response::allow()
+            : Response::deny();
+    }
+
+    public static function getCreateAuthorizationResponse(): Response
+    {
+        return auth()->user()?->can(self::plugin()->permisoRecibir())
+            ? Response::allow()
+            : Response::deny();
+    }
+
     public static function canViewAny(): bool
     {
-        return auth()->user()?->can(self::plugin()->permisoVer()) ?? false;
+        return static::getViewAnyAuthorizationResponse()->allowed();
     }
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->can(self::plugin()->permisoRecibir()) ?? false;
+        return static::getCreateAuthorizationResponse()->allowed();
     }
 
     /**

@@ -12,6 +12,12 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 
 ## [Sin publicar]
 
+### Seguridad
+
+- El panel ARCOP volvía a abrir el alta sin permiso de recepción con Filament 5.11+
+  (`authorizeCreate` ya no consulta `canCreate`). Ahora autoriza con
+  `getCreateAuthorizationResponse`/`getViewAnyAuthorizationResponse`.
+
 ## [0.22.0] - 2026-10-16
 
 > **Ojo con el número:** la etiqueta `v0.21.0` ya existe en el remoto y apunta por error a

@@ -12,6 +12,22 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 
 ## [Sin publicar]
 
+## [0.22.1] - 2026-11-14
+
+### Seguridad
+
+- El panel ARCOP volvía a abrir el alta sin permiso de recepción con Filament 5.11+
+  (`authorizeCreate` ya no consulta `canCreate`). Ahora autoriza con
+  `getCreateAuthorizationResponse`/`getViewAnyAuthorizationResponse`.
+
+### Dependencias
+
+- `alpinejs` y `@alpinejs/focus` 3.17.5 (raíz y catálogo), `playwright` del catálogo; `demo/catalogo.html`
+  regenerado.
+
+Parche: no cambia props, slots ni clases y no hay que volver a publicar artefactos. Los sistemas que
+usan el panel ARCOP deben subir a 0.22.1 **antes** de que su `composer update` lleve Filament a 5.11 o más.
+
 ## [0.22.0] - 2026-10-16
 
 > **Ojo con el número:** la etiqueta `v0.21.0` ya existe en el remoto y apunta por error a

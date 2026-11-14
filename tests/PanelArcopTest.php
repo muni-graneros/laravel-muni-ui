@@ -234,6 +234,12 @@ it('sin permiso de recepción no se abre el formulario', function () {
     livewire(CreateSolicitud::class)->assertForbidden();
 });
 
+it('sin permiso de ver no se lista ninguna solicitud', function () {
+    $this->actingAs(funcionario([]));
+
+    livewire(ListSolicitudes::class)->assertForbidden();
+});
+
 // ─── Resolver ────────────────────────────────────────────────────────────────
 
 it('tomar y resolver pasan por el módulo, no por un update del panel', function () {

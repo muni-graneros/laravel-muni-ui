@@ -12,6 +12,8 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 
 ## [Sin publicar]
 
+## [0.22.2] - 2026-11-23
+
 ### Accesibilidad
 
 - El foco del teclado se ve en la barra lateral del panel: los ítems y los botones de

@@ -12,6 +12,15 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 
 ## [Sin publicar]
 
+## [0.22.4] - 2026-11-23
+
+### Accesibilidad
+
+- El texto de ejemplo de los campos del panel (p. ej. «Buscar» en la búsqueda global) pasa
+  de 2,62:1 en claro y 3,18:1 en oscuro a 7,72:1 y 5,86:1 (WCAG 1.4.3). Los sistemas que
+  lo parchaban en su CSS propio (cas-graneros) pueden quitar su regla; los sistemas con
+  `MuniPanel` deben volver a publicar el CSS del tema.
+
 ## [0.22.3] - 2026-11-23
 
 ### Accesibilidad

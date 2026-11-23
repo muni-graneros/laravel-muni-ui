@@ -12,6 +12,8 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 
 ## [Sin publicar]
 
+## [0.22.3] - 2026-11-23
+
 ### Accesibilidad
 
 - El primario por defecto de `MuniPanel` pasa de `Color::hex('#355a63')` (cian, botón

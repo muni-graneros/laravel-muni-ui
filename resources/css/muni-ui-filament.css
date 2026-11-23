@@ -277,6 +277,15 @@
 /* Colapsar/expandir grupos: chevron claro */
 .fi-sidebar-group-collapse-button { color:var(--mg-sb-mut) !important; }
 
+/* Foco del teclado en la barra lateral (WCAG 2.4.7 y 1.4.11). El fondo es siempre
+   oscuro, así que el indicador del tema claro (--muni-focus, petróleo) no se ve.
+   Lima brillante #c3e07a medido: 7,48:1 sobre #10424c · 9,66:1 sobre #0b2f37 ·
+   11,23:1 sobre #082228 (mínimo exigido 3:1 en todo el degradado). */
+.fi-sidebar .fi-sidebar-item-btn:focus-visible,
+.fi-sidebar .fi-sidebar-group-collapse-button:focus-visible,
+.fi-sidebar .fi-sidebar-group .fi-icon-btn:focus-visible,
+.fi-sidebar .fi-sidebar-group-btn:focus-visible { outline:3px solid var(--mg-lima-br) !important; outline-offset:2px; }
+
 /* Pie institucional del sidebar (oscuro) */
 .mg-sidebar-foot{ margin-top:auto; padding:.9rem 1rem; border-top:1px solid rgba(255,255,255,.08); display:flex; align-items:center; gap:.6rem; background:linear-gradient(180deg,transparent,rgba(0,0,0,.25)); }
 .mg-sidebar-foot img{ width:28px; height:28px; object-fit:contain; filter:drop-shadow(0 0 6px rgba(173,205,96,.4)); }

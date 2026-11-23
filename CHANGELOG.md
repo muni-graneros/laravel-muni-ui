@@ -12,6 +12,8 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 
 ## [Sin publicar]
 
+## [0.22.4] - 2026-11-23
+
 ## [0.22.3] - 2026-11-23
 
 ### Accesibilidad

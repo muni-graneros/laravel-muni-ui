@@ -109,7 +109,9 @@ class MuniPanel implements Plugin
             );
 
         if ($this->aplicarColores) {
-            $panel->colors(['primary' => Color::hex('#355a63')]);
+            // No Color::hex(): en Filament 4+ impone el croma de Tailwind y da un cian
+            // (botón 3,42:1 en oscuro). generateV3Palette conserva el petróleo en 500.
+            $panel->colors(['primary' => Color::generateV3Palette('#355a63')]);
         }
     }
 

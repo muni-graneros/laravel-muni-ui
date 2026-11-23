@@ -12,6 +12,15 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 
 ## [Sin publicar]
 
+## [0.22.2] - 2026-11-23
+
+### Accesibilidad
+
+- El foco del teclado se ve en la barra lateral del panel: los ítems y los botones de
+  plegar grupos tenían un contorno casi invisible (1,01:1) o ninguno (WCAG 2.4.7 y
+  1.4.11). Ahora llevan un contorno lima de 3 px (7,48:1 a 11,23:1 sobre el degradado).
+  Los sistemas con `MuniPanel` deben volver a publicar el CSS del tema.
+
 ## [0.22.1] - 2026-11-14
 
 ### Seguridad

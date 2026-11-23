@@ -12,6 +12,15 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 
 ## [Sin publicar]
 
+## [0.22.3] - 2026-11-23
+
+### Accesibilidad
+
+- El primario por defecto de `MuniPanel` pasa de `Color::hex('#355a63')` (cian, botón
+  3,42:1 en oscuro) a `Color::generateV3Palette('#355a63')` (petróleo, 8,76:1). Los
+  sistemas que hoy llaman `conColores(false)` solo para corregir esto pueden quitarlo;
+  los que no lo llaman cambian de color al subir la versión.
+
 ## [0.22.2] - 2026-11-23
 
 ### Accesibilidad

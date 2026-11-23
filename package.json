@@ -17,6 +17,6 @@
   "devDependencies": {
     "@alpinejs/focus": "^3.17.5",
     "alpinejs": "^3.17.5",
-    "axe-core": "4.14.0"
+    "axe-core": "4.14.1"
   }
 }

@@ -16,6 +16,10 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 
 ### Accesibilidad
 
+- El texto de ejemplo de los campos del panel (p. ej. «Buscar» en la búsqueda global) pasa
+  de 2,62:1 en claro y 3,18:1 en oscuro a 7,72:1 y 5,86:1 (WCAG 1.4.3). Los sistemas que
+  lo parchaban en su CSS propio (cas-graneros) pueden quitar su regla; los sistemas con
+  `MuniPanel` deben volver a publicar el CSS del tema.
 - El primario por defecto de `MuniPanel` pasa de `Color::hex('#355a63')` (cian, botón
   3,42:1 en oscuro) a `Color::generateV3Palette('#355a63')` (petróleo, 8,76:1). Los
   sistemas que hoy llaman `conColores(false)` solo para corregir esto pueden quitarlo;

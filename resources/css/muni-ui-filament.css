@@ -656,6 +656,9 @@
            La barra lateral, que es su otro uso, no se imprime. */
         --mg-sb-txt:var(--muni-text);
         --mg-sb-mut:var(--muni-muted);
+        /* El placeholder de los campos en oscuro usa gray-400 (#9f9fa9, 2,62:1 sobre
+           blanco): en papel pasa al tono del placeholder claro, gray-600. */
+        --gray-400:#52525c;
         /* En papel la placa vuelve a blanco. Texto 21:1. */
         --muni-logo-plate:#ffffff;
         --muni-logo-plate-fg:#000000;

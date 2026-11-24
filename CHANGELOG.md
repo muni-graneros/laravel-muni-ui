@@ -12,6 +12,16 @@ volver a publicar artefactos, porque subir el `composer.json` no aplica nada por
 
 ## [Sin publicar]
 
+## [0.23.0] - 2026-11-24
+
+### Añadido
+
+- `Muni\Ui\Filament\Tablas\FiltroDeFecha`: filtro de fecha para tablas Filament con los atajos
+  «Hoy», «Ayer», «Esta semana», «Este mes» y «Rango», calculados en la zona de `app.timezone`.
+  `FiltroDeFecha::desdeHoy('columna')` arranca en «Hoy». Guarda el atajo y no la fecha, para que
+  con `persistFiltersInSession()` «Hoy» siga siendo hoy al día siguiente. No hay nada que
+  republicar: es solo PHP.
+
 ## [0.22.4] - 2026-11-23
 
 ### Accesibilidad

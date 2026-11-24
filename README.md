@@ -461,6 +461,37 @@ declarar, y mientras no se declare el aviso al funcionario dice exactamente eso:
 que este sistema no declaró qué deja de hacer y que hay que confirmarlo antes de
 decirle al titular que su tratamiento cesó.
 
+## Filtro de fecha para tablas Filament
+
+`Muni\Ui\Filament\Tablas\FiltroDeFecha` arma un filtro de Filament con los atajos «Todo», «Hoy»,
+«Ayer», «Esta semana», «Este mes» y «Rango» (dos fechas, ambas opcionales). Requiere Filament 5.
+
+```php
+use Muni\Ui\Filament\Tablas\FiltroDeFecha;
+
+public function table(Table $table): Table
+{
+    return $table
+        ->defaultSort('ocurrido_en', 'desc')
+        ->filters([
+            FiltroDeFecha::desdeHoy('ocurrido_en'), // arranca en «Hoy»
+        ])
+        ->persistFiltersInSession();
+}
+```
+
+- `FiltroDeFecha::make($columna = 'created_at', $nombre = null)` arranca en «Todo»;
+  `FiltroDeFecha::desdeHoy(...)` arranca en «Hoy». El filtro se llama `fecha` salvo que se le pase
+  `$nombre` (necesario si una tabla lleva dos).
+- Los límites del día se calculan en la zona de `app.timezone` (`America/Santiago` si no hay
+  ninguna configurada) y la consulta es `>= inicio` y `< fin`, sin `whereDate`, para que use el
+  índice de la columna. La semana parte el lunes.
+- **El valor por defecto solo aplica en la primera visita de la sesión.** Es el comportamiento de
+  Filament: con `persistFiltersInSession()`, en cuanto la sesión tiene el estado del filtro los
+  valores por defecto dejan de usarse. Por eso el filtro guarda el ATAJO («hoy») y no una fecha: el
+  rango se recalcula en cada consulta, y quien dejó la tabla en «Hoy» ve mañana lo de mañana, no lo
+  de ayer. Si el funcionario cambia a «Todo», la tabla sigue en «Todo» hasta que cierre la sesión.
+
 ## Roadmap
 
 - Capa 2: primitivas BlatUI (button/input/dialog…) re-teñidas con estos tokens (requiere Alpine).
